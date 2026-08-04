@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ec5b13",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#221610",
+                    },
+                    fontFamily: {
+                        "display": ["Public Sans", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<title>InternConnect Dashboard</title>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-72 bg-white dark:bg-[#2d1d15] border-r border-slate-200 dark:border-primary/10 flex flex-col transition-all duration-300">
+<div class="p-6 flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white">
+<span class="material-symbols-outlined fill-1">hub</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight text-primary">InternConnect</h1>
+</div>
+<nav class="flex-1 px-4 space-y-1 mt-4">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary text-white shadow-lg shadow-primary/20" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-medium text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-medium text-sm">Saved Internships</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-medium text-sm">Browse Internships</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="font-medium text-sm">How It Works</span>
+</a>
+<div class="pt-4 pb-2 px-4">
+<p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Support &amp; Account</p>
+</div>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-medium text-sm">Help Center</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-600 dark:text-slate-400 hover:bg-primary/10 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-medium text-sm">Profile Settings</span>
+</a>
+</nav>
+<!-- Promo Card in Sidebar -->
+<div class="p-4 mt-auto">
+<div class="rounded-2xl bg-primary/5 dark:bg-primary/10 p-5 border border-primary/20">
+<h3 class="font-bold text-primary mb-2">Find More Opportunities</h3>
+<p class="text-xs text-slate-600 dark:text-slate-400 mb-4">Discover 500+ new summer internships added this week.</p>
+<button class="w-full py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-primary/90 transition-all">
+                        Browse Now
+                    </button>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col overflow-y-auto">
+<!-- Top Header -->
+<header class="h-20 bg-white/80 dark:bg-[#2d1d15]/80 backdrop-blur-md border-b border-slate-200 dark:border-primary/10 flex items-center justify-between px-8 sticky top-0 z-10">
+<div class="relative w-96">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+<input class="w-full bg-slate-100 dark:bg-background-dark/50 border-none rounded-xl py-2 pl-10 pr-4 focus:ring-2 focus:ring-primary/50 text-sm" placeholder="Search internships, companies..." type="text"/>
+</div>
+<div class="flex items-center gap-6">
+<button class="relative p-2 text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full border-2 border-white dark:border-[#2d1d15]"></span>
+</button>
+<div class="h-10 w-px bg-slate-200 dark:bg-primary/10"></div>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="text-sm font-bold">Sarah Jenkins</p>
+<p class="text-xs text-slate-500">Student Applicant</p>
+</div>
+<img alt="Sarah Jenkins" class="w-10 h-10 rounded-full object-cover border-2 border-primary/20" data-alt="Professional portrait of a smiling young woman" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA13l6-Ww9mR5hhaQZVHpWsLlp1YUGGqviMqz3hEXW_avlxXwnB8v_F8WbJTGT6UbrmBQ4-krsXB4sL_5OHBtVrMStIZuh90EfXm0WN8OZuAtIAstc4rfpbNq-K4WAasxIyltloofnvS0mJTNswJQH6kV2uhHeaen58zKPiHWeQqXDG1LM-BS7m0OIqQaCDKXQHYyPA-QqjAPgiIGkUrR0uKfONHOcPdDkXb5o83RPitugi6A_fFhoDHPO1EZtFA4ArTTeqGXs1bLE"/>
+</div>
+</div>
+</header>
+<div class="p-8 max-w-7xl mx-auto w-full">
+<!-- Greeting -->
+<div class="mb-8">
+<h2 class="text-3xl font-black tracking-tight mb-2">Good Morning, Sarah</h2>
+<p class="text-slate-500">Here is what's happening with your internship search today.</p>
+</div>
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+<div class="bg-white dark:bg-[#2d1d15] p-6 rounded-2xl border border-slate-200 dark:border-primary/10 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex items-start justify-between mb-4">
+<div class="p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-xl">
+<span class="material-symbols-outlined">description</span>
+</div>
+<span class="text-xs font-bold text-blue-600 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded-lg">+3 this week</span>
+</div>
+<p class="text-slate-500 text-sm font-medium mb-1">My Application</p>
+<p class="text-2xl font-black">18 <span class="text-base font-normal text-slate-400">submitted</span></p>
+</div>
+<div class="bg-white dark:bg-[#2d1d15] p-6 rounded-2xl border border-slate-200 dark:border-primary/10 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex items-start justify-between mb-4">
+<div class="p-3 bg-green-50 dark:bg-green-900/20 text-green-600 rounded-xl">
+<span class="material-symbols-outlined">check_circle</span>
+</div>
+<span class="text-xs font-bold text-green-600 bg-green-50 dark:bg-green-900/20 px-2 py-1 rounded-lg">Action required</span>
+</div>
+<p class="text-slate-500 text-sm font-medium mb-1">Accepted</p>
+<p class="text-2xl font-black">02 <span class="text-base font-normal text-slate-400">interviews scheduled</span></p>
+</div>
+<div class="bg-white dark:bg-[#2d1d15] p-6 rounded-2xl border border-slate-200 dark:border-primary/10 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex items-start justify-between mb-4">
+<div class="p-3 bg-red-50 dark:bg-red-900/20 text-red-600 rounded-xl">
+<span class="material-symbols-outlined">cancel</span>
+</div>
+</div>
+<p class="text-slate-500 text-sm font-medium mb-1">Rejected</p>
+<p class="text-2xl font-black">01 <span class="text-base font-normal text-slate-400">total refusal</span></p>
+</div>
+</div>
+<!-- Recent Applications Table -->
+<div class="bg-white dark:bg-[#2d1d15] rounded-2xl border border-slate-200 dark:border-primary/10 shadow-sm overflow-hidden">
+<div class="p-6 border-b border-slate-100 dark:border-primary/5 flex items-center justify-between">
+<h3 class="text-lg font-bold">Recent Applications</h3>
+<button class="text-primary text-sm font-bold hover:underline">View All</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-slate-50 dark:bg-background-dark/30 text-slate-500 text-xs uppercase tracking-wider">
+<tr>
+<th class="px-6 py-4 font-semibold">Company</th>
+<th class="px-6 py-4 font-semibold">Role</th>
+<th class="px-6 py-4 font-semibold">Status</th>
+<th class="px-6 py-4 font-semibold">Date Applied</th>
+<th class="px-6 py-4 font-semibold">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-primary/5">
+<tr class="hover:bg-slate-50/50 dark:hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-slate-100 dark:bg-background-dark flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-400 text-sm">business</span>
+</div>
+<span class="font-bold text-sm">TechFlow Inc.</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">UX Design Intern</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">Pending</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">Oct 24, 2023</td>
+<td class="px-6 py-4">
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-slate-100 dark:bg-background-dark flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-400 text-sm">cloud</span>
+</div>
+<span class="font-bold text-sm">Skyline Data</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Product Management</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">Accepted</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">Oct 22, 2023</td>
+<td class="px-6 py-4">
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-slate-100 dark:bg-background-dark flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-400 text-sm">rocket_launch</span>
+</div>
+<span class="font-bold text-sm">Nova Startups</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Frontend Developer</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400">Rejected</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">Oct 15, 2023</td>
+<td class="px-6 py-4">
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50/50 dark:hover:bg-primary/5 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-slate-100 dark:bg-background-dark flex items-center justify-center">
+<span class="material-symbols-outlined text-slate-400 text-sm">palette</span>
+</div>
+<span class="font-bold text-sm">Creative Hub</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">Graphic Intern</td>
+<td class="px-6 py-4">
+<span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">Pending</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">Oct 12, 2023</td>
+<td class="px-6 py-4">
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

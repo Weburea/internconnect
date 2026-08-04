@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>InternConnect Mobile Dashboard</title>
+<!-- Tailwind CSS CDN with plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts for modern typography -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style data-purpose="global-styles">
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #F8FAFC;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #E2E8F0;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body class="text-slate-900">
+<!-- BEGIN: Mobile Navigation Header -->
+<header class="sticky top-0 z-40 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<!-- Hamburger Menu Icon -->
+<button class="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-lg lg:hidden" data-purpose="sidebar-toggle" id="menu-toggle">
+<svg class="h-6 w-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<!-- Logo -->
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+<svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</div>
+<span class="font-bold text-lg tracking-tight text-indigo-900">InternConnect</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="p-2 text-slate-500 hover:text-indigo-600 transition-colors">
+<svg class="h-6 w-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border-2 border-indigo-100">
+<img alt="Sarah Peters" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZvuEm4Q6rw205itrNKFeN-hzo-dNT-o0eDNkeEiSJnVh7z7wr97gEpsZplyeIXGNgEcN_WbcTKGFybrI-YSo8f1wsAONPmZl0olZ-8pOqHLYEGY-qFB1xliIETjoL_Yb-e8r4LtxQHhguBmd-_kW-kB_Pn2bHJSL87337rRzO8XRUJaigKhR6cGTjpInL8OtecKJd6tklmz4PgjOXPjKB1fJUoYLKN1Q4B36xkBLYi0R45HBXn3tHOTbU8kaXv4Ks-5x__HdTb98"/>
+</div>
+</div>
+</header>
+<!-- END: Mobile Navigation Header -->
+<!-- BEGIN: Sidebar Drawer -->
+<aside class="fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0" data-purpose="mobile-drawer" id="sidebar">
+<div class="h-full flex flex-col p-6">
+<div class="flex items-center justify-between mb-8 lg:hidden">
+<span class="font-bold text-indigo-900">Menu</span>
+<button class="p-2 text-slate-400 hover:text-slate-600" id="close-menu">
+<svg class="h-6 w-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+<!-- User Profile Card in Sidebar -->
+<div class="flex flex-col items-center mb-10 pb-10 border-b border-slate-100">
+<div class="relative w-24 h-24 mb-4">
+<img alt="Sarah Peters" class="w-full h-full rounded-full object-cover ring-4 ring-indigo-50 shadow-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhzvwQjGMwwJeZ_6_6Zawcu0wL26-cK1ESm15piXc1gs2Cxf2CHVAvREKTfEi69IA7h4RF8Gwp8YM7wDcIpWZSY__57KpXjKscKCniDLj9VWn9giMMjGWjFfCZ1W-XZ6NoznSLxOZQ7pqrfGnas6tCAhTM2ICH9eFf2yBBnBES0Yghcvfv1T07mgcjGoLKMxo_pXmyitOlBi--AyRD3YRPgjggzZo7IlE9bEdZdIfeqsNNUGhzvFL9hbkKTIXRXmbNjIoVrQwVKqQ"/>
+<button class="absolute bottom-0 right-0 p-1.5 bg-indigo-600 rounded-full text-white shadow-md border-2 border-white">
+<svg class="h-3 w-3" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+</svg>
+</button>
+</div>
+<h3 class="font-bold text-slate-800 text-lg">Sarah Peters</h3>
+<p class="text-sm text-slate-500">Undergraduate Student</p>
+</div>
+<!-- Navigation Links -->
+<nav class="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
+<a class="flex items-center gap-3 px-4 py-3 text-indigo-600 bg-indigo-50 rounded-xl font-semibold transition-all" href="#">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Dashboard
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Saved Internships
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Browse Internships
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          How It Works
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Profile Settings
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Help Center
+        </a>
+</nav>
+<div class="mt-auto">
+<button class="flex items-center gap-3 px-4 py-3 w-full text-rose-500 hover:bg-rose-50 rounded-xl transition-all font-medium">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Logout
+        </button>
+</div>
+</div>
+</aside>
+<!-- Overlay for Mobile Sidebar -->
+<div class="fixed inset-0 bg-slate-900/50 z-40 hidden lg:hidden" id="overlay"></div>
+<!-- END: Sidebar Drawer -->
+<!-- BEGIN: Main Content Area -->
+<main class="flex-1 lg:ml-0 overflow-y-auto px-4 py-6 md:px-8 max-w-7xl mx-auto w-full">
+<!-- Greeting Section -->
+<section class="mb-8" data-purpose="greeting">
+<h1 class="text-3xl font-bold text-slate-900 tracking-tight">Good Morning, Sarah 👋</h1>
+<p class="text-slate-500 mt-1">Check your application status and find new opportunities.</p>
+</section>
+<!-- Statistics Cards Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8" data-purpose="statistics-grid">
+<!-- Card 1: My Application -->
+<div class="bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-3xl p-6 text-white shadow-xl shadow-indigo-100 relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform"></div>
+<div class="flex items-center justify-between mb-4">
+<div class="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
+<svg class="h-6 w-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-3xl font-bold">18</span>
+</div>
+<h3 class="font-bold text-lg">My Application</h3>
+<p class="text-indigo-100 text-sm mt-1">Submitted</p>
+</div>
+<!-- Card 2: Accepted -->
+<div class="bg-gradient-to-br from-violet-600 to-violet-700 rounded-3xl p-6 text-white shadow-xl shadow-violet-100 relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform"></div>
+<div class="flex items-center justify-between mb-4">
+<div class="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
+<svg class="h-6 w-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-3xl font-bold">02</span>
+</div>
+<h3 class="font-bold text-lg">Accepted</h3>
+<p class="text-violet-100 text-sm mt-1">Interviews Scheduled</p>
+</div>
+<!-- Card 3: Rejected -->
+<div class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-3xl p-6 text-white shadow-xl shadow-indigo-100 relative overflow-hidden group">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform"></div>
+<div class="flex items-center justify-between mb-4">
+<div class="p-3 bg-white/20 rounded-2xl backdrop-blur-sm">
+<svg class="h-6 w-6" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-3xl font-bold">01</span>
+</div>
+<h3 class="font-bold text-lg">Rejected</h3>
+<p class="text-indigo-50 text-sm mt-1">Total Refusals</p>
+</div>
+</section>
+<!-- Recent Applications Table/List -->
+<section class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden mb-8" data-purpose="recent-applications">
+<div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+<h2 class="font-bold text-slate-900 text-lg">Recent Applications</h2>
+<a class="text-indigo-600 font-semibold text-sm hover:underline inline-flex items-center gap-1" href="#">
+          View All 
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</a>
+</div>
+<!-- Mobile List View (replacing table for small screens) -->
+<div class="divide-y divide-slate-50">
+<!-- List Item 1 -->
+<div class="p-4 md:p-6 flex items-start gap-4">
+<div class="w-12 h-12 rounded-xl bg-orange-50 flex-shrink-0 flex items-center justify-center text-orange-600 font-bold">TC</div>
+<div class="flex-1">
+<div class="flex items-center justify-between mb-1">
+<h4 class="font-bold text-slate-800">TechCorp Inc.</h4>
+<span class="px-3 py-1 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full uppercase tracking-wider">Pending</span>
+</div>
+<p class="text-sm text-slate-500">Software Engineering Intern</p>
+<p class="text-[11px] text-slate-400 mt-2 font-medium">Applied: Feb 20, 2026</p>
+</div>
+</div>
+<!-- List Item 2 -->
+<div class="p-4 md:p-6 flex items-start gap-4">
+<div class="w-12 h-12 rounded-xl bg-emerald-50 flex-shrink-0 flex items-center justify-center text-emerald-600 font-bold">DH</div>
+<div class="flex-1">
+<div class="flex items-center justify-between mb-1">
+<h4 class="font-bold text-slate-800">DesignHub</h4>
+<span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-bold rounded-full uppercase tracking-wider">Accepted</span>
+</div>
+<p class="text-sm text-slate-500">UX/UI Design Intern</p>
+<p class="text-[11px] text-slate-400 mt-2 font-medium">Applied: Feb 22, 2026</p>
+</div>
+</div>
+<!-- List Item 3 -->
+<div class="p-4 md:p-6 flex items-start gap-4">
+<div class="w-12 h-12 rounded-xl bg-blue-50 flex-shrink-0 flex items-center justify-center text-blue-600 font-bold">DA</div>
+<div class="flex-1">
+<div class="flex items-center justify-between mb-1">
+<h4 class="font-bold text-slate-800">DataWise Analytics</h4>
+<span class="px-3 py-1 bg-amber-100 text-amber-700 text-[10px] font-bold rounded-full uppercase tracking-wider">Pending</span>
+</div>
+<p class="text-sm text-slate-500">Data Science Intern</p>
+<p class="text-[11px] text-slate-400 mt-2 font-medium">Applied: Feb 15, 2026</p>
+</div>
+</div>
+<!-- List Item 4 -->
+<div class="p-4 md:p-6 flex items-start gap-4">
+<div class="w-12 h-12 rounded-xl bg-rose-50 flex-shrink-0 flex items-center justify-center text-rose-600 font-bold">FF</div>
+<div class="flex-1">
+<div class="flex items-center justify-between mb-1">
+<h4 class="font-bold text-slate-800">FinanceFlow</h4>
+<span class="px-3 py-1 bg-rose-100 text-rose-700 text-[10px] font-bold rounded-full uppercase tracking-wider">Rejected</span>
+</div>
+<p class="text-sm text-slate-500">Finance Analyst Intern</p>
+<p class="text-[11px] text-slate-400 mt-2 font-medium">Applied: Jan 12, 2026</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Promotional Section -->
+<section class="relative bg-slate-900 rounded-3xl overflow-hidden p-8" data-purpose="promo-banner">
+<!-- Background pattern/image placeholder -->
+<div class="absolute inset-0 opacity-40 bg-[url('https://placehold.co/800x400')] bg-cover bg-center"></div>
+<div class="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/80 to-transparent"></div>
+<div class="relative z-10 max-w-sm">
+<h2 class="text-2xl md:text-3xl font-bold text-white mb-3">Find More Opportunities</h2>
+<p class="text-slate-300 text-sm mb-6 leading-relaxed">
+          Browse thousands of internship opportunities from top companies worldwide. Tailored just for your skills.
+        </p>
+<button class="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-3 rounded-xl font-bold transition-all shadow-lg shadow-emerald-500/20 active:scale-95">
+          Browse Internships
+        </button>
+</div>
+</section>
+</main>
+<!-- END: Main Content Area -->
+<script data-purpose="mobile-nav-handlers">
+    // Simple script to handle mobile sidebar toggle
+    const menuToggle = document.getElementById('menu-toggle');
+    const closeMenu = document.getElementById('close-menu');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+
+    const toggleSidebar = () => {
+      sidebar.classList.toggle('-translate-x-full');
+      overlay.classList.toggle('hidden');
+      document.body.classList.toggle('overflow-hidden');
+    };
+
+    menuToggle.addEventListener('click', toggleSidebar);
+    closeMenu.addEventListener('click', toggleSidebar);
+    overlay.addEventListener('click', toggleSidebar);
+  </script>
+</body></html>

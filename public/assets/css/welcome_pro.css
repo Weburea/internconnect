@@ -1,0 +1,419 @@
+/* ── Welcome Page Scoped Styles ─────────────────────── */
+.wlc-page {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: #F8F9FA;
+}
+
+/* ── Header / Stepper ───────────────────────────────── */
+.wlc-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 40px;
+    background: #ffffff;
+    border-bottom: 1px solid #E2E8F0;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.wlc-logo img {
+    height: 26px;
+    width: auto;
+    display: block;
+}
+
+.wlc-stepper {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    font-size: 13px;
+    font-weight: 500;
+    color: #9CA3AF;
+}
+
+.wlc-step {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.wlc-step-label {
+    white-space: nowrap;
+}
+
+.wlc-step-divider {
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #E2E8F0 0%, #4F47E6 50%, #E2E8F0 100%);
+    background-size: 200% 100%;
+    animation: waveAnim 1.5s linear infinite;
+    margin: 0 10px;
+    flex-shrink: 0;
+    border-radius: 2px;
+}
+
+@keyframes waveAnim {
+    0% {
+        background-position: 100% 0;
+    }
+
+    100% {
+        background-position: -100% 0;
+    }
+}
+
+.wlc-step.is-done {
+    color: #4F47E6;
+    font-weight: 700;
+    border-bottom: 2px solid #4F47E6;
+    padding-bottom: 2px;
+}
+
+.wlc-step-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #D1D5DB;
+    flex-shrink: 0;
+}
+
+.wlc-step.is-done .wlc-step-dot {
+    background: #4F47E6;
+}
+
+.wlc-auth-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.wlc-btn-link {
+    font-size: 14px;
+    font-weight: 500;
+    color: #464555;
+    text-decoration: none;
+    transition: color .15s;
+}
+
+.wlc-btn-link:hover {
+    color: #191C1D;
+}
+
+.wlc-btn-signup {
+    background: #4F47E6;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 9px 22px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background .15s, box-shadow .15s;
+    white-space: nowrap;
+}
+
+.wlc-btn-signup:hover {
+    background: #4338CA;
+    box-shadow: 0 4px 14px rgba(79, 71, 230, .25);
+}
+
+/* ── Main Content ───────────────────────────────────── */
+.wlc-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 32px;
+}
+
+.wlc-grid {
+    width: 100%;
+    max-width: 1140px;
+    display: grid;
+    grid-template-columns: 460px 1fr;
+    align-items: center;
+    gap: 80px;
+}
+
+/* ── Image Card ─────────────────────────────────────── */
+.wlc-card {
+    position: relative;
+    width: 100%;
+    height: 560px;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 24px 56px rgba(0, 0, 0, .18);
+    flex-shrink: 0;
+}
+
+.wlc-card img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+}
+
+.wlc-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top,
+            rgba(12, 10, 36, .90) 0%,
+            rgba(12, 10, 36, .35) 55%,
+            rgba(12, 10, 36, .04) 100%);
+}
+
+.wlc-card-quote {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 30px 32px;
+    z-index: 2;
+}
+
+.wlc-card-quote h3 {
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 30px;
+    color: #fff;
+    letter-spacing: -0.2px;
+}
+
+.wlc-card-bar {
+    margin-top: 14px;
+    width: 36px;
+    height: 3px;
+    background: #4F47E6;
+    border-radius: 99px;
+}
+
+/* ── Right Content ──────────────────────────────────── */
+.wlc-right {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Checkmark badge */
+.wlc-badge {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: #4F47E6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 36px;
+    flex-shrink: 0;
+    animation: badgeRipple 2s infinite ease-in-out;
+}
+
+@keyframes badgeRipple {
+    0% {
+        box-shadow: 0 0 0 0 rgba(238, 242, 255, 1);
+    }
+    50% {
+        box-shadow: 0 0 0 16px rgba(238, 242, 255, 0.5);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(238, 242, 255, 0);
+    }
+}
+
+.wlc-badge svg {
+    width: 26px;
+    height: 26px;
+    color: #fff;
+}
+
+.wlc-badge svg path {
+    stroke-dasharray: 30;
+    stroke-dashoffset: 30;
+    animation: checkDraw 2.5s infinite ease-in-out;
+}
+
+@keyframes checkDraw {
+    0% {
+        stroke-dashoffset: 30;
+        opacity: 0;
+    }
+    20% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+    }
+    80% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+    }
+    100% {
+        stroke-dashoffset: -30;
+        opacity: 0;
+    }
+}
+
+/* Heading */
+.wlc-h1 {
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 56px;
+    letter-spacing: -1.2px;
+    color: #191C1D;
+    margin-bottom: 16px;
+}
+
+.wlc-h1 span {
+    color: #4F47E6;
+}
+
+/* Subtitle */
+.wlc-sub {
+    font-size: 16px;
+    line-height: 26px;
+    color: #464555;
+    max-width: 400px;
+    margin-bottom: 36px;
+}
+
+/* Buttons */
+.wlc-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.wlc-btn-dash {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #4F47E6;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 14px 28px;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: background .15s, box-shadow .15s, transform .1s;
+    white-space: nowrap;
+}
+
+.wlc-btn-dash:hover {
+    background: #4338CA;
+    box-shadow: 0 6px 20px rgba(79, 71, 230, .3);
+    transform: translateY(-1px);
+}
+
+.wlc-btn-dash svg {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+    transition: transform .2s;
+}
+
+.wlc-btn-dash:hover svg {
+    transform: translateX(3px);
+}
+
+.wlc-btn-track {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    color: #191C1D;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 14px 28px;
+    border-radius: 10px;
+    border: 1.5px solid #E2E8F0;
+    text-decoration: none;
+    transition: border-color .15s, box-shadow .15s, transform .1s;
+    white-space: nowrap;
+}
+
+.wlc-btn-track:hover {
+    border-color: #A5B4FC;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .07);
+    transform: translateY(-1px);
+}
+
+.wlc-btn-track svg {
+    width: 17px;
+    height: 17px;
+    color: #4F47E6;
+    flex-shrink: 0;
+}
+
+/* ── Footer ─────────────────────────────────────────── */
+.wlc-footer {
+    padding: 18px 40px;
+    background: #fff;
+    border-top: 1px solid #E2E8F0;
+    font-size: 13px;
+    color: #9CA3AF;
+    flex-shrink: 0;
+}
+
+/* ── Responsive ─────────────────────────────────────── */
+@media (max-width: 860px) {
+    .wlc-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        max-width: 480px;
+    }
+
+    .wlc-card {
+        height: 300px;
+    }
+
+    .wlc-h1 {
+        font-size: 38px;
+        line-height: 46px;
+    }
+}
+
+@media (max-width: 600px) {
+    .wlc-header {
+        padding: 14px 20px;
+    }
+
+    .wlc-stepper {
+        display: none;
+    }
+
+    .wlc-main {
+        padding: 28px 20px;
+    }
+
+    .wlc-h1 {
+        font-size: 30px;
+        line-height: 38px;
+    }
+
+    .wlc-card {
+        height: 240px;
+    }
+
+    .wlc-card-quote h3 {
+        font-size: 17px;
+    }
+
+    .wlc-actions {
+        flex-direction: column;
+    }
+
+    .wlc-btn-dash,
+    .wlc-btn-track {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .wlc-footer {
+        padding: 14px 20px;
+    }
+}

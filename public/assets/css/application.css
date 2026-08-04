@@ -1,0 +1,61 @@
+@keyframes riverFlow {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+.river-flow-bg {
+    background: linear-gradient(270deg, #4F47E6, #6366F1, #8F83FF, #4F47E6);
+    background-size: 400% 400%;
+    animation: riverFlow 3s ease infinite;
+}
+/* Purple scrollbar for preview modal */
+.modal-scroll::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+.modal-scroll::-webkit-scrollbar-track {
+    background: #f1f0fe;
+    border-radius: 99px;
+}
+.modal-scroll::-webkit-scrollbar-thumb {
+    background: #6366f1;
+    border-radius: 99px;
+}
+.modal-scroll::-webkit-scrollbar-thumb:hover {
+    background: #4f46e5;
+}
+/* Firefox */
+.modal-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: #6366f1 #f1f0fe;
+}
+/* Clip PDF iframe native scrollbar off-screen — only wrapper shows */
+.pdf-clip {
+    overflow: hidden;
+    position: relative;
+    border-right: 3px solid #6366f1;
+}
+.pdf-clip iframe {
+    display: block;
+    width: calc(100% + 20px);
+    margin-right: -20px;
+    border: none;
+}
+
+/* Stepper vertical discrete line connectors */
+.stepper-connector {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 40px;
+    width: 3px;
+    height: 48px;
+    border-radius: 99px;
+    transition: background-color 0.3s ease;
+}

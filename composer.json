@@ -1,0 +1,14 @@
+{
+    "name": "weburea/internconnect",
+    "description": "InternConnect: AI-powered internship platform (Pure PHP Version)",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": "^8.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "backend/"
+        }
+    }
+}

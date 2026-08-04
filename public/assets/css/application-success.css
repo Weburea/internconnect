@@ -1,0 +1,223 @@
+/* ── Application Success Scoped Styles ── */
+.app-succ-page {
+    width: 100%;
+    min-height: calc(100vh - 80px); /* minus approx navbar height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 32px;
+    background: #F8F9FA;
+}
+
+.app-succ-grid {
+    width: 100%;
+    max-width: 1140px;
+    display: grid;
+    grid-template-columns: 460px 1fr;
+    align-items: center;
+    gap: 80px;
+}
+
+/* ── Image Card ── */
+.app-succ-card {
+    position: relative;
+    width: 100%;
+    height: 560px;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 24px 56px rgba(0,0,0,.18);
+    flex-shrink: 0;
+}
+.app-succ-card img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+}
+.app-succ-card-overlay {
+    display: none;
+}
+.app-succ-card-overlay-2 {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0) 100%);
+}
+.app-succ-card-quote {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 30px 32px;
+    z-index: 2;
+}
+.app-succ-card-quote h3 {
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 32px;
+    color: #fff;
+    letter-spacing: -0.2px;
+}
+.app-succ-card-bar {
+    margin-top: 16px;
+    width: 48px;
+    height: 4px;
+    background: #4F47E6;
+    border-radius: 99px;
+}
+
+/* ── Right Content ── */
+.app-succ-right { display: flex; flex-direction: column; }
+
+.app-succ-badge {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #4F47E6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 32px;
+    flex-shrink: 0;
+    animation: succBadgeRipple 2.5s infinite ease-in-out;
+}
+@keyframes succBadgeRipple {
+    0% { box-shadow: 0 0 0 0 rgba(238, 242, 255, 1); }
+    50% { box-shadow: 0 0 0 16px rgba(238, 242, 255, 0.6); }
+    100% { box-shadow: 0 0 0 0 rgba(238, 242, 255, 0); }
+}
+.app-succ-badge svg { width: 30px; height: 30px; color: #fff; }
+.app-succ-badge svg path {
+    stroke-dasharray: 40;
+    stroke-dashoffset: 40;
+    animation: succCheckDraw 2.5s infinite ease-in-out;
+}
+@keyframes succCheckDraw {
+    0% { stroke-dashoffset: 40; opacity: 0; }
+    20% { stroke-dashoffset: 0; opacity: 1; }
+    80% { stroke-dashoffset: 0; opacity: 1; }
+    100% { stroke-dashoffset: -40; opacity: 0; }
+}
+
+.app-succ-h1 {
+    font-size: 44px;
+    font-weight: 800;
+    line-height: 52px;
+    letter-spacing: -1.2px;
+    color: #191C1D;
+    margin-bottom: 16px;
+}
+
+.app-succ-sub {
+    font-size: 16px;
+    line-height: 26px;
+    color: #464555;
+    max-width: 480px;
+    margin-bottom: 36px;
+}
+
+/* Buttons */
+.app-succ-actions { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 40px; }
+
+.app-succ-btn-dash {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #4F47E6;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 14px 28px;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: background .15s, box-shadow .15s, transform .1s;
+    white-space: nowrap;
+}
+.app-succ-btn-dash:hover { background: #4338CA; box-shadow: 0 6px 20px rgba(79,71,230,.3); transform: translateY(-1px); }
+.app-succ-btn-dash svg { width: 17px; height: 17px; flex-shrink: 0; transition: transform .2s; }
+.app-succ-btn-dash:hover svg { transform: translateX(3px); }
+
+.app-succ-btn-track {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    color: #191C1D;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 14px 28px;
+    border-radius: 10px;
+    border: 1.5px solid #E2E8F0;
+    text-decoration: none;
+    transition: border-color .15s, box-shadow .15s, transform .1s;
+    white-space: nowrap;
+}
+.app-succ-btn-track:hover { border-color: #A5B4FC; box-shadow: 0 4px 12px rgba(0,0,0,.07); transform: translateY(-1px); }
+.app-succ-btn-track svg { width: 17px; height: 17px; color: #191C1D; flex-shrink: 0; }
+
+/* Status Box */
+.app-succ-divider {
+    height: 1px;
+    width: 100%;
+    background: #E2E8F0;
+    margin-bottom: 32px;
+}
+.app-succ-status {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+.app-succ-icons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.app-succ-icon-circle {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #E2E8F0;
+    background: #F1F5F9;
+    color: #64748B;
+}
+.app-succ-icon-circle.is-active { background: #4F47E6; color: #fff; z-index: 2; border-color: #4F47E6; box-shadow: 0 0 0 4px #EEF2FF; }
+.app-succ-icon-circle svg { width: 14px; height: 14px; }
+
+.app-succ-status-text {
+    display: flex;
+    flex-direction: column;
+}
+.app-succ-status-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #9CA3AF;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+}
+.app-succ-status-val {
+    font-size: 14px;
+    font-weight: 600;
+    color: #191C1D;
+}
+
+/* ── Responsive ── */
+@media (max-width: 860px) {
+    .app-succ-grid { grid-template-columns: 1fr; gap: 40px; max-width: 480px; }
+    .app-succ-card { height: 300px; }
+    .app-succ-h1 { font-size: 36px; line-height: 44px; }
+}
+@media (max-width: 600px) {
+    .app-succ-page { padding: 28px 20px; }
+    .app-succ-h1 { font-size: 30px; line-height: 38px; }
+    .app-succ-card { height: 240px; }
+    .app-succ-card-quote h3 { font-size: 18px; line-height: 26px; }
+    .app-succ-actions { flex-direction: column; gap: 12px; }
+    .app-succ-btn-dash, .app-succ-btn-track { justify-content: center; width: 100%; }
+}

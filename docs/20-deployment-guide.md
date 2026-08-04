@@ -1,0 +1,30 @@
+# Deployment
+
+Server
+
+Ubuntu 24.04
+
+Stack
+
+PHP-FPM
+MySQL
+
+Requirements
+
+PHP 8.3+
+MySQL 8+
+Composer
+SSL Certificate
+
+Environment Variables
+
+APP_ENV
+APP_KEY
+DB_HOST
+DB_NAME
+DB_USER
+DB_PASSWORD
+PAYSTACK_SECRET
+DEEPSEEK_API_KEY
+GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET
