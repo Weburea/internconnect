@@ -19,7 +19,7 @@ $isError = ($_GET['error'] ?? '') === 'invalid';
 
         <!-- Logo -->
         <a href="<?= url('/') ?>" class="flex-shrink-0 flex items-center mb-6">
-            <img src="<?= asset('assets/images/logos/Logo_dark_dx00tg.svg') ?>" alt="InternConnect" class="h-6 w-auto">
+            <img src="<?= asset('assets/images/logos/Logo_dark_dx00tg.svg') ?>" alt="InternConnect" class="h-[18px] md:h-[22px] w-auto">
         </a>
 
         <!-- Card -->
@@ -244,8 +244,8 @@ $isError = ($_GET['error'] ?? '') === 'invalid';
         <!-- Background gradient -->
         <div class="absolute inset-0 bg-gradient-to-br from-[#1E234B] to-[#12142B] z-0"></div>
 
-        <!-- Plant image backdrop blended -->
-        <div class="absolute inset-0 bg-cover bg-bottom mix-blend-overlay z-0" style="opacity: 0.35; background-image: url('<?= asset('assets/images/plant.png') ?>');"></div>
+        <!-- Visual Identity backdrop blended -->
+        <div class="absolute inset-0 bg-cover bg-left mix-blend-overlay z-0" style="opacity: 0.95; background-image: url('<?= asset('assets/images/Visual_Identity_7_ptgohs.png') ?>'); transform: scale(1.2); transform-origin: left 80px;"></div>
 
         <!-- Subtle pattern overlay -->
         <div class="absolute inset-0 mix-blend-overlay z-0" style="opacity: 0.05; background-image: url('https://www.transparenttextures.com/patterns/cubes.png');"></div>

@@ -3,8 +3,8 @@
  * Component: Global Page Loader
  *
  * Displays a premium animated loading screen.
- * Animation: InternConnect logo mark — top dot bounces on the fork crossbar,
- * fork body sways on impact, colors cycle purple → charcoal → purple.
+ * Redesigned to maintain absolute aspect ratio integrity, eliminating stretching.
+ * Features a clean breathing logo mark surrounded by a sleek revolving spinner ring.
  *
  * Included via:
  *   - frontend/shared/layouts/app.php
@@ -26,40 +26,19 @@
         transition: opacity 0.6s ease-out;
      ">
 
-    <!-- Animated Logo Mark -->
-    <div class="loader-logo-wrap">
+    <!-- Premium Loader Ring and Centered Logo -->
+    <div class="premium-loader-container">
+        
+        <!-- Rotating Spinner Ring -->
+        <div class="loader-spinner-ring"></div>
 
-        <!-- The bouncing ball (top dot of the logo) -->
-        <div class="loader-ball-wrap">
-            <svg class="loader-ball" viewBox="0 0 28 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path class="loader-color-shape"
-                      d="M13.9334 0.001C15.2436 0.014 16.5208 0.414 17.6039 1.152
-                         C18.687 1.889 19.5275 2.931 20.0195 4.145
-                         C20.5115 5.359 20.633 6.692 20.3685 7.976
-                         C20.1041 9.259 19.4656 10.435 18.5336 11.356
-                         C17.6016 12.277 16.4178 12.902 15.1314 13.151
-                         C13.845 13.4 12.5136 13.263 11.3051 12.757
-                         C10.0966 12.25 9.065 11.397 8.341 10.306
-                         C7.616 9.214 7.231 7.932 7.234 6.622
-                         C7.228 5.744 7.397 4.874 7.733 4.063
-                         C8.068 3.251 8.563 2.515 9.187 1.898
-                         C9.812 1.281 10.553 0.796 11.368 0.470
-                         C12.184 0.144 13.056 -0.015 13.9334 0.001Z"/>
-            </svg>
-        </div>
-
-        <!-- The fork body (the T/fork mark) -->
-        <div class="loader-fork-wrap">
-            <svg class="loader-fork" viewBox="0 0 28 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path class="loader-color-shape"
-                      d="M27.7388 0.001V10.338
-                         C25.5532 10.272 23.4266 11.053 21.8027 12.517
-                         C20.1787 13.981 19.1829 16.016 19.0229 18.196
-                         C19.004 18.373 18.989 18.572 18.9815 18.742H8.86632
-                         C8.86632 18.644 8.83247 18.546 8.81366 18.452
-                         C7.798 13.047 6.17295 11.579 0 10.229V0.072
-                         C5.01811 -0.334 10.2017 1.953 13.8882 5.820
-                         C17.3038 2.217 22.1903 -0.213 27.7388 0.001Z"/>
+        <!-- Bounded Logo Mark (Aspect Ratio Locked) -->
+        <div class="loader-logo-mark-wrap">
+            <svg class="loader-logo-mark" viewBox="0 0 28 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Dot (Path 1) -->
+                <path class="loader-path-color" d="M13.9334 0.00117504C15.2436 0.013806 16.5208 0.414069 17.6039 1.1515C18.687 1.88893 19.5275 2.93052 20.0195 4.14496C20.5115 5.35939 20.633 6.69231 20.3685 7.97565C20.1041 9.259 19.4656 10.4353 18.5336 11.3564C17.6016 12.2774 16.4178 12.9018 15.1314 13.151C13.845 13.4002 12.5136 13.263 11.3051 12.7566C10.0966 12.2503 9.06505 11.3974 8.34052 10.3057C7.61598 9.21391 7.2309 7.93207 7.23381 6.62177C7.22762 5.74393 7.39728 4.87374 7.73277 4.06252C8.06826 3.25129 8.56279 2.51546 9.1872 1.89841C9.81161 1.28136 10.5533 0.795594 11.3684 0.469749C12.1835 0.143903 13.0557 -0.0154196 13.9334 0.00117504Z" fill="#4F48E6"/>
+                <!-- Fork Body (Path 2) -->
+                <path class="loader-path-color" d="M27.7388 13.2846V23.6218C25.5532 23.5558 23.4266 24.3363 21.8027 25.8005C20.1787 27.2646 19.1829 29.2993 19.0229 31.48C19.0041 31.6568 18.9891 31.8561 18.9815 32.0254H8.86632C8.86632 31.9276 8.83247 31.8298 8.81366 31.7358C7.798 26.3302 6.17295 24.8631 0 23.5127V13.3561C5.01811 12.9498 10.2017 15.2369 13.8882 19.104C17.3038 15.5003 22.1903 13.0702 27.7388 13.2846Z" fill="#4F48E6"/>
             </svg>
         </div>
 
@@ -72,56 +51,49 @@
 
 <style>
 /* ================================================================
-   GLOBAL PAGE LOADER  —  Enlarged + Ultra-Smooth Physics
+   GLOBAL PAGE LOADER  —  Modern Shimmer & Revolving Spinner
    ================================================================ */
 
-.loader-logo-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+.premium-loader-container {
     position: relative;
-    gap: 0;
-}
-
-/* ── Ball container ─────────────────────────────────────────── */
-.loader-ball-wrap {
-    width: 130px;
+    width: 120px;
     height: 120px;
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: center;
-    animation: ballBounce 1.8s infinite;
-    transform-origin: center bottom;
+}
+
+/* ── Rotating Outer Ring ─────────────────────────────────────── */
+.loader-spinner-ring {
+    position: absolute;
+    inset: 0;
+    border: 3px solid #EEF2FF;
+    border-top-color: #4F48E6;
+    border-radius: 50%;
+    animation: spin 1.2s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite;
     will-change: transform;
 }
 
-.loader-ball {
-    width: 84px;
-    height: 84px;
-    display: block;
-}
-
-/* ── Fork container ─────────────────────────────────────────── */
-.loader-fork-wrap {
-    width: 130px;
-    height: 96px;
+/* ── Bounded Logo Wrapper ────────────────────────────────────── */
+.loader-logo-mark-wrap {
+    width: 44px;
+    height: 52px;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: center;
-    animation: forkSway 3.6s ease-in-out infinite;
-    transform-origin: center 6px;
+    animation: breathe 2.4s ease-in-out infinite;
     will-change: transform;
 }
 
-.loader-fork {
-    width: 92px;
-    height: 72px;
+.loader-logo-mark {
+    width: 100%;
+    height: 100%;
     display: block;
 }
 
-/* ── Color cycle on both paths ──────────────────────────────── */
-.loader-color-shape {
-    animation: colorCycle 3.6s ease-in-out infinite;
+/* ── Subtle color shift on SVG paths ────────────────────────── */
+.loader-path-color {
+    animation: subtleColorShift 4.8s ease-in-out infinite;
     will-change: fill;
 }
 
@@ -129,66 +101,33 @@
    KEYFRAMES
    ================================================================ */
 
-/*
- * ballBounce  — realistic gravity fall + spring rebound
- *
- *   0%   ball at peak height (−80px above fork)
- *  68%   ball lands: squash flat  scaleY(0.76) scaleX(1.28)
- *  80%   first rebound: stretch tall
- *  90%   small secondary squash
- * 100%   back at peak — seamless loop
- */
-@keyframes ballBounce {
+@keyframes spin {
     0% {
-        transform: translateY(-80px) scaleY(1) scaleX(1);
-        animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
-    }
-    68% {
-        transform: translateY(5px) scaleY(0.74) scaleX(1.30);
-        animation-timing-function: cubic-bezier(0, 0.6, 0.4, 1);
-    }
-    80% {
-        transform: translateY(-22px) scaleY(1.10) scaleX(0.92);
-        animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
-    }
-    91% {
-        transform: translateY(-6px) scaleY(0.96) scaleX(1.04);
-        animation-timing-function: cubic-bezier(0, 0.6, 0.4, 1);
+        transform: rotate(0deg);
     }
     100% {
-        transform: translateY(-80px) scaleY(1) scaleX(1);
+        transform: rotate(360deg);
     }
 }
 
-/*
- * forkSway  — pendulum absorption (3.6s = 2x bounce)
- *  Peaks timed so fork tilts just as ball strikes (68% of 1.8s = 1.224s ≈ 34%)
- */
-@keyframes forkSway {
-    0%   { transform: rotate(0deg);     }
-    18%  { transform: rotate(-2.2deg);  }
-    34%  { transform: rotate(1.8deg);   }
-    50%  { transform: rotate(-1.1deg);  }
-    66%  { transform: rotate(0.7deg);   }
-    82%  { transform: rotate(-0.3deg);  }
-    100% { transform: rotate(0deg);     }
+/* Breathe animation scales the logo uniformly, avoiding stretching */
+@keyframes breathe {
+    0%, 100% {
+        transform: scale(0.93);
+    }
+    50% {
+        transform: scale(1.07);
+    }
 }
 
-/*
- * colorCycle  — silky purple → charcoal → purple
- *  Long hold periods make each state feel deliberate
- */
-@keyframes colorCycle {
-    0%   { fill: #4F48E6; }
-    38%  { fill: #4F48E6; }
-    52%  { fill: #1C1C1E; }
-    88%  { fill: #1C1C1E; }
-    100% { fill: #4F48E6; }
+@keyframes subtleColorShift {
+    0%, 100% { fill: #4F48E6; }
+    50%       { fill: #4338CA; }
 }
 
 /* ── Loading label ──────────────────────────────────────────── */
 .loader-label {
-    margin-top: 40px;
+    margin-top: 36px;
     font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
     font-size: 11px;
     font-weight: 700;
@@ -200,7 +139,7 @@
 }
 
 @keyframes labelPulse {
-    0%, 100% { opacity: 0.3; }
+    0%, 100% { opacity: 0.4; }
     50%       { opacity: 0.9; }
 }
 </style>
@@ -213,8 +152,8 @@
     /* Prevent scroll while loading */
     document.body.style.overflow = 'hidden';
 
-    /* Minimum brand display: 2.4s — long enough to see 1+ full animation cycles */
-    const MIN_MS = 2400;
+    /* Minimum brand display: 1.5s — short, clean load */
+    const MIN_MS = 1500;
     const start  = Date.now();
 
     function dismiss() {
@@ -238,8 +177,8 @@
         tryDismiss();
     } else {
         window.addEventListener('load', tryDismiss, { once: true });
-        /* Safety hard cap — never hold longer than 5s */
-        setTimeout(dismiss, 5000);
+        /* Safety hard cap — never hold longer than 4s */
+        setTimeout(dismiss, 4000);
     }
 })();
 </script>

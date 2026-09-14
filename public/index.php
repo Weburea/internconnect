@@ -6,6 +6,10 @@ if (function_exists('opcache_reset')) {
     @opcache_reset();
 }
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 require_once dirname(__DIR__) . '/backend/Core/helpers.php';
 

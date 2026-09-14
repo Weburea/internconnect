@@ -23,11 +23,33 @@ document.addEventListener('alpine:init', () => {
         salary: <?= json_encode($oldInput['salary_expectation'] ?? '') ?>,
         coverLetterFile: false,
         coverLetterFileName: '',
+        clMode: 'type',
+        showUploadSwitchAlert: false,
+        showTypeSwitchAlert: false,
         alertOpen: false,
         alertTitle: '',
         alertMessage: '',
         resumeError: '',
         coverLetterError: '',
+        portfolioError: '',
+        
+        interestReason: <?= json_encode($oldInput['interest_reason'] ?? '') ?>,
+        designProcess: <?= json_encode($oldInput['design_process'] ?? '') ?>,
+        learningGoals: <?= json_encode($oldInput['learning_goals'] ?? '') ?>,
+        
+        portfolioUploaded: false,
+        portfolioFileName: '',
+        portfolioFileSize: '',
+        portfolioFileUrl: '',
+        portfolioFileExt: '',
+        portfolioLink: <?= json_encode($oldInput['portfolio_link'] ?? '') ?>,
+        figmaLink: <?= json_encode($oldInput['figma_link'] ?? '') ?>,
+        portfolioDragOver: false,
+        
+        wordCount(text) {
+            if (!text) return 0;
+            return text.trim().split(/\s+/).filter(Boolean).length;
+        },
         
         showAlert(title, message) {
             this.$dispatch('toast', { message: message, type: 'warning' });
@@ -123,6 +145,138 @@ document.addEventListener('alpine:init', () => {
             this.coverLetterFileName = '';
             this.coverLetterError = '';
             if (this.$refs.clFileInput) this.$refs.clFileInput.value = '';
+        },
+        switchMode(mode) {
+            if (mode === 'upload') {
+                if (this.coverLetter && this.coverLetter.trim().length > 0) {
+                    this.showUploadSwitchAlert = true;
+                    this.showTypeSwitchAlert = false;
+                } else {
+                    this.clMode = 'upload';
+                    this.showUploadSwitchAlert = false;
+                    this.showTypeSwitchAlert = false;
+                }
+            } else if (mode === 'type') {
+                if (this.coverLetterFile) {
+                    this.showTypeSwitchAlert = true;
+                    this.showUploadSwitchAlert = false;
+                } else {
+                    this.clMode = 'type';
+                    this.showTypeSwitchAlert = false;
+                    this.showUploadSwitchAlert = false;
+                }
+            }
+        },
+        confirmSwitchToUpload() {
+            this.coverLetter = '';
+            this.clMode = 'upload';
+            this.showUploadSwitchAlert = false;
+        },
+        confirmSwitchToType() {
+            this.removeCoverLetterFile();
+            this.clMode = 'type';
+            this.showTypeSwitchAlert = false;
+        },
+        isCoverLetterValid() {
+            if (this.clMode === 'type') {
+                return this.coverLetter.length >= 100 && this.coverLetter.length <= 2000;
+            } else {
+                return this.coverLetterFile === true;
+            }
+        },
+        handlePortfolioFile(event) {
+            const file = event.target.files[0];
+            if (file) {
+                this.processPortfolioFile(file);
+            }
+        },
+        handlePortfolioDrop(event) {
+            this.portfolioDragOver = false;
+            const file = event.dataTransfer.files[0];
+            if (file) {
+                this.processPortfolioFile(file);
+                if (this.$refs.portfolioFileInput) {
+                    this.$refs.portfolioFileInput.files = event.dataTransfer.files;
+                }
+            }
+        },
+        processPortfolioFile(file) {
+            if (file.size > 10 * 1024 * 1024) {
+                this.portfolioError = 'File size exceeds the 10MB limit.';
+                this.showAlert('File Size Limit Exceeded', 'The selected file exceeds the 10MB limit. Please upload a smaller file.');
+                return;
+            }
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (!['pdf', 'png', 'jpg', 'jpeg'].includes(ext)) {
+                this.portfolioError = 'Unsupported file type. Please upload a PDF, PNG, or JPG.';
+                this.showAlert('Invalid File Format', 'Unsupported file type. Please upload a PDF, PNG, or JPG document.');
+                return;
+            }
+            this.portfolioError = '';
+            if (this.portfolioFileUrl) {
+                URL.revokeObjectURL(this.portfolioFileUrl);
+            }
+            this.portfolioFileName = file.name;
+            this.portfolioFileSize = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+            this.portfolioFileExt = ext;
+            this.portfolioFileUrl = URL.createObjectURL(file);
+            this.portfolioUploaded = true;
+        },
+        removePortfolio() {
+            if (this.portfolioFileUrl) {
+                URL.revokeObjectURL(this.portfolioFileUrl);
+            }
+            this.portfolioUploaded = false;
+            this.portfolioFileName = '';
+            this.portfolioFileSize = '';
+            this.portfolioFileUrl = '';
+            this.portfolioFileExt = '';
+            this.portfolioError = '';
+            if (this.$refs.portfolioFileInput) {
+                this.$refs.portfolioFileInput.value = '';
+            }
+        },
+        init() {
+            this.$watch('salary', (value) => {
+                if (!value) return;
+                let clean = value.replace(/[^\d]/g, '');
+                if (clean) {
+                    let formatted = Number(clean).toLocaleString('en-US');
+                    if (value !== formatted) {
+                        this.salary = formatted;
+                    }
+                } else {
+                    this.salary = '';
+                }
+            });
+        },
+        canAccessStep(targetStep) {
+            if (targetStep === 1) return true;
+            
+            const isStep1Valid = this.phone && this.phone.trim() !== '' &&
+                                 this.jobTitle && this.jobTitle.trim() !== '' &&
+                                 this.company && this.company.trim() !== '' &&
+                                 this.salary && this.salary.trim() !== '';
+                                 
+            if (targetStep === 2) return isStep1Valid;
+            
+            const isStep2Valid = isStep1Valid && this.fileUploaded && this.isCoverLetterValid();
+            if (targetStep === 3) return isStep2Valid;
+            
+            const isStep3Valid = isStep2Valid && 
+                                 this.interestReason && this.interestReason.trim() !== '' &&
+                                 this.designProcess && this.designProcess.trim() !== '' &&
+                                 this.learningGoals && this.learningGoals.trim() !== '';
+            if (targetStep === 4) return isStep3Valid;
+            
+            return false;
+        },
+        goToStep(targetStep) {
+            if (this.canAccessStep(targetStep)) {
+                this.step = targetStep;
+            } else {
+                this.showAlert('Step Incomplete', 'You need to complete the step-by-step process sequentially.');
+            }
         }
     }));
 });
@@ -160,18 +314,16 @@ document.addEventListener('alpine:init', () => {
                             </div>
                         </div>
                     </div>
-
                     <!-- ── Progress Card ── -->
                     <div class="bg-[#F4F7FB] rounded-2xl p-8 border border-gray-100 shadow-sm">
                         <p class="text-primary font-bold text-lg mb-1">Application Progress</p>
-                        <p class="text-gray-500 text-sm mb-10" x-text="'Step ' + step + ' of 3'"></p>
+                        <p class="text-gray-500 text-sm mb-10" x-text="'Step ' + step + ' of 4'"></p>
 
                         <!-- Stepper Container -->
                         <div class="flex flex-col relative space-y-8 mb-12">
-
                             <!-- Step 1 -->
                             <div class="flex items-center gap-5 relative z-10 p-2 rounded-2xl transition-all duration-300 cursor-pointer" 
-                                 @click="step = 1"
+                                 @click="goToStep(1)"
                                  :class="{ 'bg-white shadow-sm border border-gray-100': step === 1, 'opacity-70 hover:opacity-100': step !== 1 }">
                                 <div class="relative flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300"
                                      :class="step > 1 ? 'river-flow-bg text-white shadow-md' : (step === 1 ? 'river-flow-bg text-white shadow-lg ring-4 ring-[#EEF2FF]' : 'bg-white border border-gray-200 text-gray-400')">
@@ -196,7 +348,7 @@ document.addEventListener('alpine:init', () => {
                             
                             <!-- Step 2 -->
                             <div class="flex items-center gap-5 relative z-10 p-2 rounded-2xl transition-all duration-300 cursor-pointer" 
-                                 @click="step = 2"
+                                 @click="goToStep(2)"
                                  :class="{ 'bg-white shadow-sm border border-gray-100': step === 2, 'opacity-70 hover:opacity-100': step !== 2 }">
                                 <div class="relative flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300"
                                      :class="step > 2 ? 'river-flow-bg text-white shadow-md' : (step === 2 ? 'river-flow-bg text-white shadow-lg ring-4 ring-[#EEF2FF]' : 'bg-white border border-gray-200 text-gray-400')">
@@ -224,16 +376,41 @@ document.addEventListener('alpine:init', () => {
 
                             <!-- Step 3 -->
                             <div class="flex items-center gap-5 relative z-10 p-2 rounded-2xl transition-all duration-300 cursor-pointer" 
-                                 @click="step = 3"
+                                 @click="goToStep(3)"
                                  :class="{ 'bg-white shadow-sm border border-gray-100': step === 3, 'opacity-70 hover:opacity-100': step !== 3 }">
-                                <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300"
-                                     :class="step === 3 ? 'river-flow-bg text-white shadow-lg ring-4 ring-[#EEF2FF]' : 'bg-white border border-gray-200 text-gray-400'">
-                                    <span>3</span>
+                                <div class="relative flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300"
+                                     :class="step > 3 ? 'river-flow-bg text-white shadow-md' : (step === 3 ? 'river-flow-bg text-white shadow-lg ring-4 ring-[#EEF2FF]' : 'bg-white border border-gray-200 text-gray-400')">
+                                    <template x-if="step > 3">
+                                        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </template>
+                                    <template x-if="step <= 3">
+                                        <span>3</span>
+                                    </template>
+                                    <!-- Segment connector to next step -->
+                                    <div class="stepper-connector"
+                                         :class="step > 3 ? 'river-flow-bg' : 'bg-gray-200'"></div>
                                 </div>
                                 <div>
                                     <p class="text-[10px] font-bold uppercase tracking-wider mb-0.5"
-                                       :class="step === 3 ? 'text-primary' : 'text-gray-400'">Final Statement</p>
-                                    <h3 class="font-bold text-sm transition-colors" :class="step === 3 ? 'text-primary-text' : 'text-gray-500'">Cover Letter</h3>
+                                       :class="step === 3 ? 'text-primary' : 'text-gray-400'">Questions</p>
+                                    <h3 class="font-bold text-sm transition-colors" :class="step === 3 ? 'text-primary-text' : 'text-gray-500'">A few questions from <?= htmlspecialchars($internship['company'] ?? 'Nexora') ?></h3>
+                                </div>
+                            </div>
+
+                            <!-- Step 4 -->
+                            <div class="flex items-center gap-5 relative z-10 p-2 rounded-2xl transition-all duration-300 cursor-pointer" 
+                                 @click="goToStep(4)"
+                                 :class="{ 'bg-white shadow-sm border border-gray-100': step === 4, 'opacity-70 hover:opacity-100': step !== 4 }">
+                                <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300"
+                                     :class="step === 4 ? 'river-flow-bg text-white shadow-lg ring-4 ring-[#EEF2FF]' : 'bg-white border border-gray-200 text-gray-400'">
+                                    <span>4</span>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] font-bold uppercase tracking-wider mb-0.5"
+                                       :class="step === 4 ? 'text-primary' : 'text-gray-400'">Preview</p>
+                                    <h3 class="font-bold text-sm transition-colors" :class="step === 4 ? 'text-primary-text' : 'text-gray-500'">See what your application looks like</h3>
                                 </div>
                             </div>
                         </div>
@@ -369,7 +546,7 @@ document.addEventListener('alpine:init', () => {
                                 </div>
 
                                 <div class="mt-12 flex justify-end">
-                                    <button type="button" @click="step = 2" class="bg-primary hover:bg-primary-hover text-white text-sm font-semibold py-3 px-6 rounded-xl transition active:scale-95 shadow-sm flex items-center gap-2">
+                                    <button type="button" @click="goToStep(2)" class="bg-primary hover:bg-primary-hover text-white text-sm font-semibold py-3 px-6 rounded-xl transition active:scale-95 shadow-sm flex items-center gap-2">
                                         Next: Resume
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
                                     </button>
@@ -516,19 +693,162 @@ document.addEventListener('alpine:init', () => {
                                 </div>
 
 
-                                <div class="mt-12 pt-8 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-                                    <button type="button" @click="step = 1" class="w-full sm:w-auto justify-center border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm font-semibold py-3 px-6 rounded-xl transition active:scale-95 flex items-center gap-2 shadow-sm order-2 sm:order-1">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd" /></svg>
-                                        <span style="white-space: nowrap;">Previous</span>
-                                    </button>
-                                    <button type="button" @click="step = 3" class="w-full sm:w-auto justify-center bg-primary hover:bg-primary-hover text-white text-sm font-semibold py-3 px-6 rounded-xl transition active:scale-95 shadow-sm flex items-center gap-2 order-1 sm:order-2">
-                                        <span style="white-space: nowrap;">Next: Cover Letter</span>
+                                <!-- ================= COVER LETTER (Now in Step 2) ================= -->
+                                <div class="mt-12 pt-8 border-t border-gray-100">
+                                    <h2 class="text-3xl font-bold text-primary-text mb-2">Statement of Intent / Cover Letter</h2>
+                                    <p class="text-gray-500 mb-8 text-base">Explain your motivation for applying and how your skills align with the internship requirements.</p>
+
+                                    <!-- Toggle: Type vs Upload -->
+                                    <div class="mb-8">
+                                        <div class="flex sm:inline-flex bg-gray-100 rounded-xl p-1 gap-1 mb-8 w-full sm:w-auto">
+                                            <button type="button" @click="switchMode('type')"
+                                                    :class="clMode === 'type' ? 'bg-white shadow-sm text-primary font-bold' : 'text-gray-500 hover:text-gray-700'"
+                                                    class="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2">
+                                                <svg class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                                <span style="white-space: nowrap;">Type Letter</span>
+                                            </button>
+                                            <button type="button" @click="switchMode('upload')"
+                                                    :class="clMode === 'upload' ? 'bg-white shadow-sm text-primary font-bold' : 'text-gray-500 hover:text-gray-700'"
+                                                    class="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2">
+                                                <svg class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                                                <span style="white-space: nowrap;">Upload File</span>
+                                            </button>
+                                        </div>
+
+                                        <!-- Alert Box for switching to Upload mode while text is typed -->
+                                        <div x-show="showUploadSwitchAlert" x-transition class="bg-[#EEF2FF] border border-[#4F47E6]/25 rounded-2xl p-5 mb-6" style="display: none;">
+                                            <div class="flex gap-4 items-start">
+                                                <div class="h-10 w-10 bg-white border border-[#4F47E6]/20 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
+                                                    <svg class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                </div>
+                                                <div class="flex-1">
+                                                    <h4 class="text-sm font-bold text-primary mb-1">Clear your typed statement?</h4>
+                                                    <p class="text-xs text-gray-600 leading-relaxed mb-4">You have already started typing a statement of intent. Switching to file upload requires clearing your current text so that you can upload a file.</p>
+                                                    <div class="flex gap-2">
+                                                        <button type="button" @click="confirmSwitchToUpload()" class="bg-primary hover:bg-primary-hover text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition active:scale-95" style="background-color: #4F47E6;">
+                                                            Clear & Switch
+                                                        </button>
+                                                        <button type="button" @click="showUploadSwitchAlert = false" class="bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition active:scale-95">
+                                                            Cancel
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Alert Box for switching to Type mode while a file is uploaded -->
+                                        <div x-show="showTypeSwitchAlert" x-transition class="bg-[#EEF2FF] border border-[#4F47E6]/25 rounded-2xl p-5 mb-6" style="display: none;">
+                                            <div class="flex gap-4 items-start">
+                                                <div class="h-10 w-10 bg-white border border-[#4F47E6]/20 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
+                                                    <svg class="h-5 w-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                </div>
+                                                <div class="flex-1">
+                                                    <h4 class="text-sm font-bold text-primary mb-1">Remove uploaded file?</h4>
+                                                    <p class="text-xs text-gray-600 leading-relaxed mb-4">You have already uploaded a cover letter file. To type a statement of intent instead, you must remove the uploaded file first.</p>
+                                                    <div class="flex gap-2">
+                                                        <button type="button" @click="confirmSwitchToType()" class="bg-primary hover:bg-primary-hover text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition active:scale-95" style="background-color: #4F47E6;">
+                                                            Remove & Switch
+                                                        </button>
+                                                        <button type="button" @click="showTypeSwitchAlert = false" class="bg-white border border-gray-200 text-gray-600 hover:bg-gray-50 text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition active:scale-95">
+                                                            Cancel
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Type mode -->
+                                        <div x-show="clMode === 'type'" x-transition style="margin-top: 24px;">
+                                            <label class="block text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">Statement of Intent</label>
+                                            <textarea name="cover_letter" x-model="coverLetter" rows="12"
+                                                      class="w-full px-6 py-5 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white focus:border-transparent transition-colors resize-none text-gray-700 placeholder-gray-400 text-base leading-relaxed shadow-sm"
+                                                      placeholder="Type or paste your cover letter here..."></textarea>
+                                            <div x-show="coverLetter.length > 0 && coverLetter.length < 100" class="text-xs text-amber-600 font-semibold mt-2" style="display: none;">
+                                                Your statement is too short. It must be at least 100 characters (currently <span x-text="coverLetter.length"></span>).
+                                            </div>
+                                            <div x-show="coverLetter.length > 2000" class="text-xs text-red-500 font-semibold mt-2" style="display: none;">
+                                                Your statement exceeds the 2,000 character limit.
+                                            </div>
+                                            <div class="flex items-center justify-between mt-4 px-1">
+                                                <span class="text-sm text-gray-500 font-medium">Professional tone recommended.</span>
+                                                <span class="text-sm font-bold" :class="(coverLetter.length > 2000 || (coverLetter.length > 0 && coverLetter.length < 100)) ? 'text-red-500' : 'text-gray-900'" x-text="coverLetter.length + ' / 2,000 characters'"></span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Upload mode -->
+                                        <div x-show="clMode === 'upload'" x-transition style="display:none; margin-top: 24px;">
+                                            <input type="file" name="cover_letter_file" x-ref="clFileInput"
+                                                   @change="handleCoverLetterFile($event)"
+                                                   class="hidden" accept=".pdf,.docx,.rtf">
+
+                                            <!-- Drop zone (hidden once file uploaded) -->
+                                            <div x-show="!coverLetterFile"
+                                                 @click="$refs.clFileInput.click()"
+                                                 @dragover.prevent="clDragOver = true"
+                                                 @dragleave.prevent="clDragOver = false"
+                                                 @drop.prevent="handleCoverLetterDrop($event)"
+                                                 :class="clDragOver ? 'border-primary bg-primary-light' : 'border-gray-300 bg-gray-50/50 hover:bg-gray-50 hover:border-primary/50'"
+                                                 class="border-2 border-dashed rounded-2xl p-8 lg:p-12 flex flex-col sm:flex-row items-center justify-center gap-6 text-center sm:text-left transition-all duration-300 cursor-pointer group mb-6">
+                                                <div class="h-16 w-16 bg-primary rounded-full flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-105 transition-transform" :class="{ 'river-flow-bg': clDragOver }">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                                                </div>
+                                                <p class="font-bold text-primary-text mb-1">Upload your cover letter</p>
+                                                <p class="text-sm text-gray-500">PDF, DOCX or RTF · Max 5MB</p>
+                                            </div>
+
+                                            <!-- Inline Cover Letter Error Message -->
+                                            <div x-show="coverLetterError" class="text-sm text-red-600 flex items-center gap-2 mb-6 bg-red-50 border border-red-200 rounded-xl p-3" style="display: none;">
+                                                <svg class="h-5 w-5 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                                </svg>
+                                                <span x-text="coverLetterError"></span>
+                                            </div>
+
+                                            <!-- Uploaded file row -->
+                                            <div x-show="coverLetterFile" class="border border-gray-200 rounded-xl p-4 flex items-center justify-between bg-[#F8FAFC] shadow-sm">
+                                                <div class="flex items-center gap-3 min-w-0 flex-1">
+                                                    <div class="h-10 w-8 bg-white border border-gray-300 rounded-lg flex-shrink-0 flex items-center justify-center">
+                                                        <span class="text-[8px] font-bold text-red-500 uppercase">PDF</span>
+                                                    </div>
+                                                    <div class="min-w-0 flex-1">
+                                                        <p class="text-sm font-bold text-primary-text break-all" x-text="coverLetterFileName"></p>
+                                                        <span class="text-[10px] font-semibold text-emerald-600">✓ Ready to submit</span>
+                                                    </div>
+                                                </div>
+                                                <button type="button" @click="removeCoverLetterFile()"
+                                                        class="text-xs text-red-500 hover:text-red-700 font-semibold border border-red-100 hover:bg-red-50 px-3 py-1.5 rounded-lg transition">
+                                                    Remove
+                                                </button>
+                                            </div>
+
+                                            <p class="text-xs text-gray-400 mt-4">Upload your pre-written cover letter document. If you also typed a letter above, the uploaded file takes priority.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-8 pt-8 border-t border-gray-200 flex flex-col sm:flex-row items-center gap-3">
+                                    <!-- Next: Questions — top on mobile, right on desktop -->
+                                    <button type="button" 
+                                            @click="step = 3"
+                                            :disabled="!fileUploaded || !isCoverLetterValid()"
+                                            class="w-full sm:w-auto sm:ml-auto bg-primary hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold py-3 px-6 rounded-xl transition active:scale-95 shadow-sm flex items-center justify-center gap-2 order-1 sm:order-3">
+                                        Next: Questions
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                                    </button>
+
+                                    <!-- Previous — bottom on mobile, left on desktop -->
+                                    <button type="button" @click="step = 1" class="w-full sm:w-auto justify-center border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm font-semibold py-3 px-6 rounded-xl transition active:scale-95 flex items-center gap-2 order-3 sm:order-1 sm:mr-auto shadow-sm">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd" /></svg>
+                                        Previous
                                     </button>
                                 </div>
                             </div>
 
-                            <!-- ================= STEP 3: COVER LETTER ================= -->
+                            <!-- ================= STEP 3: QUESTIONS ================= -->
                             <div x-show="step === 3" style="display: none;"
                                  x-transition:enter="transition ease-out duration-300 transform delay-100"
                                  x-transition:enter-start="opacity-0 translate-x-8"
@@ -538,92 +858,304 @@ document.addEventListener('alpine:init', () => {
                                  x-transition:leave-end="opacity-0 -translate-x-8"
                                  class="w-full pb-4">
                                 
-                                <h2 class="text-3xl font-bold text-primary-text mb-2">Statement of Intent / Cover Letter</h2>
-                                <p class="text-gray-500 mb-8 text-base">Explain your motivation for applying and how your skills align with the internship requirements.</p>
+                                <h2 class="text-3xl font-extrabold text-primary-text mb-2">A few questions from <?= htmlspecialchars($internship['company'] ?? 'Nexora') ?></h2>
+                                <p class="text-gray-500 mb-8 text-base">These help the hiring team learn more about your motivations, unique perspective, and philosophy.</p>
 
-                                <!-- Toggle: Type vs Upload -->
-                                <div x-data="{ clMode: 'type' }" class="mb-8">
-                                    <div class="flex sm:inline-flex bg-gray-100 rounded-xl p-1 gap-1 mb-8 w-full sm:w-auto">
-                                        <button type="button" @click="clMode = 'type'"
-                                                :class="clMode === 'type' ? 'bg-white shadow-sm text-primary font-bold' : 'text-gray-500 hover:text-gray-700'"
-                                                class="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2">
-                                            <svg class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                                            <span style="white-space: nowrap;">Type Letter</span>
-                                        </button>
-                                        <button type="button" @click="clMode = 'upload'"
-                                                :class="clMode === 'upload' ? 'bg-white shadow-sm text-primary font-bold' : 'text-gray-500 hover:text-gray-700'"
-                                                class="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center gap-2">
-                                            <svg class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                                            <span style="white-space: nowrap;">Upload File</span>
-                                        </button>
-                                    </div>
-
-                                    <!-- Type mode -->
-                                    <div x-show="clMode === 'type'" x-transition style="margin-top: 24px;">
-                                        <label class="block text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">Statement of Intent</label>
-                                        <textarea name="cover_letter" x-model="coverLetter" rows="12"
-                                                  class="w-full px-6 py-5 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white focus:border-transparent transition-colors resize-none text-gray-700 placeholder-gray-400 text-base leading-relaxed shadow-sm"
-                                                  placeholder="Type or paste your cover letter here..."></textarea>
-                                        <div class="flex items-center justify-between mt-4 px-1">
-                                            <span class="text-sm text-gray-500 font-medium">Professional tone recommended.</span>
-                                            <span class="text-sm font-bold" :class="coverLetter.length > 2000 ? 'text-red-500' : 'text-gray-900'" x-text="coverLetter.length + ' / 2,000 characters'"></span>
+                                <div class="space-y-8">
+                                    <!-- Question 1 -->
+                                    <div>
+                                        <label class="block text-sm font-bold text-gray-900 mb-3">Why are you interested in joining <?= htmlspecialchars($internship['company'] ?? 'Nexora') ?> specifically?</label>
+                                        <textarea name="interest_reason" x-model="interestReason" rows="4"
+                                                  class="w-full px-5 py-4 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none text-gray-700 placeholder-gray-400 text-sm shadow-sm"
+                                                  placeholder="Share your motivation and how your values align with <?= htmlspecialchars($internship['company'] ?? 'Nexora') ?>'s mission..."></textarea>
+                                        <div class="flex justify-end mt-2">
+                                            <span class="text-xs text-gray-400" x-text="wordCount(interestReason) + ' / 500 words'"></span>
                                         </div>
                                     </div>
 
-                                    <!-- Upload mode -->
-                                    <div x-show="clMode === 'upload'" x-transition style="display:none; margin-top: 24px;">
-                                        <input type="file" name="cover_letter_file" x-ref="clFileInput"
-                                               @change="handleCoverLetterFile($event)"
-                                               class="hidden" accept=".pdf,.docx,.rtf">
+                                    <!-- Question 2 -->
+                                    <div>
+                                        <label class="block text-sm font-bold text-gray-900 mb-3">Describe your proudest project or process.</label>
+                                        <textarea name="design_process" x-model="designProcess" rows="4"
+                                                  class="w-full px-5 py-4 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none text-gray-700 placeholder-gray-400 text-sm shadow-sm"
+                                                  placeholder="What problem did you solve? What was your specific impact?"></textarea>
+                                        <div class="flex justify-end mt-2">
+                                            <span class="text-xs text-gray-400" x-text="wordCount(designProcess) + ' / 500 words'"></span>
+                                        </div>
+                                    </div>
 
-                                        <!-- Drop zone (hidden once file uploaded) -->
-                                        <div x-show="!coverLetterFile"
-                                             @click="$refs.clFileInput.click()"
-                                             @dragover.prevent="clDragOver = true"
-                                             @dragleave.prevent="clDragOver = false"
-                                             @drop.prevent="handleCoverLetterDrop($event)"
-                                             :class="clDragOver ? 'border-primary bg-primary-light' : 'border-gray-300 bg-gray-50/50 hover:bg-gray-50 hover:border-primary/50'"
-                                             class="border-2 border-dashed rounded-2xl p-8 lg:p-12 flex flex-col sm:flex-row items-center justify-center gap-6 text-center sm:text-left transition-all duration-300 cursor-pointer group mb-6">
-                                            <div class="h-16 w-16 bg-primary rounded-full flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-105 transition-transform" :class="{ 'river-flow-bg': clDragOver }">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                                    <!-- Question 3 -->
+                                    <div>
+                                        <label class="block text-sm font-bold text-gray-900 mb-3">What are your primary learning goals for this internship?</label>
+                                        <textarea name="learning_goals" x-model="learningGoals" rows="4"
+                                                  class="w-full px-5 py-4 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none text-gray-700 placeholder-gray-400 text-sm shadow-sm"
+                                                  placeholder="What skills or knowledge do you hope to acquire?"></textarea>
+                                        <div class="flex justify-end mt-2">
+                                            <span class="text-xs text-gray-400" x-text="wordCount(learningGoals) + ' / 300 words'"></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- NYSC Credentials Upload -->
+                                    <div class="pt-4 border-t border-gray-100">
+                                        <label class="block text-sm font-bold text-gray-900 mb-3">Attach NYSC credentials (optional)</label>
+                                        
+                                        <input type="file" name="portfolio_piece" x-ref="portfolioFileInput"
+                                               @change="handlePortfolioFile($event)"
+                                               class="hidden" accept=".pdf,.png,.jpg,.jpeg">
+
+                                        <!-- Drop zone -->
+                                        <div x-show="!portfolioUploaded"
+                                             @click="$refs.portfolioFileInput.click()"
+                                             @dragover.prevent="portfolioDragOver = true"
+                                             @dragleave.prevent="portfolioDragOver = false"
+                                             @drop.prevent="handlePortfolioDrop($event)"
+                                             :class="portfolioDragOver ? 'border-primary bg-primary-light' : 'border-gray-300 bg-gray-50/50 hover:bg-gray-50 hover:border-primary/50'"
+                                             class="border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center gap-3 text-center transition-all duration-300 cursor-pointer group">
+                                            <div class="h-12 w-12 bg-primary rounded-xl flex items-center justify-center shadow-md group-hover:scale-105 transition-transform" :class="{ 'river-flow-bg': portfolioDragOver }">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                                </svg>
                                             </div>
-                                            <p class="font-bold text-primary-text mb-1">Upload your cover letter</p>
-                                            <p class="text-sm text-gray-500">PDF, DOCX or RTF · Max 5MB</p>
+                                            <div>
+                                                <p class="font-bold text-sm text-primary-text mb-1">Click to upload or drag and drop</p>
+                                                <p class="text-xs text-gray-500">PDF, PNG or JPG · Max 10MB</p>
+                                            </div>
                                         </div>
 
-                                        <!-- Inline Cover Letter Error Message -->
-                                        <div x-show="coverLetterError" class="text-sm text-red-600 flex items-center gap-2 mb-6 bg-red-50 border border-red-200 rounded-xl p-3" style="display: none;">
+                                        <!-- Inline Portfolio Error Message -->
+                                        <div x-show="portfolioError" class="text-sm text-red-600 flex items-center gap-2 mt-4 bg-red-50 border border-red-200 rounded-xl p-3" style="display: none;">
                                             <svg class="h-5 w-5 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                             </svg>
-                                            <span x-text="coverLetterError"></span>
+                                            <span x-text="portfolioError"></span>
                                         </div>
 
-                                        <!-- Uploaded file row -->
-                                        <div x-show="coverLetterFile" class="border border-gray-200 rounded-xl p-4 flex items-center justify-between bg-[#F8FAFC] shadow-sm">
+                                        <!-- Uploaded Portfolio File Row -->
+                                        <div x-show="portfolioUploaded" class="border border-gray-200 rounded-xl p-4 flex items-center justify-between bg-[#F8FAFC] shadow-sm mt-4">
                                             <div class="flex items-center gap-3 min-w-0 flex-1">
                                                 <div class="h-10 w-8 bg-white border border-gray-300 rounded-lg flex-shrink-0 flex items-center justify-center">
-                                                    <span class="text-[8px] font-bold text-red-500 uppercase">PDF</span>
+                                                    <span class="text-[8px] font-bold text-red-500 uppercase" x-text="portfolioFileExt"></span>
                                                 </div>
                                                 <div class="min-w-0 flex-1">
-                                                    <p class="text-sm font-bold text-primary-text break-all" x-text="coverLetterFileName"></p>
-                                                    <span class="text-[10px] font-semibold text-emerald-600">✓ Ready to submit</span>
+                                                    <p class="text-sm font-bold text-primary-text break-all" x-text="portfolioFileName"></p>
+                                                    <span class="text-[10px] font-semibold text-emerald-600">✓ Credential Attached</span>
                                                 </div>
                                             </div>
-                                            <button type="button" @click="removeCoverLetterFile()"
+                                            <button type="button" @click="removePortfolio()"
                                                     class="text-xs text-red-500 hover:text-red-700 font-semibold border border-red-100 hover:bg-red-50 px-3 py-1.5 rounded-lg transition">
                                                 Remove
                                             </button>
                                         </div>
 
-                                        <p class="text-xs text-gray-400 mt-4">Upload your pre-written cover letter document. If you also typed a letter above, the uploaded file takes priority.</p>
+                                        <!-- Portfolio Link Input -->
+                                        <div class="mt-6">
+                                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Link for Portfolio</label>
+                                            <input type="text" name="portfolio_link" x-model="portfolioLink" placeholder="https://myportfolio.com"
+                                                   class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white focus:border-transparent transition-colors text-gray-700 placeholder-gray-400 text-sm shadow-sm">
+                                        </div>
+
+                                        <!-- Figma Link Input -->
+                                        <div class="mt-4">
+                                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Figma Link</label>
+                                            <input type="text" name="figma_link" x-model="figmaLink" placeholder="https://www.figma.com/file/..."
+                                                   class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white focus:border-transparent transition-colors text-gray-700 placeholder-gray-400 text-sm shadow-sm">
+                                        </div>
                                     </div>
                                 </div>
 
+                                <!-- Step 3 Buttons -->
+                                <div class="mt-12 pt-8 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+                                    <button type="button" @click="step = 2" class="w-full sm:w-auto justify-center border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm font-semibold py-3 px-6 rounded-xl transition active:scale-95 flex items-center gap-2 shadow-sm order-2 sm:order-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd" /></svg>
+                                        Previous
+                                    </button>
+                                    <button type="button" @click="goToStep(4)" class="w-full sm:w-auto justify-center bg-primary hover:bg-primary-hover text-white text-sm font-semibold py-3 px-6 rounded-xl transition active:scale-95 shadow-sm flex items-center gap-2 order-1 sm:order-2">
+                                        Preview Application
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- ================= STEP 4: PREVIEW / REVIEW ================= -->
+                            <div x-show="step === 4" style="display: none;"
+                                 x-transition:enter="transition ease-out duration-300 transform delay-100"
+                                 x-transition:enter-start="opacity-0 translate-x-8"
+                                 x-transition:enter-end="opacity-100 translate-x-0"
+                                 x-transition:leave="transition ease-in duration-200 transform absolute top-0 left-0 right-0 w-full"
+                                 x-transition:leave-start="opacity-100 translate-x-0"
+                                 x-transition:leave-end="opacity-0 -translate-x-8"
+                                 class="w-full pb-4">
+                                
+                                <h2 class="text-3xl font-extrabold text-primary-text mb-2">Review your application</h2>
+                                <p class="text-gray-500 mb-8 text-base">Everything looks good? Submit when you're ready.</p>
+
+                                <div class="border border-gray-200 rounded-2xl bg-white shadow-sm flex flex-col divide-y divide-gray-100 overflow-hidden">
+                                    <!-- Section 1: Your Details -->
+                                    <div class="p-6 sm:p-8">
+                                        <div class="flex items-center justify-between mb-6">
+                                            <div class="flex items-center gap-2.5 text-primary">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                </svg>
+                                                <h3 class="font-bold text-base text-primary-text">Your Details</h3>
+                                            </div>
+                                            <button type="button" @click="step = 1" class="text-xs font-semibold text-primary hover:underline flex items-center gap-1">
+                                                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                                Edit
+                                            </button>
+                                        </div>
+
+                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
+                                            <div>
+                                                <span class="block text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Full Name</span>
+                                                <span class="text-sm font-semibold text-primary-text">Sarah Peters</span>
+                                            </div>
+                                            <div>
+                                                <span class="block text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Phone Number</span>
+                                                <span class="text-sm font-semibold text-primary-text" x-text="phone || 'Not provided'"></span>
+                                            </div>
+                                            <div>
+                                                <span class="block text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Salary Expectation</span>
+                                                <span class="text-sm font-semibold text-primary-text" x-text="salary ? ('$' + salary) : 'Not provided'"></span>
+                                            </div>
+                                            <div>
+                                                <span class="block text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Application Source</span>
+                                                <span class="text-sm font-semibold text-primary-text">InternConnect</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Section 2: Your Answers -->
+                                    <div class="p-6 sm:p-8">
+                                        <div class="flex items-center justify-between mb-6">
+                                            <div class="flex items-center gap-2.5 text-primary">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                <h3 class="font-bold text-base text-primary-text">Your Answers</h3>
+                                            </div>
+                                            <button type="button" @click="goToStep(3)" class="text-xs font-semibold text-primary hover:underline flex items-center gap-1">
+                                                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                                Edit
+                                            </button>
+                                        </div>
+
+                                        <div class="space-y-4">
+                                            <!-- Q1 -->
+                                            <div class="bg-[#F8FAFC] border border-gray-100 rounded-2xl p-5 shadow-sm">
+                                                <span class="block text-xs font-bold text-primary uppercase tracking-wider mb-2">Why are you interested in joining <?= htmlspecialchars($internship['company'] ?? 'Nexora') ?> specifically?</span>
+                                                <p class="text-sm text-gray-700 leading-relaxed font-medium" x-text="interestReason || 'No answer provided.'"></p>
+                                            </div>
+                                            <!-- Q2 -->
+                                            <div class="bg-[#F8FAFC] border border-gray-100 rounded-2xl p-5 shadow-sm">
+                                                <span class="block text-xs font-bold text-primary uppercase tracking-wider mb-2">Describe your proudest project or process.</span>
+                                                <p class="text-sm text-gray-700 leading-relaxed font-medium" x-text="designProcess || 'No answer provided.'"></p>
+                                            </div>
+                                            <!-- Q3 -->
+                                            <div class="bg-[#F8FAFC] border border-gray-100 rounded-2xl p-5 shadow-sm">
+                                                <span class="block text-xs font-bold text-primary uppercase tracking-wider mb-2">What are your primary learning goals for this internship?</span>
+                                                <p class="text-sm text-gray-700 leading-relaxed font-medium" x-text="learningGoals || 'No answer provided.'"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Section 3: Attachments -->
+                                    <div class="p-6 sm:p-8">
+                                        <div class="flex items-center justify-between mb-6">
+                                            <div class="flex items-center gap-2.5 text-primary">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                                </svg>
+                                                <h3 class="font-bold text-base text-primary-text">Attachments & Links</h3>
+                                            </div>
+                                            <button type="button" @click="goToStep(2)" class="text-xs font-semibold text-primary hover:underline flex items-center gap-1">
+                                                <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                                                Edit
+                                            </button>
+                                        </div>
+
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <!-- Resume -->
+                                            <div x-show="fileUploaded" class="bg-[#F8FAFC] border border-gray-100 rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:border-primary/20 transition-all duration-300">
+                                                <div class="h-12 w-12 bg-red-50 border border-red-100 rounded-xl flex items-center justify-center flex-shrink-0 text-red-500 font-bold uppercase text-[10px] shadow-sm">
+                                                    PDF
+                                                </div>
+                                                <div class="min-w-0 flex-1">
+                                                    <p class="text-xs text-gray-400 font-bold uppercase tracking-wider mb-0.5">Resume / CV</p>
+                                                    <p class="text-sm font-bold text-primary-text truncate" x-text="uploadedFileName"></p>
+                                                </div>
+                                                <div class="h-6 w-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0 text-xs font-bold shadow-sm">
+                                                    ✓
+                                                </div>
+                                            </div>
+
+                                            <!-- NYSC Credentials -->
+                                            <div x-show="portfolioUploaded" class="bg-[#F8FAFC] border border-gray-100 rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:border-primary/20 transition-all duration-300">
+                                                <div class="h-12 w-12 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0 text-indigo-500 font-bold uppercase text-[10px] shadow-sm">
+                                                    <span x-text="portfolioFileExt">Doc</span>
+                                                </div>
+                                                <div class="min-w-0 flex-1">
+                                                    <p class="text-xs text-gray-400 font-bold uppercase tracking-wider mb-0.5">NYSC Credentials</p>
+                                                    <p class="text-sm font-bold text-primary-text truncate" x-text="portfolioFileName"></p>
+                                                </div>
+                                                <div class="h-6 w-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0 text-xs font-bold shadow-sm">
+                                                    ✓
+                                                </div>
+                                            </div>
+
+                                            <!-- Portfolio Link -->
+                                            <div x-show="portfolioLink" class="bg-[#F8FAFC] border border-gray-100 rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:border-primary/20 transition-all duration-300">
+                                                <div class="h-12 w-12 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0 text-indigo-600 shadow-sm">
+                                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                                    </svg>
+                                                </div>
+                                                <div class="min-w-0 flex-1">
+                                                    <p class="text-xs text-gray-400 font-bold uppercase tracking-wider mb-0.5">Portfolio Link</p>
+                                                    <p class="text-sm font-bold text-primary-text truncate" x-text="portfolioLink"></p>
+                                                </div>
+                                                <div class="h-6 w-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0 text-xs font-bold shadow-sm">
+                                                    ✓
+                                                </div>
+                                            </div>
+
+                                            <!-- Figma Link -->
+                                            <div x-show="figmaLink" class="bg-[#F8FAFC] border border-gray-100 rounded-2xl p-4 flex items-center gap-4 shadow-sm hover:border-primary/20 transition-all duration-300">
+                                                <div class="h-12 w-12 bg-pink-50 border border-pink-100 rounded-xl flex items-center justify-center flex-shrink-0 text-pink-500 shadow-sm">
+                                                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                        <path d="M8 2h8a6 6 0 0 1 6 6v8a6 6 0 0 1-6 6H8a6 6 0 0 1-6-6V8a6 6 0 0 1 6-6z" />
+                                                        <path d="M12 18a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+                                                    </svg>
+                                                </div>
+                                                <div class="min-w-0 flex-1">
+                                                    <p class="text-xs text-gray-400 font-bold uppercase tracking-wider mb-0.5">Figma Link</p>
+                                                    <p class="text-sm font-bold text-primary-text truncate" x-text="figmaLink"></p>
+                                                </div>
+                                                <div class="h-6 w-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0 text-xs font-bold shadow-sm">
+                                                    ✓
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Review Alert Message -->
+                                <div class="mt-6 bg-blue-50 border border-blue-100 rounded-2xl p-5 flex gap-4">
+                                    <div class="flex-shrink-0 h-10 w-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <p class="text-sm text-blue-700 leading-relaxed font-medium">
+                                        Your application will be reviewed by <?= htmlspecialchars($internship['company'] ?? 'Nexora') ?> recruiting team. If your profile matches our requirements, you will be contacted for an online screening within 14 business days.
+                                    </p>
+                                </div>
+
+                                <!-- Step 4 Buttons -->
                                 <div class="mt-8 pt-8 border-t border-gray-200 flex flex-col sm:flex-row items-center gap-3">
                                     <!-- Submit — top on mobile, right on desktop -->
                                     <button type="submit" 
-                                            :disabled="!fileUploaded || coverLetter.length > 2000"
+                                            :disabled="!fileUploaded"
                                             class="w-full sm:w-auto sm:ml-auto bg-primary hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold py-3 px-6 rounded-xl transition active:scale-95 shadow-sm flex items-center justify-center gap-2 order-1 sm:order-3">
                                         Submit Application
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -631,13 +1163,8 @@ document.addEventListener('alpine:init', () => {
                                         </svg>
                                     </button>
 
-                                    <!-- Save for later — middle on mobile, center on desktop -->
-                                    <button type="button" class="w-full sm:w-auto justify-center border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm font-semibold py-3 px-6 rounded-xl transition active:scale-95 flex items-center gap-2 order-2 shadow-sm">
-                                        Save for later
-                                    </button>
-
                                     <!-- Previous — bottom on mobile, left on desktop -->
-                                    <button type="button" @click="step = 2" class="w-full sm:w-auto justify-center border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm font-semibold py-3 px-6 rounded-xl transition active:scale-95 flex items-center gap-2 order-3 sm:order-1 sm:mr-auto shadow-sm">
+                                    <button type="button" @click="step = 3" class="w-full sm:w-auto justify-center border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm font-semibold py-3 px-6 rounded-xl transition active:scale-95 flex items-center gap-2 order-3 sm:order-1 sm:mr-auto shadow-sm">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd" /></svg>
                                         Previous
                                     </button>
@@ -679,33 +1206,7 @@ document.addEventListener('alpine:init', () => {
                     </div>
 
                     <!-- Show on Step 3 (Cover Letter) -->
-                    <div x-show="step === 3" 
-                         x-transition:enter="transition ease-out duration-300 delay-300"
-                         x-transition:enter-start="opacity-0 translate-y-4"
-                         x-transition:enter-end="opacity-100 translate-y-0"
-                         style="display: none;" 
-                         class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-                         
-                        <div class="bg-blue-50 rounded-2xl border border-blue-100 p-6 shadow-sm flex gap-4 hover:shadow-md transition-shadow">
-                            <div class="flex-shrink-0 h-10 w-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-sm text-blue-900 mb-1">Personalize it</h4>
-                                <p class="text-xs text-blue-700 leading-relaxed">Tailor your letter to the specific company goals mentioned in the job post.</p>
-                            </div>
-                        </div>
-                        
-                        <div class="bg-orange-50 rounded-2xl border border-orange-100 p-6 shadow-sm flex gap-4 hover:shadow-md transition-shadow">
-                            <div class="flex-shrink-0 h-10 w-10 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-sm text-orange-900 mb-1">Highlight Projects</h4>
-                                <p class="text-xs text-orange-700 leading-relaxed">Mention 1-2 specific projects where you demonstrated the required tech stack.</p>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Extra Step 3 info cards removed -->
 
                 </div>
 

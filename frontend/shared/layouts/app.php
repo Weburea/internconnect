@@ -16,8 +16,8 @@ declare(strict_types=1);
     <title><?= htmlspecialchars($title ?? 'InternConnect') ?></title>
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="<?= asset('assets/images/logos/Logo_single_dark_dj6vhf.png') ?>">
-    <!-- Tailwind CSS -->
-    <link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>">
+    <!-- Global CSS -->
+    <link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>?v=<?= time() ?>">
     <?php if (isset($extraCss)): ?>
         <?php foreach ((array)$extraCss as $cssPath): ?>
             <link rel="stylesheet" href="<?= asset($cssPath) ?>">
@@ -46,7 +46,9 @@ declare(strict_types=1);
     </main>
 
     <!-- Footer Component Placeholder -->
-    <?php include dirname(__DIR__) . '/components/footer.php'; ?>
+    <?php if (!isset($hideFooter) || !$hideFooter): ?>
+        <?php include dirname(__DIR__) . '/components/footer.php'; ?>
+    <?php endif; ?>
 
     <!-- Global Toast Component -->
     <?php include dirname(__DIR__) . '/components/toast.php'; ?>

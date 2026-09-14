@@ -24,7 +24,18 @@ class AuthController extends Controller
             $parts = explode('@', $email);
             $name = ucfirst($parts[0]);
         }
-        header('Location: ' . url('/welcome-pro?name=' . urlencode($name)));
+        
+        $role = 'candidate';
+        $lowerEmail = strtolower($email);
+        if (strpos($lowerEmail, 'employer') !== false || 
+            strpos($lowerEmail, 'tech') !== false || 
+            strpos($lowerEmail, 'company') !== false || 
+            strpos($lowerEmail, 'solutions') !== false ||
+            strpos($lowerEmail, 'global') !== false) {
+            $role = 'employer';
+        }
+
+        header('Location: ' . url('/welcome-back?name=' . urlencode($name) . '&role=' . $role));
         exit;
     }
 
@@ -77,12 +88,23 @@ class AuthController extends Controller
         ], 'auth');
     }
 
-    public function welcomePro(): void
+    public function welcomeSuccess(): void
     {
         $name = $_GET['name'] ?? 'Sarah';
-        $this->renderView('auth/welcome_pro', [
-            'title' => 'Welcome to Pro - InterConnect',
+        $this->renderView('auth/welcome_success', [
+            'title' => 'Success - InternConnect',
             'name' => $name
+        ], 'auth');
+    }
+
+    public function welcomeBack(): void
+    {
+        $name = $_GET['name'] ?? 'Sarah';
+        $role = $_GET['role'] ?? 'candidate';
+        $this->renderView('auth/welcome-back', [
+            'title' => 'Welcome Back - InternConnect',
+            'name' => $name,
+            'role' => $role
         ], 'auth');
     }
 
@@ -168,4 +190,16 @@ class AuthController extends Controller
             'showLoader' => false,
         ], 'auth');
     }
+
+    public function logout(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $_SESSION['is_logged_in'] = false;
+        unset($_SESSION['profile_name'], $_SESSION['profile_email'], $_SESSION['profile_avatar']);
+        header('Location: ' . url('/?logged_out=1'));
+        exit;
+    }
 }
+

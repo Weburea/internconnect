@@ -21,7 +21,7 @@ declare(strict_types=1);
         <!-- ── Header ── -->
         <header class="w-full flex items-center justify-between mb-8 py-4">
             <a href="<?= url('/') ?>">
-                <img src="<?= asset('assets/images/logos/Logo_dark_dx00tg.svg') ?>" alt="InternConnect" class="h-6 w-auto">
+                <img src="<?= asset('assets/images/logos/Logo_dark_dx00tg.svg') ?>" alt="InternConnect" class="h-[18px] md:h-[22px] w-auto">
             </a>
         </header>
 

@@ -23,6 +23,128 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## [Unreleased]
 
+- **Employer Company Profile View & Navigation (`/employer/company`, `/companies`, `/company`)**:
+  - **Asset Integration via Cloudinary**: Uploaded and integrated the circular HK logo (`hk_logo.jpg`) and horizontal banner (`hk_banner.png`) under Cloudinary folder `internConnect/images/`.
+  - **Hero Card**: High-resolution banner background with overlay circular avatar badge, verified status checkmark, company name (`TechFlow Systems`), slogan, metadata pills (`Software Development`, `Lagos, Nigeria`, `201–500 employees`), and action buttons (`Follow`, `Apply Now` / `Post Opening`).
+  - **Sidebar Navigation Updates**:
+    - Replaced the previous "Analytics" item with "Companies" pointing to `/employer/company`.
+    - Added "Saved", "Resources", and a "Quick Access" sub-section (`Recommended for you`, `Saved companies`, `Upcoming interviews`).
+    - Added bottom promo card ("Build your future with the right opportunities").
+  - **Layout & Content Hierarchy**:
+    - Single unified `Overview` tab without cumbersome modal switching.
+    - **Left Column**: "About Company" card with tag pills, "Culture & Values" card with tag pills, "Company Gallery" (4-photo grid with `+5` overflow badge), and "Candidate & Intern Reviews" (4.9★ rating badge, verified reviewer cards, and recommendations).
+    - **Right Column**: "Profile Insights" (78% strength meter + actionable checklist + "Improve Profile" button), "Contact Information" (email, phone, social links), and "Company Details" (Industry, Size, Location, Website).
+    - Strictly omitted "Similar Companies" per explicit user directive.
+    - Clean white background / light theme dashboard aesthetics in compliance with the **Emoji Prohibition Rule** and design standards.
+  - Redesigned the 5 top metric cards (`ACTIVE POSTS`, `APPLICATIONS`, `SHORTLISTED`, `INTERVIEWS`, `HIRED`) in [frontend/employer/dashboard/index.php](file:///c:/xampp/htdocs/InternConnect/frontend/employer/dashboard/index.php) to strictly match the layout and design of the candidate "Your Internship Journey" KPI cards.
+  - Structure: Left-aligned info column (Title $\rightarrow$ Big Bold Metric Number $\rightarrow$ Subtitle) with vertically-centered 44x44px rounded square icon box (`.emp-kpi-icon-wrap`) on the right.
+  - Card Dimensions & Spacing: Unified with 18px 20px padding, 16px grid gap, 16px border-radius, subtle shadow, and smooth hover lift animations.
+
+- **Candidate Profile Settings Redesign (`/candidate/profile`, `/profile`)**:
+  - Reorganized profile sections to strictly follow the desired layout hierarchy: **Personal Information** $\rightarrow$ **Academic Information** $\rightarrow$ **Experience Assets** $\rightarrow$ **Notification Preferences**.
+  - **Academic Information Card**:
+    - Added comprehensive academic credential fields: `University Name` (`db-input`), `Expected Graduation Year/ Graduation Year` (styled custom `.db-select` dropdown spanning 2018–2030), `Degree Type` (styled custom `.db-select` dropdown), `Field of Study` (`db-input`), and `GPA/ Grade (Optional)` (`db-input`).
+  - **Experience Assets Card**:
+    - Renamed from "Resume & Portfolio" to "Experience Assets".
+    - Preserved high-fidelity resume upload drag-and-drop zone (`.db-upload-zone`), uploaded resume pill (`.db-file-card`), and live full-screen modal preview.
+    - Added dedicated, high-contrast input fields for **Portfolio Website URL**, **LinkedIn Profile**, and **GitHub Profile** in a responsive 6x6 two-column layout with SVG prefix badges.
+  - **Security & Authentication Cards (Right Column)**:
+    - **Authentication Card**: Fixed alignment and spacing on `Verified` and `Connected` status badges with `justify-content: space-between;`, `gap: 16px;`, and `white-space: nowrap;` so badges never crowd against email addresses.
+    - **Password & Security Card**: Implemented Current Password, New Password, and Confirm Password fields with interactive eye toggles and recovery link to `/forgot-password`.
+    - **Active Devices & Sessions Card**: Standardized device titles to clean names (e.g., `Windows PC`, `iPhone 15 Pro`), fixed single-line alignment for the `This Device` badge (`white-space: nowrap; flex-shrink: 0;`), and preserved location/IP metadata cleanly below.
+  - **Account Management & Safe Deactivation Card (`.db-danger-card`)**:
+    - Replaced the floating text button with a clean, dedicated **Account Management** card featuring dark typography and a structured action button.
+    - Integrated a high-fidelity deactivation confirmation modal requiring the candidate to spell their exact full name before enabling the destructive action button, preventing accidental account deactivations.
+  - **Project Governance & Anti-AI-Sloppiness Rules**:
+    - Updated `.agents/rules/rules.md` and `.agents/rules/agent_mistakes_preventions.md` with strict rules enforcing pixel-perfect badge alignment, single-line badge integrity (`white-space: nowrap`), clean entity labeling, and strict SVG bounding to prevent AI-generated design artifacts.
+  - **Mobile Hamburger Sidebar Fix**:
+    - Implemented a resilient, global event-delegated click listener in [candidate-sidebar.php](file:///c:/xampp/htdocs/InternConnect/frontend/shared/components/candidate-sidebar.php) and [employer-sidebar.php](file:///c:/xampp/htdocs/InternConnect/frontend/shared/components/employer-sidebar.php) ensuring the mobile hamburger button (`#db-hamburger`) opens the sidebar drawer reliably across all candidate and employer views on mobile viewports.
+- **Candidate Interview Preparation Guide (`/candidate/interview/guide`, `/interview/guide`)**:
+  - Completely redesigned [frontend/candidate/interview/guide.php](file:///c:/xampp/htdocs/InternConnect/frontend/candidate/interview/guide.php) matching the new design layout (Image 2):
+    - **Header**: Breadcrumb navigation (`← My Application / Interview Preparation`), page title, and subtitle.
+    - **Overview Readiness Strip**: Target badge icon, dynamic progress bar with percentage readout (`60%`), section count (`5 sections`), checklist count (`7 checklist items`), and estimated reading time (`~15 min read`).
+    - **5 Interactive Phase Accordion Cards**: Pre-Interview Preparation, STAR Framework, Portfolio/Code Walkthrough, Smart Questions to Ask, and Post-Interview Follow-Up with individual task completion badges (`Done` / `Start`) and collapsible sections.
+    - **Right Sidebar Widgets**: Interactive **Interview Readiness Checklist** synced dynamically with preparation tasks and **Quick tips** card with SVG accents.
+    - Zero emojis used across UI components in compliance with the **Emoji Prohibition Rule**.
+- **Interview Invite Page & Flatpickr Refinements (`/candidate/interview`)**:
+  - Enhanced **Flatpickr Time Picker** popover styling in [dashboard.css](file:///c:/xampp/htdocs/InternConnect/public/assets/css/dashboard.css) with high-contrast borders (`1.5px solid #CBD5E1`), pronounced shadow depth, styled number steppers, and vibrant AM/PM toggles to eliminate any washed-out appearance on white modal backgrounds.
+  - Standardized submitted file rows (`Resume` and `Portfolio Case Study`): unified PDF badge colors, removed file size numbers, and removed unnecessary `"View"` action links to keep the drawer strictly as a clean submission summary matching the Cover Letter row pattern.
+- **Project Governance Updates (`.agents/rules/rules.md`)**:
+  - Added strict **Emoji Prohibition Rule** forbidding emojis in UI text, cards, headings, and text platform-wide (requiring clean SVG icons instead).
+  - Added **Modal Design & Pattern Rule** enforcing unified backdrop, dialog dimensions, recruiter profile boxes, and styled pickers.
+- **Candidate Applications Journey Tracking Portal (`/candidate`, `/candidate/applications`, `/candidate/application`, `/applications`, `/my-applications`)**:
+  - Implemented the candidate application tracking portal view matching design specifications in [applications/index.php](file:///c:/xampp/htdocs/InternConnect/frontend/candidate/applications/index.php).
+  - Configured layout using the unified candidate dashboard shell (`db-shell`, `db-sidebar`, `db-main`, `db-topnav`, `db-content`, `db-footer.php`) matching `/candidate/dashboard` and `/candidate/saved`.
+  - Added `applications()` controller action in [CandidateController.php](file:///c:/xampp/htdocs/InternConnect/backend/Controllers/CandidateController.php) providing live mock state for metrics, urgent alert banners, and 6 diverse application stages with full year dates (`Sep 28, 2024`, `Sep 25, 2024`, `Sep 20, 2024`, `Sep 15, 2024`, `Sep 12, 2024`, `Sep 08, 2024`).
+  - Registered route endpoints `/candidate`, `/candidate/applications`, `/candidate/application`, `/applications`, and `/my-applications` in [routes.php](file:///c:/xampp/htdocs/InternConnect/backend/routes.php).
+  - Features:
+    - **Candidate Dashboard Sidebar**: Candidate profile block with photo edit dropdown, navigation items (`Dashboard`, `Saved Internships`, `My Applications` with active state, `Browse Opportunities`, `Help Center`, `Profile Settings`), and bottom "Find More Opportunities" promo card with "Subscribe Now" CTA.
+    - **Top Dashboard Bar**: Mobile drawer trigger, search input, notifications dropdown with real-time updates, and profile settings menu.
+    - **Page Header**: Added "Your Internship Journey" with personalized subtitle count (`"Stay organized and ahead of the curve, Sarah. 12 active opportunities found."`) positioned prominently before the KPI cards.
+    - **5 Top Metric Cards**: `Total Applications` (24), `In Progress` (5), `Interviews` (3), `Offers` (1), `Rejected` (15).
+    - **Urgent Action Banners**:
+      - **Offer Extended Banner (Mint Green)**: `"Stellar Systems extended an offer!"` with subtext, `"Respond by Oct 15"`, and solid green `"Review Offer"` CTA button.
+      - **Upcoming Interview Banner (Lavender/Indigo)**: `"Upcoming Interview: Vanguard Design"` with `"Oct 5, 2:00 PM"` and `"View Invite"` CTA button.
+    - **All Applications Section**: Header with increased 24px bold typography, search input (`Search companies...`), and status filter dropdown.
+    - **6 Application Cards**: Built with company initial avatars, verified checkmark badges, compensation & work type tags (`Remote`, `Internship`, `Paid`, `Hybrid`, `On-site`), status & stage texts, customized colored next step badge boxes (`Wait for feedback`, `Prepare for interview` + `Oct 5, 2024`, `Review offer`, `Application closed`), full year submission dates, and 3-dots action dropdown menus featuring icons for "View Listing" (navigating to role details) and single-line "Withdraw Application" modal action.
+    - **Mobile Responsiveness**: Implemented a structured CSS grid-area card layout for mobile viewports (e.g. iPhone 17 Pro Max 440px) ensuring avatar, company metadata, top-right 3-dots menu, dual-column status & stage, full-width action boxes, and bottom date alignment render cleanly.
+  - Added dedicated styling rules strictly in external [style.css](file:///c:/xampp/htdocs/InternConnect/public/assets/css/style.css).
+
+### Changed
+- **Payment & Upgrade Selection Checkout Flow**:
+  - Connected live Paystack Test Mode integration via [PaystackService.php](file:///c:/xampp/htdocs/InternConnect/backend/Services/PaystackService.php) and [PaymentController.php](file:///c:/xampp/htdocs/InternConnect/backend/Controllers/PaymentController.php).
+  - Configured test API credentials in [.env](file:///c:/xampp/htdocs/InternConnect/.env) (`PAYSTACK_PUBLIC_KEY` and `PAYSTACK_SECRET_KEY`).
+  - Added `absolute_url()` helper in [helpers.php](file:///c:/xampp/htdocs/InternConnect/backend/Core/helpers.php) to ensure Paystack receives fully qualified `http://localhost/...` callback endpoints for automatic post-payment redirection.
+  - Implemented 3 dedicated status result screens matching design:
+    - **Payment Successful** in [payment-success.php](file:///c:/xampp/htdocs/InternConnect/frontend/landing/payment-success.php): 2-column layout with smiling candidate photo (`pricing_success_n0cbzk.png`), animated blue checkmark ripple badge, plan activation summary with row dividers, next renewal date, and "Go to Dashboard →" CTA.
+    - **Payment Declined** in [payment-declined.php](file:///c:/xampp/htdocs/InternConnect/frontend/landing/payment-declined.php): 2-column layout with concerned candidate photo (`payment_declined_jyso8t.png`), animated red X ripple badge, decline reason card with row dividers, "Try Again" & "Choose another plan" buttons.
+    - **Payment Cancelled** in [payment-cancelled.php](file:///c:/xampp/htdocs/InternConnect/frontend/landing/payment-cancelled.php): 2-column layout with stressed candidate photo (`payment_cancelled_dnvsmc.png`), animated red X ripple badge, cancelled status summary with row dividers, "Try Again" & "Choose another plan" buttons.
+  - Added direct preview routes (`/payment/success`, `/payment/declined`, `/payment/cancelled`) in [routes.php](file:///c:/xampp/htdocs/InternConnect/backend/routes.php).
+  - Implemented the standalone upgrade / checkout selection view in [payment.php](file:///c:/xampp/htdocs/InternConnect/frontend/landing/payment.php) accessible via `/payments`, `/pricing/upgrade`, and `/checkout`.
+  - Built a 2-column layout matching the design:
+    - **Left Column**: Visual image card rendering Cloudinary asset (`picing_side_aq52aw.jpg`) with dark gradient overlay, displaying `"Invest in your potential."` and explanatory subtext.
+    - **Right Column**: Upgrade selection card featuring a purple lightning bolt badge ⚡, dynamic title (`Elevate Your Career with Pro` / `Premium`), interactive selectable Monthly and Annual billing radio cards with live price toggles (`₦2,499/mo` vs `₦24,999/yr` with "Best Value" savings pill badge), 3 feature checkmarks, cancellation disclaimer, and "Continue to payment" & "Back to plans" buttons.
+    - **Paystack Redirection Popup Modal**: Added animated modal triggered on "Continue to payment" with blurred backdrop, custom payment card icon badge, `"Redirecting you to Paystack"`, `"Secured by Paystack"` badge, trust security indicators (`256-bit encryption`, `PCI-DSS compliant`), and an animated indeterminate progress loading track.
+  - Linked the "Upgrade to Pro" (`/payments?plan=pro`) and "Go Premium" (`/payments?plan=premium`) buttons on [pricing.php](file:///c:/xampp/htdocs/InternConnect/frontend/landing/pricing.php) and [components/pricing.php](file:///c:/xampp/htdocs/InternConnect/frontend/landing/components/pricing.php) to seamlessly launch the checkout selection flow.
+  - Added dedicated styling rules strictly in external [style.css](file:///c:/xampp/htdocs/InternConnect/public/assets/css/style.css).
+- **Shared Navbar Layout, Auth State Switching & User Profile Dropdown**:
+  - Implemented dynamic auth state switching in [navbar.php](file:///c:/xampp/htdocs/InternConnect/frontend/shared/components/navbar.php):
+    - **Logged-In State**: Displays search input (`Search Internships`), notification bell with red unread indicator, and avatar dropdown (Dashboard, Saved Internships, Applications, Help Center, Profile Settings, and Log Out).
+    - **Logged-Out State**: Automatically hides search input, notification bell, and avatar dropdown, rendering clean **Log In** (`/login`) and **Sign Up** (`/register`) CTA buttons.
+    - **Log Out Handler & Flow**: Added `/logout` route in [routes.php](file:///c:/xampp/htdocs/InternConnect/backend/routes.php) and `logout()` method in [AuthController.php](file:///c:/xampp/htdocs/InternConnect/backend/Controllers/AuthController.php) resetting the `is_logged_in` session state and redirecting to the homepage with the navbar immediately rendered in the logged-out state.
+    - **Mobile Drawer Support**: Adapts mobile drawer navigation seamlessly between logged-in user profile sublinks and logged-out action buttons.
+  - Rearranged the desktop and mobile navigation links in [navbar.php](file:///c:/xampp/htdocs/InternConnect/frontend/shared/components/navbar.php) to: **Find Internships**, **How it Works**, **E-Learning**, **Payments**, and **Success Stories**.
+  - Placed all supporting styles into [style.css](file:///c:/xampp/htdocs/InternConnect/public/assets/css/style.css).
+- **Pricing Page Visual & Feature Showcase Refresh**: 
+  - Promoted the Section Header with billing switcher to act as the primary banner on the pricing page ([pricing.php](file:///c:/xampp/htdocs/InternConnect/frontend/landing/pricing.php)), removing the previous 2-column hero banner.
+  - Replaced the 4-column "Why Thousands of Candidates Choose Pro" section with a visual showcase consisting of a focused candidate image (`Woman_working_focused_sqvdeg.png`) on the left and 4 staggered floating feature cards on the right. Formatted **AI Recommendations** and **Interview Preparation** cards to overlap directly on top of the image boundary on desktop while offsetting **Resume Optimization** and **Priority Application** to the right, centered the overall layout horizontally, and made it stack smoothly to full-width cards on mobile viewports.
+  - Redesigned the "Ready to Find Your Next Opportunity?" CTA banner section on the pricing page using the Cloudinary photograph background (`Celebrating_success_ouxlqf.png`) with a 72% dark overlay, centered white typography, and a single "Get Started For Free" white CTA button.
+- **Global Footer 5-Column Redesign & Styling**: Updated [footer.php](file:///c:/xampp/htdocs/InternConnect/frontend/shared/components/footer.php) to feature a spacious 5-column horizontal grid layout with expanded max-width container (`max-width: 1280px`). Restored the dark SVG brand logo (`Logo_dark_dx00tg.svg`). Configured the 5 columns in a single row across desktop/laptop screens: **Brand** (logo + description), **Platform** ("About Us", "Employer Hub", "Applicant Resources"), **Support** ("Contact Support", "Privacy Policy", "Terms of Service"), **Blog** ("Latest Article", "News & Updates", "Interview Prep"), and **Follow Us** positioned on the far right with styled rounded square social icon buttons (LinkedIn, Facebook, Instagram, X). Consolidated all styling rules inside external [style.css](file:///c:/xampp/htdocs/InternConnect/public/assets/css/style.css).
+- **Auth Page Right-Side Background Image**: Updated the right-side presentation background on login (`login.php`), forgot-password (`forgot-password.php`), verify-code (`verify-code.php`), and reset-password (`reset-password.php`) pages to render the new Cloudinary visual identity asset (`Visual_Identity_7_ptgohs.png`). The asset is dynamically served via the `asset()` helper, aligned to the left (`bg-left`), zoomed in slightly (`scale-120` with a custom `transform-origin: left 80px`), and blended at 95% opacity on top of a dark gradient backdrop to keep the text crisp, highly legible, and visually clean.
+- **Application Cover Letter Validation & Switching Guards**: Updated the application wizard ([application.php](file:///c:/xampp/htdocs/InternConnect/frontend/candidate/application.php)) to enforce a minimum of 100 characters and a maximum of 2,000 characters for typed statements of intent. Implemented premium, primary-branded confirmation/inner alert warnings preventing direct mode switching if data exists in the active tab (requiring users to explicitly click custom styled switch buttons to clear text or remove files). Removed the redundant "Save for later" buttons from the application wizard steps.
+- **Application Wizard Fields & Navigation Rules**: Updated the application wizard ([application.php](file:///c:/xampp/htdocs/InternConnect/frontend/candidate/application.php)) and [CandidateController.php](file:///c:/xampp/htdocs/InternConnect/backend/Controllers/CandidateController.php):
+  - Renamed the portfolio dropzone upload to "Attach NYSC credentials (optional)" and extended file type support to include `.pdf`, `.png`, `.jpg`, and `.jpeg`.
+  - Added a new text input field for "Link for Portfolio" before the Figma Link input.
+  - Simplified the Figma Link input field label to "Figma Link".
+  - Implemented an Alpine.js watcher for the salary expectation input that dynamically formats numbers with commas (e.g., `3,999` or `40,000`) as the user types.
+  - Added navigation validation guards on the progress sidebar stepper links, preventing users from skipping steps and dispatching the system's toast alert component on invalid navigation attempts.
+  - Redesigned the Step 4 preview layout for "Your Answers" and "Attachments & Links" using custom card layouts, icon indicators, doc extension badges, and a grid system.
+  - Stepper Spacing Optimization: reduced discrete vertical segment connector lines (`.stepper-connector` in `application.css`) height to 24px and shifted offset top to 52px to create clean spacing from step circles. (Later restored to its original spacious `height: 48px` and `top: 40px` styling based on user preference).
+- **Employer Dashboard Layout & Spacing Refinements**: Fixed layout alignment discrepancies in the employer dashboard ([index.php](file:///c:/xampp/htdocs/InternConnect/frontend/employer/dashboard/index.php)) by introducing a custom local `<style>` block. Converted invalid inline style utility properties (Tailwind classes mixed into inline styles) to standard valid CSS rules, correcting the KPI stats row into a 5-column grid, aligning the welcome banner horizontally, ensuring bar charts rise from the bottom baseline, adding a `Live` badge with a pulsating dot to the interviews header, and wrapping match rate badges neatly. Added:
+  - Custom **Applications Performance Period Dropdown**: Styled the period selector dropdown to match the candidate Filter dropdown design (`db-filter-btn` trigger and light-mode floating options card), eliminating all template text-squishing bugs.
+  - Mobile responsive optimization for the **Review Queue** table, converting rows into beautiful blocks with left-aligned details indented by 48px to prevent button squishing, aligning the role and date elements in a single row next to each other, and styling **Review Now** as a full-width block button.
+  - Increased chart bar widths to 24px on desktop while dynamically restoring slim 12px widths on mobile device viewports.
+  - CSS grow-up keyframe animations for the performance chart bars.
+  - Interactive CSS-driven pop-up tooltips showing department-specific Goal vs. Actual details above the bar columns on hover.
+  - Purple/lavender styling matching the mockup for the match rate pill badges.
+  - Styled AI candidate status badges with left-aligned status dots (emerald for "Available Now", amber for "Interviewed").
+  - Redesigned topbar controls on employer navigation with circular icon containers (`db-topnav-icon`) and Alpine.js dropdown menus for **Notification Bell** (showing recent alerts and unread badge dot) and **Settings Cog** (showing Company Profile, Security & Permissions, Notification Settings), matching the candidate navbar behavior down to the pixel.
+  - Redesigned topbar **Sign Out** button on employer navigation using `db-signout`, displaying red icon + red text on desktop, and automatically converting to a clean circular red icon button (`38px x 38px`) on mobile screens (`< 900px`) matching the candidate navbar.
+  - Increased graph width share to `2.4fr` in the grid.
+  - Adjusted **Recent Activity** container layout to use clean `gap: 20px` list spacing while positioning card footer action cleanly at the bottom.
+- **Candidate Prefix Route Mapping & Chart Tooltips**: Registered `/candidate/dashboard`, `/candidate/saved`, and `/candidate/profile` in [routes.php](file:///c:/xampp/htdocs/InternConnect/backend/routes.php) to mirror employer routing architecture (`/employer/dashboard`), with automated 302 redirects from `/dashboard` to `/candidate/dashboard` in [CandidateController.php](file:///c:/xampp/htdocs/InternConnect/backend/Controllers/CandidateController.php). Integrated floating dark pop-up tooltips (`cand-chart-tooltip`) showing stage-specific volumes on Candidate Dashboard performance chart bar hover. Updated all links across candidate views, welcome-back screens, sidebar navigation, saved internships, profile settings, and application success screens.
+
+
 ### Added
 - **Index Page Hero & Cloudinary Showcase Assets**: Updated the homepage hero section ([hero.php](file:///c:/xampp/htdocs/InternConnect/frontend/landing/components/hero.php)) with updated subheadline, Bento Grid layout lines, and official Cloudinary showcase assets:
   - Right-side showcase image: `https://res.cloudinary.com/weburea/image/upload/v1785645677/internConnect/images/homepage_feature_showcase.png`

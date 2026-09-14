@@ -11,7 +11,7 @@ declare(strict_types=1);
     <div class="w-full md:w-1/2 flex flex-col p-8 lg:p-12 overflow-y-auto">
         <!-- Logo -->
         <a href="<?= url('/') ?>" class="flex-shrink-0 flex items-center">
-            <img src="<?= asset('assets/images/logos/Logo_dark_dx00tg.svg') ?>" alt="InternConnect" class="h-6 w-auto">
+            <img src="<?= asset('assets/images/logos/Logo_dark_dx00tg.svg') ?>" alt="InternConnect" class="h-[18px] md:h-[22px] w-auto">
         </a>
 
         <!-- Form Container -->
@@ -77,12 +77,12 @@ declare(strict_types=1);
         
         <!-- Subtle background styling based on image -->
         <div class="absolute inset-0 bg-gradient-to-br from-[#1E234B] to-[#12142B] z-0"></div>
-        <div class="absolute inset-0 bg-cover bg-bottom mix-blend-overlay opacity-[0.35] z-0" style="background-image: url('<?= asset('assets/images/plant.png') ?>');"></div>
+        <div class="absolute inset-0 bg-cover bg-left mix-blend-overlay z-0" style="opacity: 0.95; background-image: url('<?= asset('assets/images/Visual_Identity_7_ptgohs.png') ?>'); transform: scale(1.2); transform-origin: left 80px;"></div>
         <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 mix-blend-overlay z-0"></div>
         
         <!-- Large abstract geometry in background -->
         <div class="absolute bottom-[-10%] right-[-10%] w-3/4 h-3/4 border-[40px] border-white/5 rounded-tl-[80px] z-0"></div>
-
+        
         <!-- Content -->
         <div class="relative z-10 w-full max-w-[500px]">
             <div class="inline-flex items-center gap-2 border border-white/20 rounded-full px-4 py-1.5 mb-6 bg-white/5 backdrop-blur-sm">

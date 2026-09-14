@@ -14,4 +14,20 @@ class HomeController extends Controller
             'title' => 'Home - InternConnect'
         ]);
     }
+
+    public function pricing(): void
+    {
+        $this->renderView('landing/pricing', [
+            'title' => 'Pricing - InternConnect'
+        ]);
+    }
+
+    public function payments(): void
+    {
+        $plan = $_GET['plan'] ?? 'pro';
+        $this->renderView('landing/payment', [
+            'title' => 'Checkout - InternConnect',
+            'plan' => htmlspecialchars((string)$plan)
+        ]);
+    }
 }

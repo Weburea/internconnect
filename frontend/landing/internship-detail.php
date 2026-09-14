@@ -214,7 +214,7 @@ function tagBadgeClass(string $tag): string
                         <!-- Salary: single amount -->
                         <div class="mb-6">
                             <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
-                                Monthly Compensation
+                                Monthly Pay
                             </p>
                             <p class="text-3xl font-bold text-gray-900">
                                 $3,000

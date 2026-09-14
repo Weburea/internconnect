@@ -1,10 +1,16 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    
-    # Prevent directory listing
-    Options -Indexes
 
-    # Send all requests to the public/ directory
-    RewriteCond %{REQUEST_URI} !^/InterConnect/public/
-    RewriteRule ^(.*)$ public/$1 [L]
+    # If the requested file or directory exists directly, serve it
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # Rewrite assets requests to public/assets
+    RewriteRule ^assets/(.*)$ public/assets/$1 [L,QSA]
+
+    # Route all other application routes to root index.php
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L,QSA]
 </IfModule>
