@@ -528,11 +528,9 @@ $draftQuestions      = $draft['screening_questions'] ?? [
                             <!-- ── Card 1: AI Internship Assistant ── -->
                             <div class="emp-ai-card">
                                 <div class="emp-ai-header">
-                                    <div class="emp-ai-badge-icon">
-                                        <!-- Sparkles / AI Robot Icon SVG -->
-                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                        </svg>
+                                    <div class="emp-ai-avatar-wrap">
+                                        <!-- Official Waving Jenny AI Chatbot Mascot Image -->
+                                        <img src="<?= asset('assets/images/jenny_ai/jenny_ai_hi.png') ?>" alt="Jenny AI Assistant" class="emp-ai-mascot-img">
                                     </div>
                                     <div class="emp-ai-title-wrap">
                                         <h3 class="emp-ai-title">AI Internship Assistant</h3>

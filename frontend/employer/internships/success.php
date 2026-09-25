@@ -69,16 +69,16 @@ $title = $internship['title'] ?? 'Product Design Intern';
 
                         <!-- Action Buttons -->
                         <div class="emp-success-cta-row">
-                            <a href="<?= url('/employer/dashboard') ?>" class="emp-btn-primary">
-                                <span>View Candidates</span>
-                                <svg style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <a href="<?= url('/employer/dashboard') ?>" class="emp-btn-primary" style="display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; white-space: nowrap !important; flex-shrink: 0 !important;">
+                                <span style="white-space: nowrap !important;">View Candidates</span>
+                                <svg style="width: 14px; height: 14px; flex-shrink: 0 !important;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                 </svg>
                             </a>
 
-                            <a href="<?= url('/employer/internships/create') ?>" class="emp-btn-secondary" style="background: #EFF6FF; border-color: #BFDBFE; color: #4F48E6;">
-                                <span>Post another role</span>
-                                <svg style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <a href="<?= url('/employer/internships/create') ?>" class="emp-btn-secondary" style="background: #EFF6FF; border-color: #BFDBFE; color: #4F48E6; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; white-space: nowrap !important; flex-shrink: 0 !important;">
+                                <span style="white-space: nowrap !important;">Post another role</span>
+                                <svg style="width: 14px; height: 14px; flex-shrink: 0 !important;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                 </svg>
                             </a>

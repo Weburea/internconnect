@@ -527,21 +527,25 @@
     margin-bottom: 12px;
 }
 
-.emp-ai-badge-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: #4F48E6;
-    color: #FFFFFF;
+.emp-ai-avatar-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: #FFFFFF;
+    border: 1px solid #BFDBFE;
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
     flex-shrink: 0 !important;
+    box-shadow: 0 2px 8px rgba(79, 72, 230, 0.08);
 }
 
-.emp-ai-badge-icon svg {
-    width: 18px;
-    height: 18px;
+.emp-ai-mascot-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
 }
 
 .emp-ai-title-wrap {
@@ -826,8 +830,18 @@ input:checked + .emp-slider:before {
     color: #334155;
     cursor: pointer;
     text-decoration: none;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
     transition: all 0.15s ease;
     white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+.emp-btn-secondary svg {
+    width: 14px;
+    height: 14px;
     flex-shrink: 0 !important;
 }
 
@@ -847,6 +861,10 @@ input:checked + .emp-slider:before {
     color: #4F48E6;
     cursor: pointer;
     text-decoration: none;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
     transition: all 0.15s ease;
     white-space: nowrap !important;
     flex-shrink: 0 !important;
@@ -866,12 +884,19 @@ input:checked + .emp-slider:before {
     color: #FFFFFF;
     cursor: pointer;
     text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
     box-shadow: 0 4px 12px rgba(79, 72, 230, 0.25);
     transition: all 0.15s ease;
     white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+.emp-btn-primary svg {
+    width: 14px;
+    height: 14px;
     flex-shrink: 0 !important;
 }
 
@@ -1205,8 +1230,8 @@ input:checked + .emp-slider:before {
 }
 
 .emp-success-icon-badge {
-    width: 58px;
-    height: 58px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     background: #EFF4FE;
     display: flex;
@@ -1214,23 +1239,61 @@ input:checked + .emp-slider:before {
     justify-content: center;
     margin-bottom: 24px;
     flex-shrink: 0 !important;
+    animation: successBadgeRipple 2.2s infinite ease-in-out;
 }
 
 .emp-success-icon-inner {
-    width: 38px;
-    height: 38px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background: #4F48E6;
     color: #FFFFFF;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 12px rgba(79, 72, 230, 0.3);
+    box-shadow: 0 4px 14px rgba(79, 72, 230, 0.35);
 }
 
 .emp-success-icon-inner svg {
-    width: 20px;
-    height: 20px;
+    width: 22px;
+    height: 22px;
+}
+
+.emp-success-icon-inner svg path {
+    stroke-dasharray: 30;
+    stroke-dashoffset: 30;
+    animation: checkDraw 2.5s infinite ease-in-out;
+}
+
+@keyframes successBadgeRipple {
+    0% {
+        box-shadow: 0 0 0 0 rgba(79, 72, 230, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 16px rgba(79, 72, 230, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(79, 72, 230, 0);
+    }
+}
+
+@keyframes checkDraw {
+    0% {
+        stroke-dashoffset: 30;
+        opacity: 0;
+    }
+    20% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+    }
+    80% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+    }
+    100% {
+        stroke-dashoffset: -30;
+        opacity: 0;
+    }
 }
 
 .emp-success-h1 {
@@ -1255,16 +1318,38 @@ input:checked + .emp-slider:before {
     align-items: center;
     gap: 16px;
     margin-bottom: 28px;
+    flex-wrap: wrap;
 }
 
-@media (max-width: 540px) {
+.emp-success-cta-row a {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.emp-success-cta-row a svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0 !important;
+}
+
+@media (max-width: 640px) {
     .emp-success-cta-row {
         flex-direction: column;
         width: 100%;
+        gap: 12px;
     }
     .emp-success-cta-row a {
-        width: 100%;
-        justify-content: center;
+        width: 100% !important;
+        justify-content: center !important;
+        text-align: center;
+        white-space: nowrap !important;
     }
 }
 
