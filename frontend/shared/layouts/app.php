@@ -53,6 +53,9 @@ declare(strict_types=1);
     <!-- Global Toast Component -->
     <?php include dirname(__DIR__) . '/components/toast.php'; ?>
 
+    <!-- Global Jenny AI Chatbot Component -->
+    <?php include dirname(__DIR__) . '/components/chatbot/jenny-ai.php'; ?>
+
     <!-- Animated Favicon -->
     <script src="<?= asset('assets/js/favicon-animator.js') ?>"></script>
 

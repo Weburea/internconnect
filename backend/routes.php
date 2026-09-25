@@ -76,11 +76,23 @@ $router->get('/interview/invite', [CandidateController::class, 'viewInterviewInv
 $router->get('/interview/guide', [CandidateController::class, 'interviewGuide']);
 $router->get('/interview-guide', [CandidateController::class, 'interviewGuide']);
 
+// Help Center routes
+$router->get('/help', [CandidateController::class, 'help']);
+$router->get('/candidate/help', [CandidateController::class, 'help']);
+$router->get('/help/search', [CandidateController::class, 'helpSearch']);
+$router->get('/help/article', [CandidateController::class, 'helpArticle']);
+$router->get('/help/article/{slug}', [CandidateController::class, 'helpArticle']);
+$router->get('/help/{category}/{slug}', [CandidateController::class, 'helpArticle']);
+
 // Employer routes
 $router->get('/employer/dashboard', [EmployerController::class, 'dashboard']);
 $router->get('/employer/company', [EmployerController::class, 'companyProfile']);
 $router->get('/employer/companies', [EmployerController::class, 'companyProfile']);
-$router->get('/employer/profile', [EmployerController::class, 'companyProfile']);
+$router->get('/employer/profile', [EmployerController::class, 'profileSettings']);
+$router->post('/employer/profile', [EmployerController::class, 'updateProfileSettings']);
+$router->get('/employer/settings', [EmployerController::class, 'profileSettings']);
+$router->post('/employer/settings', [EmployerController::class, 'updateProfileSettings']);
+$router->get('/employer/profile/settings', [EmployerController::class, 'profileSettings']);
 $router->get('/companies', [EmployerController::class, 'companyProfile']);
 $router->get('/company', [EmployerController::class, 'companyProfile']);
 $router->get('/company/{slug}', [EmployerController::class, 'companyProfile']);

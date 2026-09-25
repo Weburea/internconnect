@@ -50,6 +50,9 @@ if (!function_exists('asset')) {
                 if ($subPath === 'logos/Logo_single_dark_dj6vhf.png' || $subPath === 'logos/logo_color.svg') {
                     return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1785517512/Logo_single_dark_dj6vhf.png";
                 }
+                if ($subPath === 'logos/internconnect-icon.svg' || $subPath === 'internconnect-icon.svg') {
+                    return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1790300840/internConnect/images/logo/internconnect-icon.svg";
+                }
 
                 // Specific homepage image asset mappings with versions
                 if ($subPath === 'homepage_feature_showcase.png') {
@@ -83,6 +86,23 @@ if (!function_exists('asset')) {
                 }
                 if ($subPath === 'payment_cancelled_dnvsmc.png' || $subPath === 'payment_cancelled.png') {
                     return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1788574692/payment_cancelled_dnvsmc.png";
+                }
+
+                // Jenny AI Chatbot mascot poses and launcher badge
+                if ($subPath === 'jenny_ai/jenny_icon.png' || $subPath === 'jenny_icon.png') {
+                    return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1790300712/internConnect/images/jenny_ai/jenny_icon.png";
+                }
+                if ($subPath === 'jenny_ai/jenny_ai_hi.png' || $subPath === 'jenny_ai_hi.png') {
+                    return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1790296466/internConnect/images/jenny_ai/jenny_ai_hi.png";
+                }
+                if ($subPath === 'jenny_ai/Thinking_jenny_ai.png' || $subPath === 'Thinking_jenny_ai.png') {
+                    return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1790296471/internConnect/images/jenny_ai/Thinking_jenny_ai.png";
+                }
+                if ($subPath === 'jenny_ai/Pointing_jenny_ai.png' || $subPath === 'Pointing_jenny_ai.png') {
+                    return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1790296510/internConnect/images/jenny_ai/Pointing_jenny_ai.png";
+                }
+                if ($subPath === 'jenny_ai/Full-body_standing_pose_jenny_ai.png' || $subPath === 'Full-body_standing_pose_jenny_ai.png') {
+                    return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1790296516/internConnect/images/jenny_ai/Full-body_standing_pose_jenny_ai.png";
                 }
 
                 // If it starts with logos/, map to logo/ (singular)

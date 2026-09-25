@@ -1,0 +1,49 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4F46E5"/>
+      <stop offset="1" stop-color="#4338CA"/>
+    </linearGradient>
+    <linearGradient id="screenGrad" x1="16" y1="20" x2="48" y2="44" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1E1B4B"/>
+      <stop offset="1" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="eyeGlow" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#38BDF8"/>
+      <stop offset="1" stop-color="#818CF8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background Circle / Badge -->
+  <circle cx="32" cy="32" r="31" fill="url(#bgGrad)" stroke="#6366F1" stroke-width="2"/>
+
+  <!-- Headphone Arc -->
+  <path d="M16 32C16 23.1634 23.1634 16 32 16C40.8366 16 48 23.1634 48 32" stroke="#E0E7FF" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Robot Head / Body -->
+  <rect x="18" y="22" width="28" height="24" rx="8" fill="#FFFFFF"/>
+
+  <!-- Visor Screen -->
+  <rect x="21" y="25" width="22" height="15" rx="5" fill="url(#screenGrad)"/>
+
+  <!-- Friendly Glowing Eyes -->
+  <path d="M25 32C25 30.5 26.2 29.5 27.5 29.5C28.8 29.5 30 30.5 30 32" stroke="url(#eyeGlow)" stroke-width="2" stroke-linecap="round"/>
+  <path d="M34 32C34 30.5 35.2 29.5 36.5 29.5C37.8 29.5 39 30.5 39 32" stroke="url(#eyeGlow)" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Headphone Ear Pads -->
+  <!-- Left Ear Pad with InternConnect Logo -->
+  <rect x="13" y="27" width="6" height="12" rx="3" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+  <!-- Right Ear Pad -->
+  <rect x="45" y="27" width="6" height="12" rx="3" fill="#EEF2FF" stroke="#4F46E5" stroke-width="1.5"/>
+
+  <!-- InternConnect Connected Emblem on Chest / Front Collar -->
+  <g transform="translate(26, 44) scale(0.42)">
+    <!-- Top Dot -->
+    <path d="M13.9334 0.00117504C15.2436 0.013806 16.5208 0.414069 17.6039 1.1515C18.687 1.88893 19.5275 2.93052 20.0195 4.14496C20.5115 5.35939 20.633 6.69231 20.3685 7.97565C20.1041 9.259 19.4656 10.4353 18.5336 11.3564C17.6016 12.2774 16.4178 12.9018 15.1314 13.151C13.845 13.4002 12.5136 13.263 11.3051 12.7566C10.0966 12.2503 9.06505 11.3974 8.34052 10.3057C7.61598 9.21391 7.2309 7.93207 7.23381 6.62177C7.22762 5.74393 7.39728 4.87374 7.73277 4.06252C8.06826 3.25129 8.56279 2.51546 9.1872 1.89841C9.81161 1.28136 10.5533 0.795594 11.3684 0.469749C12.1835 0.143903 13.0557 -0.0154196 13.9334 0.00117504Z" fill="#FFFFFF"/>
+    <!-- Connected Swoosh -->
+    <path d="M27.7388 13.2846V23.6218C25.5532 23.5558 23.4266 24.3363 21.8027 25.8005C20.1787 27.2646 19.1829 29.2993 19.0229 31.48C19.0041 31.6568 18.9891 31.8561 18.9815 32.0254H8.86632C8.86632 31.9276 8.83247 31.8298 8.81366 31.7358C7.798 26.3302 6.17295 24.8631 0 23.5127V13.3561C5.01811 12.9498 10.2017 15.2369 13.8882 19.104C17.3038 15.5003 22.1903 13.0702 27.7388 13.2846Z" fill="#FFFFFF"/>
+  </g>
+
+  <!-- Online Green Status Indicator Dot -->
+  <circle cx="48" cy="46" r="4.5" fill="#10B981" stroke="#FFFFFF" stroke-width="1.5"/>
+</svg>

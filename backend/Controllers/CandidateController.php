@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Services\HelpService;
 
 /**
  * CandidateController
@@ -1099,6 +1100,104 @@ class CandidateController extends Controller
             'title'     => 'Offer Declined — Stellar Systems — InternConnect',
             'candidate' => $candidate,
             'offer'     => $offer,
+        ], 'dashboard');
+    }
+
+    /**
+     * Help Center Landing View
+     * Route: /help, /candidate/help
+     */
+    public function help(array $params = []): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // If a search query parameter is present, redirect/handle as search
+        $query = trim(strip_tags($_GET['q'] ?? ($_GET['search'] ?? '')));
+        if ($query !== '') {
+            $this->helpSearch(['query' => $query]);
+            return;
+        }
+
+        $candidate = [
+            'name'   => $_SESSION['profile_name'] ?? 'Sarah Peters',
+            'role'   => $_SESSION['profile_role'] ?? 'Student Applicant',
+            'avatar' => $_SESSION['profile_avatar'] ?? asset('assets/images/profile.png'),
+        ];
+
+        $categories = HelpService::getCategories();
+        $popularFaqs = HelpService::getPopularFaqs();
+
+        $this->renderView('candidate/help/index', [
+            'title'       => 'Help Center — InternConnect',
+            'activeNav'   => 'help',
+            'candidate'   => $candidate,
+            'categories'  => $categories,
+            'popularFaqs' => $popularFaqs,
+        ], 'dashboard');
+    }
+
+    /**
+     * Help Center Search Results View
+     * Route: /help/search
+     */
+    public function helpSearch(array $params = []): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $query = $params['query'] ?? trim(strip_tags($_GET['q'] ?? ($_GET['search'] ?? '')));
+
+        $candidate = [
+            'name'   => $_SESSION['profile_name'] ?? 'Sarah Peters',
+            'role'   => $_SESSION['profile_role'] ?? 'Student Applicant',
+            'avatar' => $_SESSION['profile_avatar'] ?? asset('assets/images/profile.png'),
+        ];
+
+        $searchData = HelpService::search($query);
+
+        $this->renderView('candidate/help/search', [
+            'title'       => 'Search Results for "' . htmlspecialchars($query) . '" — Help Center',
+            'activeNav'   => 'help',
+            'candidate'   => $candidate,
+            'query'       => $searchData['query'],
+            'count'       => $searchData['count'],
+            'results'     => $searchData['results'],
+        ], 'dashboard');
+    }
+
+    /**
+     * Help Center Article Detail View
+     * Route: /help/article/{slug}, /help/{category}/{slug}
+     */
+    public function helpArticle(array $params = []): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $slug = $params['slug'] ?? trim(strip_tags($_GET['slug'] ?? 'can-i-edit-an-application-after-submission'));
+        $article = HelpService::getArticleBySlug($slug);
+
+        if (!$article) {
+            // Default fallback to first article if slug not found
+            $all = HelpService::getAllArticles();
+            $article = $all['can-i-edit-an-application-after-submission'] ?? reset($all);
+        }
+
+        $candidate = [
+            'name'   => $_SESSION['profile_name'] ?? 'Sarah Peters',
+            'role'   => $_SESSION['profile_role'] ?? 'Student Applicant',
+            'avatar' => $_SESSION['profile_avatar'] ?? asset('assets/images/profile.png'),
+        ];
+
+        $this->renderView('candidate/help/article', [
+            'title'     => ($article['title'] ?? 'Help Article') . ' — InternConnect',
+            'activeNav' => 'help',
+            'candidate' => $candidate,
+            'article'   => $article,
         ], 'dashboard');
     }
 }

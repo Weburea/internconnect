@@ -23,6 +23,64 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## [Unreleased]
 
+- **Jenny AI Assistant Chatbot Polish & Strict Zero-Emoji Compliance**:
+  - **Ultra-Crisp 3D Launcher & Header Avatar**: Replaced header avatar and floating launcher badge with the new high-resolution 3D blue gradient badge (`jenny_icon.png` / Cloudinary `v1790300712`) featuring the crisp InternConnect student/book symbol.
+  - **Guaranteed Brand Mark Rendering ("Powered by InternConnect AI")**: Replaced external image tag with pixel-perfect inline SVG brand mark (`#4F48E6`) to guarantee zero broken image frames across all network conditions and browsers.
+  - **Strict Zero-Emoji Governance & Icon Modernization**: Fully purged all unicode emojis (`📅`, `💼`, `👤`, `✓`, etc.) from chat bubbles, persona bars, and action cards across the chatbot widget. Replaced with clean, bounded inline SVGs.
+  - **Single-Line Button Integrity ("Applied")**: Enforced `white-space: nowrap !important;` and `flex-shrink: 0 !important;` along with an inline SVG checkmark on `.jenny-apply-btn` so "Applied" with checkmark never awkwardly wraps onto a second line.
+  - **Dynamic Persona Header & Modern Pill Switcher**: Dynamically targets first names (`Job Seeker (Adaeze)` / `Recruiter (Tunde)` or active user first name) with clean SVG user/briefcase role icons and a modern rounded pill toggle button (`Switch to Recruiter` / `Switch to Job Seeker`).
+  - **Premium Online Interview Scheduling Card**: Completely redesigned recruiter interview scheduling card with an inline SVG calendar icon, clean date & time zone display, duration pill (30 mins), responsive time slot pill grid (`9:00 AM`, `10:30 AM`, `2:00 PM`, `4:00 PM`, `5:30 PM`), full-width confirm CTA, and green confirmed state card.
+
+
+- **Help Center Knowledge Base & Support Chatbot Integration (`/help`, `/help/search`, `/help/article/{slug}`)**:
+  - **Main Help Center Hub (`frontend/candidate/help/index.php`)**: Built candidate-focused help center hub with purple hero search banner (`How can we help you, Sarah?`), live keyword search bar, popular suggestion chips (`Quick Apply`, `Resume building`, `Interview tips`), 6 category cards (*Getting Started*, *Applying for Internships*, *Profile & Settings*, *Saved Internships*, *Notifications & Alerts*, *Account & Privacy*), and smooth Alpine.js accordion for Popular FAQs with direct article links.
+  - **Help Center Keyword Search (`frontend/candidate/help/search.php`)**: Implemented keyword search matching and highlighting using soft-yellow `<mark>` badges matching design specifications, displaying match counts, result snippets, and category tags.
+  - **Article Detail View (`frontend/candidate/help/article.php`)**: Implemented full article view with multi-level breadcrumb navigation, category and reading time metadata, structured article content, related articles grid, interactive feedback card (*"Was this article helpful?"* with Yes/No actions), and a *"Still need help?"* CTA card triggering student support.
+  - **HelpService Knowledge Provider (`backend/Services/HelpService.php`)**: Centralized repository of categories, articles, FAQs, search indexing, and keyword highlighting.
+  - **Candidate Controller & Route Registration**: Registered `/help`, `/candidate/help`, `/help/search`, `/help/article`, `/help/article/{slug}`, and `/help/{category}/{slug}` in `backend/routes.php` and controller methods in `CandidateController.php`.
+  - **Extracted Brand Logo & Chatbot Avatar Asset Generation**: Extracted standalone SVG mark `public/assets/images/logos/internconnect-icon.svg`, vector bot avatar `public/assets/images/chatbot/bot-avatar.svg`, and generated ultra-modern 3D AI assistant chatbot avatar `public/assets/images/chatbot/bot-avatar.jpg` with headphones and embedded InternConnect logo emblem.
+  - **Modular Floating Support Chatbot Component (`frontend/shared/components/chatbot/widget.php`)**: Built floating student support launcher button and interactive popup chat dialog with agent avatar (*Alex from Student Success*), online status indicator, average wait time banner (*Avg. wait time: 2 mins*), message history, typing indicator, quick suggestions (*Syncing issues*, *Profile completion*, *Password reset*), and message input box.
+
+- **Onboarding Wizard UX & UI Polish (Employer & Student)**:
+  - **Compact Document Dropzones**: Reduced excessive height on upload dropzones (`py-4 px-4`) to make them clean, compact, and boxy.
+  - **Filename Overflow Containment**: Enforced strict `overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%` on uploaded document preview cards so long filenames never push or overflow out of the box.
+  - **Optional Company Website**: Changed Employer Step 5 Website field to optional (`Website (Optional)`) and removed requirement from step validation.
+  - **Enhanced Add Department Dropdown**: Added custom primary-colored scrollbar (`.custom-primary-scrollbar`) and smooth animated checkbox components.
+  - **Redesigned Primary Internship Type (Step 6)**: Fixed edge spacing and vertical/horizontal padding with balanced `px-4 py-3.5` cards, brand-indigo icon containers, and smooth radio check indicators.
+  - **Monochromatic & Professional Profile Preview Summary (Step 7)**: Redesigned the Program Overview & Verification summary grid into a cohesive, monochromatic corporate card layout with unified `bg-indigo-50 text-primary` icon tokens (Target Intake, Compensation Model, CAC RC Status, Company Size), eliminating clashy multi-colored badges.
+  - **Monogram Logo Fallbacks (Step 5 & 7)**: Added automated company monogram avatars and `@error` image fallbacks to prevent broken image icon frames when logos are unset or draft blob URLs expire.
+
+- **Custom Form Dropdowns Standardization & Company Overview Polish**:
+  - **Eliminated Native Boxy HTML Selects Across All Portals**: Replaced all native `<select>` elements in Candidate Profile, Student Registration Wizard (`/register/student`), Employer Registration Wizard (`/register/employer`), and Employer Profile Settings (`/employer/profile`) with custom rounded Alpine.js dropdown components (`.db-dropdown-wrap`, `.db-dropdown-btn`, `.db-dropdown-menu`, `.db-dropdown-item`) matching the employer dashboard filter style.
+  - **Single Tick Selection & Escaping Fix**: Fixed Degree Type and Graduation Year multi-tick bug by encoding options with `json_encode()` and using single-variable strict equality (`degree_level === dOpt` / `graduation_year === yOpt`).
+  - **Company Overview Navigation & Detail Sync**:
+    - Renamed sidebar navigation item from "Companies" to "**Company Overview**" (`/employer/company`).
+    - Removed hero banner "Change Banner" button and avatar pencil edit icon from Company Overview (edits now properly routed exclusively to Profile Settings).
+    - Linked "Edit Profile" directly to `/employer/profile`.
+    - Added verified CAC RC Registration badge and dynamic target department tags from onboarding session.
+  - **Master Governance Rules**: Enforced mandatory custom form dropdown rules in `.agents/rules/agent_mistakes_preventions.md` and `.agents/rules/rules.md`.
+
+- **Employer Profile Settings & Organization Management (`/employer/profile`, `/employer/settings`)**:
+  - **Employer Profile Settings View**: Built complete organization profile settings matching the candidate profile UX architecture:
+    - **Brand Visual Assets**: Company Cover Banner and Logo / Avatar uploaders with drag-and-drop, live image preview, recommended aspect ratio guidelines, and instant replacement.
+    - **Organization Verification & CAC**: CAC Registration / RC number input with business incorporation certificate upload card, full-screen document preview modal, and verified status indicator.
+    - **Company Profile Information**: Company Name, Slogan/Tagline, Industry selection, Company Size, Overview Bio, and Culture & Values descriptions.
+    - **Internship Program & Focus**: Multi-tag hiring department selector (Engineering, Product Design, Marketing, Data Science, etc.), expected intern volume, and program compensation type.
+    - **Contact Details & Social Links**: Careers email, phone number, headquarters location, website URL, and social media handles (LinkedIn, X/Twitter, etc.).
+    - **Notification Preferences**: Application alerts, interview RSVPs, and platform announcements switches.
+    - **Danger Zone**: Organization account deactivation modal protected by company name verification input.
+    - **Authentication & Security**: Primary login email (Verified), Google Workspace OAuth (Connected), Password & Security change form with visibility toggles, and Active Devices & Sessions management.
+  - **Sidebar Navigation Refactoring**:
+    - Removed `Saved`, `Resources`, and redundant Quick Access links from the employer sidebar.
+    - Added dedicated **Profile Settings** link with active route indicators.
+    - Restyled and polished the **Build your future** promo card at the bottom of the sidebar with proper spacing and gradient aesthetics.
+  - **UI/UX Refinements & Bug Fixes**:
+    - **Single Arrow Select Dropdowns**: Fixed repeating `v v v v v` background arrow artifacts on `<select>` inputs by enforcing `appearance: none !important;` and `background-repeat: no-repeat !important; background-position: right 14px center !important; background-size: 16px 16px !important;` across normal, hover, and focus states.
+    - **Target Internship Departments Pills**: Restructured department tags into pre-rendered `.emp-tag-pill` elements inside flex-wrapping `.emp-tags-wrapper` with explicit SVG checkmarks and seamless Alpine.js state synchronization.
+    - **Clean File Upload Dropzone Default**: Configured Business Verification (CAC) dropzone to initialize in an interactive empty state by default, rendering uploaded file cards only when actual documents exist.
+    - **Base Controller Redirection**: Added `redirect(string $path): void` to `App\Core\Controller` to handle post-submission redirects without fatal method exceptions.
+    - **Rule System Updates**: Updated `.agents/rules/agent_mistakes_preventions.md` and `.agents/rules/rules.md` with strict rules for select arrows, interactive tag pills, form redirects, and empty dropzone states.
+
 - **Employer Company Profile View & Navigation (`/employer/company`, `/companies`, `/company`)**:
   - **Asset Integration via Cloudinary**: Uploaded and integrated the circular HK logo (`hk_logo.jpg`) and horizontal banner (`hk_banner.png`) under Cloudinary folder `internConnect/images/`.
   - **Hero Card**: High-resolution banner background with overlay circular avatar badge, verified status checkmark, company name (`TechFlow Systems`), slogan, metadata pills (`Software Development`, `Lagos, Nigeria`, `201–500 employees`), and action buttons (`Follow`, `Apply Now` / `Post Opening`).
