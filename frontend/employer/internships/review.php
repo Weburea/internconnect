@@ -70,7 +70,7 @@ $deadline         = !empty($draft['deadline']) ? date('M j, Y', strtotime($draft
                         <p class="emp-post-subtitle">Make sure everything looks perfect before going live.</p>
                     </div>
 
-                    <div style="display: flex; align-items: center; gap: 12px;">
+                    <div class="emp-post-header-actions">
                         <a href="<?= url('/employer/internships/create') ?>" class="emp-btn-secondary">Save as Draft</a>
                         <form action="<?= url('/employer/internships/publish') ?>" method="POST" style="margin: 0;">
                             <button type="submit" class="emp-btn-primary">Publish Internship</button>

@@ -124,7 +124,7 @@ $draftQuestions      = $draft['screening_questions'] ?? [
                                 </div>
 
                                 <!-- Category & Internship Type (Row) -->
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;" class="emp-field-group">
+                                <div class="emp-form-grid-2col emp-field-group">
                                     
                                     <!-- Category Custom Alpine Dropdown (Image 4 Match) -->
                                     <div>
@@ -326,7 +326,7 @@ $draftQuestions      = $draft['screening_questions'] ?? [
                                 </div>
 
                                 <!-- Education Level & Experience Level (Row) -->
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;" class="emp-field-group">
+                                <div class="emp-form-grid-2col emp-field-group">
                                     
                                     <!-- Education Level Alpine Dropdown (Image 4 Match) -->
                                     <div>
@@ -402,7 +402,7 @@ $draftQuestions      = $draft['screening_questions'] ?? [
                                     <h2 class="emp-card-title">Details & Duration</h2>
                                 </div>
 
-                                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+                                <div class="emp-form-grid-3col emp-field-group">
                                     
                                     <!-- Start Date -->
                                     <div>
@@ -469,7 +469,7 @@ $draftQuestions      = $draft['screening_questions'] ?? [
                                     <h2 class="emp-card-title">Perks & Stipend</h2>
                                 </div>
 
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                                <div class="emp-form-grid-2col">
                                     
                                     <!-- Stipend Amount -->
                                     <div>

@@ -97,7 +97,9 @@ $router->get('/companies', [EmployerController::class, 'companyProfile']);
 $router->get('/company', [EmployerController::class, 'companyProfile']);
 $router->get('/company/{slug}', [EmployerController::class, 'companyProfile']);
 
-// Employer Post Internship flow
+// Employer My Internships & Post Internship flow
+$router->get('/employer/internships', [EmployerController::class, 'myInternships']);
+$router->get('/employer/my-internships', [EmployerController::class, 'myInternships']);
 $router->get('/employer/internships/create', [EmployerController::class, 'createInternship']);
 $router->post('/employer/internships/create', [EmployerController::class, 'storeInternship']);
 $router->get('/employer/post-internship', [EmployerController::class, 'createInternship']);

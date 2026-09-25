@@ -608,5 +608,94 @@ class EmployerController extends Controller
             'activeNav'  => 'post',
         ], 'dashboard');
     }
+
+    /**
+     * Renders the "My Internships" management page (Employer Portal).
+     */
+    public function myInternships(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $employer = [
+            'company_name' => $_SESSION['employer_company'] ?? 'TechFlow System',
+            'role'         => 'Manage Talent',
+            'avatar'       => $_SESSION['employer_avatar'] ?? null,
+        ];
+
+        // Sample / real internships data matching Image 5 specs
+        $internships = [
+            [
+                'id'            => 1,
+                'title'         => 'Senior Software Engineer Intern',
+                'status'        => 'ACTIVE',
+                'department'    => 'Engineering',
+                'location_type' => 'Hybrid',
+                'posted_at'     => 'Posted Apr 12, 2026',
+                'is_draft'      => false,
+                'stats'         => [
+                    'applicants' => 142,
+                    'shortlist'  => 24,
+                    'interviews' => 8,
+                    'hired'      => 2,
+                ],
+            ],
+            [
+                'id'            => 2,
+                'title'         => 'Product Designer (UX/UI) Intern',
+                'status'        => 'ACTIVE',
+                'department'    => 'Design',
+                'location_type' => 'Remote',
+                'posted_at'     => 'Posted Apr 08, 2026',
+                'is_draft'      => false,
+                'stats'         => [
+                    'applicants' => 86,
+                    'shortlist'  => 12,
+                    'interviews' => 4,
+                    'hired'      => 0,
+                ],
+            ],
+            [
+                'id'            => 3,
+                'title'         => 'Product Marketing Intern',
+                'status'        => 'CLOSED',
+                'department'    => 'Marketing',
+                'location_type' => 'On-site',
+                'posted_at'     => 'Closed Mar 30, 2026',
+                'is_draft'      => false,
+                'stats'         => [
+                    'applicants' => 215,
+                    'shortlist'  => 45,
+                    'interviews' => 12,
+                    'hired'      => 3,
+                ],
+            ],
+            [
+                'id'            => 4,
+                'title'         => 'Content Strategist Intern (Draft)',
+                'status'        => 'DRAFT',
+                'department'    => 'Marketing',
+                'location_type' => 'Remote',
+                'posted_at'     => 'Last saved 2 hours ago',
+                'is_draft'      => true,
+                'stats'         => null,
+            ],
+        ];
+
+        $currentFilter = strtolower($_GET['filter'] ?? 'all');
+        $validFilters  = ['all', 'active', 'closed', 'draft'];
+        if (!in_array($currentFilter, $validFilters, true)) {
+            $currentFilter = 'all';
+        }
+
+        $this->renderView('employer/internships/index', [
+            'title'         => 'My Internships — InternConnect',
+            'employer'      => $employer,
+            'internships'   => $internships,
+            'currentFilter' => $currentFilter,
+            'activeNav'     => 'internships',
+        ], 'dashboard');
+    }
 }
 

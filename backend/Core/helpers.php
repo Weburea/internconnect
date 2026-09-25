@@ -87,6 +87,9 @@ if (!function_exists('asset')) {
                 if ($subPath === 'payment_cancelled_dnvsmc.png' || $subPath === 'payment_cancelled.png') {
                     return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1788574692/payment_cancelled_dnvsmc.png";
                 }
+                if ($subPath === 'banner_my_internship.jpg' || $subPath === 'banner_my_internship.jpeg') {
+                    return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1790308883/internConnect/images/banner_my_internship.jpg";
+                }
 
                 // Jenny AI Chatbot mascot poses and launcher badge
                 if ($subPath === 'jenny_ai/jenny_icon.png' || $subPath === 'jenny_icon.png') {

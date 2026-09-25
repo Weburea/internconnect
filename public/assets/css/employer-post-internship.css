@@ -13,7 +13,10 @@
 
 @media (max-width: 768px) {
     .emp-post-container {
-        padding: 16px 16px 48px 16px;
+        padding: 0 0 100px 0;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
     }
 }
 
@@ -41,6 +44,57 @@
     margin-top: 6px;
     margin-bottom: 0;
     font-weight: 500;
+}
+
+.emp-post-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+@media (max-width: 768px) {
+    .emp-post-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 20px;
+        width: 100%;
+    }
+    .emp-post-title {
+        font-size: clamp(18px, 4.8vw, 22px);
+        line-height: 1.25;
+        white-space: nowrap !important; /* strictly single line on mobile */
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
+    .emp-post-subtitle {
+        font-size: 13.5px;
+        margin-top: 4px;
+        line-height: 1.4;
+    }
+    .emp-post-header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        margin-top: 6px;
+    }
+    .emp-post-header-actions .emp-btn-secondary,
+    .emp-post-header-actions .emp-btn-primary,
+    .emp-post-header-actions form {
+        flex: 1;
+        width: 100%;
+    }
+    .emp-post-header-actions button,
+    .emp-post-header-actions a {
+        width: 100% !important;
+        justify-content: center !important;
+        text-align: center;
+        white-space: nowrap !important;
+        padding: 10px 14px;
+        font-size: 13px;
+    }
 }
 
 /* ── 2-Column Grid ── */
@@ -76,6 +130,36 @@
 
 .emp-form-card:hover {
     box-shadow: 0 4px 16px rgba(0, 6, 35, 0.05);
+}
+
+@media (max-width: 768px) {
+    .emp-form-card {
+        padding: 18px 14px;
+        border-radius: 14px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
+
+/* ── Responsive Form Grids ── */
+.emp-form-grid-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.emp-form-grid-3col {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+}
+
+@media (max-width: 768px) {
+    .emp-form-grid-2col,
+    .emp-form-grid-3col {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
 }
 
 .emp-card-header {
@@ -183,15 +267,17 @@
     border: 1px solid #E2E8F0;
     border-radius: 10px;
     padding: 3px;
-    gap: 2px;
+    gap: 3px;
     width: 100%;
+    box-sizing: border-box;
 }
 
 .emp-segment-btn {
     flex: 1;
+    min-width: 0;
     border: none;
     background: transparent;
-    padding: 8px 12px;
+    padding: 8px 10px;
     font-size: 12.5px;
     font-weight: 600;
     color: #64748B;
@@ -200,7 +286,8 @@
     text-align: center;
     transition: all 0.15s ease;
     white-space: nowrap !important;
-    flex-shrink: 0 !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .emp-segment-btn:hover {
@@ -820,6 +907,28 @@ input:checked + .emp-slider:before {
     gap: 12px;
 }
 
+@media (max-width: 768px) {
+    .emp-post-actions-bar {
+        flex-direction: column-reverse;
+        gap: 12px;
+        margin-top: 24px;
+        padding-top: 16px;
+        width: 100%;
+    }
+    .emp-post-actions-right {
+        width: 100%;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .emp-post-actions-right button,
+    .emp-post-actions-right a,
+    .emp-btn-cancel {
+        width: 100% !important;
+        justify-content: center !important;
+        text-align: center;
+    }
+}
+
 .emp-btn-secondary {
     background: #FFFFFF;
     border: 1px solid #CBD5E1;
@@ -1368,3 +1477,600 @@ input:checked + .emp-slider:before {
 .emp-success-manage-link a:hover {
     color: #4338CA;
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   MY INTERNSHIPS PAGE STYLES (Employer Portal - Matches Image 5 & Audio Specs)
+   Palette: Navy #000623, Indigo #4F48E6, Light Grey #F2F2F2, White #FFFFFF
+   Banner: Cloudinary banner_my_internship.jpg with Jenny AI Mascot
+════════════════════════════════════════════════════════════════════════════ */
+
+.emp-myint-page {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* ── Top Header ── */
+.emp-myint-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.emp-myint-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: #000623;
+    line-height: 1.2;
+    margin: 0;
+    letter-spacing: -0.02em;
+}
+
+.emp-myint-subtitle {
+    font-size: 14px;
+    color: #475569;
+    margin-top: 6px;
+    margin-bottom: 0;
+    font-weight: 500;
+}
+
+.emp-btn-launch {
+    background: #4F48E6;
+    color: #FFFFFF;
+    border: 1px solid #4F48E6;
+    border-radius: 10px;
+    padding: 11px 22px;
+    font-size: 14px;
+    font-weight: 700;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(79, 72, 230, 0.25);
+    transition: all 0.15s ease;
+}
+
+.emp-btn-launch:hover {
+    background: #4338CA;
+    border-color: #4338CA;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(79, 72, 230, 0.35);
+}
+
+@media (max-width: 768px) {
+    .emp-myint-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
+    .emp-myint-title {
+        font-size: 22px;
+        white-space: nowrap !important;
+    }
+    .emp-btn-launch {
+        width: 100% !important;
+    }
+}
+
+/* ── Top Bar with Filter Pills & Search ── */
+.emp-filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 10px 16px;
+}
+
+.emp-filter-tabs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.emp-filter-tab {
+    background: transparent;
+    border: 1px solid transparent;
+    color: #64748B;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+.emp-filter-tab:hover {
+    background: #F1F5F9;
+    color: #0F172A;
+}
+
+.emp-filter-tab.is-active {
+    background: #EEF2FF;
+    border-color: #C7D2FE;
+    color: #4F48E6;
+    font-weight: 700;
+}
+
+.emp-myint-search-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 6px 12px;
+    flex: 1;
+    max-width: 320px;
+}
+
+.emp-myint-search-wrap svg {
+    width: 16px;
+    height: 16px;
+    color: #94A3B8;
+    flex-shrink: 0 !important;
+}
+
+.emp-myint-search-input {
+    border: none;
+    background: transparent;
+    font-size: 13px;
+    color: #0F172A;
+    width: 100%;
+    outline: none;
+}
+
+@media (max-width: 640px) {
+    .emp-filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .emp-myint-search-wrap {
+        max-width: 100%;
+    }
+}
+
+/* ── AI Insights Banner (Matches Image 5 + Cloudinary Asset) ── */
+.emp-myint-banner {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    background-color: #3730A3;
+    display: flex;
+    align-items: stretch;
+    box-shadow: 0 8px 24px rgba(55, 48, 163, 0.2);
+    min-height: 180px;
+}
+
+.emp-banner-content-side {
+    flex: 1.3;
+    padding: 32px 36px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+    background: linear-gradient(90deg, #312E81 0%, #3730A3 75%, rgba(55, 48, 163, 0.9) 100%);
+}
+
+.emp-banner-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #C7D2FE;
+    margin-bottom: 12px;
+}
+
+.emp-banner-tag svg {
+    width: 14px;
+    height: 14px;
+    color: #A5B4FC;
+    flex-shrink: 0 !important;
+}
+
+.emp-banner-heading {
+    font-size: 20px;
+    font-weight: 800;
+    color: #FFFFFF;
+    line-height: 1.3;
+    margin: 0 0 10px 0;
+    letter-spacing: -0.01em;
+    max-width: 580px;
+}
+
+.emp-banner-subtext {
+    font-size: 13.5px;
+    color: #E0E7FF;
+    line-height: 1.55;
+    margin: 0 0 20px 0;
+    max-width: 520px;
+}
+
+.emp-banner-btn {
+    align-self: flex-start;
+    background: #FFFFFF;
+    color: #4F48E6;
+    border-radius: 8px;
+    padding: 9px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    transition: all 0.15s ease;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+.emp-banner-btn:hover {
+    background: #F8FAFC;
+    color: #3730A3;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
+.emp-banner-media-side {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    min-height: 180px;
+    background: #3730A3;
+}
+
+.emp-banner-media-side img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: right center;
+}
+
+@media (max-width: 860px) {
+    .emp-myint-banner {
+        flex-direction: column;
+    }
+    .emp-banner-content-side {
+        padding: 24px 20px;
+        background: #312E81;
+    }
+    .emp-banner-heading {
+        font-size: 18px;
+    }
+    .emp-banner-media-side {
+        min-height: 140px;
+    }
+}
+
+/* ── Internship Listing Cards (Image 5 Pattern) ── */
+.emp-myint-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.emp-internship-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 16px;
+    padding: 22px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    box-shadow: 0 1px 3px rgba(0, 6, 35, 0.03);
+    transition: all 0.2s ease;
+}
+
+.emp-internship-card:hover {
+    border-color: #CBD5E1;
+    box-shadow: 0 4px 16px rgba(0, 6, 35, 0.06);
+}
+
+/* Draft card dashed styling */
+.emp-internship-card.is-draft {
+    border: 1.5px dashed #F59E0B;
+    background: #FFFDF9;
+}
+
+.emp-card-left {
+    flex: 1.2;
+    min-width: 220px;
+}
+
+.emp-card-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.emp-card-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: #000623;
+    line-height: 1.3;
+    margin: 0;
+}
+
+/* Status Badges */
+.emp-status-badge {
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    padding: 3px 9px;
+    border-radius: 99px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+.emp-status-badge.active {
+    background: #ECFDF5;
+    color: #059669;
+    border: 1px solid #A7F3D0;
+}
+
+.emp-status-badge.closed {
+    background: #F1F5F9;
+    color: #64748B;
+    border: 1px solid #E2E8F0;
+}
+
+.emp-status-badge.draft {
+    background: #FEF3C7;
+    color: #D97706;
+    border: 1px solid #FDE68A;
+}
+
+.emp-card-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 12.5px;
+    color: #64748B;
+    flex-wrap: wrap;
+}
+
+.emp-card-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+.emp-card-meta-item svg {
+    width: 14px;
+    height: 14px;
+    color: #94A3B8;
+    flex-shrink: 0 !important;
+}
+
+.emp-card-postdate {
+    font-size: 12px;
+    color: #94A3B8;
+    margin-top: 8px;
+}
+
+/* Metrics Section (Applicants, Shortlist, Interviews, Hired) */
+.emp-card-stats {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding: 0 16px;
+}
+
+.emp-stat-col {
+    text-align: center;
+    min-width: 48px;
+}
+
+.emp-stat-number {
+    font-size: 22px;
+    font-weight: 800;
+    color: #000623;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+.emp-stat-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #64748B;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 3px;
+}
+
+.emp-draft-ready-prompt {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #92400E;
+    white-space: nowrap !important;
+    padding-right: 12px;
+}
+
+/* Card Actions */
+.emp-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0 !important;
+}
+
+.emp-btn-view-apps {
+    background: #EEF2FF;
+    color: #4F48E6;
+    border: 1px solid #C7D2FE;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+}
+
+.emp-btn-view-apps:hover {
+    background: #E0E7FF;
+    color: #3730A3;
+}
+
+.emp-btn-archive {
+    background: #F1F5F9;
+    color: #475569;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+.emp-btn-archive:hover {
+    background: #E2E8F0;
+    color: #0F172A;
+}
+
+.emp-btn-finish-post {
+    background: #78350F;
+    color: #FFFFFF;
+    border: 1px solid #78350F;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+.emp-btn-finish-post:hover {
+    background: #5A270B;
+}
+
+.emp-icon-action-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    color: #64748B;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-decoration: none;
+    flex-shrink: 0 !important;
+}
+
+.emp-icon-action-btn:hover {
+    background: #F1F5F9;
+    color: #0F172A;
+    border-color: #CBD5E1;
+}
+
+.emp-icon-action-btn svg {
+    width: 15px;
+    height: 15px;
+}
+
+/* Responsive Card Breakpoint */
+@media (max-width: 960px) {
+    .emp-internship-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 18px;
+        padding: 20px 18px;
+    }
+    .emp-card-stats {
+        padding: 14px 0;
+        border-top: 1px solid #F1F5F9;
+        border-bottom: 1px solid #F1F5F9;
+        justify-content: space-around;
+        gap: 12px;
+    }
+    .emp-card-actions {
+        justify-content: flex-end;
+    }
+}
+
+/* ── Pagination ── */
+.emp-pagination-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 16px;
+    font-size: 13.5px;
+    color: #64748B;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.emp-pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.emp-page-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid #E2E8F0;
+    background: #FFFFFF;
+    color: #475569;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.emp-page-btn:hover {
+    border-color: #CBD5E1;
+    background: #F8FAFC;
+    color: #0F172A;
+}
+
+.emp-page-btn.is-active {
+    background: #4F48E6;
+    border-color: #4F48E6;
+    color: #FFFFFF;
+}
+
+.emp-page-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
