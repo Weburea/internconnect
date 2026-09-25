@@ -56,9 +56,9 @@ declare(strict_types=1);
                      style="background-image: linear-gradient(90deg, #4F47DA 0%, #4F47DA 38%, rgba(79, 71, 218, 0.8) 58%, transparent 80%), url('<?= asset('assets/images/banner_my_internship.jpg') ?>');">
                     <div class="emp-banner-inner">
                         <div class="emp-banner-tag">
-                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                            </svg>
+                            <div class="emp-banner-ai-badge">
+                                <img src="<?= asset('assets/images/jenny_ai/jenny_ai_hi.png') ?>" alt="Jenny AI" class="emp-banner-ai-img">
+                            </div>
                             <span>AI Internship Insights</span>
                         </div>
 

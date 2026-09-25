@@ -697,5 +697,457 @@ class EmployerController extends Controller
             'activeNav'     => 'internships',
         ], 'dashboard');
     }
+
+    /**
+     * Renders the Applications / Candidates list view
+     * Route: /employer/candidates or /employer/applications
+     */
+    public function candidates(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $employer = [
+            'company_name' => $_SESSION['employer_company'] ?? 'Global Tech Solutions',
+            'role'         => 'Manage Talent',
+            'avatar'       => $_SESSION['employer_avatar'] ?? null,
+        ];
+
+        $candidates = $this->getMockCandidates();
+
+        $this->renderView('employer/candidates/index', [
+            'title'      => 'Applications — InternConnect',
+            'employer'   => $employer,
+            'candidates' => $candidates,
+            'activeNav'  => 'candidates',
+        ], 'dashboard');
+    }
+
+    /**
+     * Renders the Candidate Profile / Application Review view
+     * Route: /employer/candidates/{id}
+     */
+    public function candidateProfile(array $params = []): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $id = (int)($params['id'] ?? ($_GET['id'] ?? 1));
+        $all = $this->getMockCandidates();
+        $candidate = null;
+
+        foreach ($all as $c) {
+            if ($c['id'] === $id) {
+                $candidate = $c;
+                break;
+            }
+        }
+
+        if (!$candidate) {
+            $candidate = $all[0];
+        }
+
+        $employer = [
+            'company_name' => $_SESSION['employer_company'] ?? 'Global Tech Solutions',
+            'role'         => 'Manage Talent',
+            'avatar'       => $_SESSION['employer_avatar'] ?? null,
+        ];
+
+        $this->renderView('employer/candidates/show', [
+            'title'      => $candidate['name'] . ' — Application Review | InternConnect',
+            'employer'   => $employer,
+            'candidate'  => $candidate,
+            'activeNav'  => 'candidates',
+        ], 'dashboard');
+    }
+
+    /**
+     * Renders the Interview Scheduler view
+     * Route: /employer/interviews/schedule/{id} or /employer/interviews/schedule
+     */
+    public function scheduleInterview(array $params = []): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $id = (int)($params['id'] ?? ($_GET['id'] ?? 1));
+        $all = $this->getMockCandidates();
+        $candidate = null;
+
+        foreach ($all as $c) {
+            if ($c['id'] === $id) {
+                $candidate = $c;
+                break;
+            }
+        }
+
+        if (!$candidate) {
+            $candidate = $all[0];
+        }
+
+        $employer = [
+            'company_name' => $_SESSION['employer_company'] ?? 'Global Tech Solutions',
+            'role'         => 'Manage Talent',
+            'avatar'       => $_SESSION['employer_avatar'] ?? null,
+        ];
+
+        $this->renderView('employer/interviews/schedule', [
+            'title'      => 'Schedule Interview — ' . $candidate['name'] . ' | InternConnect',
+            'employer'   => $employer,
+            'candidate'  => $candidate,
+            'activeNav'  => 'interviews',
+        ], 'dashboard');
+    }
+
+    /**
+     * Convenience route for Interviews listing / scheduler
+     * Route: /employer/interviews
+     */
+    public function interviews(array $params = []): void
+    {
+        $this->scheduleInterview($params);
+    }
+
+    /**
+     * Mock Candidates dataset matching Applications and Candidate Profile screenshots
+     */
+    private function getMockCandidates(): array
+    {
+        return [
+            [
+                'id'              => 1,
+                'name'            => 'Sarah Peters',
+                'avatar'          => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&h=160&fit=crop&crop=faces',
+                'initials'        => 'SP',
+                'role'            => 'UX Design Intern',
+                'applied_time'    => 'Applied 2d ago',
+                'match_score'     => 92,
+                'match_label'     => 'Strong UI skills...',
+                'status'          => 'Applied',
+                'status_type'     => 'applied',
+                'student_title'   => 'UI/UX Design Student • Class of 2026 • Lagos, NG',
+                'availability'    => 'Immediate Start',
+                'relocation'      => 'Open to Relocate',
+                'pipeline_stage'  => 'Under Review',
+                'summary'         => 'Passionate designer focused on creating intuitive digital experiences. Currently exploring the intersection of accessibility and high-end visual design. Strong foundation in design systems and user-centric research methodologies.',
+                'questions'       => [
+                    [
+                        'q' => 'Why are you interested in Flux Technologies?',
+                        'a' => "Flux's commitment to accessible enterprise software aligns perfectly with my thesis project. I've been following your design team's blog on systemic UX for two years."
+                    ],
+                    [
+                        'q' => 'Describe your proudest design project.',
+                        'a' => 'Created a community banking app for unbanked youth in Oakland. It focused on ultra-clear visual hierarchy and reduced cognitive load, which increased savings rates by 12% in user testing.'
+                    ],
+                    [
+                        'q' => 'What are your primary learning goals?',
+                        'a' => 'I want to master design-to-code handoff workflows and learn how to leverage AI/ML in predicting user navigation friction points.'
+                    ]
+                ],
+                'experience'      => [
+                    [
+                        'title'   => 'UI Design Intern',
+                        'period'  => 'JUN 2026 - AUG 2026',
+                        'company' => 'TechFlow Solutions • Remote',
+                        'desc'    => 'Led the redesign of the client dashboard, resulting in a 15% increase in user engagement. Collaborated with engineers to implement a new component library.'
+                    ],
+                    [
+                        'title'   => 'Freelance UX Researcher',
+                        'period'  => 'JAN 2026 - MAY 2026',
+                        'company' => 'Independent • Hybrid',
+                        'desc'    => 'Conducted user interviews and usability testing for local startups. Delivered actionable insights through journey maps and wireframes.'
+                    ]
+                ],
+                'documents'       => [
+                    'resume_name'   => 'Sarah_Peters_Resume',
+                    'portfolio_url' => 'https://sarahpeters.design',
+                    'linkedin_url'  => 'https://linkedin.com/in/sarahpeters'
+                ],
+                'contact'         => [
+                    'email' => 'sarahp@university.edu',
+                    'phone' => '+1 (415) 555-0198'
+                ],
+                'education'       => [
+                    'degree'     => 'BFA in Interaction Design',
+                    'school'     => 'California College of the Arts',
+                    'grade'      => 'FIRST CLASS',
+                    'gpa'        => 'GPA 3.8/4.0',
+                    'graduation' => 'Expected Graduation: May 2027'
+                ],
+                'skills'          => ['UI/UX', 'Figma', 'Adobe XD', 'AI/ML', 'Marketing', 'React.js', 'Tailwind CSS']
+            ],
+            [
+                'id'              => 2,
+                'name'            => 'Michael Chang',
+                'avatar'          => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=160&h=160&fit=crop&crop=faces',
+                'initials'        => 'MC',
+                'role'            => 'UI Design Intern',
+                'applied_time'    => 'Applied 5d ago',
+                'match_score'     => 88,
+                'match_label'     => 'Excellent Match...',
+                'status'          => 'Shortlisted',
+                'status_type'     => 'shortlisted',
+                'student_title'   => 'Visual Design Specialist • Class of 2026 • Lagos, NG',
+                'availability'    => 'Immediate Start',
+                'relocation'      => 'Open to Relocate',
+                'pipeline_stage'  => 'Shortlisted',
+                'summary'         => 'Experienced UI/UX designer with a deep passion for minimalist design systems and accessible user interfaces.',
+                'questions'       => [
+                    ['q' => 'Why are you interested in Flux Technologies?', 'a' => 'Passionate about crafting design systems at scale.'],
+                    ['q' => 'Describe your proudest design project.', 'a' => 'Developed an end-to-end design token pipeline for a fintech startup.'],
+                    ['q' => 'What are your primary learning goals?', 'a' => 'Enhancing user motion design and micro-interactions.']
+                ],
+                'experience'      => [
+                    [
+                        'title'   => 'Visual Designer Intern',
+                        'period'  => 'MAY 2026 - AUG 2026',
+                        'company' => 'Apex Studios • Remote',
+                        'desc'    => 'Created 40+ responsive web components and built cross-browser guidelines.'
+                    ]
+                ],
+                'documents'       => [
+                    'resume_name'   => 'Michael_Chang_Resume',
+                    'portfolio_url' => 'https://michaelchang.design',
+                    'linkedin_url'  => 'https://linkedin.com/in/michaelchang'
+                ],
+                'contact'         => [
+                    'email' => 'mchang@university.edu',
+                    'phone' => '+1 (415) 555-0210'
+                ],
+                'education'       => [
+                    'degree'     => 'B.Sc. in Human-Computer Interaction',
+                    'school'     => 'University of Lagos',
+                    'grade'      => 'FIRST CLASS',
+                    'gpa'        => 'GPA 3.9/4.0',
+                    'graduation' => 'Expected Graduation: Dec 2026'
+                ],
+                'skills'          => ['UI Design', 'Figma', 'Prototyping', 'Design Systems', 'CSS']
+            ],
+            [
+                'id'              => 3,
+                'name'            => 'Elena Daniels',
+                'avatar'          => 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=160&h=160&fit=crop&crop=faces',
+                'initials'        => 'ED',
+                'role'            => 'Marketing Intern',
+                'applied_time'    => 'Applied 2d ago',
+                'match_score'     => 40,
+                'match_label'     => 'Poor Fit...',
+                'status'          => 'Rejected',
+                'status_type'     => 'rejected',
+                'student_title'   => 'Marketing & Communications • Class of 2027 • Abuja, NG',
+                'availability'    => 'Flexible',
+                'relocation'      => 'Not Available',
+                'pipeline_stage'  => 'Under Review',
+                'summary'         => 'Content marketer and social strategist interested in brand voice and organic social media growth.',
+                'questions'       => [
+                    ['q' => 'Why are you interested in Flux Technologies?', 'a' => 'Looking to grow within tech marketing.'],
+                    ['q' => 'Describe your proudest design project.', 'a' => 'Led social campaigns for university campus club.'],
+                    ['q' => 'What are your primary learning goals?', 'a' => 'Data-driven marketing and SEO.']
+                ],
+                'experience'      => [],
+                'documents'       => [
+                    'resume_name'   => 'Elena_Daniels_Resume',
+                    'portfolio_url' => '#',
+                    'linkedin_url'  => '#'
+                ],
+                'contact'         => [
+                    'email' => 'edaniels@university.edu',
+                    'phone' => '+234 802 345 6789'
+                ],
+                'education'       => [
+                    'degree'     => 'B.A. in Mass Communication',
+                    'school'     => 'University of Abuja',
+                    'grade'      => 'SECOND CLASS UPPER',
+                    'gpa'        => 'GPA 3.4/4.0',
+                    'graduation' => 'Expected Graduation: June 2027'
+                ],
+                'skills'          => ['Marketing', 'Social Media', 'Copywriting', 'Canva']
+            ],
+            [
+                'id'              => 4,
+                'name'            => 'Isabella Dan',
+                'avatar'          => 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=160&h=160&fit=crop&crop=faces',
+                'initials'        => 'ID',
+                'role'            => 'Software Engineering Intern',
+                'applied_time'    => 'Applied 1week ago',
+                'match_score'     => 88,
+                'match_label'     => 'Excellent Match...',
+                'status'          => 'Shortlisted',
+                'status_type'     => 'shortlisted',
+                'student_title'   => 'Computer Science Senior • Class of 2026 • Port Harcourt, NG',
+                'availability'    => 'Immediate Start',
+                'relocation'      => 'Open to Relocate',
+                'pipeline_stage'  => 'Shortlisted',
+                'summary'         => 'Full-stack developer passionate about high-throughput APIs, clean architecture, and modern JavaScript frameworks.',
+                'questions'       => [
+                    ['q' => 'Why are you interested in Flux Technologies?', 'a' => 'Great engineering challenges and cloud infrastructure.'],
+                    ['q' => 'Describe your proudest design project.', 'a' => 'Built an open-source real-time markdown editor with WebSockets.'],
+                    ['q' => 'What are your primary learning goals?', 'a' => 'Distributed systems and cloud deployment.']
+                ],
+                'experience'      => [
+                    [
+                        'title'   => 'Frontend Engineer Intern',
+                        'period'  => 'JAN 2026 - MAY 2026',
+                        'company' => 'CloudScale • Remote',
+                        'desc'    => 'Engineered real-time dashboard analytics using React and TypeScript.'
+                    ]
+                ],
+                'documents'       => [
+                    'resume_name'   => 'Isabella_Dan_Resume',
+                    'portfolio_url' => 'https://isabelladan.dev',
+                    'linkedin_url'  => 'https://linkedin.com/in/isabelladan'
+                ],
+                'contact'         => [
+                    'email' => 'isabella.dan@techuni.edu',
+                    'phone' => '+234 812 345 6789'
+                ],
+                'education'       => [
+                    'degree'     => 'B.Sc. in Computer Science',
+                    'school'     => 'University of Port Harcourt',
+                    'grade'      => 'FIRST CLASS',
+                    'gpa'        => 'GPA 3.85/4.0',
+                    'graduation' => 'Expected Graduation: July 2026'
+                ],
+                'skills'          => ['React.js', 'Node.js', 'TypeScript', 'PostgreSQL', 'Tailwind CSS', 'Docker']
+            ],
+            [
+                'id'              => 5,
+                'name'            => 'Peter John',
+                'avatar'          => 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=160&h=160&fit=crop&crop=faces',
+                'initials'        => 'PJ',
+                'role'            => 'Social Media Manager Intern',
+                'applied_time'    => 'Applied 1d ago',
+                'match_score'     => 30,
+                'match_label'     => 'Poor Fit...',
+                'status'          => 'Rejected',
+                'status_type'     => 'rejected',
+                'student_title'   => 'Media Studies • Class of 2027 • Lagos, NG',
+                'availability'    => 'Immediate Start',
+                'relocation'      => 'Not Available',
+                'pipeline_stage'  => 'Under Review',
+                'summary'         => 'Enthusiastic creator focused on short-form video production and social media audience engagement.',
+                'questions'       => [
+                    ['q' => 'Why are you interested in Flux Technologies?', 'a' => 'Looking to learn social media strategy.'],
+                    ['q' => 'Describe your proudest design project.', 'a' => 'Managed TikTok account reaching 10k followers.'],
+                    ['q' => 'What are your primary learning goals?', 'a' => 'Content strategy and paid acquisition.']
+                ],
+                'experience'      => [],
+                'documents'       => [
+                    'resume_name'   => 'Peter_John_Resume',
+                    'portfolio_url' => '#',
+                    'linkedin_url'  => '#'
+                ],
+                'contact'         => [
+                    'email' => 'peter.j@college.edu',
+                    'phone' => '+234 701 234 5678'
+                ],
+                'education'       => [
+                    'degree'     => 'Diploma in Creative Arts',
+                    'school'     => 'Yaba College of Technology',
+                    'grade'      => 'UPPER CREDIT',
+                    'gpa'        => 'GPA 3.2/4.0',
+                    'graduation' => 'Expected Graduation: Aug 2027'
+                ],
+                'skills'          => ['Social Media', 'Video Editing', 'Content Creation']
+            ],
+            [
+                'id'              => 6,
+                'name'            => 'Topper Andrew',
+                'avatar'          => 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=160&h=160&fit=crop&crop=faces',
+                'initials'        => 'TA',
+                'role'            => 'Software Engineering Intern',
+                'applied_time'    => 'Applied 5d ago',
+                'match_score'     => 88,
+                'match_label'     => 'Excellent Match...',
+                'status'          => 'Shortlisted',
+                'status_type'     => 'shortlisted',
+                'student_title'   => 'Software Engineering • Class of 2026 • Ibadan, NG',
+                'availability'    => 'Immediate Start',
+                'relocation'      => 'Open to Relocate',
+                'pipeline_stage'  => 'Shortlisted',
+                'summary'         => 'Backend-focused software engineering student with extensive hands-on experience building REST APIs with Go and PHP.',
+                'questions'       => [
+                    ['q' => 'Why are you interested in Flux Technologies?', 'a' => 'Impressed by the architecture and scalable services.'],
+                    ['q' => 'Describe your proudest design project.', 'a' => 'Architected a payment webhook processor handling 500 req/sec.'],
+                    ['q' => 'What are your primary learning goals?', 'a' => 'Cloud-native services and microservice orchestration.']
+                ],
+                'experience'      => [
+                    [
+                        'title'   => 'Backend Developer Intern',
+                        'period'  => 'MAR 2026 - JUN 2026',
+                        'company' => 'CodeBridge NG • Remote',
+                        'desc'    => 'Designed relational database schemas and automated CI/CD pipeline tests.'
+                    ]
+                ],
+                'documents'       => [
+                    'resume_name'   => 'Topper_Andrew_Resume',
+                    'portfolio_url' => 'https://topperandrew.dev',
+                    'linkedin_url'  => 'https://linkedin.com/in/topperandrew'
+                ],
+                'contact'         => [
+                    'email' => 'topper.a@uni-ibadan.edu',
+                    'phone' => '+234 813 456 7890'
+                ],
+                'education'       => [
+                    'degree'     => 'B.Sc. in Computer Engineering',
+                    'school'     => 'University of Ibadan',
+                    'grade'      => 'FIRST CLASS',
+                    'gpa'        => 'GPA 3.9/4.0',
+                    'graduation' => 'Expected Graduation: Nov 2026'
+                ],
+                'skills'          => ['Go', 'PHP', 'MySQL', 'REST APIs', 'Git', 'Linux']
+            ],
+            [
+                'id'              => 7,
+                'name'            => 'Sarah Peters',
+                'avatar'          => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&h=160&fit=crop&crop=faces',
+                'initials'        => 'SP',
+                'role'            => 'UX Design Intern',
+                'applied_time'    => 'Applied 2d ago',
+                'match_score'     => 95,
+                'match_label'     => 'Perfect match...',
+                'status'          => 'Interview Scheduled',
+                'status_type'     => 'scheduled',
+                'student_title'   => 'UI/UX Design Student • Class of 2026 • Lagos, NG',
+                'availability'    => 'Immediate Start',
+                'relocation'      => 'Open to Relocate',
+                'pipeline_stage'  => 'Interviewing',
+                'summary'         => 'Passionate designer focused on creating intuitive digital experiences. Currently exploring the intersection of accessibility and high-end visual design.',
+                'questions'       => [
+                    ['q' => 'Why are you interested in Flux Technologies?', 'a' => "Flux's commitment to accessible enterprise software aligns perfectly with my thesis project."],
+                    ['q' => 'Describe your proudest design project.', 'a' => 'Created a community banking app for unbanked youth in Oakland.'],
+                    ['q' => 'What are your primary learning goals?', 'a' => 'I want to master design-to-code handoff workflows and learn how to leverage AI/ML.']
+                ],
+                'experience'      => [
+                    [
+                        'title'   => 'UI Design Intern',
+                        'period'  => 'JUN 2026 - AUG 2026',
+                        'company' => 'TechFlow Solutions • Remote',
+                        'desc'    => 'Led the redesign of the client dashboard, resulting in a 15% increase in user engagement.'
+                    ]
+                ],
+                'documents'       => [
+                    'resume_name'   => 'Sarah_Peters_Resume',
+                    'portfolio_url' => 'https://sarahpeters.design',
+                    'linkedin_url'  => 'https://linkedin.com/in/sarahpeters'
+                ],
+                'contact'         => [
+                    'email' => 'sarahp@university.edu',
+                    'phone' => '+1 (415) 555-0198'
+                ],
+                'education'       => [
+                    'degree'     => 'BFA in Interaction Design',
+                    'school'     => 'California College of the Arts',
+                    'grade'      => 'FIRST CLASS',
+                    'gpa'        => 'GPA 3.8/4.0',
+                    'graduation' => 'Expected Graduation: May 2027'
+                ],
+                'skills'          => ['UI/UX', 'Figma', 'Adobe XD', 'AI/ML', 'Marketing', 'React.js', 'Tailwind CSS']
+            ]
+        ];
+    }
 }
 
