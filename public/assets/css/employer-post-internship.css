@@ -920,12 +920,20 @@ input:checked + .emp-slider:before {
         flex-direction: column;
         gap: 10px;
     }
+    .emp-post-actions-right form {
+        width: 100% !important;
+        display: block !important;
+        margin: 0 !important;
+    }
     .emp-post-actions-right button,
+    .emp-post-actions-right form button,
     .emp-post-actions-right a,
     .emp-btn-cancel {
         width: 100% !important;
         justify-content: center !important;
         text-align: center;
+        display: flex !important;
+        box-sizing: border-box !important;
     }
 }
 
@@ -1556,111 +1564,29 @@ input:checked + .emp-slider:before {
     }
 }
 
-/* ── Top Bar with Filter Pills & Search ── */
-.emp-filter-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-    background: #FFFFFF;
-    border: 1px solid #E2E8F0;
-    border-radius: 12px;
-    padding: 10px 16px;
-}
-
-.emp-filter-tabs {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.emp-filter-tab {
-    background: transparent;
-    border: 1px solid transparent;
-    color: #64748B;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 6px 16px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    white-space: nowrap !important;
-    flex-shrink: 0 !important;
-}
-
-.emp-filter-tab:hover {
-    background: #F1F5F9;
-    color: #0F172A;
-}
-
-.emp-filter-tab.is-active {
-    background: #EEF2FF;
-    border-color: #C7D2FE;
-    color: #4F48E6;
-    font-weight: 700;
-}
-
-.emp-myint-search-wrap {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: #F8FAFC;
-    border: 1px solid #E2E8F0;
-    border-radius: 8px;
-    padding: 6px 12px;
-    flex: 1;
-    max-width: 320px;
-}
-
-.emp-myint-search-wrap svg {
-    width: 16px;
-    height: 16px;
-    color: #94A3B8;
-    flex-shrink: 0 !important;
-}
-
-.emp-myint-search-input {
-    border: none;
-    background: transparent;
-    font-size: 13px;
-    color: #0F172A;
-    width: 100%;
-    outline: none;
-}
-
-@media (max-width: 640px) {
-    .emp-filter-bar {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .emp-myint-search-wrap {
-        max-width: 100%;
-    }
-}
-
-/* ── AI Insights Banner (Matches Image 5 + Cloudinary Asset) ── */
+/* ── AI Insights Banner (Seamless Canvas - Zero Split / Zero Halving) ── */
 .emp-myint-banner {
     position: relative;
-    border-radius: 18px;
+    border-radius: 20px;
     overflow: hidden;
-    background-color: #3730A3;
-    display: flex;
-    align-items: stretch;
-    box-shadow: 0 8px 24px rgba(55, 48, 163, 0.2);
-    min-height: 180px;
-}
-
-.emp-banner-content-side {
-    flex: 1.3;
+    background-color: #4F47DA;
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: auto 100%;
+    box-shadow: 0 8px 24px rgba(79, 71, 218, 0.22);
+    min-height: 190px;
     padding: 32px 36px;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    margin-bottom: 32px;
+    color: #FFFFFF;
+}
+
+.emp-banner-inner {
+    max-width: 580px;
     position: relative;
     z-index: 2;
-    background: linear-gradient(90deg, #312E81 0%, #3730A3 75%, rgba(55, 48, 163, 0.9) 100%);
 }
 
 .emp-banner-tag {
@@ -1671,41 +1597,42 @@ input:checked + .emp-slider:before {
     font-weight: 800;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #C7D2FE;
-    margin-bottom: 12px;
+    color: #E0E7FF;
+    margin-bottom: 10px;
 }
 
 .emp-banner-tag svg {
     width: 14px;
     height: 14px;
-    color: #A5B4FC;
+    color: #C7D2FE;
     flex-shrink: 0 !important;
 }
 
 .emp-banner-heading {
-    font-size: 20px;
+    font-size: 21px;
     font-weight: 800;
     color: #FFFFFF;
     line-height: 1.3;
     margin: 0 0 10px 0;
     letter-spacing: -0.01em;
-    max-width: 580px;
 }
 
 .emp-banner-subtext {
     font-size: 13.5px;
-    color: #E0E7FF;
+    color: #EEF2FF;
     line-height: 1.55;
     margin: 0 0 20px 0;
-    max-width: 520px;
+    opacity: 0.95;
 }
 
 .emp-banner-btn {
-    align-self: flex-start;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     background: #FFFFFF;
     color: #4F48E6;
     border-radius: 8px;
-    padding: 9px 20px;
+    padding: 9px 22px;
     font-size: 13px;
     font-weight: 700;
     text-decoration: none;
@@ -1713,46 +1640,222 @@ input:checked + .emp-slider:before {
     transition: all 0.15s ease;
     white-space: nowrap !important;
     flex-shrink: 0 !important;
+    align-self: flex-start;
 }
 
 .emp-banner-btn:hover {
     background: #F8FAFC;
     color: #3730A3;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
 }
 
-.emp-banner-media-side {
-    flex: 1;
-    position: relative;
-    overflow: hidden;
-    min-height: 180px;
-    background: #3730A3;
-}
-
-.emp-banner-media-side img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: right center;
-}
-
-@media (max-width: 860px) {
+@media (max-width: 768px) {
     .emp-myint-banner {
-        flex-direction: column;
+        padding: 24px 20px 110px 20px;
+        background-position: right bottom;
+        background-size: 210px auto;
+        margin-bottom: 24px;
     }
-    .emp-banner-content-side {
-        padding: 24px 20px;
-        background: #312E81;
+    .emp-banner-inner {
+        max-width: 100%;
     }
     .emp-banner-heading {
         font-size: 18px;
     }
-    .emp-banner-media-side {
-        min-height: 140px;
+    .emp-banner-subtext {
+        font-size: 13px;
+        margin-bottom: 16px;
+    }
+}
+
+/* ── Section Header Bar with Search & Filter (Candidate Applications Inspiration) ── */
+.emp-list-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.emp-list-heading {
+    font-size: 22px;
+    font-weight: 800;
+    color: #000623;
+    margin: 0;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.emp-list-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.emp-search-input-wrap {
+    position: relative;
+    width: 250px;
+}
+
+.emp-search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 15px;
+    height: 15px;
+    color: #94A3B8;
+    pointer-events: none;
+    flex-shrink: 0 !important;
+}
+
+.emp-search-input {
+    width: 100%;
+    height: 38px;
+    padding-left: 36px;
+    padding-right: 12px;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    font-size: 13px;
+    background: #FFFFFF;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    box-sizing: border-box;
+    color: #0F172A;
+}
+
+.emp-search-input:focus {
+    border-color: #4F48E6;
+    box-shadow: 0 0 0 3px rgba(79, 72, 230, 0.1);
+}
+
+.emp-filter-btn {
+    height: 38px;
+    padding: 0 14px;
+    background-color: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+.emp-filter-btn:hover {
+    background-color: #F8FAFC;
+    border-color: #94A3B8;
+    color: #0F172A;
+}
+
+.emp-filter-btn svg {
+    width: 14px;
+    height: 14px;
+    color: #64748B;
+    flex-shrink: 0 !important;
+}
+
+.emp-filter-dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    width: 180px;
+    background-color: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    z-index: 50;
+    padding: 6px;
+}
+
+.emp-filter-dropdown-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #94A3B8;
+    padding: 6px 10px 4px;
+    letter-spacing: 0.04em;
+}
+
+.emp-filter-option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 7px 10px;
+    font-size: 13px;
+    color: #334155;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.12s;
+}
+
+.emp-filter-option:hover {
+    background-color: #F1F5F9;
+    color: #0F172A;
+}
+
+.emp-filter-option.is-active {
+    background-color: #EEF2FF;
+    color: #4F48E6;
+    font-weight: 700;
+}
+
+/* Category Tabs Bar (Directly Inspired by Candidate Applications) */
+.emp-category-tabs-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #E2E8F0;
+    padding-bottom: 4px;
+    overflow-x: auto;
+    margin-bottom: 24px;
+}
+
+.emp-category-tab {
+    padding: 8px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748B;
+    background: transparent;
+    border: none;
+    border-bottom: 2.5px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+.emp-category-tab:hover {
+    color: #0F172A;
+}
+
+.emp-category-tab.is-active {
+    color: #4F48E6;
+    border-bottom-color: #4F48E6;
+    font-weight: 700;
+}
+
+@media (max-width: 640px) {
+    .emp-list-header-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    .emp-list-controls {
+        width: 100%;
+    }
+    .emp-search-input-wrap {
+        flex: 1;
+        width: auto;
     }
 }
 

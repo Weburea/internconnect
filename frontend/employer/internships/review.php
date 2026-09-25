@@ -324,8 +324,8 @@ $deadline         = !empty($draft['deadline']) ? date('M j, Y', strtotime($draft
 
                     <div class="emp-post-actions-right">
                         <a href="<?= url('/employer/internships/create') ?>" class="emp-btn-draft">Save Draft</a>
-                        <form action="<?= url('/employer/internships/publish') ?>" method="POST" style="margin: 0;">
-                            <button type="submit" class="emp-btn-primary">Publish Internship</button>
+                        <form action="<?= url('/employer/internships/publish') ?>" method="POST" style="margin: 0; width: 100%;">
+                            <button type="submit" class="emp-btn-primary" style="width: 100%;">Publish Internship</button>
                         </form>
                     </div>
                 </div>

@@ -5,6 +5,9 @@ declare(strict_types=1);
  * Route: /employer/internships
  * Layout: dashboard (Employer Portal)
  * 
+ * Inspired by Candidate Applications (/candidate/applications)
+ * Seamless AI Insights Banner with Zero Split / Halving
+ * 
  * @var array  $employer      Employer profile data
  * @var array  $internships   List of internships (Active, Closed, Draft)
  * @var string $currentFilter Filter identifier ('all', 'active', 'closed', 'draft')
@@ -31,10 +34,10 @@ declare(strict_types=1);
         <!-- ══ PAGE CONTENT ══ -->
         <div class="db-content">
             <div class="emp-post-container" 
-                 x-data="myInternshipsManager(<?= htmlspecialchars(json_encode($internships)) ?>, '<?= htmlspecialchars($currentFilter) ?>')">
+                 x-data="myInternshipsManager(<?= htmlspecialchars(json_encode($internships), ENT_QUOTES, 'UTF-8') ?>, '<?= htmlspecialchars($currentFilter) ?>')">
 
-                <!-- ── 1. Top Header (Title, Subtitle & Launch Button) ── -->
-                <div class="emp-myint-header">
+                <!-- ── 1. Top Page Header (Title, Subtitle & Launch Button) ── -->
+                <div class="emp-myint-header" style="margin-bottom: 28px;">
                     <div>
                         <h1 class="emp-myint-title">My Internships</h1>
                         <p class="emp-myint-subtitle">Manage and track your posted internships</p>
@@ -48,49 +51,10 @@ declare(strict_types=1);
                     </a>
                 </div>
 
-                <!-- ── 2. Top Filter Bar & Search ── -->
-                <div class="emp-filter-bar">
-                    <div class="emp-filter-tabs">
-                        <button type="button" 
-                                class="emp-filter-tab" 
-                                :class="{ 'is-active': activeFilter === 'all' }" 
-                                @click="activeFilter = 'all'">
-                            All
-                        </button>
-                        <button type="button" 
-                                class="emp-filter-tab" 
-                                :class="{ 'is-active': activeFilter === 'active' }" 
-                                @click="activeFilter = 'active'">
-                            Active
-                        </button>
-                        <button type="button" 
-                                class="emp-filter-tab" 
-                                :class="{ 'is-active': activeFilter === 'closed' }" 
-                                @click="activeFilter = 'closed'">
-                            Closed
-                        </button>
-                        <button type="button" 
-                                class="emp-filter-tab" 
-                                :class="{ 'is-active': activeFilter === 'draft' }" 
-                                @click="activeFilter = 'draft'">
-                            Draft
-                        </button>
-                    </div>
-
-                    <div class="emp-myint-search-wrap">
-                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                        <input type="text" 
-                               x-model="searchQuery" 
-                               class="emp-myint-search-input" 
-                               placeholder="Search internships, departments...">
-                    </div>
-                </div>
-
-                <!-- ── 3. AI Internship Insights Banner (Matches Screenshot 5 + Cloudinary Banner) ── -->
-                <div class="emp-myint-banner" x-show="activeFilter === 'all' || activeFilter === 'active'" x-transition>
-                    <div class="emp-banner-content-side">
+                <!-- ── 2. AI Internship Insights Banner (Solely on its own, Seamless Canvas Blend) ── -->
+                <div class="emp-myint-banner" 
+                     style="background-image: linear-gradient(90deg, #4F47DA 0%, #4F47DA 38%, rgba(79, 71, 218, 0.8) 58%, transparent 80%), url('<?= asset('assets/images/banner_my_internship.jpg') ?>');">
+                    <div class="emp-banner-inner">
                         <div class="emp-banner-tag">
                             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -105,17 +69,75 @@ declare(strict_types=1);
                             Apply Now
                         </a>
                     </div>
+                </div>
 
-                    <div class="emp-banner-media-side">
-                        <!-- Cloudinary Banner Asset (Waving Jenny AI Robot illustration with headphones) -->
-                        <img src="<?= asset('assets/images/banner_my_internship.jpg') ?>" 
-                             alt="AI Internship Insights" 
-                             loading="lazy">
+                <!-- ── 3. All Internships Section Header Bar (Candidate Applications Inspiration) ── -->
+                <div class="emp-list-header-bar">
+                    <h2 class="emp-list-heading">All Internships</h2>
+                    
+                    <div class="emp-list-controls">
+                        <!-- Search Input -->
+                        <div class="emp-search-input-wrap">
+                            <svg class="emp-search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            <input type="text" 
+                                   x-model="searchQuery" 
+                                   placeholder="Search internships, departments..." 
+                                   class="emp-search-input" 
+                                   aria-label="Search internships">
+                        </div>
+
+                        <!-- Filter Button & Dropdown -->
+                        <div class="relative" style="position: relative;" @click.outside="filterOpen = false">
+                            <button type="button" class="emp-filter-btn" @click="filterOpen = !filterOpen" aria-label="Filter internships">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                                </svg>
+                                <span>Filter</span>
+                            </button>
+                            
+                            <div x-show="filterOpen" class="emp-filter-dropdown" style="display: none;">
+                                <div class="emp-filter-dropdown-title">Filter by Status</div>
+                                <button type="button" class="emp-filter-option" :class="{ 'is-active': activeFilter === 'all' }" @click="setTab('all'); filterOpen = false">All Internships</button>
+                                <button type="button" class="emp-filter-option" :class="{ 'is-active': activeFilter === 'active' }" @click="setTab('active'); filterOpen = false">Active</button>
+                                <button type="button" class="emp-filter-option" :class="{ 'is-active': activeFilter === 'closed' }" @click="setTab('closed'); filterOpen = false">Closed</button>
+                                <button type="button" class="emp-filter-option" :class="{ 'is-active': activeFilter === 'draft' }" @click="setTab('draft'); filterOpen = false">Draft</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- ── 4. Internship Listings ── -->
-                <div class="emp-myint-list">
+                <!-- ── 4. Category Filter Tabs Bar (Candidate Applications Consistent Underline Tabs) ── -->
+                <div class="emp-category-tabs-bar">
+                    <button type="button" 
+                            class="emp-category-tab" 
+                            :class="{ 'is-active': activeFilter === 'all' }" 
+                            @click="setTab('all')">
+                        All (<span x-text="countAll()">12</span>)
+                    </button>
+                    <button type="button" 
+                            class="emp-category-tab" 
+                            :class="{ 'is-active': activeFilter === 'active' }" 
+                            @click="setTab('active')">
+                        Active (<span x-text="countActive()">8</span>)
+                    </button>
+                    <button type="button" 
+                            class="emp-category-tab" 
+                            :class="{ 'is-active': activeFilter === 'closed' }" 
+                            @click="setTab('closed')">
+                        Closed (<span x-text="countClosed()">3</span>)
+                    </button>
+                    <button type="button" 
+                            class="emp-category-tab" 
+                            :class="{ 'is-active': activeFilter === 'draft' }" 
+                            @click="setTab('draft')">
+                        Draft (<span x-text="countDraft()">1</span>)
+                    </button>
+                </div>
+
+                <!-- ── 5. Internship Listings Stack ── -->
+                <div class="emp-myint-list" style="margin-bottom: 24px;">
                     <template x-for="item in filteredInternships()" :key="item.id">
                         <div class="emp-internship-card" :class="{ 'is-draft': item.is_draft }">
                             
@@ -252,10 +274,10 @@ declare(strict_types=1);
                     </div>
                 </div>
 
-                <!-- ── 5. Pagination (Matches Screenshot 5) ── -->
+                <!-- ── 6. Pagination ── -->
                 <div class="emp-pagination-wrap">
                     <div>
-                        Showing <span x-text="filteredInternships().length">3</span> of 12 internships
+                        Showing <span x-text="filteredInternships().length">4</span> of 12 internships
                     </div>
 
                     <div class="emp-pagination-controls">
@@ -288,6 +310,27 @@ document.addEventListener('alpine:init', () => {
         internships: initialList || [],
         activeFilter: defaultFilter || 'all',
         searchQuery: '',
+        filterOpen: false,
+
+        setTab(tab) {
+            this.activeFilter = tab;
+        },
+
+        countAll() {
+            return 12;
+        },
+
+        countActive() {
+            return 8;
+        },
+
+        countClosed() {
+            return 3;
+        },
+
+        countDraft() {
+            return 1;
+        },
 
         filteredInternships() {
             return this.internships.filter(item => {
