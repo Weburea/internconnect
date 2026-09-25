@@ -354,7 +354,7 @@ $fullBodyImg    = asset('assets/images/jenny_ai/Full-body_standing_pose_jenny_ai
         color: #000623;
     }
 
-    /* ─── Floating Launcher Badge Button ─── */
+    /* ─── Floating Launcher Badge Button (Perfect Circle) ─── */
     .jenny-launcher-btn {
         position: relative;
         background: transparent;
@@ -366,6 +366,9 @@ $fullBodyImg    = asset('assets/images/jenny_ai/Full-body_standing_pose_jenny_ai
         display: flex;
         align-items: center;
         justify-content: center;
+        width: 62px;
+        height: 62px;
+        border-radius: 50%;
     }
 
     .jenny-launcher-btn:hover {
@@ -374,8 +377,9 @@ $fullBodyImg    = asset('assets/images/jenny_ai/Full-body_standing_pose_jenny_ai
     }
 
     .jenny-launcher-img {
-        width: 66px;
-        height: 66px;
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
         display: block;
         filter: drop-shadow(0 8px 18px rgba(79, 72, 230, 0.32));
     }
