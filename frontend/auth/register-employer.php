@@ -297,22 +297,35 @@ declare(strict_types=1);
                         <div class="space-y-4 text-left">
                             <div>
                                 <label for="company-name" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Company Name</label>
-                                <input type="text" id="company-name" x-model="company_name" placeholder="Flux technology" 
-                                       class="w-full px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                <div class="relative flex items-center">
+                                    <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
+                                        <iconify-icon icon="lucide:building-2" class="text-lg"></iconify-icon>
+                                    </div>
+                                    <input type="text" id="company-name" x-model="company_name" placeholder="e.g. Flux Technologies" 
+                                           class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                </div>
                             </div>
 
                             <div>
                                 <label for="email" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Work Email</label>
-                                <input type="email" id="email" x-model="email" placeholder="you@company.com" 
-                                       class="w-full px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                <div class="relative flex items-center">
+                                    <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
+                                        <iconify-icon icon="lucide:mail" class="text-lg"></iconify-icon>
+                                    </div>
+                                    <input type="email" id="email" x-model="email" placeholder="e.g. contact@fluxtech.io" 
+                                           class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                </div>
                             </div>
 
                             <!-- Password -->
                             <div>
                                 <label for="reg-password" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Password</label>
-                                <div class="relative">
+                                <div class="relative flex items-center">
+                                    <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
+                                        <iconify-icon icon="lucide:lock" class="text-lg"></iconify-icon>
+                                    </div>
                                     <input :type="password_visible ? 'text' : 'password'" id="reg-password" x-model="password" placeholder="••••••••" 
-                                           class="w-full px-4 pr-10 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm tracking-widest text-[#191C1D] placeholder-gray-400">
+                                           class="w-full pl-10 pr-10 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm tracking-widest text-[#191C1D] placeholder-gray-400">
                                     <button @click="password_visible = !password_visible" type="button" 
                                             style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); cursor: pointer;"
                                             class="text-gray-400 hover:text-gray-600 flex items-center border-none bg-transparent outline-none">
@@ -333,9 +346,12 @@ declare(strict_types=1);
                             <!-- Confirm Password -->
                             <div>
                                 <label for="confirm-password" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Confirm Password</label>
-                                <div class="relative">
+                                <div class="relative flex items-center">
+                                    <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
+                                        <iconify-icon icon="lucide:lock" class="text-lg"></iconify-icon>
+                                    </div>
                                     <input :type="confirm_password_visible ? 'text' : 'password'" id="confirm-password" x-model="confirm_password" placeholder="••••••••" 
-                                           class="w-full px-4 pr-10 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm tracking-widest text-[#191C1D] placeholder-gray-400">
+                                           class="w-full pl-10 pr-10 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm tracking-widest text-[#191C1D] placeholder-gray-400">
                                     <button @click="confirm_password_visible = !confirm_password_visible" type="button" 
                                             style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); cursor: pointer;"
                                             class="text-gray-400 hover:text-gray-600 flex items-center border-none bg-transparent outline-none">
@@ -470,38 +486,38 @@ declare(strict_types=1);
                                      @dragleave.prevent="is_dragged_business_doc = false"
                                      @drop.prevent="handleBusinessDocDrop($event)"
                                      @click="$refs.businessDocInput.click()"
-                                     class="border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-2 select-none"
+                                     class="border-2 border-dashed rounded-xl py-4 px-4 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-1.5 select-none"
                                      :class="is_dragged_business_doc ? 'border-primary bg-primary/5' : 'border-brandBorder bg-white hover:border-gray-300'">
                                     
                                     <input type="file" x-ref="businessDocInput" accept=".pdf,.png,.jpg,.jpeg" class="hidden" @change="handleBusinessDocSelect($event)">
                                     
-                                    <div class="w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center text-primary">
-                                        <iconify-icon icon="lucide:cloud-upload" class="text-2xl"></iconify-icon>
+                                    <div class="w-9 h-9 rounded-full bg-primary/5 flex items-center justify-center text-primary flex-shrink-0">
+                                        <iconify-icon icon="lucide:cloud-upload" class="text-xl"></iconify-icon>
                                     </div>
-                                    <div class="text-sm font-semibold text-primary">
+                                    <div class="text-xs font-semibold text-primary">
                                         Click to upload <span class="text-[#191C1D]">or drag and drop</span>
                                     </div>
-                                    <div class="text-[12px] text-secondary-text">PDF, JPG or PNG (max. 10MB)</div>
+                                    <div class="text-[11px] text-secondary-text">PDF, JPG or PNG (max. 10MB)</div>
                                 </div>
 
-                                <!-- Business Doc Preview Card -->
-                                <div x-show="business_doc_uploaded" class="mt-4" style="display: none;">
-                                    <div class="border border-gray-200 rounded-xl p-4 flex gap-4 items-start justify-between bg-[#F8FAFC] shadow-sm">
-                                        <div class="flex items-start gap-3 min-w-0 flex-1">
-                                            <div class="h-12 w-9 bg-white border border-gray-300 rounded-lg shadow-sm flex-shrink-0 relative overflow-hidden flex flex-col p-1 justify-between">
+                                <!-- Business Doc Preview Card with strict truncation and box containment -->
+                                <div x-show="business_doc_uploaded" class="mt-3 w-full overflow-hidden" style="display: none;">
+                                    <div class="border border-gray-200 rounded-xl p-3 flex gap-3 items-center justify-between bg-[#F8FAFC] shadow-sm w-full min-w-0">
+                                        <div class="flex items-center gap-2.5 min-w-0 flex-1 overflow-hidden">
+                                            <div class="h-10 w-8 bg-white border border-gray-300 rounded-lg shadow-sm flex-shrink-0 relative overflow-hidden flex flex-col p-1 justify-between">
                                                 <div class="absolute right-0 top-0 h-3 w-3.5 bg-primary text-white font-bold text-[6px] flex items-center justify-center rounded-bl uppercase" x-text="business_doc_name.split('.').pop()">PDF</div>
-                                                <div class="space-y-1 mt-2.5">
+                                                <div class="space-y-1 mt-2">
                                                     <div class="h-[1.5px] bg-gray-300 w-full rounded"></div>
                                                     <div class="h-[1.5px] bg-gray-300 w-5/6 rounded"></div>
                                                 </div>
                                             </div>
-                                            <div class="min-w-0 flex-1">
-                                                <p class="text-sm font-bold text-primary-text mb-0.5 break-all truncate" x-text="business_doc_name"></p>
-                                                <p class="text-xs text-gray-500" x-text="business_doc_size"></p>
+                                            <div class="min-w-0 flex-1 overflow-hidden">
+                                                <p class="text-xs font-bold text-[#191C1D] truncate block" :title="business_doc_name" x-text="business_doc_name"></p>
+                                                <p class="text-[11px] text-gray-500 truncate" x-text="business_doc_size"></p>
                                             </div>
                                         </div>
-                                        <button type="button" @click="removeBusinessDoc()" class="text-red-500 hover:text-red-700">
-                                            <iconify-icon icon="lucide:trash-2" class="text-lg"></iconify-icon>
+                                        <button type="button" @click="removeBusinessDoc()" class="text-red-500 hover:text-red-700 flex-shrink-0 p-1.5 rounded-lg hover:bg-red-50 transition-colors" title="Delete document">
+                                            <iconify-icon icon="lucide:trash-2" class="text-base"></iconify-icon>
                                         </button>
                                     </div>
                                 </div>
@@ -533,73 +549,138 @@ declare(strict_types=1);
                     <!-- ─────────────────────────────────────────────── -->
                     <!-- Step 5: Company Profile                         -->
                     <!-- ─────────────────────────────────────────────── -->
+                    <!-- Step 5: Company Details                         -->
+                    <!-- ─────────────────────────────────────────────── -->
                     <div x-show="step === 5" class="space-y-6">
                         <h3 class="text-[24px] font-bold text-[#191C1D] tracking-tight text-left">Company details</h3>
 
                         <div class="space-y-4 text-left">
                             
-                            <!-- Logo Upload -->
+                            <!-- Logo / Avatar Preview & Upload -->
                             <div class="flex items-center gap-4">
                                 <div @click="$refs.logoInput.click()" 
-                                     class="w-16 h-16 rounded-full border border-brandBorder bg-gray-50 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-100 flex-shrink-0 relative overflow-hidden">
-                                    <template x-if="!logo_uploaded">
-                                        <div class="flex flex-col items-center justify-center text-[10px] text-gray-500">
-                                            <iconify-icon icon="lucide:image" class="text-lg"></iconify-icon>
-                                            <span>Upload</span>
+                                     class="rounded-2xl border border-brandBorder bg-indigo-50/50 flex items-center justify-center cursor-pointer hover:opacity-95 flex-shrink-0 relative overflow-hidden transition-all shadow-sm group"
+                                     style="width: 56px; height: 56px; min-width: 56px;"
+                                     title="Click to upload or change company logo">
+                                    <template x-if="logo_uploaded && logo_url">
+                                        <div class="relative w-full h-full">
+                                            <img :src="logo_url" @error="logo_uploaded = false; logo_url = ''" class="w-full h-full object-cover">
+                                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity text-white">
+                                                <iconify-icon icon="lucide:camera" class="text-base"></iconify-icon>
+                                            </div>
                                         </div>
                                     </template>
-                                    <template x-if="logo_uploaded">
-                                        <img :src="logo_url" class="w-full h-full object-cover">
+                                    <template x-if="!logo_uploaded || !logo_url">
+                                        <div class="relative w-full h-full">
+                                            <div class="w-full h-full bg-gradient-to-br from-indigo-500 to-primary flex items-center justify-center text-white font-bold text-base tracking-wider" x-text="getCompanyInitials()"></div>
+                                            <div class="absolute inset-0 bg-primary/80 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity text-white">
+                                                <iconify-icon icon="lucide:upload" class="text-base"></iconify-icon>
+                                            </div>
+                                        </div>
                                     </template>
                                 </div>
-                                <input type="file" x-ref="logoInput" accept="image/*" class="hidden" @change="handleLogoSelect($event)">
-                                <div class="text-left">
+                                <input type="file" x-ref="logoInput" accept="image/png,image/jpeg" class="hidden" @change="handleLogoSelect($event)">
+                                <div class="text-left min-w-0">
                                     <span class="text-xs font-bold block text-[#191C1D]">Company Logo</span>
-                                    <span class="text-[11px] text-gray-500">High-res square image (PNG or JPG). Max 5MB.</span>
-                                    <button type="button" x-show="logo_uploaded" @click.stop="removeLogo()" class="text-red-500 hover:text-red-700 text-[11px] font-bold block mt-1">Remove logo</button>
+                                    <span class="text-[11px] text-gray-500 block mt-0.5">High-res square image (PNG or JPG, max 5MB), or use initials avatar.</span>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <button type="button" @click="$refs.logoInput.click()" class="text-primary hover:text-primary-hover text-[11px] font-bold inline-flex items-center gap-1 transition-colors">
+                                            <iconify-icon icon="lucide:upload" class="text-xs"></iconify-icon>
+                                            <span x-text="logo_uploaded && logo_url ? 'Change logo' : 'Upload custom logo'"></span>
+                                        </button>
+                                        <template x-if="logo_uploaded && logo_url">
+                                            <button type="button" @click.stop="removeLogo()" class="text-red-500 hover:text-red-700 text-[11px] font-bold inline-flex items-center gap-1 transition-colors ml-2">
+                                                <iconify-icon icon="lucide:trash-2" class="text-xs"></iconify-icon>
+                                                <span>Remove</span>
+                                            </button>
+                                        </template>
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Fields Row -->
                             <div>
                                 <label for="company-name-details" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Company Name</label>
-                                <input type="text" id="company-name-details" x-model="company_name" placeholder="Flux Technologies" 
-                                       class="w-full px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D]">
+                                <div class="relative flex items-center">
+                                    <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
+                                        <iconify-icon icon="lucide:building-2" class="text-lg"></iconify-icon>
+                                    </div>
+                                    <input type="text" id="company-name-details" x-model="company_name" placeholder="e.g. Flux Technologies" 
+                                           class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                </div>
                             </div>
 
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label for="industry" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Industry</label>
-                                    <input type="text" id="industry" x-model="industry" placeholder="Fintech" 
-                                           class="w-full px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D]">
+                                    <div class="relative flex items-center">
+                                        <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
+                                            <iconify-icon icon="lucide:briefcase" class="text-lg"></iconify-icon>
+                                        </div>
+                                        <input type="text" id="industry" x-model="industry" placeholder="e.g. Fintech / SaaS" 
+                                               class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                    </div>
                                 </div>
                                 <div>
-                                    <label for="company-size" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Company Size</label>
-                                    <select id="company-size" x-model="company_size" 
-                                            class="w-full px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] bg-white">
-                                        <option>1-10 employees</option>
-                                        <option>11-50 employees</option>
-                                        <option>51-200 employees</option>
-                                        <option>201-500 employees</option>
-                                        <option>500+ employees</option>
-                                    </select>
+                                    <label class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Company Size</label>
+                                    <div class="relative w-full" x-data="{ open: false }" @click.outside="open = false">
+                                        <button type="button" 
+                                                class="w-full flex items-center justify-between px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] bg-white text-left cursor-pointer"
+                                                :class="{ 'border-primary ring-2 ring-primary/20': open }"
+                                                @click="open = !open">
+                                            <span :class="company_size ? 'text-[#191C1D]' : 'text-gray-400'" x-text="company_size || 'Select Company Size'"></span>
+                                            <svg class="w-4 h-4 text-gray-500 transition-transform duration-200" :class="{ 'rotate-180 text-primary': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
+                                            </svg>
+                                        </button>
+                                        <div x-show="open" 
+                                             x-transition:enter="transition ease-out duration-100"
+                                             x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                                             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                             x-transition:leave="transition ease-in duration-75"
+                                             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                                             x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                                             class="absolute top-[calc(100%+6px)] left-0 right-0 bg-white border border-brandBorder rounded-xl shadow-lg z-50 p-1.5 max-h-52 overflow-y-auto"
+                                             style="display: none;">
+                                            <template x-for="sOpt in company_size_options" :key="sOpt">
+                                                <div class="flex items-center justify-between px-3 py-2 text-xs font-medium rounded-lg cursor-pointer transition-colors"
+                                                     :class="company_size === sOpt ? 'bg-indigo-50 text-primary font-semibold' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'"
+                                                     @click="company_size = sOpt; open = false">
+                                                    <span x-text="sOpt"></span>
+                                                    <svg x-show="company_size === sOpt" class="w-3.5 h-3.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
                             <div>
-                                <label for="website" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Website</label>
-                                <input type="text" id="website" x-model="website" placeholder="fluxtech.io" 
-                                       class="w-full px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                <label for="website" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Website (Optional)</label>
+                                <div class="relative flex items-center">
+                                    <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
+                                        <iconify-icon icon="lucide:globe" class="text-lg"></iconify-icon>
+                                    </div>
+                                    <input type="text" id="website" x-model="website" placeholder="https://fluxtech.io" 
+                                           class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                </div>
                             </div>
 
                             <div>
-                                <label for="description" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Description</label>
-                                <textarea id="description" x-model="description" rows="3" placeholder="Fintech startup based in Lagos focused on democratizing access to cross-border payments for small businesses."
-                                          class="w-full px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400"></textarea>
+                                <div class="flex justify-between items-center mb-1.5">
+                                    <label for="description" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider">Description</label>
+                                    <span class="text-[11px] font-medium text-secondary-text" x-text="getWordCount(description) + '/250 words'"></span>
+                                </div>
+                                <textarea id="description" x-model="description" rows="4" 
+                                          placeholder="Briefly describe your company, mission, and internship culture..."
+                                          class="w-full px-4 py-3 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400 custom-primary-scrollbar"
+                                          style="min-height: 110px; resize: vertical; scrollbar-width: thin; scrollbar-color: #6366F1 transparent;"></textarea>
                             </div>
                         </div>
 
-                        <!-- CTA Row -->
+                        <!-- CTA Row (Website is Optional) -->
                         <div class="flex justify-between items-center pt-4 border-t border-brandBorder">
                             <button @click="step = 4; server_errors = []" class="text-sm font-semibold text-secondary-text hover:text-[#191C1D] transition-colors flex items-center gap-1.5">
                                 <iconify-icon icon="lucide:arrow-left"></iconify-icon>
@@ -607,7 +688,7 @@ declare(strict_types=1);
                             </button>
                             
                             <button @click="submitStep5()" 
-                                    :disabled="!company_name || !industry || !website || !description || submitting"
+                                    :disabled="!company_name || !industry || !company_size || !description || submitting"
                                     class="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm flex items-center gap-1.5">
                                 <span>Continue</span>
                                 <iconify-icon icon="lucide:arrow-right"></iconify-icon>
@@ -640,24 +721,31 @@ declare(strict_types=1);
                                     </button>
                                 </div>
 
-                                <!-- Add Department Dropdown List -->
+                                <!-- Add Department Dropdown List with Primary Colored Scrollbar & Premium Checkboxes -->
                                 <div x-show="show_dept_dropdown" @click.away="show_dept_dropdown = false"
-                                     class="absolute left-0 mt-2 w-full max-w-[280px] bg-white border border-brandBorder rounded-2xl shadow-xl z-30 p-4 space-y-3" style="display:none;">
+                                     class="absolute left-0 mt-2 w-full max-w-[300px] bg-white border border-brandBorder rounded-2xl shadow-xl z-40 p-3.5 space-y-2.5" style="display:none;">
                                     <div class="relative flex items-center">
                                         <iconify-icon icon="lucide:search" class="absolute left-2.5 text-gray-400"></iconify-icon>
                                         <input type="text" x-model="search_query" placeholder="Search departments..." 
-                                               class="w-full pl-8 pr-3 py-1.5 rounded-lg border border-brandBorder text-xs focus:ring-1 focus:ring-primary">
+                                               class="w-full pl-8 pr-3 py-1.5 rounded-lg border border-brandBorder text-xs focus:ring-1 focus:ring-primary focus:border-primary outline-none">
                                     </div>
-                                    <div class="max-h-[160px] overflow-y-auto space-y-1.5">
+                                    <div class="max-h-[170px] overflow-y-auto space-y-1 pr-1 custom-primary-scrollbar">
                                         <template x-for="dept in filteredDepartments()" :key="dept">
-                                            <label class="flex items-center gap-2 text-xs font-semibold text-[#191C1D] cursor-pointer hover:bg-gray-50 p-1.5 rounded-lg">
-                                                <input type="checkbox" :checked="departments.includes(dept)" @change="toggleDepartment(dept)" class="rounded text-primary focus:ring-primary border-brandBorder w-3.5 h-3.5">
+                                            <div @click="toggleDepartment(dept)"
+                                                 class="flex items-center justify-between px-2.5 py-2 text-xs font-semibold rounded-lg cursor-pointer transition-all duration-150 select-none"
+                                                 :class="departments.includes(dept) ? 'bg-indigo-50/80 text-primary' : 'text-[#191C1D] hover:bg-gray-50'">
                                                 <span x-text="dept"></span>
-                                            </label>
+                                                <div class="w-4 h-4 rounded border flex items-center justify-center transition-all duration-150"
+                                                     :class="departments.includes(dept) ? 'bg-primary border-primary text-white scale-105' : 'border-gray-300 bg-white'">
+                                                    <svg x-show="departments.includes(dept)" class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </div>
+                                            </div>
                                         </template>
                                     </div>
                                     <div class="flex justify-between items-center border-t border-[#E2E8F0] pt-2 text-[11px]">
-                                        <button type="button" @click="clearAllDepartments()" class="text-gray-500 hover:text-red-500">Clear all</button>
+                                        <button type="button" @click="clearAllDepartments()" class="text-gray-500 hover:text-red-500 font-semibold">Clear all</button>
                                         <button type="button" @click="show_dept_dropdown = false" class="bg-primary text-white px-3 py-1 rounded-md font-bold hover:bg-primary-hover">Apply</button>
                                     </div>
                                 </div>
@@ -665,39 +753,105 @@ declare(strict_types=1);
 
                             <!-- Hiring Volume -->
                             <div>
-                                <label for="expected-volume" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Expected Hiring Volume (Per Year)</label>
-                                <select id="expected-volume" x-model="expected_volume" 
-                                        class="w-full px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] bg-white">
-                                    <option>1 - 5 Interns</option>
-                                    <option>6 - 15 Interns</option>
-                                    <option>16 - 50 Interns</option>
-                                    <option>51+ Interns</option>
-                                </select>
+                                <label class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Expected Hiring Volume (Per Year)</label>
+                                <div class="relative w-full" x-data="{ open: false }" @click.outside="open = false">
+                                    <button type="button" 
+                                            class="w-full flex items-center justify-between px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] bg-white text-left cursor-pointer"
+                                            :class="{ 'border-primary ring-2 ring-primary/20': open }"
+                                            @click="open = !open">
+                                        <span :class="expected_volume ? 'text-[#191C1D]' : 'text-gray-400'" x-text="expected_volume || 'Select Hiring Volume'"></span>
+                                        <svg class="w-4 h-4 text-gray-500 transition-transform duration-200" :class="{ 'rotate-180 text-primary': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
+                                        </svg>
+                                    </button>
+                                    <div x-show="open" 
+                                         x-transition:enter="transition ease-out duration-100"
+                                         x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                                         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                         x-transition:leave="transition ease-in duration-75"
+                                         x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                                         x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                                         class="absolute top-[calc(100%+6px)] left-0 right-0 bg-white border border-brandBorder rounded-xl shadow-lg z-50 p-1.5 max-h-52 overflow-y-auto"
+                                         style="display: none;">
+                                        <template x-for="vOpt in expected_volume_options" :key="vOpt">
+                                            <div class="flex items-center justify-between px-3 py-2 text-xs font-medium rounded-lg cursor-pointer transition-colors"
+                                                 :class="expected_volume === vOpt ? 'bg-indigo-50 text-primary font-semibold' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'"
+                                                 @click="expected_volume = vOpt; open = false">
+                                                <span x-text="vOpt"></span>
+                                                <svg x-show="expected_volume === vOpt" class="w-3.5 h-3.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
                             </div>
 
-                            <!-- Internship Type cards -->
+                            <!-- Redesigned Clean & Flexible Internship Type Selection Cards -->
                             <div>
-                                <label class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Primary Internship Type</label>
-                                <div class="grid grid-cols-3 gap-3">
+                                <label class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-2">Primary Internship Type</label>
+                                <div class="space-y-2">
+                                    <!-- Paid Internships -->
                                     <div @click="internship_type = 'Paid'" 
-                                         class="border border-brandBorder rounded-xl p-3 cursor-pointer text-center transition-all flex flex-col justify-center gap-1 select-none"
-                                         :class="internship_type === 'Paid' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'bg-white hover:border-gray-300'">
-                                        <span class="text-xs font-bold text-[#191C1D]">Paid Internships</span>
-                                        <span class="text-[9px] text-secondary-text">Hourly or Salary</span>
-                                    </div>
-                                    
-                                    <div @click="internship_type = 'Stipend'" 
-                                         class="border border-brandBorder rounded-xl p-3 cursor-pointer text-center transition-all flex flex-col justify-center gap-1 select-none"
-                                         :class="internship_type === 'Stipend' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'bg-white hover:border-gray-300'">
-                                        <span class="text-xs font-bold text-[#191C1D]">Stipend-based</span>
-                                        <span class="text-[9px] text-secondary-text">Fixed amount</span>
+                                         class="flex items-center justify-between rounded-xl border cursor-pointer transition-all duration-150 select-none"
+                                         style="padding: 14px 16px;"
+                                         :class="internship_type === 'Paid' ? 'border-primary bg-indigo-50/50 shadow-sm ring-1 ring-primary' : 'border-brandBorder bg-white hover:border-gray-300 hover:bg-gray-50/60'">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors"
+                                                 :class="internship_type === 'Paid' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-500'">
+                                                <iconify-icon icon="lucide:banknote" class="text-lg"></iconify-icon>
+                                            </div>
+                                            <div class="text-left">
+                                                <h5 class="text-[13px] font-bold text-[#191C1D] leading-tight">Paid Internships</h5>
+                                                <p class="text-[11px] text-secondary-text mt-0.5 leading-snug">Hourly wage or monthly base salary</p>
+                                            </div>
+                                        </div>
+                                        <div class="w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center flex-shrink-0 ml-3"
+                                             :class="internship_type === 'Paid' ? 'border-primary bg-primary' : 'border-gray-300 bg-white'">
+                                            <div x-show="internship_type === 'Paid'" class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                                        </div>
                                     </div>
 
+                                    <!-- Stipend-based -->
+                                    <div @click="internship_type = 'Stipend'" 
+                                         class="flex items-center justify-between rounded-xl border cursor-pointer transition-all duration-150 select-none"
+                                         style="padding: 14px 16px;"
+                                         :class="internship_type === 'Stipend' ? 'border-primary bg-indigo-50/50 shadow-sm ring-1 ring-primary' : 'border-brandBorder bg-white hover:border-gray-300 hover:bg-gray-50/60'">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors"
+                                                 :class="internship_type === 'Stipend' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-500'">
+                                                <iconify-icon icon="lucide:coins" class="text-lg"></iconify-icon>
+                                            </div>
+                                            <div class="text-left">
+                                                <h5 class="text-[13px] font-bold text-[#191C1D] leading-tight">Stipend-based</h5>
+                                                <p class="text-[11px] text-secondary-text mt-0.5 leading-snug">Fixed allowance (transportation & meal support)</p>
+                                            </div>
+                                        </div>
+                                        <div class="w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center flex-shrink-0 ml-3"
+                                             :class="internship_type === 'Stipend' ? 'border-primary bg-primary' : 'border-gray-300 bg-white'">
+                                            <div x-show="internship_type === 'Stipend'" class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Unpaid for Academic Credit -->
                                     <div @click="internship_type = 'Unpaid'" 
-                                         class="border border-brandBorder rounded-xl p-3 cursor-pointer text-center transition-all flex flex-col justify-center gap-1 select-none"
-                                         :class="internship_type === 'Unpaid' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'bg-white hover:border-gray-300'">
-                                        <span class="text-xs font-bold text-[#191C1D]">Unpaid for Credit</span>
-                                        <span class="text-[9px] text-secondary-text">Academic only</span>
+                                         class="flex items-center justify-between rounded-xl border cursor-pointer transition-all duration-150 select-none"
+                                         style="padding: 14px 16px;"
+                                         :class="internship_type === 'Unpaid' ? 'border-primary bg-indigo-50/50 shadow-sm ring-1 ring-primary' : 'border-brandBorder bg-white hover:border-gray-300 hover:bg-gray-50/60'">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors"
+                                                 :class="internship_type === 'Unpaid' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-500'">
+                                                <iconify-icon icon="lucide:graduation-cap" class="text-lg"></iconify-icon>
+                                            </div>
+                                            <div class="text-left">
+                                                <h5 class="text-[13px] font-bold text-[#191C1D] leading-tight">Unpaid for Academic Credit</h5>
+                                                <p class="text-[11px] text-secondary-text mt-0.5 leading-snug">University coursework or SIWES/IT accreditation</p>
+                                            </div>
+                                        </div>
+                                        <div class="w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center flex-shrink-0 ml-3"
+                                             :class="internship_type === 'Unpaid' ? 'border-primary bg-primary' : 'border-gray-300 bg-white'">
+                                            <div x-show="internship_type === 'Unpaid'" class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -726,64 +880,102 @@ declare(strict_types=1);
                     <div x-show="step === 7" class="space-y-6">
                         
                         <!-- Mini Card Company Header Profile Preview -->
-                        <div class="border border-brandBorder rounded-2xl p-5 bg-white text-left space-y-4 shadow-sm">
-                            <div class="flex items-center gap-4">
-                                <div class="w-14 h-14 rounded-xl border border-brandBorder bg-gray-50 flex items-center justify-center overflow-hidden flex-shrink-0">
-                                    <template x-if="logo_uploaded">
-                                        <img :src="logo_url" class="w-full h-full object-cover">
+                        <div class="border border-brandBorder rounded-2xl bg-white text-left shadow-sm" style="padding: 24px;">
+                            <!-- Company Header -->
+                            <div class="flex items-start gap-4" style="margin-bottom: 20px;">
+                                <div class="rounded-2xl border border-brandBorder bg-indigo-50/50 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm" style="width: 56px; height: 56px; min-width: 56px;">
+                                    <template x-if="logo_uploaded && logo_url">
+                                        <img :src="logo_url" @error="logo_uploaded = false; logo_url = ''" class="w-full h-full object-cover">
                                     </template>
-                                    <template x-if="!logo_uploaded">
-                                        <iconify-icon icon="lucide:building-2" class="text-2xl text-gray-400"></iconify-icon>
+                                    <template x-if="!logo_uploaded || !logo_url">
+                                        <div class="w-full h-full bg-gradient-to-br from-indigo-500 to-primary flex items-center justify-center text-white font-bold text-base tracking-wider" x-text="getCompanyInitials()"></div>
                                     </template>
                                 </div>
                                 
-                                <div class="min-w-0">
+                                <div class="min-w-0 flex-1" style="padding-top: 2px;">
                                     <div class="flex items-center gap-1.5">
-                                        <h4 class="text-md font-bold text-[#191C1D] truncate" x-text="company_name || 'Flux Technologies'"></h4>
-                                        <iconify-icon icon="lucide:badge-check" class="text-primary text-sm flex-shrink-0"></iconify-icon>
+                                        <h4 class="text-sm font-bold text-[#191C1D] truncate" x-text="company_name || 'Flux Technologies'"></h4>
+                                        <iconify-icon icon="lucide:badge-check" class="text-primary flex-shrink-0" style="font-size: 14px;"></iconify-icon>
                                     </div>
-                                    <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-secondary-text mt-0.5">
+                                    <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-secondary-text" style="margin-top: 3px;">
                                         <span class="inline-flex items-center gap-1">
-                                            <iconify-icon icon="lucide:building"></iconify-icon>
+                                            <iconify-icon icon="lucide:building" style="font-size: 12px;"></iconify-icon>
                                             <span x-text="industry || 'Fintech'"></span>
                                         </span>
                                         <span>•</span>
                                         <span class="inline-flex items-center gap-1">
-                                            <iconify-icon icon="lucide:map-pin"></iconify-icon>
+                                            <iconify-icon icon="lucide:map-pin" style="font-size: 12px;"></iconify-icon>
                                             <span>Lagos</span>
                                         </span>
                                     </div>
-                                    <!-- 0 Open Internships status pill badge -->
-                                    <div class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-gray-100 text-[10px] text-secondary-text font-bold">
-                                        <div class="w-1.5 h-1.5 rounded-full bg-gray-400"></div>
-                                        <span>0 Open Internships</span>
+                                    <!-- Profile Ready pill badge -->
+                                    <div class="inline-flex items-center gap-1.5 px-2.5 rounded-full bg-indigo-50 text-primary font-bold border border-primary/20" style="margin-top: 8px; font-size: 10px; padding-top: 3px; padding-bottom: 3px;">
+                                        <div class="rounded-full bg-primary animate-pulse" style="width: 6px; height: 6px;"></div>
+                                        <span>Profile Ready • 0 Active Postings</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- About us block -->
-                            <div class="space-y-1">
-                                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block">About Us</span>
+                            <!-- About Us block -->
+                            <div style="margin-bottom: 16px;">
+                                <span class="block text-gray-400 uppercase font-bold" style="font-size: 10px; letter-spacing: 0.06em; margin-bottom: 4px;">About Us</span>
                                 <p class="text-xs leading-relaxed text-secondary-text" x-text="description || 'No description provided yet.'"></p>
                             </div>
 
-                            <!-- Hiring Needs block -->
-                            <div class="space-y-1.5">
-                                <span class="text-[10px] font-bold text-gray-500 uppercase tracking-widest block">Hiring Needs (Preview)</span>
-                                <div class="flex flex-wrap gap-1.5">
+                            <!-- Target Departments block -->
+                            <div style="margin-bottom: 18px;">
+                                <span class="block text-gray-400 uppercase font-bold" style="font-size: 10px; letter-spacing: 0.06em; margin-bottom: 6px;">Target Departments</span>
+                                <div class="flex flex-wrap" style="gap: 6px;">
                                     <template x-for="dept in departments" :key="dept">
-                                        <span class="px-2.5 py-0.5 rounded-md border border-primary/20 bg-primary/5 text-primary text-[10px] font-bold" x-text="dept"></span>
+                                        <span class="rounded-md border border-primary/20 bg-primary/5 text-primary font-bold" style="padding: 4px 10px; font-size: 10px;" x-text="dept"></span>
                                     </template>
-                                    <span class="px-2.5 py-0.5 rounded-md border border-gray-200 bg-gray-50 text-[#191C1D] text-[10px] font-bold">Remote Eligible</span>
+                                    <span class="rounded-md border border-gray-200 bg-gray-50 text-[#191C1D] font-bold" style="padding: 4px 10px; font-size: 10px;">Remote Eligible</span>
                                 </div>
                             </div>
 
-                            <!-- Open opportunities block -->
-                            <div class="space-y-2 pt-2 border-t border-brandBorder">
-                                <span class="text-[10px] font-bold text-[#191C1D] tracking-wide block">Open Opportunities</span>
-                                <div class="border border-dashed border-gray-200 rounded-xl p-6 text-center text-xs text-secondary-text flex flex-col items-center justify-center gap-1 bg-[#FDFDFD]">
-                                    <iconify-icon icon="lucide:briefcase" class="text-lg text-gray-400"></iconify-icon>
-                                    <span>No roles posted yet</span>
+                            <!-- Organization Details — Clean key-value list -->
+                            <div class="border-t border-brandBorder" style="padding-top: 18px;">
+                                <div class="flex items-center justify-between" style="margin-bottom: 12px;">
+                                    <span class="text-gray-400 uppercase font-bold" style="font-size: 10px; letter-spacing: 0.06em;">Organization Details</span>
+                                    <span class="text-primary bg-indigo-50 rounded-full border border-primary/15 inline-flex items-center gap-1 whitespace-nowrap flex-shrink-0 font-bold" style="font-size: 10px; padding: 3px 8px;">
+                                        <iconify-icon icon="lucide:shield-check" style="width: 10px; height: 10px;" class="flex-shrink-0"></iconify-icon>
+                                        <span>Verified</span>
+                                    </span>
+                                </div>
+
+                                <!-- Key-value rows with zebra striping -->
+                                <div class="rounded-xl border border-gray-200 overflow-hidden">
+                                    <div class="flex items-center justify-between bg-white" style="padding: 12px 16px;">
+                                        <div class="flex items-center text-secondary-text" style="gap: 8px;">
+                                            <iconify-icon icon="lucide:users" style="width: 14px; height: 14px;" class="text-primary/60 flex-shrink-0"></iconify-icon>
+                                            <span class="font-medium" style="font-size: 11px;">Target Intake</span>
+                                        </div>
+                                        <span class="font-bold text-[#191C1D]" style="font-size: 11px;" x-text="expected_volume || '6 - 15 Interns'"></span>
+                                    </div>
+                                    <div class="border-t border-gray-100"></div>
+                                    <div class="flex items-center justify-between" style="padding: 12px 16px; background: rgba(248,250,252,0.6);">
+                                        <div class="flex items-center text-secondary-text" style="gap: 8px;">
+                                            <iconify-icon icon="lucide:banknote" style="width: 14px; height: 14px;" class="text-primary/60 flex-shrink-0"></iconify-icon>
+                                            <span class="font-medium" style="font-size: 11px;">Compensation</span>
+                                        </div>
+                                        <span class="font-bold text-[#191C1D]" style="font-size: 11px;" x-text="internship_type ? internship_type + ' Program' : 'Paid Program'"></span>
+                                    </div>
+                                    <div class="border-t border-gray-100"></div>
+                                    <div class="flex items-center justify-between bg-white" style="padding: 12px 16px;">
+                                        <div class="flex items-center text-secondary-text" style="gap: 8px;">
+                                            <iconify-icon icon="lucide:shield-check" style="width: 14px; height: 14px;" class="text-primary/60 flex-shrink-0"></iconify-icon>
+                                            <span class="font-medium" style="font-size: 11px;">CAC / RC Number</span>
+                                        </div>
+                                        <span class="font-bold text-[#191C1D]" style="font-size: 11px;" x-text="cac_number || 'RC-Verified'"></span>
+                                    </div>
+                                    <div class="border-t border-gray-100"></div>
+                                    <div class="flex items-center justify-between" style="padding: 12px 16px; background: rgba(248,250,252,0.6);">
+                                        <div class="flex items-center text-secondary-text" style="gap: 8px;">
+                                            <iconify-icon icon="lucide:building" style="width: 14px; height: 14px;" class="text-primary/60 flex-shrink-0"></iconify-icon>
+                                            <span class="font-medium" style="font-size: 11px;">Organization Size</span>
+                                        </div>
+                                        <span class="font-bold text-[#191C1D]" style="font-size: 11px;" x-text="company_size || '11-50 employees'"></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>

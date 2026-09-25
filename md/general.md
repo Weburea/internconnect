@@ -41,6 +41,9 @@ This master walkthrough document details all platform views, route paths, archit
 | **Candidate Offer Declined** | [`candidate/offers/declined.php`](file:///c:/xampp/htdocs/InternConnect/frontend/candidate/offers/declined.php) | `/candidate/offer/declined` | [Open](http://localhost/InternConnect/candidate/offer/declined) | [Open](http://localhost/InternConnect/public/candidate/offer/declined) | Confirmation page after declining an offer: "Offer Declined" banner, summary card with `Offer Declined` status, explanation, and action cards. |
 | **Candidate Profile Settings** | [`candidate/profile.php`](file:///c:/xampp/htdocs/InternConnect/frontend/candidate/profile.php) | `/candidate/profile` | [Open](http://localhost/InternConnect/candidate/profile) | [Open](http://localhost/InternConnect/public/candidate/profile) | Candidate profile settings with custom Alpine dropdowns. |
 | **Employer Dashboard** | [`employer/dashboard/index.php`](file:///c:/xampp/htdocs/InternConnect/frontend/employer/dashboard/index.php) | `/employer/dashboard` | [Open](http://localhost/InternConnect/employer/dashboard) | [Open](http://localhost/InternConnect/public/employer/dashboard) | Employer portal talent management dashboard view with top KPI cards. |
+| **Employer Post Internship (Create Opportunity)** | [`employer/internships/create.php`](file:///c:/xampp/htdocs/InternConnect/frontend/employer/internships/create.php) | `/employer/internships/create` or `/employer/post-internship` | [Open](http://localhost/InternConnect/employer/internships/create) | [Open](http://localhost/InternConnect/public/employer/internships/create) | Create New Opportunity form: Basic Info, Category dropdown with search & checkboxes, Rich text overview textareas, Skills tag pills, Details & Duration, Perks, AI Assistant, and Screening Questions. |
+| **Employer Review & Publish Internship** | [`employer/internships/review.php`](file:///c:/xampp/htdocs/InternConnect/frontend/employer/internships/review.php) | `/employer/internships/review` | [Open](http://localhost/InternConnect/employer/internships/review) | [Open](http://localhost/InternConnect/public/employer/internships/review) | Review & Publish preview card: Role details, structured `<li>` listing for What You'll Do & What We're Looking For, AI Optimization card (85%), Expected Performance, and Publish Settings. |
+| **Employer Role Published (Celebration Screen)** | [`employer/internships/success.php`](file:///c:/xampp/htdocs/InternConnect/frontend/employer/internships/success.php) | `/employer/internships/success` | [Open](http://localhost/InternConnect/employer/internships/success) | [Open](http://localhost/InternConnect/public/employer/internships/success) | "Your role is live!" celebration screen: candidate photo card with laptop (`welcome_smiling_woman.png`), blue checkmark badge, and "View Candidates" / "Post another role" action CTAs. |
 | **Employer Company Profile** | [`employer/company/index.php`](file:///c:/xampp/htdocs/InternConnect/frontend/employer/company/index.php) | `/employer/company` or `/companies` | [Open](http://localhost/InternConnect/employer/company) | [Open](http://localhost/InternConnect/public/employer/company) | Company Profile & Identity showcase with hero banner, HK logo, About, Culture, Gallery, Reviews, and Contact Info. |
 | **Employer Profile Settings** | [`employer/profile/index.php`](file:///c:/xampp/htdocs/InternConnect/frontend/employer/profile/index.php) | `/employer/profile` | [Open](http://localhost/InternConnect/employer/profile) | [Open](http://localhost/InternConnect/public/employer/profile) | Complete Employer Organization settings: Cover/Logo management, CAC verification, Company Details, Department multi-select pills, and Notification Switches. |
 | **Candidate Help Center Hub** | [`candidate/help/index.php`](file:///c:/xampp/htdocs/InternConnect/frontend/candidate/help/index.php) | `/help` or `/candidate/help` | [Open](http://localhost/InternConnect/help) | [Open](http://localhost/InternConnect/public/help) | Purple hero search banner, suggestion chips, 6 knowledge categories, Popular FAQs accordion, and Jenny AI Support Chatbot. |
@@ -118,3 +121,54 @@ This master walkthrough document details all platform views, route paths, archit
   - Single-line guaranteed action buttons (`white-space: nowrap !important; flex-shrink: 0 !important;`).
   - Dual persona intelligence: Job Seeker (`Adaeze`) vs. Recruiter (`Tunde`) with dynamic first-name targeting.
   - Interactive flows: simulated CV upload, 78% radial review card, before/after comparison preview, candidate shortlisting, and redesigned online video interview scheduling card.
+
+---
+
+## 7. Employer Post Internship Journey & Multi-Step Architecture
+
+The Employer Post Internship pipeline allows employers and recruiters to quickly create, customize, optimize with AI, review, and publish internship opportunities across the InternConnect platform.
+
+### 7.1 Pipeline Flow & Routing Overview
+```mermaid
+graph TD
+    Dashboard[Employer Dashboard] -->|Launch New Opening / Nav Item #2| Step1[Step 1: Create New Opportunity]
+    Step1 -->|Preview / Submit| Step2[Step 2: Review & Publish Internship]
+    Step2 -->|Publish Internship| Step3[Step 3: Your role is live! Celebration]
+    Step2 -->|Save Draft / Cancel| Step1
+    Step3 -->|View Candidates| Pipeline[Employer Candidates / Dashboard]
+    Step3 -->|Post another role| Step1
+```
+
+### 7.2 Stage 1: Create New Opportunity Form
+- **Routes**: `/employer/internships/create` & `/employer/post-internship`
+- **Direct Link**: **[http://localhost/InternConnect/employer/internships/create](http://localhost/InternConnect/employer/internships/create)**
+- **Architecture**:
+  - **Basic Information**: Internship Title, Custom Alpine Category Dropdown with live search input and checkbox list (`Technology`, `Creative`, `Business`, `Finance`, `Engineering`, `Education`, `Media & Communication`) with "Apply" button (Image 4 match), Segmented control for Internship Type (`Remote`, `Hybrid`, `On-site`), and Location with map pin SVG.
+  - **Role Overview**: Rich text formatting toolbars (`B`, `I`, bulleted list) with dedicated areas for "About the Internship", "What You'll Do", and "What We're Looking For" (enabling bullet lines that render as structured `<li>` elements in the review step).
+  - **Requirements**: Interactive Alpine tag manager for Required Skills (`React`, `TypeScript`, `Figma`) with inline add/remove pill controls, and Custom Alpine Dropdowns with "Apply" button for Education Level (`Undergraduate`, `Graduate`, `Postgraduate`) and Experience Level.
+  - **Details & Duration**: Start Date input, Custom Alpine Duration Dropdown (`1 week`, `2 weeks`, `1 month`, `3 months`, `6 months`), and Openings count.
+  - **Perks & Stipend**: Monthly stipend input with currency prefix and "Unpaid / Volunteering" toggle, accompanied by interactive perks checkboxes (`Certificate`, `Letter of Recommendation`, `Flexible work hours`).
+  - **Right Column Suite**:
+    - **AI Internship Assistant**: Indigo gradient badge with "Generate description", "Suggest required skills", and "Suggest requirements" interactive triggers, plus social proof indicator.
+    - **Application Settings**: Application Deadline, Interns Needed, and "Allow Remote Applicants" toggle switch.
+    - **Interview Preferences**: Custom dropdown for interview platform (`Video Interview (Google Meet)`) with security callout banner.
+    - **Screening Questions**: Pre-configured question cards with inline delete and "+ Add Question" interactive modal prompt.
+
+### 7.3 Stage 2: Review & Publish Internship
+- **Route**: `/employer/internships/review`
+- **Direct Link**: **[http://localhost/InternConnect/employer/internships/review](http://localhost/InternConnect/employer/internships/review)**
+- **Architecture**:
+  - **Candidate Preview Card**: Visual card previewing the opportunity with company badge, role title, stipend pill, and location.
+  - **Structured `<li>` Listing (Mandatory Audio Requirement)**: "What You'll Do" and "What We're Looking For" are explicitly rendered as clean semantic `<ul>` lists with styled `<li>` items featuring custom inline SVG checkmark circle bullets, eliminating unformatted text walls.
+  - **Salary Smart Tip Callout**: Informational banner highlighting application boosts for salary transparency.
+  - **AI Optimization Card**: Circular progress score showing 85% listing health, AI suggestion pills, and "Apply Suggestions" trigger boosting score to 98%.
+  - **Expected Performance & Target Audience**: 120+ expected applicant forecast, high visibility metric tile, and matched skills detected pills (`Figma`, `Research`, `Prototyping`).
+  - **Publish Settings**: Public visibility toggle, deadline edit quick-link, and auto-close checkbox after 100 applicants.
+
+### 7.4 Stage 3: "Your role is live!" Celebration Screen
+- **Route**: `/employer/internships/success`
+- **Direct Link**: **[http://localhost/InternConnect/employer/internships/success](http://localhost/InternConnect/employer/internships/success)**
+- **Architecture**:
+  - **Featured Photo Card**: Rounded card featuring the smiling candidate holding a laptop in a yellow turtleneck (`welcome_smiling_woman.png`), overlaid with "The next chapter of your career starts here." and an indigo underline accent bar (Image 3 match).
+  - **Confirmation Area**: Pulsing soft blue success badge with white checkmark SVG, "Your role is live!" headline, confirmation copy for 12,000+ students, solid indigo "View Candidates →" CTA, and soft-outlined "Post another role →" CTA.
+

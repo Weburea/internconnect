@@ -39,4 +39,11 @@ class Controller
         http_response_code($statusCode);
         echo json_encode($data);
     }
+
+    protected function redirect(string $path): void
+    {
+        $target = function_exists('url') ? url($path) : $path;
+        header('Location: ' . $target);
+        exit;
+    }
 }

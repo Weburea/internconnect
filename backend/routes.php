@@ -97,6 +97,16 @@ $router->get('/companies', [EmployerController::class, 'companyProfile']);
 $router->get('/company', [EmployerController::class, 'companyProfile']);
 $router->get('/company/{slug}', [EmployerController::class, 'companyProfile']);
 
+// Employer Post Internship flow
+$router->get('/employer/internships/create', [EmployerController::class, 'createInternship']);
+$router->post('/employer/internships/create', [EmployerController::class, 'storeInternship']);
+$router->get('/employer/post-internship', [EmployerController::class, 'createInternship']);
+$router->post('/employer/post-internship', [EmployerController::class, 'storeInternship']);
+$router->get('/employer/internships/review', [EmployerController::class, 'reviewInternship']);
+$router->post('/employer/internships/publish', [EmployerController::class, 'publishInternship']);
+$router->get('/employer/internships/success', [EmployerController::class, 'internshipSuccess']);
+$router->get('/employer/post-internship/success', [EmployerController::class, 'internshipSuccess']);
+
 // Internship & Application routes
 $router->get('/internships', [InternshipController::class, 'index']);
 $router->get('/internship/{slug}', [InternshipController::class, 'show']);

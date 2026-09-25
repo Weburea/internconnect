@@ -403,7 +403,7 @@ $avatar      = $employer['avatar'] ?? null;
                     <h1 style="font-size: 28px; font-weight: 800; color: #0F172A; margin: 0; line-height: 1.2;">Welcome back, <?= htmlspecialchars($companyName) ?></h1>
                     <p style="font-size: 14px; color: #475569; margin-top: 8px; font-weight: 500;">Ready to scale your team? You have 12 new applications waiting for review.</p>
                 </div>
-                <a href="#" style="background: #4F47E6; color: #fff; text-decoration: none; font-size: 13px; font-weight: 700; padding: 12px 24px; border-radius: 12px; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(79, 70, 230, 0.25); transition: transform 0.2s, background 0.2s; flex-shrink: 0;" onmouseover="this.style.background='#4338ca'; this.style.transform='translateY(-1px)';" onmouseout="this.style.background='#4F47E6'; this.style.transform='translateY(0)';">
+                <a href="<?= url('/employer/internships/create') ?>" style="background: #4F47E6; color: #fff; text-decoration: none; font-size: 13px; font-weight: 700; padding: 12px 24px; border-radius: 12px; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(79, 70, 230, 0.25); transition: transform 0.2s, background 0.2s; flex-shrink: 0;" onmouseover="this.style.background='#4338ca'; this.style.transform='translateY(-1px)';" onmouseout="this.style.background='#4F47E6'; this.style.transform='translateY(0)';">
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                     </svg>

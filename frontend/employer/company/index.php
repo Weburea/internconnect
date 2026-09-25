@@ -72,7 +72,7 @@ $strength    = (int)($employer['profile_strength'] ?? 78);
 
     .comp-cover-wrap {
         position: relative;
-        height: 200px;
+        height: 220px;
         background: #0F172A;
         overflow: hidden;
     }
@@ -88,7 +88,40 @@ $strength    = (int)($employer['profile_strength'] ?? 78);
     .comp-cover-overlay {
         position: absolute;
         inset: 0;
-        background: linear-gradient(180deg, rgba(15, 23, 42, 0.2) 0%, rgba(15, 23, 42, 0.6) 100%);
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.15) 0%, rgba(15, 23, 42, 0.6) 100%);
+    }
+
+    .comp-cover-edit-btn {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        background: rgba(15, 23, 42, 0.75);
+        backdrop-filter: blur(8px);
+        color: #FFFFFF;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        padding: 7px 14px;
+        border-radius: 10px;
+        font-size: 12px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        text-decoration: none;
+        cursor: pointer;
+        z-index: 15;
+        transition: all 0.2s ease;
+    }
+
+    .comp-cover-edit-btn:hover {
+        background: rgba(15, 23, 42, 0.95);
+        border-color: #FFFFFF;
+        color: #FFFFFF;
+        transform: translateY(-1px);
+    }
+
+    .comp-cover-edit-btn svg {
+        width: 14px;
+        height: 14px;
     }
 
     .comp-hero-body {
@@ -116,6 +149,36 @@ $strength    = (int)($employer['profile_strength'] ?? 78);
         object-fit: cover;
         display: block;
         background: #0F172A;
+    }
+
+    .comp-logo-edit-trigger {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: 26px;
+        height: 26px;
+        background: #4F47E6;
+        color: #FFFFFF;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #FFFFFF;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        cursor: pointer;
+        text-decoration: none;
+        transition: transform 0.15s ease;
+        z-index: 12;
+    }
+
+    .comp-logo-edit-trigger:hover {
+        transform: scale(1.1);
+        background: #4338CA;
+    }
+
+    .comp-logo-edit-trigger svg {
+        width: 13px;
+        height: 13px;
     }
 
     .comp-logo-badge-check {
@@ -629,18 +692,40 @@ $strength    = (int)($employer['profile_strength'] ?? 78);
     }
 
     @media (max-width: 640px) {
+        .comp-cover-wrap {
+            height: 140px;
+        }
+        .comp-cover-edit-btn {
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            font-size: 11px;
+        }
+        .comp-cover-edit-btn span {
+            display: none;
+        }
         .comp-hero-body {
             padding: 0 16px 20px;
         }
         .comp-logo-avatar-wrap {
             left: 16px;
-            top: -44px;
-            width: 88px;
-            height: 88px;
+            top: -40px;
+            width: 80px;
+            height: 80px;
+            padding: 3px;
+        }
+        .comp-logo-edit-trigger {
+            width: 22px;
+            height: 22px;
+        }
+        .comp-logo-edit-trigger svg {
+            width: 11px;
+            height: 11px;
         }
         .comp-hero-header-row {
-            padding-top: 50px;
+            padding-top: 46px;
             flex-direction: column;
+            gap: 16px;
         }
         .comp-gallery-grid {
             grid-template-columns: repeat(2, 1fr);
@@ -652,7 +737,7 @@ $strength    = (int)($employer['profile_strength'] ?? 78);
 
     <!-- ══ SIDEBAR ══ -->
     <?php 
-    $activeNav = 'companies';
+    $activeNav = 'company_overview';
     include dirname(__DIR__, 2) . '/shared/components/employer-sidebar.php'; 
     ?>
 
@@ -673,7 +758,7 @@ $strength    = (int)($employer['profile_strength'] ?? 78);
                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                         </svg>
-                        <span>Companies</span>
+                        <span>Company Overview</span>
                     </a>
                 </div>
 
@@ -731,9 +816,12 @@ $strength    = (int)($employer['profile_strength'] ?? 78);
                             </div>
 
                             <div class="comp-hero-actions">
-                                <button type="button" class="comp-btn-outline" onclick="this.innerText = this.innerText === 'Follow' ? 'Following' : 'Follow'">
-                                    Follow
-                                </button>
+                                <a href="<?= url('/employer/profile') ?>" class="comp-btn-outline">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                    <span>Edit Profile</span>
+                                </a>
                                 <a href="<?= url('/employer/dashboard') ?>" class="comp-btn-primary">
                                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -929,15 +1017,15 @@ $strength    = (int)($employer['profile_strength'] ?? 78);
                             </div>
 
                             <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 18px; padding-top: 16px; border-top: 1px solid #F1F5F9;">
-                                <a href="<?= url('/employer/dashboard') ?>" class="comp-btn-primary" style="justify-content: center;">
+                                <a href="<?= url('/employer/company') ?>" class="comp-btn-primary" style="justify-content: center;">
                                     <span>Preview Profile →</span>
                                 </a>
-                                <button type="button" class="comp-btn-outline" style="justify-content: center;" onclick="alert('Profile editing mode active')">
+                                <a href="<?= url('/employer/profile') ?>" class="comp-btn-outline" style="justify-content: center;">
                                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                     </svg>
                                     <span>Edit Profile</span>
-                                </button>
+                                </a>
                             </div>
                         </div>
 
@@ -1012,6 +1100,21 @@ $strength    = (int)($employer['profile_strength'] ?? 78);
                             </div>
 
                             <div class="comp-details-list">
+                                <div class="comp-detail-item">
+                                    <div class="comp-detail-icon">
+                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div class="comp-detail-label">CAC / RC Registration</div>
+                                        <div class="comp-detail-val" style="display: flex; align-items: center; gap: 6px;">
+                                            <span><?= htmlspecialchars($employer['cac_number'] ?? 'RC-1849204') ?></span>
+                                            <span style="font-size: 11px; background: #DCFCE7; color: #166534; font-weight: 700; padding: 2px 6px; border-radius: 4px;">Verified</span>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="comp-detail-item">
                                     <div class="comp-detail-icon">
                                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

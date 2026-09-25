@@ -13,6 +13,94 @@ $firstName = explode(' ', trim($name))[0];
 $role = $candidate['role'] ?? 'Student Applicant';
 $avatar = $candidate['avatar'] ?? null;
 ?>
+<style>
+/* Custom Form Dropdown Styles */
+.db-dropdown-wrap {
+    position: relative;
+    width: 100%;
+}
+.db-dropdown-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #F8FAFC;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13.5px;
+    color: #1E293B;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s ease;
+    outline: none;
+    font-family: inherit;
+    user-select: none;
+}
+.db-dropdown-btn:hover {
+    border-color: #CBD5E1;
+    background-color: #F1F5F9;
+}
+.db-dropdown-btn.is-open,
+.db-dropdown-btn:focus {
+    border-color: #4F47E6;
+    background-color: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(79, 70, 230, 0.12);
+}
+.db-dropdown-chevron {
+    width: 15px;
+    height: 15px;
+    color: #64748B;
+    flex-shrink: 0;
+    transition: transform 0.2s ease, color 0.15s ease;
+}
+.db-dropdown-btn.is-open .db-dropdown-chevron {
+    color: #4F47E6;
+    transform: rotate(180deg);
+}
+.db-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+    z-index: 60;
+    padding: 6px;
+    max-height: 250px;
+    overflow-y: auto;
+}
+.db-dropdown-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #334155;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    user-select: none;
+}
+.db-dropdown-item:hover {
+    background-color: #F1F5F9;
+    color: #0F172A;
+}
+.db-dropdown-item.is-selected {
+    background-color: #EEF2FF;
+    color: #4F47E6;
+    font-weight: 600;
+}
+.db-dropdown-check {
+    width: 14px;
+    height: 14px;
+    color: #4F47E6;
+    flex-shrink: 0;
+}
+</style>
 <div class="db-shell" x-data="{ 
     deactivateModal: false, 
     confirmNameInput: '',
@@ -207,35 +295,72 @@ $avatar = $candidate['avatar'] ?? null;
 
                             <div class="db-form-row">
                                 <div class="db-form-group">
-                                    <label for="select-grad-year" class="db-label">Expected Graduation Year/ Graduation Year</label>
-                                    <select name="graduation_year" id="select-grad-year" class="db-input db-select">
-                                        <option value="" <?= empty($candidate['graduation_year']) ? 'selected' : '' ?>>Select Year</option>
-                                        <?php 
-                                        $selectedYear = (string)($candidate['graduation_year'] ?? '');
-                                        for ($yr = 2030; $yr >= 2018; $yr--): ?>
-                                            <option value="<?= $yr ?>" <?= ($selectedYear === (string)$yr) ? 'selected' : '' ?>><?= $yr ?></option>
-                                        <?php endfor; ?>
-                                    </select>
+                                    <label class="db-label">Expected Graduation Year/ Graduation Year</label>
+                                    <?php 
+                                    $selectedYear = (string)($candidate['graduation_year'] ?? '');
+                                    $yearLabel = !empty($selectedYear) ? $selectedYear : 'Select Year';
+                                    ?>
+                                    <div class="db-dropdown-wrap" x-data="{ open: false, selected: '<?= htmlspecialchars($selectedYear) ?>', label: '<?= htmlspecialchars($yearLabel) ?>' }" @click.outside="open = false">
+                                        <button type="button" class="db-dropdown-btn" :class="{ 'is-open': open }" @click="open = !open">
+                                            <span x-text="label" :style="!selected ? 'color: #94A3B8;' : 'color: #1E293B; font-weight: 500;'">Select Year</span>
+                                            <svg class="db-dropdown-chevron" :class="{ 'rotate-180': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
+                                        </button>
+                                        <div x-show="open" x-transition class="db-dropdown-menu" style="display: none;">
+                                            <div class="db-dropdown-item" :class="{ 'is-selected': selected === '' }" @click="selected = ''; label = 'Select Year'; open = false;">
+                                                <span>Select Year</span>
+                                                <svg x-show="selected === ''" class="db-dropdown-check" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                            </div>
+                                            <?php for ($yr = 2030; $yr >= 2018; $yr--): ?>
+                                                <div class="db-dropdown-item" :class="{ 'is-selected': selected === '<?= $yr ?>' }" @click="selected = '<?= $yr ?>'; label = '<?= $yr ?>'; open = false;">
+                                                    <span><?= $yr ?></span>
+                                                    <svg x-show="selected === '<?= $yr ?>'" class="db-dropdown-check" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                                </div>
+                                            <?php endfor; ?>
+                                        </div>
+                                        <input type="hidden" name="graduation_year" :value="selected">
+                                    </div>
                                 </div>
                                 <div class="db-form-group">
-                                    <label for="select-degree-type" class="db-label">Degree Type</label>
-                                    <select name="degree_type" id="select-degree-type" class="db-input db-select">
-                                        <option value="" <?= empty($candidate['degree_type']) ? 'selected' : '' ?>>Select Degree</option>
-                                        <?php 
-                                        $degreeOptions = [
-                                            "Bachelor's",
-                                            "Master's",
-                                            "Doctorate / Ph.D",
-                                            "Associate Degree",
-                                            "Diploma / Certificate",
-                                            "High School / Secondary",
-                                            "Bootcamp / Certificate",
-                                        ];
-                                        $selectedDegree = $candidate['degree_type'] ?? "";
-                                        foreach ($degreeOptions as $dOption): ?>
-                                            <option value="<?= htmlspecialchars($dOption) ?>" <?= ($selectedDegree === $dOption) ? 'selected' : '' ?>><?= htmlspecialchars($dOption) ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
+                                    <label class="db-label">Degree Type</label>
+                                    <?php 
+                                    $degreeOptions = [
+                                        "Bachelor's",
+                                        "Master's",
+                                        "Doctorate / Ph.D",
+                                        "Associate Degree",
+                                        "Diploma / Certificate",
+                                        "High School / Secondary",
+                                        "Bootcamp / Certificate",
+                                    ];
+                                    $selectedDegree = $candidate['degree_type'] ?? "";
+                                    $degreeLabel = !empty($selectedDegree) ? $selectedDegree : 'Select Degree';
+                                    ?>
+                                    <div class="db-dropdown-wrap" 
+                                         x-data="{ 
+                                             open: false, 
+                                             selected: <?= htmlspecialchars(json_encode($selectedDegree), ENT_QUOTES, 'UTF-8') ?>, 
+                                             label: <?= htmlspecialchars(json_encode($degreeLabel), ENT_QUOTES, 'UTF-8') ?>,
+                                             options: <?= htmlspecialchars(json_encode($degreeOptions), ENT_QUOTES, 'UTF-8') ?>
+                                         }" 
+                                         @click.outside="open = false">
+                                        <button type="button" class="db-dropdown-btn" :class="{ 'is-open': open }" @click="open = !open">
+                                            <span x-text="label" :style="!selected ? 'color: #94A3B8;' : 'color: #1E293B; font-weight: 500;'">Select Degree</span>
+                                            <svg class="db-dropdown-chevron" :class="{ 'rotate-180': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/></svg>
+                                        </button>
+                                        <div x-show="open" x-transition class="db-dropdown-menu" style="display: none;">
+                                            <div class="db-dropdown-item" :class="{ 'is-selected': selected === '' }" @click="selected = ''; label = 'Select Degree'; open = false;">
+                                                <span>Select Degree</span>
+                                                <svg x-show="selected === ''" class="db-dropdown-check" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                            </div>
+                                            <template x-for="dOpt in options" :key="dOpt">
+                                                <div class="db-dropdown-item" :class="{ 'is-selected': selected === dOpt }" @click="selected = dOpt; label = dOpt; open = false;">
+                                                    <span x-text="dOpt"></span>
+                                                    <svg x-show="selected === dOpt" class="db-dropdown-check" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                                </div>
+                                            </template>
+                                        </div>
+                                        <input type="hidden" name="degree_type" :value="selected">
+                                    </div>
                                 </div>
                             </div>
 

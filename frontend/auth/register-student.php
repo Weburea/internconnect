@@ -331,20 +331,28 @@ declare(strict_types=1);
                             <div class="flex-grow border-t border-brandBorder"></div>
                         </div>
 
-                        <!-- Fields (Clean reset with no left icons and correct absolute right eye icons) -->
+                        <!-- Fields with standard left icons -->
                         <div class="space-y-4 text-left">
                             <div>
                                 <label for="email" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Email Address</label>
-                                <input type="email" id="email" x-model="email" placeholder="jane@university.edu" 
-                                       class="w-full px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                <div class="relative flex items-center">
+                                    <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
+                                        <iconify-icon icon="lucide:mail" class="text-lg"></iconify-icon>
+                                    </div>
+                                    <input type="email" id="email" x-model="email" placeholder="e.g. jane@university.edu" 
+                                           class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                </div>
                             </div>
 
                             <!-- Password -->
                             <div>
                                 <label for="reg-password" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Password</label>
-                                <div class="relative">
+                                <div class="relative flex items-center">
+                                    <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
+                                        <iconify-icon icon="lucide:lock" class="text-lg"></iconify-icon>
+                                    </div>
                                     <input :type="password_visible ? 'text' : 'password'" id="reg-password" x-model="password" placeholder="••••••••" 
-                                           class="w-full px-4 pr-10 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm tracking-widest text-[#191C1D] placeholder-gray-400">
+                                           class="w-full pl-10 pr-10 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm tracking-widest text-[#191C1D] placeholder-gray-400">
                                     <button @click="password_visible = !password_visible" type="button" 
                                             style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); cursor: pointer;"
                                             class="text-gray-400 hover:text-gray-600 flex items-center border-none bg-transparent outline-none">
@@ -365,9 +373,12 @@ declare(strict_types=1);
                             <!-- Confirm Password -->
                             <div>
                                 <label for="confirm-password" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Confirm Password</label>
-                                <div class="relative">
+                                <div class="relative flex items-center">
+                                    <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
+                                        <iconify-icon icon="lucide:lock" class="text-lg"></iconify-icon>
+                                    </div>
                                     <input :type="confirm_password_visible ? 'text' : 'password'" id="confirm-password" x-model="confirm_password" placeholder="••••••••" 
-                                           class="w-full px-4 pr-10 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm tracking-widest text-[#191C1D] placeholder-gray-400">
+                                           class="w-full pl-10 pr-10 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm tracking-widest text-[#191C1D] placeholder-gray-400">
                                     <button @click="confirm_password_visible = !confirm_password_visible" type="button" 
                                             style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); cursor: pointer;"
                                             class="text-gray-400 hover:text-gray-600 flex items-center border-none bg-transparent outline-none">
@@ -484,13 +495,23 @@ declare(strict_types=1);
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label for="first-name" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">First Name</label>
-                                    <input type="text" id="first-name" x-model="first_name" placeholder="Sarah" 
-                                           class="w-full px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                    <div class="relative flex items-center">
+                                        <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
+                                            <iconify-icon icon="lucide:user" class="text-lg"></iconify-icon>
+                                        </div>
+                                        <input type="text" id="first-name" x-model="first_name" placeholder="e.g. Sarah" 
+                                               class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                    </div>
                                 </div>
                                 <div>
                                     <label for="last-name" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Last Name</label>
-                                    <input type="text" id="last-name" x-model="last_name" placeholder="Peters" 
-                                           class="w-full px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                    <div class="relative flex items-center">
+                                        <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
+                                            <iconify-icon icon="lucide:user" class="text-lg"></iconify-icon>
+                                        </div>
+                                        <input type="text" id="last-name" x-model="last_name" placeholder="e.g. Peters" 
+                                               class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                    </div>
                                 </div>
                             </div>
 
@@ -501,7 +522,7 @@ declare(strict_types=1);
                                     <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
                                         <iconify-icon icon="lucide:building" class="text-lg"></iconify-icon>
                                     </div>
-                                    <input type="text" id="university" x-model="university" placeholder="University of Lagos" 
+                                    <input type="text" id="university" x-model="university" placeholder="e.g. University of Lagos" 
                                            class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
                                 </div>
                             </div>
@@ -509,45 +530,97 @@ declare(strict_types=1);
                             <!-- Degree / Graduation Year Row -->
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label for="degree-level" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Degree Level</label>
-                                    <select id="degree-level" x-model="degree_level" 
-                                            class="w-full px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] bg-white">
-                                        <option>Bachelor's</option>
-                                        <option>Master's</option>
-                                        <option>PhD</option>
-                                        <option>Associate Degree</option>
-                                        <option>Diploma</option>
-                                    </select>
+                                    <label class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Degree Level</label>
+                                    <div class="relative w-full" x-data="{ open: false }" @click.outside="open = false">
+                                        <button type="button" 
+                                                class="w-full flex items-center justify-between px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] bg-white text-left cursor-pointer"
+                                                :class="{ 'border-primary ring-2 ring-primary/20': open }"
+                                                @click="open = !open">
+                                            <span :class="degree_level ? 'text-[#191C1D]' : 'text-gray-400'" x-text="degree_level || 'Select Degree Level'"></span>
+                                            <svg class="w-4 h-4 text-gray-500 transition-transform duration-200" :class="{ 'rotate-180 text-primary': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
+                                            </svg>
+                                        </button>
+                                        <div x-show="open" 
+                                             x-transition:enter="transition ease-out duration-100"
+                                             x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                                             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                             x-transition:leave="transition ease-in duration-75"
+                                             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                                             x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                                             class="absolute top-[calc(100%+6px)] left-0 right-0 bg-white border border-brandBorder rounded-xl shadow-lg z-50 p-1.5 max-h-52 overflow-y-auto"
+                                             style="display: none;">
+                                            <template x-for="dOpt in degree_options" :key="dOpt">
+                                                <div class="flex items-center justify-between px-3 py-2 text-xs font-medium rounded-lg cursor-pointer transition-colors"
+                                                     :class="degree_level === dOpt ? 'bg-indigo-50 text-primary font-semibold' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'"
+                                                     @click="degree_level = dOpt; open = false">
+                                                    <span x-text="dOpt"></span>
+                                                    <svg x-show="degree_level === dOpt" class="w-3.5 h-3.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div>
-                                    <label for="graduation-year" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Graduation Year</label>
-                                    <select id="graduation-year" x-model="graduation_year" 
-                                            class="w-full px-4 py-2.5 rounded-lg border border-[#E2E8F0] focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] bg-white">
-                                        <option>2024</option>
-                                        <option>2025</option>
-                                        <option>2026</option>
-                                        <option>2027</option>
-                                        <option>2028</option>
-                                        <option>2029</option>
-                                        <option>2030</option>
-                                        <option>2031</option>
-                                        <option>2032</option>
-                                    </select>
+                                    <label class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Graduation Year</label>
+                                    <div class="relative w-full" x-data="{ open: false }" @click.outside="open = false">
+                                        <button type="button" 
+                                                class="w-full flex items-center justify-between px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] bg-white text-left cursor-pointer"
+                                                :class="{ 'border-primary ring-2 ring-primary/20': open }"
+                                                @click="open = !open">
+                                            <span :class="graduation_year ? 'text-[#191C1D]' : 'text-gray-400'" x-text="graduation_year || 'Select Graduation Year'"></span>
+                                            <svg class="w-4 h-4 text-gray-500 transition-transform duration-200" :class="{ 'rotate-180 text-primary': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
+                                            </svg>
+                                        </button>
+                                        <div x-show="open" 
+                                             x-transition:enter="transition ease-out duration-100"
+                                             x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                                             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                             x-transition:leave="transition ease-in duration-75"
+                                             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                                             x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                                             class="absolute top-[calc(100%+6px)] left-0 right-0 bg-white border border-brandBorder rounded-xl shadow-lg z-50 p-1.5 max-h-52 overflow-y-auto"
+                                             style="display: none;">
+                                            <template x-for="yOpt in graduation_year_options" :key="yOpt">
+                                                <div class="flex items-center justify-between px-3 py-2 text-xs font-medium rounded-lg cursor-pointer transition-colors"
+                                                     :class="graduation_year === yOpt ? 'bg-indigo-50 text-primary font-semibold' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'"
+                                                     @click="graduation_year = yOpt; open = false">
+                                                    <span x-text="yOpt"></span>
+                                                    <svg x-show="graduation_year === yOpt" class="w-3.5 h-3.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Field of Study -->
                             <div>
                                 <label for="field-of-study" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Field of Study</label>
-                                <input type="text" id="field-of-study" x-model="field_of_study" placeholder="Computer Science" 
-                                       class="w-full px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                <div class="relative flex items-center">
+                                    <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
+                                        <iconify-icon icon="lucide:book-open" class="text-lg"></iconify-icon>
+                                    </div>
+                                    <input type="text" id="field-of-study" x-model="field_of_study" placeholder="e.g. Computer Science" 
+                                           class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                </div>
                             </div>
 
                             <!-- GPA (Optional) -->
                             <div>
                                 <label for="gpa" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">GPA (Optional)</label>
-                                <input type="text" id="gpa" x-model="gpa" placeholder="e.g. 3.8" 
-                                       class="w-full px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                <div class="relative flex items-center">
+                                    <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
+                                        <iconify-icon icon="lucide:award" class="text-lg"></iconify-icon>
+                                    </div>
+                                    <input type="text" id="gpa" x-model="gpa" placeholder="e.g. 3.8 / 4.0" 
+                                           class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                </div>
                             </div>
                         </div>
 
@@ -578,50 +651,47 @@ declare(strict_types=1);
                              @dragleave.prevent="is_dragged = false"
                              @drop.prevent="handleFileDrop($event)"
                              @click="$refs.fileInput.click()"
-                             class="border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-2 select-none"
+                             class="border-2 border-dashed rounded-xl py-4 px-4 text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-1.5 select-none"
                              :class="is_dragged ? 'border-primary bg-primary/5' : 'border-brandBorder bg-white hover:border-gray-300'">
                             
                             <!-- Hidden File Input -->
                             <input type="file" x-ref="fileInput" accept=".pdf,.docx" class="hidden" @change="handleFileSelect($event)">
                             
-                            <div class="w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center text-primary">
-                                <iconify-icon icon="lucide:cloud-upload" class="text-2xl"></iconify-icon>
+                            <div class="w-9 h-9 rounded-full bg-primary/5 flex items-center justify-center text-primary flex-shrink-0">
+                                <iconify-icon icon="lucide:cloud-upload" class="text-xl"></iconify-icon>
                             </div>
 
-                            <div class="text-sm font-semibold text-primary">
+                            <div class="text-xs font-semibold text-primary">
                                 Click to upload <span class="text-[#191C1D]">or drag and drop</span>
                             </div>
-                            <div class="text-[12px] text-secondary-text">PDF or DOCX (Max. 10MB)</div>
+                            <div class="text-[11px] text-secondary-text">PDF or DOCX (Max. 10MB)</div>
                         </div>
 
-                        <!-- Visually Rich Uploaded File Preview Card (Adopted from candidate/application.php) -->
-                        <div x-show="fileUploaded" class="text-left mt-4" style="display: none;">
-                            <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Uploaded File</p>
-                            <div class="border border-gray-200 rounded-xl p-4 flex gap-4 items-start justify-between bg-[#F8FAFC] shadow-sm">
-                                <div class="flex items-start gap-3 min-w-0 flex-1">
+                        <!-- Visually Rich Uploaded File Preview Card with strict truncation -->
+                        <div x-show="fileUploaded" class="text-left mt-3 w-full overflow-hidden" style="display: none;">
+                            <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Uploaded File</p>
+                            <div class="border border-gray-200 rounded-xl p-3 flex gap-3 items-center justify-between bg-[#F8FAFC] shadow-sm w-full min-w-0">
+                                <div class="flex items-center gap-2.5 min-w-0 flex-1 overflow-hidden">
                                     <!-- Visual file icon -->
-                                    <div class="h-12 w-9 bg-white border border-gray-300 rounded-lg shadow-sm flex-shrink-0 relative overflow-hidden flex flex-col p-1 justify-between">
+                                    <div class="h-10 w-8 bg-white border border-gray-300 rounded-lg shadow-sm flex-shrink-0 relative overflow-hidden flex flex-col p-1 justify-between">
                                         <div class="absolute right-0 top-0 h-3 w-3.5 bg-red-500 text-white font-bold text-[6px] flex items-center justify-center rounded-bl uppercase" x-text="resume_name.split('.').pop()">PDF</div>
-                                        <div class="space-y-1 mt-2.5">
+                                        <div class="space-y-1 mt-2">
                                             <div class="h-[1.5px] bg-gray-300 w-full rounded"></div>
                                             <div class="h-[1.5px] bg-gray-300 w-5/6 rounded"></div>
-                                            <div class="h-[1.5px] bg-gray-300 w-4/5 rounded"></div>
                                         </div>
-                                        <div class="h-[1.5px] bg-primary w-1/2 rounded"></div>
                                     </div>
-                                    <div class="min-w-0 flex-1">
-                                        <p class="text-sm font-bold text-primary-text mb-0.5 break-all truncate" x-text="resume_name"></p>
-                                        <p class="text-xs text-gray-500" x-text="resume_size + ' • Uploaded just now'"></p>
-                                        <!-- Status badges -->
-                                        <div class="flex flex-wrap items-center gap-1.5 mt-1.5">
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-semibold bg-green-50 text-green-700 border border-green-200">Ready for review</span>
-                                            <span class="text-[9px] text-gray-400">✓ Parsed by InternConnect AI</span>
+                                    <div class="min-w-0 flex-1 overflow-hidden">
+                                        <p class="text-xs font-bold text-[#191C1D] truncate block" :title="resume_name" x-text="resume_name"></p>
+                                        <p class="text-[11px] text-gray-500 truncate" x-text="resume_size + ' • Ready'"></p>
+                                        <!-- Status badge -->
+                                        <div class="flex items-center gap-1.5 mt-0.5">
+                                            <span class="inline-flex items-center px-1.5 py-0.2 rounded-full text-[9px] font-semibold bg-green-50 text-green-700 border border-green-200">Parsed by AI</span>
                                         </div>
                                     </div>
                                 </div>
                                 <!-- Delete button -->
-                                <button type="button" @click="removeSelectedFile()" class="text-red-500 hover:text-red-700 flex items-center flex-shrink-0">
-                                    <iconify-icon icon="lucide:trash-2" class="text-lg"></iconify-icon>
+                                <button type="button" @click="removeSelectedFile()" class="text-red-500 hover:text-red-700 flex items-center flex-shrink-0 p-1.5 rounded-lg hover:bg-red-50 transition-colors" title="Remove Resume">
+                                    <iconify-icon icon="lucide:trash-2" class="text-base"></iconify-icon>
                                 </button>
                             </div>
                         </div>
@@ -636,35 +706,37 @@ declare(strict_types=1);
                         <!-- Links Fields -->
                         <div class="space-y-4 text-left">
                             <div>
-                                <label for="portfolio-url" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Portfolio URL</label>
+                                <label for="portfolio-url" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Portfolio URL (Optional)</label>
                                 <div class="relative flex items-center">
                                     <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
-                                        <iconify-icon icon="lucide:link" class="text-lg"></iconify-icon>
+                                        <iconify-icon icon="lucide:globe" class="text-lg"></iconify-icon>
                                     </div>
                                     <input type="text" id="portfolio-url" x-model="portfolio" placeholder="https://yourportfolio.com" 
                                            class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
                                 </div>
                             </div>
 
-                            <div>
-                                <label for="linkedin-url" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">LinkedIn URL</label>
-                                <div class="relative flex items-center">
-                                    <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
-                                        <iconify-icon icon="lucide:briefcase" class="text-lg"></iconify-icon>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="linkedin-url" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">LinkedIn (Optional)</label>
+                                    <div class="relative flex items-center">
+                                        <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
+                                            <iconify-icon icon="lucide:linkedin" class="text-lg"></iconify-icon>
+                                        </div>
+                                        <input type="text" id="linkedin-url" x-model="linkedin" placeholder="linkedin.com/in/username" 
+                                               class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
                                     </div>
-                                    <input type="text" id="linkedin-url" x-model="linkedin" placeholder="https://linkedin.com/in/username" 
-                                           class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
                                 </div>
-                            </div>
 
-                            <div>
-                                <label for="github-url" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">GitHub URL</label>
-                                <div class="relative flex items-center">
-                                    <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
-                                        <iconify-icon icon="lucide:code" class="text-lg"></iconify-icon>
+                                <div>
+                                    <label for="github-url" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">GitHub (Optional)</label>
+                                    <div class="relative flex items-center">
+                                        <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
+                                            <iconify-icon icon="lucide:github" class="text-lg"></iconify-icon>
+                                        </div>
+                                        <input type="text" id="github-url" x-model="github" placeholder="github.com/username" 
+                                               class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
                                     </div>
-                                    <input type="text" id="github-url" x-model="github" placeholder="https://github.com/username" 
-                                           class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
                                 </div>
                             </div>
                         </div>
@@ -706,8 +778,8 @@ declare(strict_types=1);
                                    class="w-full pl-10 pr-4 py-2 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
                         </div>
 
-                        <!-- Interest Tags Grid -->
-                        <div class="flex flex-wrap gap-2 py-2 max-h-[180px] overflow-y-auto pr-1">
+                        <!-- Interest Tags Grid with Primary Scrollbar -->
+                        <div class="flex flex-wrap gap-2 py-2 max-h-[180px] overflow-y-auto pr-1 custom-primary-scrollbar">
                             <template x-for="item in filteredInterests()" :key="item">
                                 <button type="button" @click="toggleInterest(item)"
                                         class="px-4 py-2 rounded-full text-xs font-semibold border transition-all duration-200"

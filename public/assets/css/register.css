@@ -99,3 +99,24 @@
     animation: modalCheckDraw 2.5s infinite ease-in-out !important;
 }
 
+/* Custom Primary Scrollbar for Onboarding Dropdowns, Textareas, and Lists */
+.custom-primary-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #4F47E6 #F1F5F9;
+}
+.custom-primary-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+.custom-primary-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 99px;
+}
+.custom-primary-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #6366F1;
+    border-radius: 99px;
+}
+.custom-primary-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: #4F46E5;
+}
+

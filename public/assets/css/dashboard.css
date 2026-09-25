@@ -1618,22 +1618,116 @@ html, body {
 }
 
 .db-select {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-color: #F8FAFC;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    background-size: 16px;
-    padding-right: 42px;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-color: #F8FAFC !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 14px center !important;
+    background-size: 16px 16px !important;
+    padding-right: 42px !important;
     cursor: pointer;
     font-family: inherit;
 }
 
-.db-select:focus {
-    background-color: #fff;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%234F47E6' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+.db-select:focus,
+.db-select:active {
+    background-color: #FFFFFF !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%234F47E6' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 14px center !important;
+    background-size: 16px 16px !important;
+    border-color: #4F47E6 !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(79, 70, 230, 0.12) !important;
+}
+
+/* ── Custom Form Dropdown Component (Modern rounded replacement for native selects) ── */
+.db-dropdown-wrap {
+    position: relative;
+    width: 100%;
+}
+.db-dropdown-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #F8FAFC;
+    border: 1.5px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13.5px;
+    color: #1E293B;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s ease;
+    outline: none;
+    font-family: inherit;
+    user-select: none;
+}
+.db-dropdown-btn:hover {
+    border-color: #CBD5E1;
+    background-color: #F1F5F9;
+}
+.db-dropdown-btn.is-open,
+.db-dropdown-btn:focus {
+    border-color: #4F47E6;
+    background-color: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(79, 70, 230, 0.12);
+}
+.db-dropdown-chevron {
+    width: 15px;
+    height: 15px;
+    color: #64748B;
+    flex-shrink: 0;
+    transition: transform 0.2s ease, color 0.15s ease;
+}
+.db-dropdown-btn.is-open .db-dropdown-chevron {
+    color: #4F47E6;
+    transform: rotate(180deg);
+}
+.db-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+    z-index: 60;
+    padding: 6px;
+    max-height: 250px;
+    overflow-y: auto;
+}
+.db-dropdown-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #334155;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    user-select: none;
+}
+.db-dropdown-item:hover {
+    background-color: #F1F5F9;
+    color: #0F172A;
+}
+.db-dropdown-item.is-selected {
+    background-color: #EEF2FF;
+    color: #4F47E6;
+    font-weight: 600;
+}
+.db-dropdown-check {
+    width: 14px;
+    height: 14px;
+    color: #4F47E6;
+    flex-shrink: 0;
 }
 
 .db-input-group-icon {

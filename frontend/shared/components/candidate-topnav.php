@@ -99,7 +99,11 @@ $activeNav     = $activeNav ?? '';
                     <?php if ($candAvatar): ?>
                         <img src="<?= htmlspecialchars($candAvatar) ?>" alt="<?= htmlspecialchars($candName) ?>">
                     <?php else: ?>
-                        <div class="db-avatar-initials-sm"><?= strtoupper(substr($candFirstName, 0, 1)) ?></div>
+                        <?php
+                        $candWords = preg_split('/\s+/', trim($candName));
+                        $candInitials = (count($candWords) >= 2) ? (strtoupper(substr($candWords[0], 0, 1) . substr($candWords[1], 0, 1))) : strtoupper(substr($candName, 0, 2));
+                        ?>
+                        <div class="db-avatar-initials-sm"><?= htmlspecialchars($candInitials ?: 'SP') ?></div>
                     <?php endif; ?>
                 </div>
 

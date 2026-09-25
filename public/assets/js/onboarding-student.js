@@ -24,10 +24,22 @@ function studentOnboardingWizard() {
         first_name: '',
         last_name: '',
         university: '',
-        degree_level: "Bachelor's",
-        graduation_year: '2025',
+        degree_level: '',
+        graduation_year: '',
         field_of_study: '',
         gpa: '',
+        degree_options: [
+            "Bachelor's",
+            "Master's",
+            "Doctorate / Ph.D",
+            "Associate Degree",
+            "Diploma / Certificate",
+            "High School / Secondary",
+            "Bootcamp / Certificate"
+        ],
+        graduation_year_options: [
+            '2024', '2025', '2026', '2027', '2028', '2029', '2030', '2031', '2032'
+        ],
         // Step 5
         resume_name: '',
         resume_size: '',
@@ -56,39 +68,10 @@ function studentOnboardingWizard() {
         submitting: false,
 
         init() {
-            // Load partial draft from local state if exists
-            const draft = localStorage.getItem('internconnect_onboarding_draft');
-            if (draft) {
-                try {
-                    const data = JSON.parse(draft);
-                    // Ensure we never land on step 1 here — that belongs to register.php
-                    const loadedStep = data.step || 2;
-                    this.step = loadedStep < 2 ? 2 : loadedStep;
-                    this.role = data.role || 'student';
-                    this.email = data.email || '';
-                    this.first_name = data.first_name || '';
-                    this.last_name = data.last_name || '';
-                    this.university = data.university || '';
-                    this.degree_level = data.degree_level || "Bachelor's";
-                    this.graduation_year = data.graduation_year || '2025';
-                    this.field_of_study = data.field_of_study || '';
-                    this.gpa = data.gpa || '';
-                    this.portfolio = data.portfolio || '';
-                    this.linkedin = data.linkedin || '';
-                    this.github = data.github || '';
-                    this.resume_name = data.resume_name || '';
-                    this.resume_size = data.resume_size || '';
-                    this.fileUploaded = data.fileUploaded || false;
-                    this.interests = data.interests || [];
-                    this.work_arrangements = data.work_arrangements || ['Remote', 'Hybrid'];
-                    this.location = data.location || '';
-                    this.open_to_relocating = data.open_to_relocating || 'Yes';
-                    this.job_suggestions_locations = data.job_suggestions_locations || [];
-                    this.include_remote = data.include_remote !== undefined ? data.include_remote : true;
-                } catch (e) {
-                    console.error('Error loading onboarding draft', e);
-                }
-            }
+            // Always clear stale localStorage drafts on fresh page load.
+            // Draft restoration should only happen via server-side session,
+            // not client-side localStorage which retains old test data.
+            localStorage.removeItem('internconnect_onboarding_draft');
 
             // Start verification timers if initialized on step 3
             if (this.step === 3) {
@@ -203,15 +186,8 @@ function studentOnboardingWizard() {
         },
 
         continueWithGoogle() {
-            // Mock Google OAuth login
-            this.first_name = 'Sarah';
-            this.last_name = 'Peters';
-            this.email = 'sarah.peters@gmail.com';
-            this.university = 'University of Lagos';
-            this.degree_level = 'PhD';
-            this.graduation_year = '2025';
-            this.field_of_study = 'Computer Science';
-            this.gpa = '4.5';
+            // Google OAuth login sets email as verified and advances to Step 4 without prefilled dummy values
+            this.signup_method = 'google';
             this.step = 4;
             this.saveDraftToLocal();
         },

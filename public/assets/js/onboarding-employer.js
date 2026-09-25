@@ -38,19 +38,32 @@ function employerOnboardingWizard() {
         logo_uploaded: false,
         logo_url: '',
         is_dragged_logo: false,
-        industry: 'Fintech',
-        company_size: '11-50 employees',
+        industry: '',
+        company_size: '',
+        company_size_options: [
+            '1-10 employees',
+            '11-50 employees',
+            '51-200 employees',
+            '201–500 employees',
+            '500+ employees'
+        ],
         website: '',
         description: '',
 
         // Step 6 Hiring Focus
         search_query: '',
-        departments: ['Engineering'],
+        departments: [],
         all_departments: [
             'Engineering', 'Product Design', 'Marketing', 'Data Science', 'Finance', 'Operations',
             'Sales', 'HR', 'Customer Success', 'Legal'
         ],
-        expected_volume: '6 - 15 Interns',
+        expected_volume: '',
+        expected_volume_options: [
+            '1 - 5 Interns',
+            '6 - 15 Interns',
+            '16 - 30 Interns',
+            '30+ Interns'
+        ],
         internship_type: 'Paid', // 'Paid' | 'Stipend' | 'Unpaid'
         show_dept_dropdown: false,
 
@@ -59,36 +72,10 @@ function employerOnboardingWizard() {
         submitting: false,
 
         init() {
-            // Load partial draft from local state if exists
-            const draft = localStorage.getItem('internconnect_employer_onboarding_draft');
-            if (draft) {
-                try {
-                    const data = JSON.parse(draft);
-                    const loadedStep = data.step || 2;
-                    this.step = loadedStep < 2 ? 2 : loadedStep;
-                    this.role = data.role || 'employer';
-                    this.company_name = data.company_name || '';
-                    this.email = data.email || '';
-                    this.signup_method = data.signup_method || null;
-                    this.cac_number = data.cac_number || '';
-                    this.business_doc_name = data.business_doc_name || '';
-                    this.business_doc_size = data.business_doc_size || '';
-                    this.business_doc_uploaded = data.business_doc_uploaded || false;
-                    this.logo_name = data.logo_name || '';
-                    this.logo_size = data.logo_size || '';
-                    this.logo_uploaded = data.logo_uploaded || false;
-                    this.logo_url = data.logo_url || '';
-                    this.industry = data.industry || 'Fintech';
-                    this.company_size = data.company_size || '11-50 employees';
-                    this.website = data.website || '';
-                    this.description = data.description || '';
-                    this.departments = data.departments || ['Engineering'];
-                    this.expected_volume = data.expected_volume || '6 - 15 Interns';
-                    this.internship_type = data.internship_type || 'Paid';
-                } catch (e) {
-                    console.error('Error loading employer onboarding draft', e);
-                }
-            }
+            // Always clear stale localStorage drafts on fresh page load.
+            // Draft restoration should only happen via server-side session,
+            // not client-side localStorage which retains old test data.
+            localStorage.removeItem('internconnect_employer_onboarding_draft');
 
             if (this.step === 3) {
                 this.startTimers();
@@ -207,17 +194,14 @@ function employerOnboardingWizard() {
 
         continueWithGoogle() {
             // Mocks OAuth success or error
-            // Simulates failure if company_name contains "fail" or randomly
-            if (this.company_name.toLowerCase().includes('fail')) {
+            if (this.company_name && this.company_name.toLowerCase().includes('fail')) {
                 this.oauth_error = 'Google Sign-up was canceled or failed. Please try again.';
                 this.signup_method = null;
                 return;
             }
             this.oauth_error = '';
-            this.company_name = this.company_name || 'Flux Technologies';
-            this.email = this.email || 'contact@fluxtech.io';
             this.signup_method = 'google';
-            // Skips email verification modal step 3 and moves to step 4
+            // Skips email verification modal step 3 and moves to step 4 with clean user input state
             this.step = 4;
             this.saveDraftToLocal();
         },
@@ -327,6 +311,21 @@ function employerOnboardingWizard() {
 
         clearAllDepartments() {
             this.departments = [];
+        },
+
+        getCompanyInitials() {
+            const name = (this.company_name || '').trim();
+            if (!name) return 'FT';
+            const words = name.split(/\s+/).filter(Boolean);
+            if (words.length >= 2) {
+                return (words[0][0] + words[1][0]).toUpperCase();
+            }
+            return name.substring(0, 2).toUpperCase() || 'FT';
+        },
+
+        getWordCount(text) {
+            if (!text) return 0;
+            return text.trim().split(/\s+/).filter(Boolean).length;
         },
 
         startSuccessModalRedirect() {

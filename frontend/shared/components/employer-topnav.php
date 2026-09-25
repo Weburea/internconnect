@@ -98,7 +98,11 @@ $activeNav   = $activeNav ?? 'dashboard';
                     <?php if ($compAvatar): ?>
                         <img src="<?= htmlspecialchars($compAvatar) ?>" alt="<?= htmlspecialchars($companyName) ?>">
                     <?php else: ?>
-                        <div class="db-avatar-initials-sm" style="background: linear-gradient(135deg, #0052CC, #4F46E5);"><?= strtoupper(substr($companyName, 0, 1)) ?></div>
+                        <?php
+                        $compWords = preg_split('/\s+/', trim($companyName));
+                        $compInitials = (count($compWords) >= 2) ? (strtoupper(substr($compWords[0], 0, 1) . substr($compWords[1], 0, 1))) : strtoupper(substr($companyName, 0, 2));
+                        ?>
+                        <div class="db-avatar-initials-sm" style="background: linear-gradient(135deg, #0052CC, #4F46E5);"><?= htmlspecialchars($compInitials ?: 'IC') ?></div>
                     <?php endif; ?>
                 </div>
 
