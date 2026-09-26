@@ -15,12 +15,43 @@ $draftCategory       = $draft['category'] ?? 'Technology';
 $draftType           = $draft['internship_type'] ?? 'Remote';
 $draftLocation       = $draft['location'] ?? 'Remote';
 $draftAbout          = $draft['about'] ?? 'We are looking for a passionate Product Design Intern to join our remote team. You will work closely with our senior designers and product managers to create intuitive, beautiful, and functional interfaces for the InternConnect platform. This is an incredible opportunity to impact a product used by thousands of students and employers globally.';
-$draftWhatYouWillDo  = is_array($draft['what_you_will_do'] ?? null) 
-    ? implode("\n", $draft['what_you_will_do']) 
-    : "Collaborate with cross-functional teams to define, design, and new features.\nCreate wireframes, storyboards, user flows, and site maps to effectively communicate interaction and design ideas.\nConduct user research and evaluate user feedback to enhance the platform's UX.";
-$draftWhatWeLookFor  = is_array($draft['what_we_look_for'] ?? null)
-    ? implode("\n", $draft['what_we_look_for'])
-    : "Demonstrated passion for user-centered digital design and interface prototyping.\nFamiliarity with modern design tools (Figma, Adobe XD) and component systems.\nClear communication and eagerness to learn from senior mentors in a fast-paced environment.";
+$draftResponsibilitiesTitle = $draft['responsibilities_title'] ?? 'Key Responsibilities';
+$draftResponsibilities      = $draft['responsibilities'] ?? [
+    'Collaborate with cross-functional teams to define, design, and ship new features.',
+    'Create wireframes, storyboards, user flows, and site maps to effectively communicate interaction ideas.',
+    'Conduct user research and evaluate candidate/student feedback to enhance the platform experience.',
+    'Participate in design critiques and mentor peer contributors in a fast-paced environment.'
+];
+$draftLookingForTitle       = $draft['looking_for_title'] ?? "What We're Looking For";
+$draftLookingForCards       = $draft['looking_for_cards'] ?? [
+    [
+        'icon'  => 'academic-cap',
+        'title' => 'Design / CS Background',
+        'desc'  => 'Pursuing or completed a degree in Design, Computer Science, Human-Computer Interaction, or related field.'
+    ],
+    [
+        'icon'  => 'code',
+        'title' => 'Prototyping Skills',
+        'desc'  => 'Proficiency with modern design and prototyping tools such as Figma, FigJam, or Adobe XD.'
+    ],
+    [
+        'icon'  => 'users',
+        'title' => 'Team Player',
+        'desc'  => 'Comfortable working in collaborative sprints and communicating blockers proactively.'
+    ],
+    [
+        'icon'  => 'target',
+        'title' => 'Problem Solver',
+        'desc'  => 'Strong analytical mindset with a passion for crafting intuitive digital experiences.'
+    ]
+];
+$draftBenefitsTitle         = $draft['benefits_title'] ?? 'Program Benefits';
+$draftBenefits              = $draft['benefits'] ?? [
+    'Competitive Stipend',
+    'Remote-first Culture',
+    'Learning & Development Budget',
+    'Return Offer Potential'
+];
 $draftSkills         = $draft['skills'] ?? ['React', 'TypeScript', 'Figma'];
 $draftEducation      = $draft['education_level'] ?? 'Undergraduate';
 $draftExperience     = $draft['experience_level'] ?? 'No Experience';
@@ -69,7 +100,13 @@ $draftQuestions      = $draft['screening_questions'] ?? [
                      interviewType: '<?= htmlspecialchars($draftInterviewType) ?>',
                      isUnpaid: <?= $draftIsUnpaid ? 'true' : 'false' ?>,
                      allowRemote: <?= $draftAllowRemote ? 'true' : 'false' ?>,
-                     questions: <?= htmlspecialchars(json_encode($draftQuestions)) ?>
+                     questions: <?= htmlspecialchars(json_encode($draftQuestions)) ?>,
+                     responsibilitiesTitle: <?= json_encode($draftResponsibilitiesTitle) ?>,
+                     responsibilities: <?= htmlspecialchars(json_encode($draftResponsibilities)) ?>,
+                     lookingForTitle: <?= json_encode($draftLookingForTitle) ?>,
+                     lookingForCards: <?= htmlspecialchars(json_encode($draftLookingForCards)) ?>,
+                     benefitsTitle: <?= json_encode($draftBenefitsTitle) ?>,
+                     benefits: <?= htmlspecialchars(json_encode($draftBenefits)) ?>
                  })">
 
                 <!-- Header Title & Subtitle -->
@@ -91,6 +128,12 @@ $draftQuestions      = $draft['screening_questions'] ?? [
                     <input type="hidden" name="experience_level" :value="experience">
                     <input type="hidden" name="duration" :value="duration">
                     <input type="hidden" name="interview_type" :value="interviewType">
+                    <input type="hidden" name="responsibilities_title" :value="responsibilitiesTitle">
+                    <input type="hidden" name="responsibilities" :value="JSON.stringify(responsibilities)">
+                    <input type="hidden" name="looking_for_title" :value="lookingForTitle">
+                    <input type="hidden" name="looking_for_cards" :value="JSON.stringify(lookingForCards)">
+                    <input type="hidden" name="benefits_title" :value="benefitsTitle">
+                    <input type="hidden" name="benefits" :value="JSON.stringify(benefits)">
 
                     <div class="emp-post-grid">
                         
@@ -218,59 +261,168 @@ $draftQuestions      = $draft['screening_questions'] ?? [
                                     <h2 class="emp-card-title">Role Overview</h2>
                                 </div>
 
-                                <!-- About the Internship -->
+                                <!-- Narrative Textarea with Bold & Italic Only Toolbar -->
                                 <div class="emp-field-group">
                                     <label class="emp-field-label">About the Internship</label>
                                     <div class="emp-richtext-wrap">
                                         <div class="emp-richtext-toolbar">
-                                            <button type="button" class="emp-toolbar-btn" title="Bold">B</button>
-                                            <button type="button" class="emp-toolbar-btn" title="Italic"><em>I</em></button>
-                                            <button type="button" class="emp-toolbar-btn" title="Bulleted List">
-                                                <svg style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                                                </svg>
-                                            </button>
+                                            <button type="button" class="emp-toolbar-btn" title="Bold" @click="applyFormat('bold')">B</button>
+                                            <button type="button" class="emp-toolbar-btn" title="Italic" @click="applyFormat('italic')"><em>I</em></button>
                                         </div>
                                         <textarea name="about" 
+                                                  x-ref="aboutTextarea"
                                                   class="emp-richtext-textarea" 
-                                                  placeholder="Describe responsibilities, expectations, and learning outcomes."><?= htmlspecialchars($draftAbout) ?></textarea>
+                                                  style="min-height: 120px;"
+                                                  placeholder="Describe the opportunity, company mission, team culture, and learning outcomes..."><?= htmlspecialchars($draftAbout) ?></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ── Card 3: Key Responsibilities (Dynamic List Builder) ── -->
+                            <div class="emp-form-card">
+                                <div class="emp-card-header">
+                                    <div class="emp-card-icon-badge">
+                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                        </svg>
+                                    </div>
+                                    <div class="emp-section-title-wrap" style="flex: 1; margin-bottom: 0;">
+                                        <input type="text" 
+                                               class="emp-section-title-input emp-card-title" 
+                                               x-model="responsibilitiesTitle" 
+                                               placeholder="Key Responsibilities">
                                     </div>
                                 </div>
 
-                                <!-- What You'll Do (Supports Clean Bullets -> `<li>` on review) -->
                                 <div class="emp-field-group">
-                                    <label class="emp-field-label">What You'll Do (One responsibility per line for bulleted display)</label>
-                                    <div class="emp-richtext-wrap">
-                                        <div class="emp-richtext-toolbar">
-                                            <button type="button" class="emp-toolbar-btn" title="Bold">B</button>
-                                            <button type="button" class="emp-toolbar-btn active" title="Bulleted List">
-                                                <svg style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                                                </svg>
-                                            </button>
-                                        </div>
-                                        <textarea name="what_you_will_do" 
-                                                  class="emp-richtext-textarea" 
-                                                  placeholder="Describe what the applicant will do (one bullet per line)..."><?= htmlspecialchars($draftWhatYouWillDo) ?></textarea>
+                                    <div class="emp-dyn-list">
+                                        <template x-for="(item, idx) in responsibilities" :key="idx">
+                                            <div class="emp-dyn-item">
+                                                <div class="emp-dyn-icon">
+                                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </div>
+                                                <input type="text" 
+                                                       class="emp-dyn-input" 
+                                                       x-model="responsibilities[idx]" 
+                                                       placeholder="Enter responsibility item...">
+                                                <button type="button" 
+                                                        class="emp-dyn-delete-btn" 
+                                                        @click="removeResponsibility(idx)" 
+                                                        title="Remove responsibility">
+                                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </template>
+                                    </div>
+
+                                    <button type="button" class="emp-dyn-add-btn" @click="addResponsibility()">
+                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        <span>Add Responsibility</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- ── Card 4: What We're Looking For (4 Qualification Cards Builder) ── -->
+                            <div class="emp-form-card">
+                                <div class="emp-card-header">
+                                    <div class="emp-card-icon-badge">
+                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                        </svg>
+                                    </div>
+                                    <div class="emp-section-title-wrap" style="flex: 1; margin-bottom: 0;">
+                                        <input type="text" 
+                                               class="emp-section-title-input emp-card-title" 
+                                               x-model="lookingForTitle" 
+                                               placeholder="What We're Looking For">
                                     </div>
                                 </div>
 
-                                <!-- What We're Looking For (Who can apply) -->
                                 <div class="emp-field-group">
-                                    <label class="emp-field-label">What We're Looking For / Who Can Apply (One item per line)</label>
-                                    <div class="emp-richtext-wrap">
-                                        <div class="emp-richtext-toolbar">
-                                            <button type="button" class="emp-toolbar-btn" title="Bold">B</button>
-                                            <button type="button" class="emp-toolbar-btn active" title="Bulleted List">
-                                                <svg style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                                                </svg>
-                                            </button>
-                                        </div>
-                                        <textarea name="what_we_look_for" 
-                                                  class="emp-richtext-textarea" 
-                                                  placeholder="Describe the skills and qualifications required (one bullet per line)..."><?= htmlspecialchars($draftWhatWeLookFor) ?></textarea>
+                                    <div class="emp-qual-grid">
+                                        <template x-for="(card, idx) in lookingForCards" :key="idx">
+                                            <div class="emp-qual-card">
+                                                <div class="emp-qual-header">
+                                                    <!-- Icon Picker -->
+                                                    <div class="emp-qual-icon-picker" @click.outside="if (openIconPicker === idx) openIconPicker = null">
+                                                        <button type="button" 
+                                                                class="emp-qual-icon-btn" 
+                                                                @click="openIconPicker = (openIconPicker === idx ? null : idx)" 
+                                                                title="Change icon">
+                                                            <template x-if="card.icon === 'academic-cap' || card.icon === 'academic'">
+                                                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 7v-6m-4-1.268A10.97 10.97 0 0012 21a10.97 10.97 0 004-0.732V14m-8 0l4 2 4-2"/></svg>
+                                                            </template>
+                                                            <template x-if="card.icon === 'code' || card.icon === 'technical'">
+                                                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                                                            </template>
+                                                            <template x-if="card.icon === 'users' || card.icon === 'collaboration'">
+                                                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                                            </template>
+                                                            <template x-if="card.icon === 'target' || card.icon === 'detail'">
+                                                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                                                            </template>
+                                                            <template x-if="card.icon === 'sparkles'">
+                                                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                                                            </template>
+                                                            <template x-if="card.icon === 'light-bulb'">
+                                                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                                                            </template>
+                                                        </button>
+                                                        <div class="emp-qual-icon-menu" x-show="openIconPicker === idx" x-cloak style="display: none;">
+                                                            <button type="button" class="emp-qual-icon-opt" :class="{ 'active': card.icon === 'academic-cap' }" @click="card.icon = 'academic-cap'; openIconPicker = null" title="Academic">
+                                                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 7v-6m-4-1.268A10.97 10.97 0 0012 21a10.97 10.97 0 004-0.732V14m-8 0l4 2 4-2"/></svg>
+                                                            </button>
+                                                            <button type="button" class="emp-qual-icon-opt" :class="{ 'active': card.icon === 'code' }" @click="card.icon = 'code'; openIconPicker = null" title="Code / Technical">
+                                                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                                                            </button>
+                                                            <button type="button" class="emp-qual-icon-opt" :class="{ 'active': card.icon === 'users' }" @click="card.icon = 'users'; openIconPicker = null" title="Team / Collaboration">
+                                                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                                            </button>
+                                                            <button type="button" class="emp-qual-icon-opt" :class="{ 'active': card.icon === 'target' }" @click="card.icon = 'target'; openIconPicker = null" title="Target / Problem Solving">
+                                                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                                                            </button>
+                                                            <button type="button" class="emp-qual-icon-opt" :class="{ 'active': card.icon === 'sparkles' }" @click="card.icon = 'sparkles'; openIconPicker = null" title="Sparkles">
+                                                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                                                            </button>
+                                                            <button type="button" class="emp-qual-icon-opt" :class="{ 'active': card.icon === 'light-bulb' }" @click="card.icon = 'light-bulb'; openIconPicker = null" title="Idea">
+                                                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <button type="button" 
+                                                            class="emp-dyn-delete-btn" 
+                                                            @click="removeLookingCard(idx)" 
+                                                            title="Remove card">
+                                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+
+                                                <input type="text" 
+                                                       class="emp-qual-title-input" 
+                                                       x-model="card.title" 
+                                                       placeholder="Requirement title (e.g. Design / CS Background)">
+                                                <textarea class="emp-qual-desc-input" 
+                                                          x-model="card.desc" 
+                                                          placeholder="Brief requirement description..."></textarea>
+                                            </div>
+                                        </template>
                                     </div>
+
+                                    <button type="button" class="emp-dyn-add-btn" @click="addLookingCard()">
+                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        <span>Add Qualification Card</span>
+                                    </button>
                                 </div>
                             </div>
 
@@ -458,7 +610,57 @@ $draftQuestions      = $draft['screening_questions'] ?? [
                                 </div>
                             </div>
 
-                            <!-- ── Card 5: Perks & Stipend ── -->
+                            <!-- ── Card 7: Program Benefits (Dynamic List Builder) ── -->
+                            <div class="emp-form-card">
+                                <div class="emp-card-header">
+                                    <div class="emp-card-icon-badge">
+                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                                        </svg>
+                                    </div>
+                                    <div class="emp-section-title-wrap" style="flex: 1; margin-bottom: 0;">
+                                        <input type="text" 
+                                               class="emp-section-title-input emp-card-title" 
+                                               x-model="benefitsTitle" 
+                                               placeholder="Program Benefits">
+                                    </div>
+                                </div>
+
+                                <div class="emp-field-group">
+                                    <div class="emp-dyn-list">
+                                        <template x-for="(benefit, idx) in benefits" :key="idx">
+                                            <div class="emp-dyn-item">
+                                                <div class="emp-dyn-icon">
+                                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                </div>
+                                                <input type="text" 
+                                                       class="emp-dyn-input" 
+                                                       x-model="benefits[idx]" 
+                                                       placeholder="e.g. Competitive Stipend, Return Offer Potential...">
+                                                <button type="button" 
+                                                        class="emp-dyn-delete-btn" 
+                                                        @click="removeBenefit(idx)" 
+                                                        title="Remove benefit">
+                                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </template>
+                                    </div>
+
+                                    <button type="button" class="emp-dyn-add-btn" @click="addBenefit()">
+                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        <span>Add Benefit</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- ── Card 8: Perks & Stipend ── -->
                             <div class="emp-form-card">
                                 <div class="emp-card-header">
                                     <div class="emp-card-icon-badge">
@@ -695,7 +897,7 @@ $draftQuestions      = $draft['screening_questions'] ?? [
                                     </template>
                                 </div>
 
-                                <button type="button" class="emp-add-question-btn" @click="addQuestion()">
+                                <button type="button" class="emp-add-question-btn" @click="openQuestionModal()">
                                     <svg style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                                     </svg>
@@ -726,6 +928,82 @@ $draftQuestions      = $draft['screening_questions'] ?? [
                     </div>
                 </form>
 
+                <!-- ════════════════════════════════════════════════════
+                     SCREENING QUESTION CUSTOM MODAL (NO NATIVE PROMPT)
+                ════════════════════════════════════════════════════ -->
+                <div class="db-offer-modal-backdrop" 
+                     x-show="showQuestionModal" 
+                     x-cloak 
+                     style="display: none;" 
+                     @keydown.escape.window="showQuestionModal = false">
+                    <div class="db-offer-modal-dialog" @click.outside="showQuestionModal = false">
+                        
+                        <!-- Modal Header -->
+                        <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px;">
+                            <div style="display: flex; align-items: center; gap: 14px;">
+                                <div class="db-offer-modal-icon-wrap message" style="margin-bottom: 0;">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="db-offer-modal-title" style="margin: 0; font-size: 19px;">Add Screening Question</h3>
+                                    <p style="font-size: 13px; color: #64748B; margin: 3px 0 0 0;">Candidates will be required to answer this during application.</p>
+                                </div>
+                            </div>
+                            <button type="button" 
+                                    @click="showQuestionModal = false" 
+                                    style="background: none; border: none; color: #94A3B8; cursor: pointer; padding: 4px; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: color 0.15s ease;" 
+                                    onmouseover="this.style.color='#0F172A'" 
+                                    onmouseout="this.style.color='#94A3B8'">
+                                <svg style="width: 20px; height: 20px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <!-- Question Text -->
+                        <div style="margin-bottom: 16px;">
+                            <label class="db-modal-field-label">Question Text</label>
+                            <textarea class="db-modal-textarea" 
+                                      x-model="newQuestionText" 
+                                      placeholder="e.g., Why are you interested in this specific internship role?" 
+                                      style="min-height: 85px;"></textarea>
+                        </div>
+
+                        <!-- Response Type Custom Alpine Dropdown -->
+                        <div style="margin-bottom: 24px;">
+                            <label class="db-modal-field-label">Response Type</label>
+                            <div class="db-dropdown-wrap" x-data="{ openTypeDropdown: false }" @click.outside="openTypeDropdown = false">
+                                <button type="button" class="db-dropdown-btn" @click="openTypeDropdown = !openTypeDropdown" :class="{ 'active': openTypeDropdown }">
+                                    <span x-text="newQuestionType">Short Answer</span>
+                                    <svg class="db-dropdown-chevron" :style="openTypeDropdown ? 'transform: rotate(180deg)' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div class="db-dropdown-menu" x-show="openTypeDropdown" x-transition style="display: none;">
+                                    <div class="db-dropdown-list">
+                                        <template x-for="qType in ['Short Answer', 'Long Answer', 'Link / URL', 'Yes / No', 'File Upload (Portfolio)']" :key="qType">
+                                            <label class="db-dropdown-item" @click="newQuestionType = qType; openTypeDropdown = false;">
+                                                <span x-text="qType"></span>
+                                                <input type="radio" name="modal_qtype" :value="qType" :checked="newQuestionType === qType">
+                                            </label>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modal Actions -->
+                        <div class="db-offer-modal-actions" style="margin-top: 20px;">
+                            <button type="button" class="db-offer-modal-btn-cancel" @click="showQuestionModal = false">Cancel</button>
+                            <button type="button" class="db-offer-modal-btn-primary" @click="submitQuestionModal()" style="background-color: #4F48E6;">
+                                <span>Add Question</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -746,6 +1024,18 @@ document.addEventListener('alpine:init', () => {
         isUnpaid: initialData.isUnpaid || false,
         allowRemote: initialData.allowRemote !== undefined ? initialData.allowRemote : true,
         questions: initialData.questions || [],
+        responsibilitiesTitle: initialData.responsibilitiesTitle || 'Key Responsibilities',
+        responsibilities: initialData.responsibilities || [],
+        lookingForTitle: initialData.lookingForTitle || "What We're Looking For",
+        lookingForCards: initialData.lookingForCards || [],
+        benefitsTitle: initialData.benefitsTitle || 'Program Benefits',
+        benefits: initialData.benefits || [],
+
+        // Modal state
+        showQuestionModal: false,
+        newQuestionText: '',
+        newQuestionType: 'Short Answer',
+        openIconPicker: null,
 
         addSkill(name) {
             if (name && !this.skills.includes(name)) {
@@ -757,15 +1047,67 @@ document.addEventListener('alpine:init', () => {
             this.skills.splice(index, 1);
         },
 
-        addQuestion() {
-            const text = prompt('Enter the screening question text:');
-            if (text && text.trim()) {
-                this.questions.push({
-                    id: Date.now(),
-                    text: text.trim(),
-                    type: 'Short Answer'
-                });
+        applyFormat(format) {
+            const el = this.$refs.aboutTextarea;
+            if (!el) return;
+            const start = el.selectionStart;
+            const end = el.selectionEnd;
+            const text = el.value;
+            const selected = text.substring(start, end);
+            const wrapper = format === 'bold' ? '**' : '*';
+            const replacement = wrapper + (selected || 'text') + wrapper;
+            el.value = text.substring(0, start) + replacement + text.substring(end);
+            el.focus();
+            const newPos = start + wrapper.length + (selected ? selected.length : 4);
+            el.setSelectionRange(newPos, newPos);
+        },
+
+        addResponsibility() {
+            this.responsibilities.push('');
+        },
+
+        removeResponsibility(index) {
+            this.responsibilities.splice(index, 1);
+        },
+
+        addLookingCard() {
+            this.lookingForCards.push({
+                icon: 'target',
+                title: '',
+                desc: ''
+            });
+        },
+
+        removeLookingCard(index) {
+            this.lookingForCards.splice(index, 1);
+        },
+
+        addBenefit() {
+            this.benefits.push('');
+        },
+
+        removeBenefit(index) {
+            this.benefits.splice(index, 1);
+        },
+
+        openQuestionModal() {
+            this.newQuestionText = '';
+            this.newQuestionType = 'Short Answer';
+            this.showQuestionModal = true;
+        },
+
+        submitQuestionModal() {
+            if (!this.newQuestionText.trim()) {
+                this.$dispatch('show-toast', { text: 'Please enter question text.', type: 'error' });
+                return;
             }
+            this.questions.push({
+                id: Date.now(),
+                text: this.newQuestionText.trim(),
+                type: this.newQuestionType
+            });
+            this.showQuestionModal = false;
+            this.$dispatch('show-toast', { text: 'Screening question added successfully.', type: 'success' });
         },
 
         removeQuestion(index) {
@@ -773,25 +1115,43 @@ document.addEventListener('alpine:init', () => {
         },
 
         suggestDescription() {
-            const aboutEl = document.querySelector('textarea[name="about"]');
+            const aboutEl = this.$refs.aboutTextarea;
             if (aboutEl) {
-                aboutEl.value = 'TechFlow System is seeking a passionate intern to join our fast-paced product engineering team. You will work on real-world web applications, collaborate with cross-functional designers and developers, and receive dedicated 1-on-1 mentorship to fast-track your professional growth.';
-                alert('AI suggestion applied to "About the Internship"!');
+                aboutEl.value = 'We are seeking an ambitious intern to join our fast-growing engineering team. In this role, you will collaborate on production applications, design clean interfaces, and receive direct 1-on-1 mentorship to accelerate your industry skills.';
+                this.$dispatch('show-toast', { text: 'AI suggestion applied to Role Overview!', type: 'success' });
             }
         },
 
         suggestSkills() {
             const suggestions = ['UI/UX', 'Wireframing', 'User Research', 'Design Systems'];
             suggestions.forEach(s => this.addSkill(s));
-            alert('AI added recommended skills: ' + suggestions.join(', '));
+            this.$dispatch('show-toast', { text: 'AI added recommended skills: ' + suggestions.join(', '), type: 'success' });
         },
 
         suggestRequirements() {
-            const reqEl = document.querySelector('textarea[name="what_we_look_for"]');
-            if (reqEl) {
-                reqEl.value = "Strong visual design fundamentals and attention to detail.\nProficiency with modern prototyping tools (Figma, FigJam).\nCuriosity to solve user experience challenges and eagerness to learn.";
-                alert('AI requirements applied to "What We\'re Looking For"!');
-            }
+            this.lookingForCards = [
+                {
+                    icon: 'academic-cap',
+                    title: 'Design or Technical Degree',
+                    desc: 'Pursuing or holding a degree in Design, Computer Science, Human-Computer Interaction, or equivalent.'
+                },
+                {
+                    icon: 'code',
+                    title: 'Figma & Prototyping',
+                    desc: 'Demonstrated experience with modern prototyping tools, wireframing, and interactive components.'
+                },
+                {
+                    icon: 'users',
+                    title: 'Collaboration & Agility',
+                    desc: 'Eagerness to participate in sprints, team standups, and communicate design decisions clearly.'
+                },
+                {
+                    icon: 'target',
+                    title: 'Attention to Detail',
+                    desc: 'Strong passion for pixel precision, user-centric thinking, and elegant simplicity.'
+                }
+            ];
+            this.$dispatch('show-toast', { text: 'AI generated 4 structured qualification cards!', type: 'success' });
         },
 
         submitAction(action) {

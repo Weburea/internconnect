@@ -16,20 +16,50 @@ $location         = $draft['location'] ?? 'Remote';
 $type             = $draft['internship_type'] ?? 'Remote';
 $about            = $draft['about'] ?? 'We are looking for a passionate Product Design Intern to join our remote team. You will work closely with our senior designers and product managers to create intuitive, beautiful, and functional interfaces for the InternConnect platform. This is an incredible opportunity to impact a product used by thousands of students and employers globally.';
 
-$whatYouWillDo    = !empty($draft['what_you_will_do']) && is_array($draft['what_you_will_do'])
-    ? $draft['what_you_will_do']
+$responsibilitiesTitle = !empty($draft['responsibilities_title']) ? $draft['responsibilities_title'] : 'Key Responsibilities';
+$responsibilities      = !empty($draft['responsibilities']) && is_array($draft['responsibilities'])
+    ? $draft['responsibilities']
+    : (!empty($draft['what_you_will_do']) && is_array($draft['what_you_will_do']) ? $draft['what_you_will_do'] : [
+        'Collaborate with cross-functional teams to define, design, and ship new features.',
+        'Create wireframes, storyboards, user flows, and site maps to effectively communicate interaction ideas.',
+        'Conduct user research and evaluate candidate/student feedback to enhance the platform experience.',
+        'Participate in design critiques and mentor peer contributors in a fast-paced environment.'
+    ]);
+
+$lookingForTitle       = !empty($draft['looking_for_title']) ? $draft['looking_for_title'] : "What We're Looking For";
+$lookingForCards       = !empty($draft['looking_for_cards']) && is_array($draft['looking_for_cards'])
+    ? $draft['looking_for_cards']
     : [
-        'Collaborate with cross-functional teams to define, design, and new features.',
-        'Create wireframes, storyboards, user flows, and site maps to effectively communicate interaction and design ideas.',
-        'Conduct user research and evaluate user feedback to enhance the platform\'s UX.'
+        [
+            'icon'  => 'academic-cap',
+            'title' => 'Design / CS Background',
+            'desc'  => 'Pursuing or completed a degree in Design, Computer Science, Human-Computer Interaction, or related field.'
+        ],
+        [
+            'icon'  => 'code',
+            'title' => 'Prototyping Skills',
+            'desc'  => 'Proficiency with modern design and prototyping tools such as Figma, FigJam, or Adobe XD.'
+        ],
+        [
+            'icon'  => 'users',
+            'title' => 'Team Player',
+            'desc'  => 'Comfortable working in collaborative sprints and communicating blockers proactively.'
+        ],
+        [
+            'icon'  => 'target',
+            'title' => 'Problem Solver',
+            'desc'  => 'Strong analytical mindset with a passion for crafting intuitive digital experiences.'
+        ]
     ];
 
-$whatWeLookFor    = !empty($draft['what_we_look_for']) && is_array($draft['what_we_look_for'])
-    ? $draft['what_we_look_for']
+$benefitsTitle         = !empty($draft['benefits_title']) ? $draft['benefits_title'] : 'Program Benefits';
+$benefits              = !empty($draft['benefits']) && is_array($draft['benefits'])
+    ? $draft['benefits']
     : [
-        'Demonstrated passion for user-centered digital design and interface prototyping.',
-        'Familiarity with modern design tools (Figma, Adobe XD) and component systems.',
-        'Clear communication and eagerness to learn from senior mentors in a fast-paced environment.'
+        'Competitive Stipend',
+        'Remote-first Culture',
+        'Learning & Development Budget',
+        'Return Offer Potential'
     ];
 
 $skills           = !empty($draft['skills']) && is_array($draft['skills'])
@@ -41,6 +71,25 @@ if (!empty($draft['is_unpaid'])) {
     $stipendAmount = 'Unpaid';
 }
 $deadline         = !empty($draft['deadline']) ? date('M j, Y', strtotime($draft['deadline'])) : 'May 15, 2026';
+
+if (!function_exists('renderQualIcon')) {
+    function renderQualIcon(string $type): string
+    {
+        $icons = [
+            'academic'      => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 7v-6m-4-1.268A10.97 10.97 0 0012 21a10.97 10.97 0 004-0.732V14m-8 0l4 2 4-2"/></svg>',
+            'academic-cap'  => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 7v-6m-4-1.268A10.97 10.97 0 0012 21a10.97 10.97 0 004-0.732V14m-8 0l4 2 4-2"/></svg>',
+            'technical'     => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>',
+            'code'          => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>',
+            'collaboration' => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>',
+            'users'         => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>',
+            'target'        => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+            'detail'        => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+            'sparkles'      => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>',
+            'light-bulb'    => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>'
+        ];
+        return $icons[$type] ?? $icons['target'];
+    }
+}
 ?>
 
 <link rel="stylesheet" href="<?= asset('assets/css/employer-post-internship.css') ?>">
@@ -110,7 +159,7 @@ $deadline         = !empty($draft['deadline']) ? date('M j, Y', strtotime($draft
                                         </span>
                                     </div>
                                     <div class="emp-review-meta-pills">
-                                        <span class="emp-meta-pill">Full-time</span>
+                                        <span class="emp-meta-pill"><?= htmlspecialchars($type) ?></span>
                                         <span class="emp-meta-pill">Paid (<?= htmlspecialchars($stipendAmount) ?>)</span>
                                     </div>
                                 </div>
@@ -124,12 +173,12 @@ $deadline         = !empty($draft['deadline']) ? date('M j, Y', strtotime($draft
                                 </p>
                             </div>
 
-                            <!-- What You'll Do (CRITICAL AUDIO REQUIREMENT: LI Tag Listing) -->
-                            <div>
-                                <h3 class="emp-review-section-title">What You'll Do</h3>
+                            <!-- Key Responsibilities (Matching Detail Page Container) -->
+                            <div class="emp-review-container-box">
+                                <h3 class="emp-review-section-title" style="margin-bottom: 14px;"><?= htmlspecialchars($responsibilitiesTitle) ?></h3>
                                 <ul class="emp-review-list">
-                                    <?php foreach ($whatYouWillDo as $bullet): ?>
-                                        <?php if (trim($bullet) !== ''): ?>
+                                    <?php foreach ($responsibilities as $item): ?>
+                                        <?php if (trim($item) !== ''): ?>
                                             <li>
                                                 <span class="emp-review-bullet-icon">
                                                     <!-- Checkmark SVG Icon -->
@@ -137,39 +186,66 @@ $deadline         = !empty($draft['deadline']) ? date('M j, Y', strtotime($draft
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                                     </svg>
                                                 </span>
-                                                <span><?= htmlspecialchars(ltrim(trim($bullet), '-*• ')) ?></span>
+                                                <span><?= htmlspecialchars(ltrim(trim($item), '-*• ')) ?></span>
                                             </li>
                                         <?php endif; ?>
                                     <?php endforeach; ?>
                                 </ul>
                             </div>
 
-                            <!-- What We're Looking For (CRITICAL AUDIO REQUIREMENT: LI Tag Listing & Skills) -->
-                            <div>
-                                <h3 class="emp-review-section-title">What We're Looking For</h3>
-                                <ul class="emp-review-list">
-                                    <?php foreach ($whatWeLookFor as $bullet): ?>
-                                        <?php if (trim($bullet) !== ''): ?>
-                                            <li>
-                                                <span class="emp-review-bullet-icon">
-                                                    <!-- Checkmark SVG Icon -->
-                                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                </span>
-                                                <span><?= htmlspecialchars(ltrim(trim($bullet), '-*• ')) ?></span>
-                                            </li>
-                                        <?php endif; ?>
+                            <!-- What We're Looking For (2x2 Grid Matching Detail Page) -->
+                            <div style="margin-top: 24px;">
+                                <h3 class="emp-review-section-title" style="margin-bottom: 14px;"><?= htmlspecialchars($lookingForTitle) ?></h3>
+                                <div class="emp-review-qual-grid">
+                                    <?php foreach ($lookingForCards as $card): ?>
+                                        <div class="emp-review-qual-card">
+                                            <div class="emp-review-qual-icon">
+                                                <?= renderQualIcon($card['icon'] ?? 'target') ?>
+                                            </div>
+                                            <h4 class="emp-review-qual-title"><?= htmlspecialchars($card['title'] ?? '') ?></h4>
+                                            <p class="emp-review-qual-desc"><?= htmlspecialchars($card['desc'] ?? '') ?></p>
+                                        </div>
                                     <?php endforeach; ?>
-                                </ul>
+                                </div>
+                            </div>
 
-                                <!-- Skill Badges Row -->
-                                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px;">
+                            <!-- Required Skills Row -->
+                            <div style="margin-top: 22px;">
+                                <h4 style="font-size: 12px; font-weight: 700; color: #64748B; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.05em;">Required Skills</h4>
+                                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                                     <?php foreach ($skills as $skill): ?>
                                         <span style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 6px 14px; font-size: 12.5px; font-weight: 600; color: #1E293B; box-shadow: 0 1px 2px rgba(0,0,0,0.03); white-space: nowrap !important; flex-shrink: 0 !important;">
                                             <?= htmlspecialchars($skill) ?>
                                         </span>
                                     <?php endforeach; ?>
+                                </div>
+                            </div>
+
+                            <!-- Program Benefits + Application Window (2-col grid) -->
+                            <div style="margin-top: 26px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
+                                <div>
+                                    <h3 class="emp-review-section-title" style="margin-bottom: 12px;"><?= htmlspecialchars($benefitsTitle) ?></h3>
+                                    <ul style="display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 0; list-style: none;">
+                                        <?php foreach ($benefits as $benefit): ?>
+                                            <?php if (trim($benefit) !== ''): ?>
+                                                <li class="emp-review-benefit-item">
+                                                    <span class="emp-review-benefit-icon">
+                                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                    </span>
+                                                    <span style="font-size: 13.5px; font-weight: 600; color: #1E293B;"><?= htmlspecialchars($benefit) ?></span>
+                                                </li>
+                                            <?php endif; ?>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </div>
+
+                                <div>
+                                    <h3 class="emp-review-section-title" style="margin-bottom: 12px;">Application Window</h3>
+                                    <p style="font-size: 13px; color: #475569; line-height: 1.6; margin: 0;">
+                                        Applications are accepted until <strong><?= htmlspecialchars($deadline) ?></strong>. Early submissions receive priority review.
+                                    </p>
                                 </div>
                             </div>
 

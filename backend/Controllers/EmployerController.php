@@ -387,6 +387,42 @@ class EmployerController extends Controller
                 'Demonstrated passion for user-centered digital design and interface prototyping.',
                 'Familiarity with modern design tools (Figma, Adobe XD) and component systems.',
                 'Clear communication and eagerness to learn from senior mentors in a fast-paced environment.'
+            'responsibilities_title' => 'Key Responsibilities',
+            'responsibilities' => [
+                'Collaborate with cross-functional teams to define, design, and ship new features.',
+                'Create wireframes, storyboards, user flows, and site maps to effectively communicate interaction ideas.',
+                'Conduct user research and evaluate candidate/student feedback to enhance the platform experience.',
+                'Participate in design critiques and mentor peer contributors in a fast-paced environment.'
+            ],
+            'looking_for_title' => "What We're Looking For",
+            'looking_for_cards' => [
+                [
+                    'icon' => 'academic-cap',
+                    'title' => 'Design / CS Background',
+                    'desc' => 'Pursuing or completed a degree in Design, Computer Science, Human-Computer Interaction, or related field.'
+                ],
+                [
+                    'icon' => 'code',
+                    'title' => 'Prototyping Skills',
+                    'desc' => 'Proficiency with modern design and prototyping tools such as Figma, FigJam, or Adobe XD.'
+                ],
+                [
+                    'icon' => 'users',
+                    'title' => 'Team Player',
+                    'desc' => 'Comfortable working in collaborative sprints and communicating blockers proactively.'
+                ],
+                [
+                    'icon' => 'target',
+                    'title' => 'Problem Solver',
+                    'desc' => 'Strong analytical mindset with a passion for crafting intuitive digital experiences.'
+                ],
+            ],
+            'benefits_title' => 'Program Benefits',
+            'benefits' => [
+                'Competitive Stipend',
+                'Remote-first Culture',
+                'Learning & Development Budget',
+                'Return Offer Potential'
             ],
             'skills'            => ['React', 'TypeScript', 'Figma'],
             'education_level'   => 'Undergraduate',
@@ -454,50 +490,98 @@ class EmployerController extends Controller
                 }
             }
 
-            $whatYouWillDo = [];
-            if (!empty($_POST['what_you_will_do'])) {
-                $whatYouWillDo = array_filter(array_map('trim', explode("\n", $_POST['what_you_will_do'])));
-            } else {
-                $whatYouWillDo = [
-                    'Collaborate with cross-functional teams to define, design, and new features.',
-                    'Create wireframes, storyboards, user flows, and site maps to effectively communicate interaction and design ideas.',
-                    'Conduct user research and evaluate user feedback to enhance the platform\'s UX.'
+            $responsibilities = [];
+            if (!empty($_POST['responsibilities'])) {
+                $decoded = json_decode($_POST['responsibilities'], true);
+                if (is_array($decoded)) {
+                    $responsibilities = array_values(array_filter(array_map('trim', $decoded)));
+                }
+            }
+            if (empty($responsibilities)) {
+                $responsibilities = [
+                    'Collaborate with cross-functional teams to define, design, and ship new features.',
+                    'Create wireframes, storyboards, user flows, and site maps to effectively communicate interaction ideas.',
+                    'Conduct user research and evaluate candidate/student feedback to enhance the platform experience.',
+                    'Participate in design critiques and mentor peer contributors in a fast-paced environment.'
                 ];
             }
 
-            $whatWeLookFor = [];
-            if (!empty($_POST['what_we_look_for'])) {
-                $whatWeLookFor = array_filter(array_map('trim', explode("\n", $_POST['what_we_look_for'])));
-            } else {
-                $whatWeLookFor = [
-                    'Demonstrated passion for user-centered digital design and interface prototyping.',
-                    'Familiarity with modern design tools (Figma, Adobe XD) and component systems.',
-                    'Clear communication and eagerness to learn from senior mentors in a fast-paced environment.'
+            $lookingForCards = [];
+            if (!empty($_POST['looking_for_cards'])) {
+                $decoded = json_decode($_POST['looking_for_cards'], true);
+                if (is_array($decoded)) {
+                    $lookingForCards = $decoded;
+                }
+            }
+            if (empty($lookingForCards)) {
+                $lookingForCards = [
+                    [
+                        'icon' => 'academic-cap',
+                        'title' => 'Design / CS Background',
+                        'desc' => 'Pursuing or completed a degree in Design, Computer Science, Human-Computer Interaction, or related field.'
+                    ],
+                    [
+                        'icon' => 'code',
+                        'title' => 'Prototyping Skills',
+                        'desc' => 'Proficiency with modern design and prototyping tools such as Figma, FigJam, or Adobe XD.'
+                    ],
+                    [
+                        'icon' => 'users',
+                        'title' => 'Team Player',
+                        'desc' => 'Comfortable working in collaborative sprints and communicating blockers proactively.'
+                    ],
+                    [
+                        'icon' => 'target',
+                        'title' => 'Problem Solver',
+                        'desc' => 'Strong analytical mindset with a passion for crafting intuitive digital experiences.'
+                    ],
+                ];
+            }
+
+            $benefits = [];
+            if (!empty($_POST['benefits'])) {
+                $decoded = json_decode($_POST['benefits'], true);
+                if (is_array($decoded)) {
+                    $benefits = array_values(array_filter(array_map('trim', $decoded)));
+                }
+            }
+            if (empty($benefits)) {
+                $benefits = [
+                    'Competitive Stipend',
+                    'Remote-first Culture',
+                    'Learning & Development Budget',
+                    'Return Offer Potential'
                 ];
             }
 
             $_SESSION['draft_internship'] = [
-                'title'             => trim($_POST['title'] ?? 'Product Design Intern'),
-                'category'          => trim($_POST['category'] ?? 'Technology'),
-                'internship_type'   => trim($_POST['internship_type'] ?? 'Remote'),
-                'location'          => trim($_POST['location'] ?? 'Remote'),
-                'about'             => trim($_POST['about'] ?? ''),
-                'what_you_will_do'  => $whatYouWillDo,
-                'what_we_look_for'  => $whatWeLookFor,
-                'skills'            => !empty($skills) ? $skills : ['Figma', 'Prototyping', 'User Research', 'UI Design'],
-                'education_level'   => trim($_POST['education_level'] ?? 'Undergraduate'),
-                'experience_level'  => trim($_POST['experience_level'] ?? 'No Experience'),
-                'start_date'        => trim($_POST['start_date'] ?? '2026-06-01'),
-                'duration'          => trim($_POST['duration'] ?? '3 months'),
-                'openings'          => (int)($_POST['openings'] ?? 10),
-                'stipend_amount'    => trim($_POST['stipend_amount'] ?? '2000'),
-                'is_unpaid'         => isset($_POST['is_unpaid']),
-                'perks'             => $perks,
-                'deadline'          => trim($_POST['deadline'] ?? '2026-05-15'),
-                'num_interns'       => (int)($_POST['num_interns'] ?? 10),
-                'allow_remote'      => isset($_POST['allow_remote']),
-                'interview_type'    => trim($_POST['interview_type'] ?? 'Video Interview (Google Meet)'),
-                'screening_questions' => $screeningQuestions,
+                'title'                 => trim($_POST['title'] ?? 'Product Design Intern'),
+                'category'              => trim($_POST['category'] ?? 'Technology'),
+                'internship_type'       => trim($_POST['internship_type'] ?? 'Remote'),
+                'location'              => trim($_POST['location'] ?? 'Remote'),
+                'about'                 => trim($_POST['about'] ?? ''),
+                'responsibilities_title'=> trim($_POST['responsibilities_title'] ?? 'Key Responsibilities'),
+                'responsibilities'      => $responsibilities,
+                'what_you_will_do'      => $responsibilities, // Backward compatibility
+                'looking_for_title'     => trim($_POST['looking_for_title'] ?? "What We're Looking For"),
+                'looking_for_cards'     => $lookingForCards,
+                'what_we_look_for'      => array_column($lookingForCards, 'desc'), // Backward compatibility
+                'benefits_title'        => trim($_POST['benefits_title'] ?? 'Program Benefits'),
+                'benefits'              => $benefits,
+                'skills'                => !empty($skills) ? $skills : ['Figma', 'Prototyping', 'User Research', 'UI Design'],
+                'education_level'       => trim($_POST['education_level'] ?? 'Undergraduate'),
+                'experience_level'      => trim($_POST['experience_level'] ?? 'No Experience'),
+                'start_date'            => trim($_POST['start_date'] ?? '2026-06-01'),
+                'duration'              => trim($_POST['duration'] ?? '3 months'),
+                'openings'              => (int)($_POST['openings'] ?? 10),
+                'stipend_amount'        => trim($_POST['stipend_amount'] ?? '2000'),
+                'is_unpaid'             => isset($_POST['is_unpaid']),
+                'perks'                 => $perks,
+                'deadline'              => trim($_POST['deadline'] ?? '2026-05-15'),
+                'num_interns'           => (int)($_POST['num_interns'] ?? 10),
+                'allow_remote'          => isset($_POST['allow_remote']),
+                'interview_type'        => trim($_POST['interview_type'] ?? 'Video Interview (Google Meet)'),
+                'screening_questions'   => $screeningQuestions,
             ];
 
             if ($action === 'publish') {
@@ -535,30 +619,57 @@ class EmployerController extends Controller
         ];
 
         $draft = $_SESSION['draft_internship'] ?? [
-            'title'             => 'Product Design Intern',
-            'category'          => 'Technology',
-            'internship_type'   => 'Remote',
-            'location'          => 'Remote',
-            'about'             => 'We are looking for a passionate Product Design Intern to join our remote team. You will work closely with our senior designers and product managers to create intuitive, beautiful, and functional interfaces for the InternConnect platform. This is an incredible opportunity to impact a product used by thousands of students and employers globally.',
-            'what_you_will_do'  => [
-                'Collaborate with cross-functional teams to define, design, and new features.',
-                'Create wireframes, storyboards, user flows, and site maps to effectively communicate interaction and design ideas.',
-                'Conduct user research and evaluate user feedback to enhance the platform\'s UX.'
+            'title'                 => 'Product Design Intern',
+            'category'              => 'Technology',
+            'internship_type'       => 'Remote',
+            'location'              => 'Remote',
+            'about'                 => 'We are looking for a passionate Product Design Intern to join our remote team. You will work closely with our senior designers and product managers to create intuitive, beautiful, and functional interfaces for the InternConnect platform. This is an incredible opportunity to impact a product used by thousands of students and employers globally.',
+            'responsibilities_title'=> 'Key Responsibilities',
+            'responsibilities'      => [
+                'Collaborate with cross-functional teams to define, design, and ship new features.',
+                'Create wireframes, storyboards, user flows, and site maps to effectively communicate interaction ideas.',
+                'Conduct user research and evaluate candidate/student feedback to enhance the platform experience.',
+                'Participate in design critiques and mentor peer contributors in a fast-paced environment.'
             ],
-            'what_we_look_for'  => [
-                'Demonstrated passion for user-centered digital design and interface prototyping.',
-                'Familiarity with modern design tools (Figma, Adobe XD) and component systems.',
-                'Clear communication and eagerness to learn from senior mentors in a fast-paced environment.'
+            'looking_for_title'     => "What We're Looking For",
+            'looking_for_cards'     => [
+                [
+                    'icon' => 'academic-cap',
+                    'title' => 'Design / CS Background',
+                    'desc' => 'Pursuing or completed a degree in Design, Computer Science, Human-Computer Interaction, or related field.'
+                ],
+                [
+                    'icon' => 'code',
+                    'title' => 'Prototyping Skills',
+                    'desc' => 'Proficiency with modern design and prototyping tools such as Figma, FigJam, or Adobe XD.'
+                ],
+                [
+                    'icon' => 'users',
+                    'title' => 'Team Player',
+                    'desc' => 'Comfortable working in collaborative sprints and communicating blockers proactively.'
+                ],
+                [
+                    'icon' => 'target',
+                    'title' => 'Problem Solver',
+                    'desc' => 'Strong analytical mindset with a passion for crafting intuitive digital experiences.'
+                ],
             ],
-            'skills'            => ['Figma', 'Prototyping', 'User Research', 'UI Design'],
-            'education_level'   => 'Undergraduate',
-            'experience_level'  => 'No Experience',
-            'start_date'        => '2026-06-01',
-            'duration'          => '3 months',
-            'openings'          => 10,
-            'stipend_amount'    => '3,000 - $4,500/mo',
-            'is_unpaid'         => false,
-            'deadline'          => 'May 15, 2026',
+            'benefits_title'        => 'Program Benefits',
+            'benefits'              => [
+                'Competitive Stipend',
+                'Remote-first Culture',
+                'Learning & Development Budget',
+                'Return Offer Potential'
+            ],
+            'skills'                => ['Figma', 'Prototyping', 'User Research', 'UI Design'],
+            'education_level'       => 'Undergraduate',
+            'experience_level'      => 'No Experience',
+            'start_date'            => '2026-06-01',
+            'duration'              => '3 months',
+            'openings'              => 10,
+            'stipend_amount'        => '2,000',
+            'is_unpaid'             => false,
+            'deadline'              => '2026-05-15',
         ];
 
         $this->renderView('employer/internships/review', [
