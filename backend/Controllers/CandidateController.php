@@ -258,40 +258,64 @@ class CandidateController extends Controller
 
         $recommendations = [
             [
-                'title'    => 'UI/UX Design Intern',
-                'company'  => 'DesignStudio Pro',
-                'location' => 'Lagos, NG',
-                'tags'     => ['User Testing', 'Figma'],
-                'salary'   => '$4,500/mo',
-                'slug'     => 'uiux-design-intern-designstudio',
-                'icon'     => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>',
+                'title'       => 'UI/UX Design Intern',
+                'category'    => 'DESIGN',
+                'company'     => 'DesignStudio Pro',
+                'company_slug'=> 'designstudio-pro',
+                'logo_bg'     => 'background: #FFE4E6; color: #E11D48;',
+                'initial'     => 'D',
+                'logo_url'    => null,
+                'location'    => 'Lagos, NG',
+                'commitment'  => 'Full-time',
+                'arrangement' => 'HYBRID',
+                'description' => 'Craft beautiful, intuitive interfaces for cross-platform products. Collaborate with engineers and product leads.',
+                'salary'      => '$4,500/mo',
+                'slug'        => 'uiux-design-intern-designstudio',
             ],
             [
-                'title'    => 'Digital Marketing',
-                'company'  => 'Global Pulse Media',
-                'location' => 'Lagos, NG',
-                'tags'     => ['Strategy', 'Analytics'],
-                'salary'   => '$3,800/mo',
-                'slug'     => 'digital-marketing-global-pulse',
-                'icon'     => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>',
+                'title'       => 'Digital Marketing Intern',
+                'category'    => 'MARKETING',
+                'company'     => 'Global Pulse Media',
+                'company_slug'=> 'global-pulse-media',
+                'logo_bg'     => 'background: #FEF3C7; color: #D97706;',
+                'initial'     => 'G',
+                'logo_url'    => null,
+                'location'    => 'Lagos, NG',
+                'commitment'  => 'Part-time',
+                'arrangement' => 'REMOTE',
+                'description' => 'Drive growth campaigns, analyze market trends, and assist with content optimization across global channels.',
+                'salary'      => '$3,800/mo',
+                'slug'        => 'digital-marketing-global-pulse',
             ],
             [
-                'title'    => 'Backend Developer',
-                'company'  => 'FinTech Systems',
-                'location' => 'Lagos, NG',
-                'tags'     => ['React', 'Node.js'],
-                'salary'   => '$5,200/mo',
-                'slug'     => 'backend-developer-fintech-systems',
-                'icon'     => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>',
+                'title'       => 'Backend Developer Intern',
+                'category'    => 'ENGINEERING',
+                'company'     => 'FinTech Systems',
+                'company_slug'=> 'fintech-systems',
+                'logo_bg'     => 'background: #000623; color: #FFFFFF;',
+                'initial'     => 'F',
+                'logo_url'    => null,
+                'location'    => 'Lagos, NG',
+                'commitment'  => 'Full-time',
+                'arrangement' => 'REMOTE',
+                'description' => 'Build secure, scalable financial APIs and microservices. Work directly with high-volume transaction systems.',
+                'salary'      => '$5,200/mo',
+                'slug'        => 'backend-developer-fintech-systems',
             ],
             [
-                'title'    => 'Frontend Developer',
-                'company'  => 'TechCorp Inc.',
-                'location' => 'Lagos, NG',
-                'tags'     => ['HTML/CSS', 'Vue.js'],
-                'salary'   => '$4,800/mo',
-                'slug'     => 'frontend-developer-techcorp',
-                'icon'     => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>',
+                'title'       => 'Frontend Developer Intern',
+                'category'    => 'ENGINEERING',
+                'company'     => 'TechCorp Inc.',
+                'company_slug'=> 'techcorp-inc',
+                'logo_bg'     => 'background: #E0E7FF; color: #4338CA;',
+                'initial'     => 'T',
+                'logo_url'    => null,
+                'location'    => 'Lagos, NG',
+                'commitment'  => 'Full-time',
+                'arrangement' => 'HYBRID',
+                'description' => 'Build high-performance web applications using modern JavaScript frameworks and responsive CSS architectures.',
+                'salary'      => '$4,800/mo',
+                'slug'        => 'frontend-developer-techcorp',
             ],
         ];
 
@@ -412,13 +436,23 @@ class CandidateController extends Controller
             session_start();
         }
 
+        $fullName = $_SESSION['profile_name'] ?? 'Sarah Peters';
+        $parts = explode(' ', trim($fullName), 2);
+        $firstName = $_SESSION['profile_first_name'] ?? ($parts[0] ?? 'Sarah');
+        $lastName  = $_SESSION['profile_last_name'] ?? ($parts[1] ?? 'Peters');
+
         $candidate = [
-            'name'                  => $_SESSION['profile_name'] ?? 'Sarah Peters',
+            'name'                  => $fullName,
+            'first_name'            => $firstName,
+            'last_name'             => $lastName,
             'role'                  => $_SESSION['profile_role'] ?? 'Student Applicant',
             'avatar'                => $_SESSION['profile_avatar'] ?? asset('assets/images/profile.png'),
             'email'                 => $_SESSION['profile_email'] ?? 'sarah.peters@design-intern.com',
             'phone'                 => $_SESSION['profile_phone'] ?? '+1 (555) 012-3456',
             'bio'                   => $_SESSION['profile_bio'] ?? 'Passionate designer focused on creating intuitive digital experiences. Currently exploring the intersection of accessibility and high-end visual design.',
+            // Interests & Preferences
+            'interests'             => $_SESSION['profile_interests'] ?? ['UI/UX Design', 'Software Engineering', 'Product Management'],
+            'work_arrangements'     => $_SESSION['profile_work_arrangements'] ?? ['Remote', 'Hybrid'],
             // Academic Info
             'university'            => $_SESSION['profile_university'] ?? '',
             'graduation_year'       => $_SESSION['profile_graduation_year'] ?? '',
@@ -512,11 +546,50 @@ class CandidateController extends Controller
                     $_SESSION['success_msg'] = 'Password updated successfully!';
                 }
             } else {
-                $_SESSION['profile_name']  = trim(strip_tags($_POST['name'] ?? 'Sarah Peters'));
+                $firstName = trim(strip_tags($_POST['first_name'] ?? ''));
+                $lastName  = trim(strip_tags($_POST['last_name'] ?? ''));
+                if ($firstName !== '' || $lastName !== '') {
+                    $_SESSION['profile_first_name'] = $firstName;
+                    $_SESSION['profile_last_name']  = $lastName;
+                    $_SESSION['profile_name']       = trim($firstName . ' ' . $lastName);
+                } elseif (isset($_POST['name'])) {
+                    $_SESSION['profile_name'] = trim(strip_tags($_POST['name']));
+                    $parts = explode(' ', $_SESSION['profile_name'], 2);
+                    $_SESSION['profile_first_name'] = $parts[0] ?? '';
+                    $_SESSION['profile_last_name']  = $parts[1] ?? '';
+                }
+
                 $_SESSION['profile_email'] = trim(strip_tags($_POST['email'] ?? 'sarah.peters@design-intern.com'));
                 $_SESSION['profile_role']  = trim(strip_tags($_POST['role'] ?? 'Student Applicant'));
                 $_SESSION['profile_phone'] = trim(strip_tags($_POST['phone'] ?? '+1 (555) 012-3456'));
                 $_SESSION['profile_bio']   = trim(strip_tags($_POST['bio'] ?? ''));
+
+                if (isset($_POST['avatar']) && !empty($_POST['avatar'])) {
+                    $_SESSION['profile_avatar'] = trim(strip_tags($_POST['avatar']));
+                } elseif (isset($_POST['remove_avatar']) && $_POST['remove_avatar'] === '1') {
+                    $_SESSION['profile_avatar'] = null;
+                }
+
+                // Interests & Work Arrangements
+                if (isset($_POST['interests'])) {
+                    $rawInterests = $_POST['interests'];
+                    if (is_string($rawInterests)) {
+                        $decoded = json_decode($rawInterests, true);
+                        $_SESSION['profile_interests'] = is_array($decoded) ? $decoded : [];
+                    } elseif (is_array($rawInterests)) {
+                        $_SESSION['profile_interests'] = $rawInterests;
+                    }
+                }
+
+                if (isset($_POST['work_arrangements'])) {
+                    $rawArrangements = $_POST['work_arrangements'];
+                    if (is_string($rawArrangements)) {
+                        $decoded = json_decode($rawArrangements, true);
+                        $_SESSION['profile_work_arrangements'] = is_array($decoded) ? $decoded : [];
+                    } elseif (is_array($rawArrangements)) {
+                        $_SESSION['profile_work_arrangements'] = $rawArrangements;
+                    }
+                }
 
                 // Academic Info
                 $_SESSION['profile_university']      = trim(strip_tags($_POST['university'] ?? ''));

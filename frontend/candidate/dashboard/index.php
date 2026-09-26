@@ -188,25 +188,46 @@ $avatar    = $candidate['avatar'] ?? null;
                 <div class="db-rec-grid">
                     <?php foreach ($recommendations as $rec): ?>
                     <div class="db-rec-card" id="db-rec-card-<?= htmlspecialchars($rec['slug']) ?>" x-data="{ saved: false }">
-                        <button class="db-rec-bookmark" @click="saved = !saved" style="background: none; border: none; padding: 4px; color: #CBD5E1; cursor: pointer; transition: color .12s;" onmouseover="this.style.color='#4F47E6'" onmouseout="this.style.color='#CBD5E1'" aria-label="Save <?= htmlspecialchars($rec['title']) ?>" id="db-rec-bookmark-<?= htmlspecialchars($rec['slug']) ?>">
-                            <!-- Saved outline state -->
-                            <svg x-show="!saved" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
-                            <!-- Saved filled state -->
-                            <svg x-show="saved" style="display: none; width: 16px; height: 16px;" class="text-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
-                        </button>
-                        <div class="db-rec-icon">
-                            <?= $rec['icon'] ?>
+                        <!-- Top Header: Brand Logo + Category/Title + Bookmark -->
+                        <div class="db-rec-top">
+                            <div class="db-rec-brand">
+                                <?php if (!empty($rec['logo_url'])): ?>
+                                    <img src="<?= htmlspecialchars($rec['logo_url']) ?>" alt="<?= htmlspecialchars($rec['company']) ?>" class="db-rec-logo-img">
+                                <?php else: ?>
+                                    <div class="db-rec-logo" style="<?= $rec['logo_bg'] ?? 'background: #000623; color: #fff;' ?>">
+                                        <?= htmlspecialchars($rec['initial'] ?? substr($rec['company'], 0, 1)) ?>
+                                    </div>
+                                <?php endif; ?>
+                                <div class="db-rec-headings">
+                                    <span class="db-rec-category"><?= htmlspecialchars($rec['category']) ?></span>
+                                    <h4 class="db-rec-title" title="<?= htmlspecialchars($rec['title']) ?>"><?= htmlspecialchars($rec['title']) ?></h4>
+                                </div>
+                            </div>
+
+                            <button class="db-rec-bookmark" @click="saved = !saved" aria-label="Save <?= htmlspecialchars($rec['title']) ?>" id="db-rec-bookmark-<?= htmlspecialchars($rec['slug']) ?>">
+                                <!-- Saved outline state -->
+                                <svg x-show="!saved" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                                <!-- Saved filled state -->
+                                <svg x-show="saved" style="display: none;" class="text-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                            </button>
                         </div>
-                        <div class="db-rec-title"><?= htmlspecialchars($rec['title']) ?></div>
-                        <div class="db-rec-company"><?= htmlspecialchars($rec['company']) ?> • <?= htmlspecialchars($rec['location']) ?></div>
-                        <div class="db-rec-tags">
-                            <?php foreach ($rec['tags'] as $tag): ?>
-                                <span class="db-rec-tag"><?= htmlspecialchars($tag) ?></span>
-                            <?php endforeach; ?>
+
+                        <!-- Company, Location & Commitment -->
+                        <div class="db-rec-meta">
+                            <a href="<?= url('/company/' . ($rec['company_slug'] ?? '')) ?>" class="db-rec-company-link"><?= htmlspecialchars($rec['company']) ?></a>
+                            <span class="db-rec-dot">•</span>
+                            <span><?= htmlspecialchars($rec['location']) ?></span>
+                            <span class="db-rec-dot">•</span>
+                            <span class="db-rec-commitment"><?= htmlspecialchars($rec['commitment']) ?></span>
                         </div>
+
+                        <!-- Brief Description Excerpt -->
+                        <p class="db-rec-desc"><?= htmlspecialchars($rec['description']) ?></p>
+
+                        <!-- Footer: Work Arrangement Tag + Apply Button -->
                         <div class="db-rec-footer">
-                            <span class="db-rec-salary"><?= htmlspecialchars($rec['salary']) ?></span>
-                            <a href="<?= url('/apply/' . $rec['slug']) ?>" class="db-apply-btn" id="db-apply-btn-<?= htmlspecialchars($rec['slug']) ?>">Apply Now</a>
+                            <span class="db-rec-tag-pill"><?= htmlspecialchars($rec['arrangement']) ?></span>
+                            <a href="<?= url('/internship/' . $rec['slug']) ?>" class="db-apply-btn" id="db-apply-btn-<?= htmlspecialchars($rec['slug']) ?>">Apply</a>
                         </div>
                     </div>
                     <?php endforeach; ?>

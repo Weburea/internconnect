@@ -100,11 +100,197 @@ $avatar = $candidate['avatar'] ?? null;
     color: #4F47E6;
     flex-shrink: 0;
 }
+.emp-tags-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.emp-tag-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 99px;
+    border: 1.5px solid #E2E8F0;
+    background: #F8FAFC;
+    font-size: 13px;
+    font-weight: 500;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+    font-family: inherit;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.emp-tag-pill:hover {
+    border-color: #CBD5E1;
+    background: #F1F5F9;
+    color: #1E293B;
+}
+.emp-tag-pill.is-active {
+    background: #EEF2FF;
+    border-color: #4F47E6;
+    color: #4F47E6;
+    font-weight: 600;
+}
+.emp-tag-pill svg {
+    width: 12px;
+    height: 12px;
+    color: #4F47E6;
+    flex-shrink: 0;
+}
+.cand-photo-header {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 16px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    margin-bottom: 22px;
+}
+.cand-photo-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #E2E8F0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    flex-shrink: 0;
+    background: #FFFFFF;
+}
+.cand-photo-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.cand-photo-btn-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.cand-btn-upload {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: #4F47E6;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.cand-btn-upload:hover {
+    background: #4338CA;
+}
+.cand-btn-remove {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    background: #FFFFFF;
+    color: #DC2626;
+    border: 1px solid #FECACA;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.cand-btn-remove:hover {
+    background: #FEE2E2;
+}
+.cand-photo-hint {
+    font-size: 11.5px;
+    color: #64748B;
+}
+.cand-arrangement-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1.5px solid #E2E8F0;
+    background: #FFFFFF;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #1E293B;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+.cand-arrangement-pill:hover {
+    border-color: #CBD5E1;
+    background: #F8FAFC;
+}
+.cand-arrangement-pill.is-active {
+    background: #EEF2FF;
+    border-color: #4F47E6;
+    color: #4F47E6;
+    font-weight: 600;
+}
 </style>
 <div class="db-shell" x-data="{ 
     deactivateModal: false, 
     confirmNameInput: '',
     candidateFullName: '<?= htmlspecialchars($candidate['name'] ?? 'Sarah Peters') ?>',
+    avatarUrl: '<?= htmlspecialchars($candidate['avatar'] ?? asset('assets/images/profile.png')) ?>',
+    defaultAvatar: '<?= asset('assets/images/profile.png') ?>',
+    removeAvatar: false,
+    triggerAvatarInput() {
+        this.$refs.avatarInput.click();
+    },
+    handleAvatarSelect(e) {
+        if (e.target.files.length > 0) {
+            const file = e.target.files[0];
+            if (file.size > 5 * 1024 * 1024) {
+                this.$dispatch('show-toast', { text: 'Avatar image exceeds 5MB limit.', type: 'warning' });
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                this.avatarUrl = ev.target.result;
+                this.removeAvatar = false;
+                this.$dispatch('show-toast', { text: 'Profile photo selected. Click Save Changes to apply.', type: 'info' });
+            };
+            reader.readAsDataURL(file);
+        }
+    },
+    removeCandidatePhoto() {
+        this.avatarUrl = this.defaultAvatar;
+        this.removeAvatar = true;
+        this.$dispatch('show-toast', { text: 'Profile photo removed. Click Save Changes to apply.', type: 'info' });
+    },
+    selectedInterests: <?= json_encode($candidate['interests'] ?? ['UI/UX Design', 'Software Engineering', 'Product Management']) ?>,
+    allInterests: [
+        'UI/UX Design', 'Software Engineering', 'Product Management', 'Data Science', 'AI/ML',
+        'Marketing', 'Sales', 'Finance', 'Operations', 'Cybersecurity', 'Cloud Computing',
+        'DevOps', 'Graphic Design', 'Content Creation', 'HR'
+    ],
+    toggleInterest(interest) {
+        if (this.selectedInterests.includes(interest)) {
+            this.selectedInterests = this.selectedInterests.filter(i => i !== interest);
+        } else {
+            this.selectedInterests.push(interest);
+        }
+    },
+    selectedArrangements: <?= json_encode($candidate['work_arrangements'] ?? ['Remote', 'Hybrid']) ?>,
+    toggleArrangement(arr) {
+        if (this.selectedArrangements.includes(arr)) {
+            this.selectedArrangements = this.selectedArrangements.filter(a => a !== arr);
+        } else {
+            this.selectedArrangements.push(arr);
+        }
+    },
     portfolio: '<?= htmlspecialchars($candidate['portfolio'] ?? '') ?>',
     linkedin: '<?= htmlspecialchars($candidate['linkedin'] ?? '') ?>',
     github: '<?= htmlspecialchars($candidate['github'] ?? '') ?>',
@@ -238,30 +424,64 @@ $avatar = $candidate['avatar'] ?? null;
                                 </button>
                             </div>
 
-                            <div class="db-form-row">
-                                <div class="db-form-group">
-                                    <label for="input-name" class="db-label">Full Name</label>
-                                    <input type="text" name="name" id="input-name" class="db-input"
-                                        value="<?= htmlspecialchars($candidate['name'] ?? 'Sarah Peters') ?>" required>
-                                </div>
-                                <div class="db-form-group">
-                                    <label for="input-email" class="db-label">Email Address</label>
-                                    <input type="email" name="email" id="input-email" class="db-input"
-                                        value="<?= htmlspecialchars($candidate['email'] ?? 'sarah.peters@design-intern.com') ?>" required>
+                            <!-- Hidden Avatar Form Controls -->
+                            <input type="file" x-ref="avatarInput" @change="handleAvatarSelect" accept="image/png,image/jpeg,image/webp" style="display: none;">
+                            <input type="hidden" name="avatar" :value="avatarUrl">
+                            <input type="hidden" name="remove_avatar" :value="removeAvatar ? '1' : '0'">
+
+                            <!-- Clean Candidate Photo Header Section -->
+                            <div class="cand-photo-header">
+                                <img :src="avatarUrl" alt="Profile Photo" class="cand-photo-avatar">
+                                <div class="cand-photo-actions">
+                                    <div class="cand-photo-btn-row">
+                                        <button type="button" class="cand-btn-upload" @click="triggerAvatarInput">
+                                            <svg style="width: 13px; height: 13px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                            <span>Upload Image</span>
+                                        </button>
+                                        <button type="button" class="cand-btn-remove" @click="removeCandidatePhoto">
+                                            <svg style="width: 13px; height: 13px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                            <span>Remove Image</span>
+                                        </button>
+                                    </div>
+                                    <span class="cand-photo-hint">Recommended: Square PNG, JPG or WebP (Max 5MB)</span>
                                 </div>
                             </div>
 
                             <div class="db-form-row">
                                 <div class="db-form-group">
-                                    <label for="input-role" class="db-label">Current Role</label>
-                                    <input type="text" name="role" id="input-role" class="db-input"
-                                        value="<?= htmlspecialchars($candidate['role'] ?? 'Student Applicant') ?>" required>
+                                    <label for="input-first-name" class="db-label">First Name</label>
+                                    <input type="text" name="first_name" id="input-first-name" class="db-input"
+                                        value="<?= htmlspecialchars($candidate['first_name'] ?? 'Sarah') ?>" required>
+                                </div>
+                                <div class="db-form-group">
+                                    <label for="input-last-name" class="db-label">Last Name</label>
+                                    <input type="text" name="last_name" id="input-last-name" class="db-input"
+                                        value="<?= htmlspecialchars($candidate['last_name'] ?? 'Peters') ?>" required>
+                                </div>
+                            </div>
+
+                            <div class="db-form-row">
+                                <div class="db-form-group">
+                                    <label for="input-email" class="db-label">Email Address</label>
+                                    <input type="email" name="email" id="input-email" class="db-input"
+                                        value="<?= htmlspecialchars($candidate['email'] ?? 'sarah.peters@design-intern.com') ?>" required>
                                 </div>
                                 <div class="db-form-group">
                                     <label for="input-phone" class="db-label">Phone Number</label>
                                     <input type="text" name="phone" id="input-phone" class="db-input"
                                         value="<?= htmlspecialchars($candidate['phone'] ?? '+1 (555) 012-3456') ?>" required>
                                 </div>
+                            </div>
+
+                            <div class="db-form-group db-form-group-full">
+                                <label for="input-role" class="db-label">Current Role</label>
+                                <input type="text" name="role" id="input-role" class="db-input"
+                                    value="<?= htmlspecialchars($candidate['role'] ?? 'Student Applicant') ?>" required>
                             </div>
 
                             <div class="db-form-group db-form-group-full">
@@ -310,7 +530,7 @@ $avatar = $candidate['avatar'] ?? null;
                                                 <span>Select Year</span>
                                                 <svg x-show="selected === ''" class="db-dropdown-check" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
                                             </div>
-                                            <?php for ($yr = 2030; $yr >= 2018; $yr--): ?>
+                                            <?php for ($yr = 2035; $yr >= 2015; $yr--): ?>
                                                 <div class="db-dropdown-item" :class="{ 'is-selected': selected === '<?= $yr ?>' }" @click="selected = '<?= $yr ?>'; label = '<?= $yr ?>'; open = false;">
                                                     <span><?= $yr ?></span>
                                                     <svg x-show="selected === '<?= $yr ?>'" class="db-dropdown-check" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
@@ -377,6 +597,67 @@ $avatar = $candidate['avatar'] ?? null;
                                         value="<?= htmlspecialchars($candidate['gpa'] ?? '') ?>"
                                         placeholder="e.g. 3.8/4.0">
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Interests & Work Preferences Card (Synced from Step 6 of 7) -->
+                        <div class="db-settings-card">
+                            <div class="db-settings-card-header">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <svg style="width: 18px; height: 18px; color: #4F47E6;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                    </svg>
+                                    <h3 class="db-settings-card-title" style="margin: 0;">Areas of Interest & Work Preferences</h3>
+                                </div>
+                                <button type="submit" class="db-btn-save" id="btn-save-interests">
+                                    <svg style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                    <span>Save Changes</span>
+                                </button>
+                            </div>
+
+                            <!-- Target Internship Interests -->
+                            <div style="margin-bottom: 24px;">
+                                <label class="db-label" style="display: block; margin-bottom: 6px;">Target Internship Interests</label>
+                                <p style="font-size: 12.5px; color: #64748B; margin: 0 0 12px 0;">Select your core areas of expertise to match with relevant internship roles.</p>
+                                <div class="emp-tags-wrapper">
+                                    <template x-for="item in allInterests" :key="item">
+                                        <button type="button" 
+                                                class="emp-tag-pill"
+                                                :class="{ 'is-active': selectedInterests.includes(item) }"
+                                                @click="toggleInterest(item)">
+                                            <span x-text="item"></span>
+                                            <svg x-show="selectedInterests.includes(item)" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </button>
+                                    </template>
+                                </div>
+                                <input type="hidden" name="interests" :value="JSON.stringify(selectedInterests)">
+                            </div>
+
+                            <!-- Work Arrangement -->
+                            <div style="margin-bottom: 8px;">
+                                <label class="db-label" style="display: block; margin-bottom: 6px;">Work Arrangement Preferences</label>
+                                <p style="font-size: 12.5px; color: #64748B; margin: 0 0 12px 0;">Select the work arrangements you are open to.</p>
+                                <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px;">
+                                    <template x-for="mode in ['Remote', 'Hybrid', 'On-site']" :key="mode">
+                                        <button type="button" 
+                                                class="cand-arrangement-pill"
+                                                :class="{ 'is-active': selectedArrangements.includes(mode) }"
+                                                @click="toggleArrangement(mode)">
+                                            <div style="width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid #CBD5E1; display: flex; align-items: center; justify-content: center; background: #fff;"
+                                                 :style="selectedArrangements.includes(mode) ? 'background: #4F47E6; border-color: #4F47E6;' : ''">
+                                                <svg x-show="selectedArrangements.includes(mode)" style="width: 12px; height: 12px; color: #fff;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </div>
+                                            <span x-text="mode"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                                <input type="hidden" name="work_arrangements" :value="JSON.stringify(selectedArrangements)">
                             </div>
                         </div>
 

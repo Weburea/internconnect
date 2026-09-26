@@ -28,7 +28,7 @@ $activeNav   = $activeNav ?? 'dashboard';
 
     <!-- Employer Company Profile Section -->
     <div class="db-profile">
-        <div class="db-avatar-wrap" x-data="{ open: false }">
+        <div class="db-avatar-wrap">
             <?php if ($compAvatar): ?>
                 <img class="db-avatar" src="<?= htmlspecialchars($compAvatar) ?>" alt="<?= htmlspecialchars($companyName) ?>">
             <?php else: ?>
@@ -36,16 +36,6 @@ $activeNav   = $activeNav ?? 'dashboard';
                     <?= strtoupper(substr($companyName, 0, 1)) . strtoupper(substr(explode(' ', $companyName)[1] ?? '', 0, 1)) ?>
                 </div>
             <?php endif; ?>
-            <div class="db-avatar-edit" role="button" aria-label="Update company logo" @click="open = !open" title="Update company logo">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/>
-                </svg>
-            </div>
-            <!-- Upload Dropdown -->
-            <div x-show="open" @click.outside="open = false" style="display: none; position: absolute; top: calc(100% + 6px); left: 50%; transform: translateX(-50%); width: max-content; min-width: 160px; white-space: nowrap; z-index: 100;" class="db-dropdown">
-                <div style="font-size: 13px; color: #191C1D; padding: 9px 16px; cursor: pointer; border-bottom: 1px solid #F0F2F7;" onmouseover="this.style.background='#F1F5F9'" onmouseout="this.style.background='transparent'">Upload Logo</div>
-                <div style="font-size: 13px; color: #DC2626; padding: 9px 16px; cursor: pointer;" onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='transparent'">Remove Logo</div>
-            </div>
         </div>
         <div class="db-profile-name"><?= htmlspecialchars($companyName) ?></div>
         <div class="db-profile-role"><?= htmlspecialchars($compRole) ?></div>

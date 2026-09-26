@@ -533,7 +533,7 @@ declare(strict_types=1);
                                     <label class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Degree Level</label>
                                     <div class="relative w-full" x-data="{ open: false }" @click.outside="open = false">
                                         <button type="button" 
-                                                class="w-full flex items-center justify-between px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] bg-white text-left cursor-pointer"
+                                                class="w-full h-[42px] flex items-center justify-between px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] bg-white text-left cursor-pointer"
                                                 :class="{ 'border-primary ring-2 ring-primary/20': open }"
                                                 @click="open = !open">
                                             <span :class="degree_level ? 'text-[#191C1D]' : 'text-gray-400'" x-text="degree_level || 'Select Degree Level'"></span>
@@ -567,7 +567,7 @@ declare(strict_types=1);
                                     <label class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Graduation Year</label>
                                     <div class="relative w-full" x-data="{ open: false }" @click.outside="open = false">
                                         <button type="button" 
-                                                class="w-full flex items-center justify-between px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] bg-white text-left cursor-pointer"
+                                                class="w-full h-[42px] flex items-center justify-between px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] bg-white text-left cursor-pointer"
                                                 :class="{ 'border-primary ring-2 ring-primary/20': open }"
                                                 @click="open = !open">
                                             <span :class="graduation_year ? 'text-[#191C1D]' : 'text-gray-400'" x-text="graduation_year || 'Select Graduation Year'"></span>

@@ -853,69 +853,168 @@ html, body {
     background: #fff;
     border: 1px solid #E8ECF2;
     border-radius: 16px;
-    padding: 28px 24px;
+    padding: 20px;
     position: relative;
     transition: box-shadow .15s, border-color .15s;
     display: flex;
     flex-direction: column;
-    min-height: 290px;
+    justify-content: space-between;
+    min-height: 250px;
 }
-.db-rec-card:hover { box-shadow: 0 6px 28px rgba(0,0,0,.08); border-color: #C7D2FE; }
-.db-rec-bookmark {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    color: #CBD5E1;
-    cursor: pointer;
-    transition: color .12s;
+.db-rec-card:hover { 
+    box-shadow: 0 8px 30px rgba(0,0,0,.08); 
+    border-color: #C7D2FE; 
 }
-.db-rec-bookmark:hover { color: #4F47E6; }
-.db-rec-bookmark svg { width: 16px; height: 16px; }
-.db-rec-icon {
+.db-rec-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+.db-rec-brand {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+}
+.db-rec-logo {
     width: 36px;
     height: 36px;
     border-radius: 10px;
-    background: #F4F6FA;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 12px;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
-.db-rec-icon svg { width: 17px; height: 17px; color: #4F47E6; }
-.db-rec-title { font-size: 14px; font-weight: 700; color: #191C1D; margin-bottom: 3px; }
-.db-rec-company { font-size: 12px; color: #94A3B8; margin-bottom: 12px; }
-.db-rec-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
-.db-rec-tag {
-    font-size: 10.5px;
-    font-weight: 600;
-    letter-spacing: .2px;
-    padding: 3px 8px;
-    border-radius: 6px;
-    background: #F1F5F9;
-    color: #64748B;
+.db-rec-logo-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+.db-rec-headings {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    flex: 1;
+}
+.db-rec-category {
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #4F47E6;
     text-transform: uppercase;
+    letter-spacing: 0.6px;
+    line-height: 1;
+    margin-bottom: 3px;
+}
+.db-rec-title { 
+    font-size: 13.5px; 
+    font-weight: 700; 
+    color: #191C1D; 
+    margin: 0; 
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.db-rec-bookmark {
+    background: none;
+    border: none;
+    padding: 2px;
+    color: #CBD5E1;
+    cursor: pointer;
+    transition: color .12s;
+    flex-shrink: 0;
+}
+.db-rec-bookmark:hover { color: #4F47E6; }
+.db-rec-bookmark svg { width: 17px; height: 17px; }
+.db-rec-meta {
+    font-size: 11.5px;
+    color: #64748B;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+    line-height: 1.3;
+}
+.db-rec-company-link {
+    color: #334155;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color .12s;
+}
+.db-rec-company-link:hover {
+    color: #4F47E6;
+    text-decoration: underline;
+}
+.db-rec-dot {
+    color: #CBD5E1;
+    font-size: 9px;
+}
+.db-rec-commitment {
+    font-style: italic;
+    font-size: 10.5px;
+    color: #64748B;
+}
+.db-rec-desc {
+    font-size: 11.5px;
+    color: #64748B;
+    line-height: 1.5;
+    margin: 0 0 14px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex-grow: 1;
 }
 .db-rec-footer { 
     display: flex; 
     align-items: center; 
     justify-content: space-between; 
+    border-top: 1px solid #F1F5F9;
+    padding-top: 10px;
     margin-top: auto; 
 }
-.db-rec-salary { font-size: 13.5px; font-weight: 700; color: #4F47E6; }
+.db-rec-tag-pill {
+    font-size: 9.5px;
+    font-weight: 700;
+    padding: 3.5px 8px;
+    border-radius: 6px;
+    background: #F1F5F9;
+    color: #475569;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
 .db-apply-btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
     background: #4F47E6;
     color: #fff;
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 700;
-    padding: 8px 16px;
+    padding: 6px 14px;
     border-radius: 8px;
     text-decoration: none;
-    transition: background .12s, box-shadow .12s;
+    transition: all .15s;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
-.db-apply-btn:hover { background: #4338CA; box-shadow: 0 4px 14px rgba(79,71,230,.3); }
+.db-apply-btn:hover { 
+    background: #4338CA; 
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(79,71,230,.25); 
+}
 
 /* ── Bottom Row: Recent Apps + Alerts ─────────── */
 .db-bottom-row {
