@@ -187,47 +187,66 @@ $avatar    = $candidate['avatar'] ?? null;
                 </div>
                 <div class="db-rec-grid">
                     <?php foreach ($recommendations as $rec): ?>
-                    <div class="db-rec-card" id="db-rec-card-<?= htmlspecialchars($rec['slug']) ?>" x-data="{ saved: false }">
-                        <!-- Top Header: Brand Logo + Category/Title + Bookmark -->
-                        <div class="db-rec-top">
-                            <div class="db-rec-brand">
-                                <?php if (!empty($rec['logo_url'])): ?>
-                                    <img src="<?= htmlspecialchars($rec['logo_url']) ?>" alt="<?= htmlspecialchars($rec['company']) ?>" class="db-rec-logo-img">
-                                <?php else: ?>
-                                    <div class="db-rec-logo" style="<?= $rec['logo_bg'] ?? 'background: #000623; color: #fff;' ?>">
-                                        <?= htmlspecialchars($rec['initial'] ?? substr($rec['company'], 0, 1)) ?>
+                    <div class="db-rec-card" id="db-rec-card-<?= htmlspecialchars($rec['slug']) ?>" x-data="{ saved: false }" style="background: #ffffff; border: 1px solid #E5E7EB; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease;">
+                        
+                        <!-- Top Header Info -->
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px;">
+                                <!-- Brand Logo / Category / Title -->
+                                <div style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
+                                    <?php if (!empty($rec['logo_url'])): ?>
+                                        <img src="<?= htmlspecialchars($rec['logo_url']) ?>" alt="<?= htmlspecialchars($rec['company']) ?>" style="width: 40px; height: 40px; border-radius: 12px; object-fit: cover; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
+                                    <?php else: ?>
+                                        <div style="<?= $rec['logo_bg'] ?> width: 40px; height: 40px; min-width: 40px; min-height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.06);">
+                                            <?= htmlspecialchars($rec['initial'] ?? substr($rec['company'], 0, 1)) ?>
+                                        </div>
+                                    <?php endif; ?>
+                                    <div style="min-width: 0; flex: 1;">
+                                        <span style="display: block; font-size: 10px; font-weight: 700; color: #4F47E6; text-transform: uppercase; letter-spacing: 0.08em; line-height: 1.2; margin-bottom: 2px;">
+                                            <?= htmlspecialchars($rec['category']) ?>
+                                        </span>
+                                        <h4 style="font-size: 14.5px; font-weight: 700; color: #111827; margin: 0; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="<?= htmlspecialchars($rec['title']) ?>">
+                                            <?= htmlspecialchars($rec['title']) ?>
+                                        </h4>
                                     </div>
-                                <?php endif; ?>
-                                <div class="db-rec-headings">
-                                    <span class="db-rec-category"><?= htmlspecialchars($rec['category']) ?></span>
-                                    <h4 class="db-rec-title" title="<?= htmlspecialchars($rec['title']) ?>"><?= htmlspecialchars($rec['title']) ?></h4>
                                 </div>
+
+                                <!-- Bookmark Icon Button -->
+                                <button type="button" @click="saved = !saved" style="background: none; border: none; padding: 4px; color: #9CA3AF; cursor: pointer; border-radius: 8px; flex-shrink: 0; transition: color 0.15s;" :style="saved ? 'color: #4F47E6;' : ''" aria-label="Save <?= htmlspecialchars($rec['title']) ?>" id="db-rec-bookmark-<?= htmlspecialchars($rec['slug']) ?>">
+                                    <!-- Saved outline state -->
+                                    <svg x-show="!saved" style="width: 20px; height: 20px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                                    </svg>
+                                    <!-- Saved filled state -->
+                                    <svg x-show="saved" style="display: none; width: 20px; height: 20px; color: #4F47E6;" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+                                    </svg>
+                                </button>
                             </div>
 
-                            <button class="db-rec-bookmark" @click="saved = !saved" aria-label="Save <?= htmlspecialchars($rec['title']) ?>" id="db-rec-bookmark-<?= htmlspecialchars($rec['slug']) ?>">
-                                <!-- Saved outline state -->
-                                <svg x-show="!saved" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
-                                <!-- Saved filled state -->
-                                <svg x-show="saved" style="display: none;" class="text-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
-                            </button>
-                        </div>
+                            <!-- Company, Location & Commitment -->
+                            <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #6B7280; margin-bottom: 12px; flex-wrap: wrap;">
+                                <a href="<?= url('/company/' . ($rec['company_slug'] ?? '')) ?>" style="font-weight: 600; color: #374151; text-decoration: none; transition: color 0.12s;"><?= htmlspecialchars($rec['company']) ?></a>
+                                <span style="color: #D1D5DB; font-size: 10px;">•</span>
+                                <span><?= htmlspecialchars($rec['location']) ?></span>
+                                <span style="color: #D1D5DB; font-size: 10px;">•</span>
+                                <span style="font-style: italic; font-size: 11px;"><?= htmlspecialchars($rec['commitment']) ?></span>
+                            </div>
 
-                        <!-- Company, Location & Commitment -->
-                        <div class="db-rec-meta">
-                            <a href="<?= url('/company/' . ($rec['company_slug'] ?? '')) ?>" class="db-rec-company-link"><?= htmlspecialchars($rec['company']) ?></a>
-                            <span class="db-rec-dot">•</span>
-                            <span><?= htmlspecialchars($rec['location']) ?></span>
-                            <span class="db-rec-dot">•</span>
-                            <span class="db-rec-commitment"><?= htmlspecialchars($rec['commitment']) ?></span>
+                            <!-- Brief Description Excerpt -->
+                            <p style="font-size: 12px; color: #4B5563; line-height: 1.55; margin: 0 0 16px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                <?= htmlspecialchars($rec['description']) ?>
+                            </p>
                         </div>
-
-                        <!-- Brief Description Excerpt -->
-                        <p class="db-rec-desc"><?= htmlspecialchars($rec['description']) ?></p>
 
                         <!-- Footer: Work Arrangement Tag + Apply Button -->
-                        <div class="db-rec-footer">
-                            <span class="db-rec-tag-pill"><?= htmlspecialchars($rec['arrangement']) ?></span>
-                            <a href="<?= url('/internship/' . $rec['slug']) ?>" class="db-apply-btn" id="db-apply-btn-<?= htmlspecialchars($rec['slug']) ?>">Apply</a>
+                        <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #F3F4F6; padding-top: 12px; margin-top: auto;">
+                            <span style="font-size: 10px; font-weight: 700; padding: 4px 10px; border-radius: 8px; background: #F3F4F6; color: #374151; letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0;">
+                                <?= htmlspecialchars($rec['arrangement']) ?>
+                            </span>
+                            <a href="<?= url('/internship/' . $rec['slug']) ?>" class="db-apply-btn" id="db-apply-btn-<?= htmlspecialchars($rec['slug']) ?>" style="background: #4F47E6; color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap !important; flex-shrink: 0 !important; transition: all 0.15s ease;">
+                                Apply
+                            </a>
                         </div>
                     </div>
                     <?php endforeach; ?>

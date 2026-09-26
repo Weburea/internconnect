@@ -24,13 +24,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS (required for global components like footer) -->
-    <link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>">
+    <link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/css/style.css') ?>">
     
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
     
     <!-- Dashboard Custom Styles -->
-    <link rel="stylesheet" href="<?= asset('assets/css/dashboard.css') ?>">
+    <link rel="stylesheet" href="<?= asset('assets/css/dashboard.css') ?>?v=<?= filemtime(dirname(__DIR__, 3) . '/public/assets/css/dashboard.css') ?>">
     
     <!-- Flatpickr Date & Time Picker -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">

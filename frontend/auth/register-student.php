@@ -533,11 +533,11 @@ declare(strict_types=1);
                                     <label class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Degree Level</label>
                                     <div class="relative w-full" x-data="{ open: false }" @click.outside="open = false">
                                         <button type="button" 
-                                                class="w-full h-[42px] flex items-center justify-between px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] bg-white text-left cursor-pointer"
+                                                class="w-full h-[42px] min-h-[42px] max-h-[42px] flex items-center justify-between px-3.5 py-2 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] bg-white text-left cursor-pointer overflow-hidden"
                                                 :class="{ 'border-primary ring-2 ring-primary/20': open }"
                                                 @click="open = !open">
-                                            <span :class="degree_level ? 'text-[#191C1D]' : 'text-gray-400'" x-text="degree_level || 'Select Degree Level'"></span>
-                                            <svg class="w-4 h-4 text-gray-500 transition-transform duration-200" :class="{ 'rotate-180 text-primary': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                                            <span class="truncate whitespace-nowrap min-w-0 mr-1" :class="degree_level ? 'text-[#191C1D]' : 'text-gray-400'" x-text="degree_level || 'Select Degree'"></span>
+                                            <svg class="w-4 h-4 text-gray-500 transition-transform duration-200 flex-shrink-0" :class="{ 'rotate-180 text-primary': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
                                             </svg>
                                         </button>
@@ -567,11 +567,11 @@ declare(strict_types=1);
                                     <label class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Graduation Year</label>
                                     <div class="relative w-full" x-data="{ open: false }" @click.outside="open = false">
                                         <button type="button" 
-                                                class="w-full h-[42px] flex items-center justify-between px-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] bg-white text-left cursor-pointer"
+                                                class="w-full h-[42px] min-h-[42px] max-h-[42px] flex items-center justify-between px-3.5 py-2 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] bg-white text-left cursor-pointer overflow-hidden"
                                                 :class="{ 'border-primary ring-2 ring-primary/20': open }"
                                                 @click="open = !open">
-                                            <span :class="graduation_year ? 'text-[#191C1D]' : 'text-gray-400'" x-text="graduation_year || 'Select Graduation Year'"></span>
-                                            <svg class="w-4 h-4 text-gray-500 transition-transform duration-200" :class="{ 'rotate-180 text-primary': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                                            <span class="truncate whitespace-nowrap min-w-0 mr-1" :class="graduation_year ? 'text-[#191C1D]' : 'text-gray-400'" x-text="graduation_year || 'Select Year'"></span>
+                                            <svg class="w-4 h-4 text-gray-500 transition-transform duration-200 flex-shrink-0" :class="{ 'rotate-180 text-primary': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
                                             </svg>
                                         </button>
@@ -1019,7 +1019,7 @@ declare(strict_types=1);
 <script>
     window.INTERN_WELCOME_URL = '<?= url('/welcome') ?>';
 </script>
-<script src="<?= asset('assets/js/onboarding-student.js') ?>"></script>
+<script src="<?= asset('assets/js/onboarding-student.js') ?>?v=<?= filemtime(dirname(__DIR__, 2) . '/public/assets/js/onboarding-student.js') ?>"></script>
 <script>
     const copyrightRegisterStudent = document.getElementById('copyright-year-register-student');
     if (copyrightRegisterStudent) {

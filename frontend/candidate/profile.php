@@ -239,146 +239,151 @@ $avatar = $candidate['avatar'] ?? null;
     font-weight: 600;
 }
 </style>
-<div class="db-shell" x-data="{ 
-    deactivateModal: false, 
-    confirmNameInput: '',
-    candidateFullName: '<?= htmlspecialchars($candidate['name'] ?? 'Sarah Peters') ?>',
-    avatarUrl: '<?= htmlspecialchars($candidate['avatar'] ?? asset('assets/images/profile.png')) ?>',
-    defaultAvatar: '<?= asset('assets/images/profile.png') ?>',
-    removeAvatar: false,
-    triggerAvatarInput() {
-        this.$refs.avatarInput.click();
-    },
-    handleAvatarSelect(e) {
-        if (e.target.files.length > 0) {
-            const file = e.target.files[0];
+<script>
+function candidateProfileSettings() {
+    return {
+        deactivateModal: false, 
+        confirmNameInput: '',
+        candidateFullName: <?= json_encode($candidate['name'] ?? 'Sarah Peters') ?>,
+        avatarUrl: <?= json_encode($candidate['avatar'] ?? asset('assets/images/profile.png')) ?>,
+        defaultAvatar: <?= json_encode(asset('assets/images/profile.png')) ?>,
+        removeAvatar: false,
+        triggerAvatarInput() {
+            this.$refs.avatarInput.click();
+        },
+        handleAvatarSelect(e) {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                if (file.size > 5 * 1024 * 1024) {
+                    this.$dispatch('show-toast', { text: 'Avatar image exceeds 5MB limit.', type: 'warning' });
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    this.avatarUrl = ev.target.result;
+                    this.removeAvatar = false;
+                    this.$dispatch('show-toast', { text: 'Profile photo selected. Click Save Changes to apply.', type: 'info' });
+                };
+                reader.readAsDataURL(file);
+            }
+        },
+        removeCandidatePhoto() {
+            this.avatarUrl = this.defaultAvatar;
+            this.removeAvatar = true;
+            this.$dispatch('show-toast', { text: 'Profile photo removed. Click Save Changes to apply.', type: 'info' });
+        },
+        selectedInterests: <?= json_encode($candidate['interests'] ?? ['UI/UX Design', 'Software Engineering', 'Product Management']) ?>,
+        allInterests: [
+            'UI/UX Design', 'Software Engineering', 'Product Management', 'Data Science', 'AI/ML',
+            'Marketing', 'Sales', 'Finance', 'Operations', 'Cybersecurity', 'Cloud Computing',
+            'DevOps', 'Graphic Design', 'Content Creation', 'HR'
+        ],
+        toggleInterest(interest) {
+            if (this.selectedInterests.includes(interest)) {
+                this.selectedInterests = this.selectedInterests.filter(i => i !== interest);
+            } else {
+                this.selectedInterests.push(interest);
+            }
+        },
+        selectedArrangements: <?= json_encode($candidate['work_arrangements'] ?? ['Remote', 'Hybrid']) ?>,
+        toggleArrangement(arr) {
+            if (this.selectedArrangements.includes(arr)) {
+                this.selectedArrangements = this.selectedArrangements.filter(a => a !== arr);
+            } else {
+                this.selectedArrangements.push(arr);
+            }
+        },
+        portfolio: <?= json_encode($candidate['portfolio'] ?? '') ?>,
+        linkedin: <?= json_encode($candidate['linkedin'] ?? '') ?>,
+        github: <?= json_encode($candidate['github'] ?? '') ?>,
+        portfolioEdit: <?= json_encode($candidate['portfolio'] ?? '') ?>,
+        linkedinEdit: <?= json_encode($candidate['linkedin'] ?? '') ?>,
+        githubEdit: <?= json_encode($candidate['github'] ?? '') ?>,
+        editingLinks: false,
+        successAlert: <?= json_encode($success ? (string)$success : '') ?>,
+        resumeFile: 'Sarah_Peters_CV_2024.pdf',
+        resumeSize: '1.2 MB',
+        resumeUploaded: 'Oct 12, 2023',
+        dragging: false,
+        showPreviewModal: false,
+        uploadedFileName: 'Sarah_Peters_CV_2024.pdf',
+        uploadedFileSize: '1.2 MB',
+        uploadedFileUrl: <?= json_encode(asset('dummy.pdf')) ?>,
+        uploadedFileExt: 'pdf',
+        init() {
+            if (this.successAlert) {
+                this.$nextTick(() => {
+                    this.$dispatch('show-toast', { text: this.successAlert, type: 'success' });
+                    this.successAlert = '';
+                });
+            }
+        },
+        saveQuickLinks() {
+            this.portfolio = this.portfolioEdit;
+            this.linkedin = this.linkedinEdit;
+            this.github = this.githubEdit;
+            this.editingLinks = false;
+            this.$dispatch('show-toast', { text: 'Quick links updated successfully!', type: 'success' });
+        },
+        triggerFileInput() {
+            this.$refs.fileInput.click();
+        },
+        handleFileDrop(e) {
+            this.dragging = false;
+            if (e.dataTransfer.files.length > 0) {
+                const file = e.dataTransfer.files[0];
+                this.uploadMockFile(file);
+            }
+        },
+        handleFileSelect(e) {
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                this.uploadMockFile(file);
+            }
+        },
+        uploadMockFile(file) {
+            if (!file) return;
             if (file.size > 5 * 1024 * 1024) {
-                this.$dispatch('show-toast', { text: 'Avatar image exceeds 5MB limit.', type: 'warning' });
+                this.$dispatch('show-toast', { text: 'The selected file exceeds the 5MB limit. Please upload a smaller file.', type: 'warning' });
                 return;
             }
-            const reader = new FileReader();
-            reader.onload = (ev) => {
-                this.avatarUrl = ev.target.result;
-                this.removeAvatar = false;
-                this.$dispatch('show-toast', { text: 'Profile photo selected. Click Save Changes to apply.', type: 'info' });
-            };
-            reader.readAsDataURL(file);
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (!['pdf', 'docx', 'rtf'].includes(ext)) {
+                this.$dispatch('show-toast', { text: 'Unsupported file type. Please upload a PDF, DOCX, or RTF document.', type: 'warning' });
+                return;
+            }
+            if (this.uploadedFileUrl && this.uploadedFileUrl !== <?= json_encode(asset('dummy.pdf')) ?> && this.uploadedFileUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(this.uploadedFileUrl);
+            }
+            this.resumeFile = file.name;
+            this.resumeSize = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
+            const options = { month: 'short', day: 'numeric', year: 'numeric' };
+            this.resumeUploaded = new Date().toLocaleDateString('en-US', options);
+            
+            this.uploadedFileName = file.name;
+            this.uploadedFileSize = this.resumeSize;
+            this.uploadedFileExt = ext;
+            this.uploadedFileUrl = URL.createObjectURL(file);
+            
+            this.$dispatch('show-toast', { text: 'Resume uploaded successfully!', type: 'success' });
+        },
+        deleteResume() {
+            if (this.uploadedFileUrl && this.uploadedFileUrl !== <?= json_encode(asset('dummy.pdf')) ?> && this.uploadedFileUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(this.uploadedFileUrl);
+            }
+            this.resumeFile = '';
+            this.resumeSize = '';
+            this.resumeUploaded = '';
+            this.uploadedFileName = '';
+            this.uploadedFileSize = '';
+            this.uploadedFileExt = '';
+            this.uploadedFileUrl = '';
+            this.$dispatch('show-toast', { text: 'Resume removed.', type: 'info' });
         }
-    },
-    removeCandidatePhoto() {
-        this.avatarUrl = this.defaultAvatar;
-        this.removeAvatar = true;
-        this.$dispatch('show-toast', { text: 'Profile photo removed. Click Save Changes to apply.', type: 'info' });
-    },
-    selectedInterests: <?= json_encode($candidate['interests'] ?? ['UI/UX Design', 'Software Engineering', 'Product Management']) ?>,
-    allInterests: [
-        'UI/UX Design', 'Software Engineering', 'Product Management', 'Data Science', 'AI/ML',
-        'Marketing', 'Sales', 'Finance', 'Operations', 'Cybersecurity', 'Cloud Computing',
-        'DevOps', 'Graphic Design', 'Content Creation', 'HR'
-    ],
-    toggleInterest(interest) {
-        if (this.selectedInterests.includes(interest)) {
-            this.selectedInterests = this.selectedInterests.filter(i => i !== interest);
-        } else {
-            this.selectedInterests.push(interest);
-        }
-    },
-    selectedArrangements: <?= json_encode($candidate['work_arrangements'] ?? ['Remote', 'Hybrid']) ?>,
-    toggleArrangement(arr) {
-        if (this.selectedArrangements.includes(arr)) {
-            this.selectedArrangements = this.selectedArrangements.filter(a => a !== arr);
-        } else {
-            this.selectedArrangements.push(arr);
-        }
-    },
-    portfolio: '<?= htmlspecialchars($candidate['portfolio'] ?? '') ?>',
-    linkedin: '<?= htmlspecialchars($candidate['linkedin'] ?? '') ?>',
-    github: '<?= htmlspecialchars($candidate['github'] ?? '') ?>',
-    portfolioEdit: '<?= htmlspecialchars($candidate['portfolio'] ?? '') ?>',
-    linkedinEdit: '<?= htmlspecialchars($candidate['linkedin'] ?? '') ?>',
-    githubEdit: '<?= htmlspecialchars($candidate['github'] ?? '') ?>',
-    editingLinks: false,
-    successAlert: '<?= $success ? htmlspecialchars($success) : '' ?>',
-    resumeFile: 'Sarah_Peters_CV_2024.pdf',
-    resumeSize: '1.2 MB',
-    resumeUploaded: 'Oct 12, 2023',
-    dragging: false,
-    showPreviewModal: false,
-    uploadedFileName: 'Sarah_Peters_CV_2024.pdf',
-    uploadedFileSize: '1.2 MB',
-    uploadedFileUrl: '<?= asset('dummy.pdf') ?>',
-    uploadedFileExt: 'pdf',
-    init() {
-        if (this.successAlert) {
-            this.$nextTick(() => {
-                this.$dispatch('show-toast', { text: this.successAlert, type: 'success' });
-                this.successAlert = '';
-            });
-        }
-    },
-    saveQuickLinks() {
-        this.portfolio = this.portfolioEdit;
-        this.linkedin = this.linkedinEdit;
-        this.github = this.githubEdit;
-        this.editingLinks = false;
-        this.$dispatch('show-toast', { text: 'Quick links updated successfully!', type: 'success' });
-    },
-    triggerFileInput() {
-        this.$refs.fileInput.click();
-    },
-    handleFileDrop(e) {
-        this.dragging = false;
-        if (e.dataTransfer.files.length > 0) {
-            const file = e.dataTransfer.files[0];
-            this.uploadMockFile(file);
-        }
-    },
-    handleFileSelect(e) {
-        if (e.target.files.length > 0) {
-            const file = e.target.files[0];
-            this.uploadMockFile(file);
-        }
-    },
-    uploadMockFile(file) {
-        if (!file) return;
-        if (file.size > 5 * 1024 * 1024) {
-            this.$dispatch('show-toast', { text: 'The selected file exceeds the 5MB limit. Please upload a smaller file.', type: 'warning' });
-            return;
-        }
-        const ext = file.name.split('.').pop().toLowerCase();
-        if (!['pdf', 'docx', 'rtf'].includes(ext)) {
-            this.$dispatch('show-toast', { text: 'Unsupported file type. Please upload a PDF, DOCX, or RTF document.', type: 'warning' });
-            return;
-        }
-        if (this.uploadedFileUrl && this.uploadedFileUrl !== '<?= asset('dummy.pdf') ?>' && this.uploadedFileUrl.startsWith('blob:')) {
-            URL.revokeObjectURL(this.uploadedFileUrl);
-        }
-        this.resumeFile = file.name;
-        this.resumeSize = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
-        const options = { month: 'short', day: 'numeric', year: 'numeric' };
-        this.resumeUploaded = new Date().toLocaleDateString('en-US', options);
-        
-        this.uploadedFileName = file.name;
-        this.uploadedFileSize = this.resumeSize;
-        this.uploadedFileExt = ext;
-        this.uploadedFileUrl = URL.createObjectURL(file);
-        
-        this.$dispatch('show-toast', { text: 'Resume uploaded successfully!', type: 'success' });
-    },
-    deleteResume() {
-        if (this.uploadedFileUrl && this.uploadedFileUrl !== '<?= asset('dummy.pdf') ?>' && this.uploadedFileUrl.startsWith('blob:')) {
-            URL.revokeObjectURL(this.uploadedFileUrl);
-        }
-        this.resumeFile = '';
-        this.resumeSize = '';
-        this.resumeUploaded = '';
-        this.uploadedFileName = '';
-        this.uploadedFileSize = '';
-        this.uploadedFileExt = '';
-        this.uploadedFileUrl = '';
-        this.$dispatch('show-toast', { text: 'Resume removed.', type: 'info' });
-    }
-}">
+    };
+}
+</script>
+<div class="db-shell" x-data="candidateProfileSettings()">
 
     <!-- ══ SIDEBAR ══ -->
     <?php 
