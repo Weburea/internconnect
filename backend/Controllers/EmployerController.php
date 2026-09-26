@@ -387,6 +387,7 @@ class EmployerController extends Controller
                 'Demonstrated passion for user-centered digital design and interface prototyping.',
                 'Familiarity with modern design tools (Figma, Adobe XD) and component systems.',
                 'Clear communication and eagerness to learn from senior mentors in a fast-paced environment.'
+            ],
             'responsibilities_title' => 'Key Responsibilities',
             'responsibilities' => [
                 'Collaborate with cross-functional teams to define, design, and ship new features.',
