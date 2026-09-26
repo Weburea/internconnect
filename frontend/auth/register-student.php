@@ -532,15 +532,20 @@ declare(strict_types=1);
                                 <div>
                                     <label class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Degree Level</label>
                                     <div class="relative w-full" x-data="{ open: false }" @click.outside="open = false">
-                                        <button type="button" 
-                                                class="w-full h-[42px] min-h-[42px] max-h-[42px] flex items-center justify-between px-3.5 py-2 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] bg-white text-left cursor-pointer overflow-hidden"
-                                                :class="{ 'border-primary ring-2 ring-primary/20': open }"
-                                                @click="open = !open">
-                                            <span class="truncate whitespace-nowrap min-w-0 mr-1" :class="degree_level ? 'text-[#191C1D]' : 'text-gray-400'" x-text="degree_level || 'Select Degree'"></span>
-                                            <svg class="w-4 h-4 text-gray-500 transition-transform duration-200 flex-shrink-0" :class="{ 'rotate-180 text-primary': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
-                                            </svg>
-                                        </button>
+                                        <div class="relative flex items-center">
+                                            <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center z-10">
+                                                <iconify-icon icon="lucide:graduation-cap" class="text-lg"></iconify-icon>
+                                            </div>
+                                            <button type="button" 
+                                                    class="w-full h-[42px] min-h-[42px] max-h-[42px] flex items-center justify-between pl-10 pr-3.5 py-2 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] bg-white text-left cursor-pointer overflow-hidden"
+                                                    :class="{ 'border-primary ring-2 ring-primary/20': open }"
+                                                    @click="open = !open">
+                                                <span class="truncate whitespace-nowrap min-w-0 mr-1" :class="degree_level ? 'text-[#191C1D]' : 'text-gray-400'" x-text="degree_level || 'Select Degree'"></span>
+                                                <svg class="w-4 h-4 text-gray-500 transition-transform duration-200 flex-shrink-0" :class="{ 'rotate-180 text-primary': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
+                                                </svg>
+                                            </button>
+                                        </div>
                                         <div x-show="open" 
                                              x-transition:enter="transition ease-out duration-100"
                                              x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
@@ -548,8 +553,8 @@ declare(strict_types=1);
                                              x-transition:leave="transition ease-in duration-75"
                                              x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                                              x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
-                                             class="absolute top-[calc(100%+6px)] left-0 right-0 bg-white border border-brandBorder rounded-xl shadow-lg z-50 p-1.5 max-h-52 overflow-y-auto"
-                                             style="display: none;">
+                                             class="absolute top-[calc(100%+6px)] left-0 right-0 bg-white border border-brandBorder rounded-xl shadow-lg z-50 p-1.5 custom-primary-scrollbar"
+                                             style="display: none; max-height: 220px; overflow-y: auto;">
                                             <template x-for="dOpt in degree_options" :key="dOpt">
                                                 <div class="flex items-center justify-between px-3 py-2 text-xs font-medium rounded-lg cursor-pointer transition-colors"
                                                      :class="degree_level === dOpt ? 'bg-indigo-50 text-primary font-semibold' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'"
@@ -566,15 +571,20 @@ declare(strict_types=1);
                                 <div>
                                     <label class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Graduation Year</label>
                                     <div class="relative w-full" x-data="{ open: false }" @click.outside="open = false">
-                                        <button type="button" 
-                                                class="w-full h-[42px] min-h-[42px] max-h-[42px] flex items-center justify-between px-3.5 py-2 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] bg-white text-left cursor-pointer overflow-hidden"
-                                                :class="{ 'border-primary ring-2 ring-primary/20': open }"
-                                                @click="open = !open">
-                                            <span class="truncate whitespace-nowrap min-w-0 mr-1" :class="graduation_year ? 'text-[#191C1D]' : 'text-gray-400'" x-text="graduation_year || 'Select Year'"></span>
-                                            <svg class="w-4 h-4 text-gray-500 transition-transform duration-200 flex-shrink-0" :class="{ 'rotate-180 text-primary': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
-                                            </svg>
-                                        </button>
+                                        <div class="relative flex items-center">
+                                            <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center z-10">
+                                                <iconify-icon icon="lucide:calendar" class="text-lg"></iconify-icon>
+                                            </div>
+                                            <button type="button" 
+                                                    class="w-full h-[42px] min-h-[42px] max-h-[42px] flex items-center justify-between pl-10 pr-3.5 py-2 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] bg-white text-left cursor-pointer overflow-hidden"
+                                                    :class="{ 'border-primary ring-2 ring-primary/20': open }"
+                                                    @click="open = !open">
+                                                <span class="truncate whitespace-nowrap min-w-0 mr-1" :class="graduation_year ? 'text-[#191C1D]' : 'text-gray-400'" x-text="graduation_year || 'Select Year'"></span>
+                                                <svg class="w-4 h-4 text-gray-500 transition-transform duration-200 flex-shrink-0" :class="{ 'rotate-180 text-primary': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
+                                                </svg>
+                                            </button>
+                                        </div>
                                         <div x-show="open" 
                                              x-transition:enter="transition ease-out duration-100"
                                              x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
@@ -582,8 +592,8 @@ declare(strict_types=1);
                                              x-transition:leave="transition ease-in duration-75"
                                              x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                                              x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
-                                             class="absolute top-[calc(100%+6px)] left-0 right-0 bg-white border border-brandBorder rounded-xl shadow-lg z-50 p-1.5 max-h-52 overflow-y-auto"
-                                             style="display: none;">
+                                             class="absolute top-[calc(100%+6px)] left-0 right-0 bg-white border border-brandBorder rounded-xl shadow-lg z-50 p-1.5 custom-primary-scrollbar"
+                                             style="display: none; max-height: 220px; overflow-y: auto;">
                                             <template x-for="yOpt in graduation_year_options" :key="yOpt">
                                                 <div class="flex items-center justify-between px-3 py-2 text-xs font-medium rounded-lg cursor-pointer transition-colors"
                                                      :class="graduation_year === yOpt ? 'bg-indigo-50 text-primary font-semibold' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'"

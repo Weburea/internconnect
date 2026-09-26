@@ -483,7 +483,7 @@ function candidateProfileSettings() {
                                 </div>
                             </div>
 
-                            <div class="db-form-group db-form-group-full">
+                            <div class="db-form-group db-form-group-full" style="margin-bottom: 20px;">
                                 <label for="input-role" class="db-label">Current Role</label>
                                 <input type="text" name="role" id="input-role" class="db-input"
                                     value="<?= htmlspecialchars($candidate['role'] ?? 'Student Applicant') ?>" required>
