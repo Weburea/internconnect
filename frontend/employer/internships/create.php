@@ -52,11 +52,11 @@ $draftBenefits              = $draft['benefits'] ?? [
     'Learning & Development Budget',
     'Return Offer Potential'
 ];
-$draftSkills         = $draft['skills'] ?? ['React', 'TypeScript', 'Figma'];
+$draftSkills         = $draft['skills'] ?? ['Figma', 'UI/UX Design', 'Wireframing', 'Prototyping', 'Design Systems'];
 $draftEducation      = $draft['education_level'] ?? 'Undergraduate';
 $draftExperience     = $draft['experience_level'] ?? 'No Experience';
 $draftStartDate      = $draft['start_date'] ?? '2026-06-01';
-$draftDuration       = $draft['duration'] ?? '3 months';
+$draftDuration       = (!empty($draft['duration']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $draft['duration'])) ? $draft['duration'] : '2026-08-31';
 $draftOpenings       = $draft['openings'] ?? 10;
 $draftStipend        = $draft['stipend_amount'] ?? '2000';
 $draftIsUnpaid       = !empty($draft['is_unpaid']);
@@ -89,25 +89,27 @@ $draftQuestions      = $draft['screening_questions'] ?? [
 
         <!-- ══ PAGE CONTENT ══ -->
         <div class="db-content">
-            <div class="emp-post-container" 
-                 x-data="postInternshipForm({
-                     skills: <?= htmlspecialchars(json_encode($draftSkills)) ?>,
-                     category: '<?= htmlspecialchars($draftCategory) ?>',
-                     type: '<?= htmlspecialchars($draftType) ?>',
-                     education: '<?= htmlspecialchars($draftEducation) ?>',
-                     experience: '<?= htmlspecialchars($draftExperience) ?>',
-                     duration: '<?= htmlspecialchars($draftDuration) ?>',
-                     interviewType: '<?= htmlspecialchars($draftInterviewType) ?>',
-                     isUnpaid: <?= $draftIsUnpaid ? 'true' : 'false' ?>,
-                     allowRemote: <?= $draftAllowRemote ? 'true' : 'false' ?>,
-                     questions: <?= htmlspecialchars(json_encode($draftQuestions)) ?>,
-                     responsibilitiesTitle: <?= json_encode($draftResponsibilitiesTitle) ?>,
-                     responsibilities: <?= htmlspecialchars(json_encode($draftResponsibilities)) ?>,
-                     lookingForTitle: <?= json_encode($draftLookingForTitle) ?>,
-                     lookingForCards: <?= htmlspecialchars(json_encode($draftLookingForCards)) ?>,
-                     benefitsTitle: <?= json_encode($draftBenefitsTitle) ?>,
-                     benefits: <?= htmlspecialchars(json_encode($draftBenefits)) ?>
-                 })">
+            <script>
+            window.__postInternshipInitialData = <?= json_encode([
+                'skills'                => $draftSkills,
+                'category'              => $draftCategory,
+                'type'                  => $draftType,
+                'education'             => $draftEducation,
+                'experience'            => $draftExperience,
+                'duration'              => $draftDuration,
+                'interviewType'         => $draftInterviewType,
+                'isUnpaid'              => $draftIsUnpaid,
+                'allowRemote'           => $draftAllowRemote,
+                'questions'             => $draftQuestions,
+                'responsibilitiesTitle' => $draftResponsibilitiesTitle,
+                'responsibilities'      => $draftResponsibilities,
+                'lookingForTitle'       => $draftLookingForTitle,
+                'lookingForCards'       => $draftLookingForCards,
+                'benefitsTitle'         => $draftBenefitsTitle,
+                'benefits'              => $draftBenefits,
+            ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
+            </script>
+            <div class="emp-post-container" x-data="postInternshipForm()">
 
                 <!-- Header Title & Subtitle -->
                 <div class="emp-post-header">
@@ -261,36 +263,59 @@ $draftQuestions      = $draft['screening_questions'] ?? [
                                     <h2 class="emp-card-title">Role Overview</h2>
                                 </div>
 
-                                <!-- Narrative Textarea with Bold & Italic Only Toolbar -->
+                                <!-- Narrative Textarea with Bold, Italic & Paragraph WYSIWYG Toolbar -->
                                 <div class="emp-field-group">
                                     <label class="emp-field-label">About the Internship</label>
                                     <div class="emp-richtext-wrap">
                                         <div class="emp-richtext-toolbar">
-                                            <button type="button" class="emp-toolbar-btn" title="Bold" @click="applyFormat('bold')">B</button>
-                                            <button type="button" class="emp-toolbar-btn" title="Italic" @click="applyFormat('italic')"><em>I</em></button>
+                                            <button type="button" class="emp-toolbar-btn" title="Bold (Ctrl+B)" @mousedown.prevent="formatDoc('bold')">
+                                                <span style="font-weight: 800; font-size: 13px;">B</span>
+                                            </button>
+                                            <button type="button" class="emp-toolbar-btn" title="Italic (Ctrl+I)" @mousedown.prevent="formatDoc('italic')">
+                                                <span style="font-style: italic; font-weight: 700; font-size: 13px; font-family: serif;">I</span>
+                                            </button>
+                                            <button type="button" class="emp-toolbar-btn" title="Format Paragraph" @mousedown.prevent="formatDoc('formatBlock', '<p>')">
+                                                <svg style="width: 14px; height: 14px; flex-shrink: 0 !important;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h10" />
+                                                </svg>
+                                                <span style="font-size: 12px; font-weight: 700; margin-left: 2px;">¶</span>
+                                            </button>
                                         </div>
-                                        <textarea name="about" 
-                                                  x-ref="aboutTextarea"
-                                                  class="emp-richtext-textarea" 
-                                                  style="min-height: 120px;"
-                                                  placeholder="Describe the opportunity, company mission, team culture, and learning outcomes..."><?= htmlspecialchars($draftAbout) ?></textarea>
+                                        <!-- Visual Editable WYSIWYG Div (min-height: 220px) -->
+                                        <div contenteditable="true" 
+                                             class="emp-richtext-editor" 
+                                             x-ref="editorArea"
+                                             @input="syncEditor()"
+                                             @blur="syncEditor()"
+                                             placeholder="Describe the opportunity, company mission, team culture, and learning outcomes..."></div>
+                                        <textarea name="about" x-ref="aboutHidden" style="display: none;"><?= htmlspecialchars($draftAbout) ?></textarea>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- ── Card 3: Key Responsibilities (Dynamic List Builder) ── -->
                             <div class="emp-form-card">
-                                <div class="emp-card-header">
-                                    <div class="emp-card-icon-badge">
-                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                                        </svg>
-                                    </div>
-                                    <div class="emp-section-title-wrap" style="flex: 1; margin-bottom: 0;">
-                                        <input type="text" 
-                                               class="emp-section-title-input emp-card-title" 
-                                               x-model="responsibilitiesTitle" 
-                                               placeholder="Key Responsibilities">
+                                <div class="emp-card-header" style="align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                                    <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 240px;">
+                                        <div class="emp-card-icon-badge">
+                                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                            </svg>
+                                        </div>
+                                        <div class="emp-section-title-wrap">
+                                            <div class="emp-title-edit-container">
+                                                <input type="text" 
+                                                       class="emp-section-title-input" 
+                                                       x-model="responsibilitiesTitle" 
+                                                       placeholder="Key Responsibilities">
+                                                <span class="emp-title-edit-hint" title="Click to rename this section">
+                                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                    </svg>
+                                                    <span>Editable Title</span>
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -330,17 +355,27 @@ $draftQuestions      = $draft['screening_questions'] ?? [
 
                             <!-- ── Card 4: What We're Looking For (4 Qualification Cards Builder) ── -->
                             <div class="emp-form-card">
-                                <div class="emp-card-header">
-                                    <div class="emp-card-icon-badge">
-                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                                        </svg>
-                                    </div>
-                                    <div class="emp-section-title-wrap" style="flex: 1; margin-bottom: 0;">
-                                        <input type="text" 
-                                               class="emp-section-title-input emp-card-title" 
-                                               x-model="lookingForTitle" 
-                                               placeholder="What We're Looking For">
+                                <div class="emp-card-header" style="align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                                    <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 240px;">
+                                        <div class="emp-card-icon-badge">
+                                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                                            </svg>
+                                        </div>
+                                        <div class="emp-section-title-wrap">
+                                            <div class="emp-title-edit-container">
+                                                <input type="text" 
+                                                       class="emp-section-title-input" 
+                                                       x-model="lookingForTitle" 
+                                                       placeholder="What We're Looking For">
+                                                <span class="emp-title-edit-hint" title="Click to rename this section">
+                                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                    </svg>
+                                                    <span>Editable Title</span>
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -516,11 +551,11 @@ $draftQuestions      = $draft['screening_questions'] ?? [
                                         <div class="db-dropdown-wrap" x-data="{ 
                                             open: false, 
                                             tempExp: '<?= htmlspecialchars($draftExperience) ?>',
-                                            options: ['No Experience', '1-2 Years', '2+ Years']
+                                            options: ['No Experience', '1-2 Years', '2-3 Years', '3-4 Years', '4-5 Years', '5-6 Years', '6-7 Years', '7-8 Years', '8-9 Years', '9-10 Years', '10+ Years']
                                         }" @click.outside="open = false">
                                             
                                             <button type="button" class="db-dropdown-btn" @click="open = !open">
-                                                <span x-text="experience">No Experience</span>
+                                                <span x-text="experience || 'No Experience'">No Experience</span>
                                                 <svg class="db-dropdown-chevron" :style="open ? 'transform: rotate(180deg)' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                                 </svg>
@@ -566,34 +601,15 @@ $draftQuestions      = $draft['screening_questions'] ?? [
                                                value="<?= htmlspecialchars($draftStartDate) ?>">
                                     </div>
 
-                                    <!-- Duration (Optional) Alpine Dropdown (Image 4 Match) -->
+                                    <!-- Duration (Optional) Date Input -->
                                     <div>
-                                        <label class="emp-field-label">Duration (Optional)</label>
-                                        <div class="db-dropdown-wrap" x-data="{ 
-                                            open: false, 
-                                            tempDur: '<?= htmlspecialchars($draftDuration) ?>',
-                                            options: ['1 week', '2 weeks', '1 month', '3 months', '6 months']
-                                        }" @click.outside="open = false">
-                                            
-                                            <button type="button" class="db-dropdown-btn" @click="open = !open">
-                                                <span x-text="duration">3 months</span>
-                                                <svg class="db-dropdown-chevron" :style="open ? 'transform: rotate(180deg)' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                                                </svg>
-                                            </button>
-
-                                            <div class="db-dropdown-menu" x-show="open" x-transition style="display: none;">
-                                                <div class="db-dropdown-list">
-                                                    <template x-for="item in options" :key="item">
-                                                        <label class="db-dropdown-item">
-                                                            <span x-text="item"></span>
-                                                            <input type="radio" name="dur_radio" :value="item" :checked="tempDur === item" @change="tempDur = item">
-                                                        </label>
-                                                    </template>
-                                                </div>
-                                                <button type="button" class="db-dropdown-apply-btn" @click="duration = tempDur; open = false">Apply</button>
-                                            </div>
-                                        </div>
+                                        <label class="emp-field-label" for="field_duration">Duration (Optional)</label>
+                                        <input type="date" 
+                                               id="field_duration" 
+                                               name="duration" 
+                                               class="emp-input-text" 
+                                               x-model="duration" 
+                                               value="<?= htmlspecialchars($draftDuration) ?>">
                                     </div>
 
                                     <!-- Openings -->
@@ -612,17 +628,27 @@ $draftQuestions      = $draft['screening_questions'] ?? [
 
                             <!-- ── Card 7: Program Benefits (Dynamic List Builder) ── -->
                             <div class="emp-form-card">
-                                <div class="emp-card-header">
-                                    <div class="emp-card-icon-badge">
-                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-                                        </svg>
-                                    </div>
-                                    <div class="emp-section-title-wrap" style="flex: 1; margin-bottom: 0;">
-                                        <input type="text" 
-                                               class="emp-section-title-input emp-card-title" 
-                                               x-model="benefitsTitle" 
-                                               placeholder="Program Benefits">
+                                <div class="emp-card-header" style="align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                                    <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 240px;">
+                                        <div class="emp-card-icon-badge">
+                                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                                            </svg>
+                                        </div>
+                                        <div class="emp-section-title-wrap">
+                                            <div class="emp-title-edit-container">
+                                                <input type="text" 
+                                                       class="emp-section-title-input" 
+                                                       x-model="benefitsTitle" 
+                                                       placeholder="Program Benefits">
+                                                <span class="emp-title-edit-hint" title="Click to rename this section">
+                                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                    </svg>
+                                                    <span>Editable Title</span>
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1013,155 +1039,177 @@ $draftQuestions      = $draft['screening_questions'] ?? [
 
 <script>
 document.addEventListener('alpine:init', () => {
-    Alpine.data('postInternshipForm', (initialData) => ({
-        skills: initialData.skills || ['React', 'TypeScript', 'Figma'],
-        category: initialData.category || 'Technology',
-        type: initialData.type || 'Remote',
-        education: initialData.education || 'Undergraduate',
-        experience: initialData.experience || 'No Experience',
-        duration: initialData.duration || '3 months',
-        interviewType: initialData.interviewType || 'Video Interview (Google Meet)',
-        isUnpaid: initialData.isUnpaid || false,
-        allowRemote: initialData.allowRemote !== undefined ? initialData.allowRemote : true,
-        questions: initialData.questions || [],
-        responsibilitiesTitle: initialData.responsibilitiesTitle || 'Key Responsibilities',
-        responsibilities: initialData.responsibilities || [],
-        lookingForTitle: initialData.lookingForTitle || "What We're Looking For",
-        lookingForCards: initialData.lookingForCards || [],
-        benefitsTitle: initialData.benefitsTitle || 'Program Benefits',
-        benefits: initialData.benefits || [],
+    Alpine.data('postInternshipForm', () => {
+        const initialData = window.__postInternshipInitialData || {};
+        return {
+            skills: Array.isArray(initialData.skills) ? initialData.skills : ['Figma', 'UI/UX Design', 'Wireframing', 'Prototyping', 'Design Systems'],
+            category: initialData.category || 'Technology',
+            type: initialData.type || 'Remote',
+            education: initialData.education || 'Undergraduate',
+            experience: initialData.experience || 'No Experience',
+            duration: initialData.duration || '2026-08-31',
+            interviewType: initialData.interviewType || 'Video Interview (Google Meet)',
+            isUnpaid: Boolean(initialData.isUnpaid),
+            allowRemote: initialData.allowRemote !== undefined ? Boolean(initialData.allowRemote) : true,
+            questions: Array.isArray(initialData.questions) ? initialData.questions : [],
+            responsibilitiesTitle: initialData.responsibilitiesTitle || 'Key Responsibilities',
+            responsibilities: Array.isArray(initialData.responsibilities) ? initialData.responsibilities : [],
+            lookingForTitle: initialData.lookingForTitle || "What We're Looking For",
+            lookingForCards: Array.isArray(initialData.lookingForCards) ? initialData.lookingForCards : [],
+            benefitsTitle: initialData.benefitsTitle || 'Program Benefits',
+            benefits: Array.isArray(initialData.benefits) ? initialData.benefits : [],
 
-        // Modal state
-        showQuestionModal: false,
-        newQuestionText: '',
-        newQuestionType: 'Short Answer',
-        openIconPicker: null,
+            // Modal state
+            showQuestionModal: false,
+            newQuestionText: '',
+            newQuestionType: 'Short Answer',
+            openIconPicker: null,
 
-        addSkill(name) {
-            if (name && !this.skills.includes(name)) {
-                this.skills.push(name);
-            }
-        },
+            init() {
+                this.$nextTick(() => {
+                    if (this.$refs.editorArea) {
+                        const raw = this.$refs.aboutHidden ? this.$refs.aboutHidden.value : '';
+                        if (raw) {
+                            if (raw.includes('<p>') || raw.includes('<b>') || raw.includes('<i>') || raw.includes('<br>')) {
+                                this.$refs.editorArea.innerHTML = raw;
+                            } else {
+                                const paragraphs = raw.split(/\n\s*\n/).map(p => `<p>${p.trim()}</p>`).join('');
+                                this.$refs.editorArea.innerHTML = paragraphs || `<p>${raw}</p>`;
+                            }
+                        }
+                    }
+                });
+            },
 
-        removeSkill(index) {
-            this.skills.splice(index, 1);
-        },
-
-        applyFormat(format) {
-            const el = this.$refs.aboutTextarea;
-            if (!el) return;
-            const start = el.selectionStart;
-            const end = el.selectionEnd;
-            const text = el.value;
-            const selected = text.substring(start, end);
-            const wrapper = format === 'bold' ? '**' : '*';
-            const replacement = wrapper + (selected || 'text') + wrapper;
-            el.value = text.substring(0, start) + replacement + text.substring(end);
-            el.focus();
-            const newPos = start + wrapper.length + (selected ? selected.length : 4);
-            el.setSelectionRange(newPos, newPos);
-        },
-
-        addResponsibility() {
-            this.responsibilities.push('');
-        },
-
-        removeResponsibility(index) {
-            this.responsibilities.splice(index, 1);
-        },
-
-        addLookingCard() {
-            this.lookingForCards.push({
-                icon: 'target',
-                title: '',
-                desc: ''
-            });
-        },
-
-        removeLookingCard(index) {
-            this.lookingForCards.splice(index, 1);
-        },
-
-        addBenefit() {
-            this.benefits.push('');
-        },
-
-        removeBenefit(index) {
-            this.benefits.splice(index, 1);
-        },
-
-        openQuestionModal() {
-            this.newQuestionText = '';
-            this.newQuestionType = 'Short Answer';
-            this.showQuestionModal = true;
-        },
-
-        submitQuestionModal() {
-            if (!this.newQuestionText.trim()) {
-                this.$dispatch('show-toast', { text: 'Please enter question text.', type: 'error' });
-                return;
-            }
-            this.questions.push({
-                id: Date.now(),
-                text: this.newQuestionText.trim(),
-                type: this.newQuestionType
-            });
-            this.showQuestionModal = false;
-            this.$dispatch('show-toast', { text: 'Screening question added successfully.', type: 'success' });
-        },
-
-        removeQuestion(index) {
-            this.questions.splice(index, 1);
-        },
-
-        suggestDescription() {
-            const aboutEl = this.$refs.aboutTextarea;
-            if (aboutEl) {
-                aboutEl.value = 'We are seeking an ambitious intern to join our fast-growing engineering team. In this role, you will collaborate on production applications, design clean interfaces, and receive direct 1-on-1 mentorship to accelerate your industry skills.';
-                this.$dispatch('show-toast', { text: 'AI suggestion applied to Role Overview!', type: 'success' });
-            }
-        },
-
-        suggestSkills() {
-            const suggestions = ['UI/UX', 'Wireframing', 'User Research', 'Design Systems'];
-            suggestions.forEach(s => this.addSkill(s));
-            this.$dispatch('show-toast', { text: 'AI added recommended skills: ' + suggestions.join(', '), type: 'success' });
-        },
-
-        suggestRequirements() {
-            this.lookingForCards = [
-                {
-                    icon: 'academic-cap',
-                    title: 'Design or Technical Degree',
-                    desc: 'Pursuing or holding a degree in Design, Computer Science, Human-Computer Interaction, or equivalent.'
-                },
-                {
-                    icon: 'code',
-                    title: 'Figma & Prototyping',
-                    desc: 'Demonstrated experience with modern prototyping tools, wireframing, and interactive components.'
-                },
-                {
-                    icon: 'users',
-                    title: 'Collaboration & Agility',
-                    desc: 'Eagerness to participate in sprints, team standups, and communicate design decisions clearly.'
-                },
-                {
-                    icon: 'target',
-                    title: 'Attention to Detail',
-                    desc: 'Strong passion for pixel precision, user-centric thinking, and elegant simplicity.'
+            formatDoc(cmd, val = null) {
+                if (this.$refs.editorArea) {
+                    this.$refs.editorArea.focus();
                 }
-            ];
-            this.$dispatch('show-toast', { text: 'AI generated 4 structured qualification cards!', type: 'success' });
-        },
+                document.execCommand(cmd, false, val);
+                this.syncEditor();
+            },
 
-        submitAction(action) {
-            const form = document.getElementById('postInternshipForm');
-            const actionInput = document.getElementById('formActionInput');
-            if (form && actionInput) {
-                actionInput.value = action;
-                form.submit();
+            syncEditor() {
+                if (this.$refs.editorArea && this.$refs.aboutHidden) {
+                    this.$refs.aboutHidden.value = this.$refs.editorArea.innerHTML.trim();
+                }
+            },
+
+            addSkill(name) {
+                if (name && !this.skills.includes(name)) {
+                    this.skills.push(name);
+                }
+            },
+
+            removeSkill(index) {
+                this.skills.splice(index, 1);
+            },
+
+            addResponsibility() {
+                this.responsibilities.push('');
+            },
+
+            removeResponsibility(index) {
+                this.responsibilities.splice(index, 1);
+            },
+
+            addLookingCard() {
+                this.lookingForCards.push({
+                    icon: 'target',
+                    title: '',
+                    desc: ''
+                });
+            },
+
+            removeLookingCard(index) {
+                this.lookingForCards.splice(index, 1);
+            },
+
+            addBenefit() {
+                this.benefits.push('');
+            },
+
+            removeBenefit(index) {
+                this.benefits.splice(index, 1);
+            },
+
+            openQuestionModal() {
+                this.newQuestionText = '';
+                this.newQuestionType = 'Short Answer';
+                this.showQuestionModal = true;
+            },
+
+            submitQuestionModal() {
+                if (!this.newQuestionText.trim()) {
+                    this.$dispatch('show-toast', { text: 'Please enter question text.', type: 'error' });
+                    return;
+                }
+                this.questions.push({
+                    id: Date.now(),
+                    text: this.newQuestionText.trim(),
+                    type: this.newQuestionType
+                });
+                this.showQuestionModal = false;
+                this.$dispatch('show-toast', { text: 'Screening question added successfully.', type: 'success' });
+            },
+
+            removeQuestion(index) {
+                this.questions.splice(index, 1);
+            },
+
+            suggestDescription() {
+                const sampleText = '<p>We are seeking an ambitious <b>Product Design Intern</b> to join our fast-growing engineering team.</p><p>In this role, you will collaborate on production applications, design clean interfaces, and receive direct 1-on-1 mentorship to accelerate your industry skills.</p>';
+                if (this.$refs.editorArea) {
+                    this.$refs.editorArea.innerHTML = sampleText;
+                }
+                if (this.$refs.aboutHidden) {
+                    this.$refs.aboutHidden.value = sampleText;
+                }
+                this.$dispatch('show-toast', { text: 'AI suggestion applied to Role Overview!', type: 'success' });
+            },
+
+            suggestSkills() {
+                const suggestions = ['UI/UX', 'Wireframing', 'User Research', 'Design Systems'];
+                suggestions.forEach(s => this.addSkill(s));
+                this.$dispatch('show-toast', { text: 'AI added recommended skills: ' + suggestions.join(', '), type: 'success' });
+            },
+
+            suggestRequirements() {
+                this.lookingForCards = [
+                    {
+                        icon: 'academic-cap',
+                        title: 'Design or Technical Degree',
+                        desc: 'Pursuing or holding a degree in Design, Computer Science, Human-Computer Interaction, or equivalent.'
+                    },
+                    {
+                        icon: 'code',
+                        title: 'Figma & Prototyping',
+                        desc: 'Demonstrated experience with modern prototyping tools, wireframing, and interactive components.'
+                    },
+                    {
+                        icon: 'users',
+                        title: 'Collaboration & Agility',
+                        desc: 'Eagerness to participate in sprints, team standups, and communicate design decisions clearly.'
+                    },
+                    {
+                        icon: 'target',
+                        title: 'Attention to Detail',
+                        desc: 'Strong passion for pixel precision, user-centric thinking, and elegant simplicity.'
+                    }
+                ];
+                this.$dispatch('show-toast', { text: 'AI generated 4 structured qualification cards!', type: 'success' });
+            },
+
+            submitAction(action) {
+                this.syncEditor();
+                const form = document.getElementById('postInternshipForm');
+                const actionInput = document.getElementById('formActionInput');
+                if (form && actionInput) {
+                    actionInput.value = action;
+                    form.submit();
+                }
             }
-        }
-    }));
+        };
+    });
 });
 </script>

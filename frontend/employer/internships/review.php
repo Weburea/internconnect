@@ -168,9 +168,12 @@ if (!function_exists('renderQualIcon')) {
                             <!-- Role Overview Paragraph -->
                             <div>
                                 <h3 class="emp-review-section-title">Role Overview</h3>
-                                <p class="emp-review-paragraph">
-                                    <?= nl2br(htmlspecialchars($about)) ?>
-                                </p>
+                                <div class="emp-review-paragraph">
+                                    <?php 
+                                    $safeAbout = strip_tags($about, '<p><b><strong><i><em><br>');
+                                    echo !empty($safeAbout) ? (strpos($safeAbout, '<p>') !== false ? $safeAbout : nl2br($safeAbout)) : 'No overview provided.';
+                                    ?>
+                                </div>
                             </div>
 
                             <!-- Key Responsibilities (Matching Detail Page Container) -->
