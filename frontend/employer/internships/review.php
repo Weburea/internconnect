@@ -74,10 +74,9 @@ $skills           = !empty($draft['skills']) && is_array($draft['skills'])
     ? $draft['skills']
     : ['Figma', 'Prototyping', 'User Research', 'UI Design'];
 
+$isUnpaid         = !empty($draft['is_unpaid']) || ($draft['stipend_type'] ?? '') === 'unpaid' || ($draft['stipend_amount'] ?? '') === 'Unpaid';
 $stipendAmount    = !empty($draft['stipend_amount']) ? '$' . $draft['stipend_amount'] . '/mo' : '$3,000 - $4,500/mo';
-if (!empty($draft['is_unpaid'])) {
-    $stipendAmount = 'Unpaid';
-}
+$stipendDisplay   = $isUnpaid ? 'No Fixed Fee (Unpaid)' : ('Paid (' . htmlspecialchars($stipendAmount) . ')');
 $deadline         = !empty($draft['deadline']) ? date('M j, Y', strtotime($draft['deadline'])) : 'May 15, 2026';
 
 $relevantExperience = !empty($draft['relevant_experience']) && is_array($draft['relevant_experience'])
@@ -177,7 +176,7 @@ if (!function_exists('renderQualIcon')) {
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                     </svg>
                                 </div>
-                                <div style="flex: 1;">
+                                <div style="flex: 1; min-width: 0;">
                                     <h2 class="emp-review-role-title"><?= htmlspecialchars($title) ?></h2>
                                     <div class="emp-review-meta">
                                         <span><?= htmlspecialchars($companyName) ?></span>
@@ -194,7 +193,7 @@ if (!function_exists('renderQualIcon')) {
                                         <span class="emp-meta-pill"><?= htmlspecialchars($category) ?></span>
                                         <span class="emp-meta-pill"><?= htmlspecialchars($type) ?></span>
                                         <span class="emp-meta-pill"><?= htmlspecialchars((string)$openings) ?> <?= (int)$openings === 1 ? 'Opening' : 'Openings' ?></span>
-                                        <span class="emp-meta-pill">Paid (<?= htmlspecialchars($stipendAmount) ?>)</span>
+                                        <span class="emp-meta-pill"><?= $stipendDisplay ?></span>
                                     </div>
                                 </div>
                             </div>
@@ -305,16 +304,16 @@ if (!function_exists('renderQualIcon')) {
                             <!-- Relevant Experience Fields Preview -->
                             <?php if (!empty($relevantExperience)): ?>
                                 <div class="emp-review-experience-box">
-                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; background: #EEF2FF; color: #4F48E6;">
-                                                <svg style="width: 15px; height: 15px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <div class="emp-review-box-header">
+                                        <div class="emp-review-box-title-group">
+                                            <span class="emp-review-box-icon">
+                                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                                                 </svg>
                                             </span>
-                                            <h4 style="font-size: 13.5px; font-weight: 700; color: #0F172A; margin: 0;">Candidate Experience Required (Step 1)</h4>
+                                            <h4 class="emp-review-box-title">Candidate Experience Required (Step 1)</h4>
                                         </div>
-                                        <span style="font-size: 11.5px; font-weight: 600; color: #64748B; background: #FFFFFF; border: 1px solid #CBD5E1; padding: 2px 8px; border-radius: 99px;">
+                                        <span class="emp-review-box-badge">
                                             <?= count($relevantExperience) ?> fields
                                         </span>
                                     </div>
@@ -345,16 +344,16 @@ if (!function_exists('renderQualIcon')) {
                             <!-- Screening Questions Preview -->
                             <?php if (!empty($screeningQuestions)): ?>
                                 <div class="emp-review-question-box">
-                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                                        <div style="display: flex; align-items: center; gap: 8px;">
-                                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; background: #EEF2FF; color: #4F48E6;">
-                                                <svg style="width: 15px; height: 15px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <div class="emp-review-box-header">
+                                        <div class="emp-review-box-title-group">
+                                            <span class="emp-review-box-icon">
+                                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                 </svg>
                                             </span>
-                                            <h4 style="font-size: 13.5px; font-weight: 700; color: #0F172A; margin: 0;">Screening Questions (Step 3)</h4>
+                                            <h4 class="emp-review-box-title">Screening Questions (Step 3)</h4>
                                         </div>
-                                        <span style="font-size: 11.5px; font-weight: 600; color: #64748B; background: #FFFFFF; border: 1px solid #CBD5E1; padding: 2px 8px; border-radius: 99px;">
+                                        <span class="emp-review-box-badge">
                                             <?= count($screeningQuestions) ?> questions
                                         </span>
                                     </div>

@@ -622,6 +622,51 @@
     background: #EEF2FF;
 }
 
+/* ── Stipend Input & Unpaid Highlight ── */
+.emp-stipend-input-wrap {
+    display: flex;
+    align-items: center;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #FFFFFF;
+    transition: all 0.2s ease;
+}
+
+.emp-stipend-input-wrap.emp-stipend-unpaid-active {
+    border-color: #4F48E6 !important;
+    background: #F5F3FF !important;
+    box-shadow: 0 0 0 1px #4F48E6;
+}
+
+.emp-stipend-prefix {
+    background: #F8FAFC;
+    border-right: 1px solid #E2E8F0;
+    padding: 11px 16px;
+    font-weight: 700;
+    color: #475569;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.emp-stipend-unpaid-active .emp-stipend-prefix {
+    background: #EDE9FE;
+    border-right-color: #DDD6FE;
+    color: #4F48E6;
+}
+
+.emp-unpaid-active-badge {
+    font-size: 11px;
+    font-weight: 700;
+    color: #4F48E6;
+    background: #EDE9FE;
+    padding: 4px 10px;
+    border-radius: 6px;
+    margin-right: 10px;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
 /* ── Perks Checkbox Cards ── */
 .emp-perks-grid {
     display: flex;
@@ -889,6 +934,35 @@ input:checked + .emp-slider:before {
     color: #64748B;
 }
 
+.emp-question-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0 !important;
+}
+
+.emp-question-edit {
+    background: transparent;
+    border: none;
+    color: #94A3B8;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s ease;
+    flex-shrink: 0 !important;
+}
+
+.emp-question-edit:hover {
+    color: #4F48E6;
+}
+
+.emp-question-edit svg {
+    width: 16px;
+    height: 16px;
+}
+
 .emp-question-delete {
     background: transparent;
     border: none;
@@ -1094,6 +1168,37 @@ input:checked + .emp-slider:before {
     box-shadow: 0 1px 4px rgba(0, 6, 35, 0.04);
 }
 
+@media (max-width: 768px) {
+    .emp-review-card {
+        padding: 18px 14px;
+        border-radius: 14px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+    .emp-review-role-header {
+        gap: 12px;
+        padding-bottom: 16px;
+        margin-bottom: 16px;
+    }
+    .emp-review-logo-box {
+        width: 44px;
+        height: 44px;
+    }
+    .emp-review-logo-box svg {
+        width: 22px;
+        height: 22px;
+    }
+    .emp-review-role-title {
+        font-size: 18px;
+    }
+    .emp-optimization-card {
+        padding: 18px 14px;
+        border-radius: 14px;
+        box-sizing: border-box;
+    }
+}
+
 .emp-review-role-header {
     display: flex;
     align-items: flex-start;
@@ -1140,6 +1245,7 @@ input:checked + .emp-slider:before {
 
 .emp-review-meta-pills {
     display: flex;
+    flex-wrap: wrap; /* CRITICAL FIX: prevents horizontal overflow on mobile viewports */
     gap: 8px;
     margin-top: 10px;
 }
@@ -1295,6 +1401,12 @@ input:checked + .emp-slider:before {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 12px;
+}
+
+@media (max-width: 480px) {
+    .emp-perf-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .emp-perf-tile {
@@ -2854,4 +2966,79 @@ input:checked + .emp-slider:before {
         align-self: flex-start;
     }
 }
+
+/* ── Review Page Step Box Headers (Single-Line Integrity) ── */
+.emp-review-box-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 12px;
+    min-width: 0;
+}
+
+.emp-review-box-title-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+}
+
+.emp-review-box-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: #EEF2FF;
+    color: #4F48E6;
+    flex-shrink: 0 !important;
+}
+
+.emp-review-box-icon svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0 !important;
+}
+
+.emp-review-box-title {
+    font-size: clamp(11px, 2.7vw, 13.5px);
+    font-weight: 700;
+    color: #0F172A;
+    margin: 0;
+    white-space: nowrap !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.emp-review-box-badge {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748B;
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    padding: 2px 8px;
+    border-radius: 99px;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+@media (max-width: 480px) {
+    .emp-review-box-header {
+        gap: 6px;
+    }
+    .emp-review-box-title-group {
+        gap: 6px;
+    }
+    .emp-review-box-title {
+        font-size: 11.5px;
+    }
+    .emp-review-box-badge {
+        font-size: 10px;
+        padding: 1.5px 6px;
+    }
+}
+
 

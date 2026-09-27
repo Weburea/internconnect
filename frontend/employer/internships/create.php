@@ -10,11 +10,11 @@ declare(strict_types=1);
  * @var string $activeNav Active navigation key ('post')
  */
 
-$draftTitle          = $draft['title'] ?? 'Product Design Intern';
+$draftTitle          = $draft['title'] ?? '';
 $draftCategory       = $draft['category'] ?? 'Technology';
 $draftType           = $draft['internship_type'] ?? 'Remote';
-$draftLocation       = $draft['location'] ?? 'Remote';
-$draftAbout          = $draft['about'] ?? 'We are looking for a passionate Product Design Intern to join our remote team. You will work closely with our senior designers and product managers to create intuitive, beautiful, and functional interfaces for the InternConnect platform. This is an incredible opportunity to impact a product used by thousands of students and employers globally.';
+$draftLocation       = $draft['location'] ?? '';
+$draftAbout          = $draft['about'] ?? '';
 
 // Key Responsibilities: start with 1 clean single-line item by default with helpful placeholder
 $draftResponsibilitiesTitle = $draft['responsibilities_title'] ?? 'Key Responsibilities';
@@ -40,7 +40,7 @@ $draftBenefits              = !empty($draft['benefits']) && is_array($draft['ben
     ? $draft['benefits']
     : [''];
 
-$draftSkills         = $draft['skills'] ?? ['Figma', 'UI/UX Design', 'Wireframing', 'Prototyping', 'Design Systems'];
+$draftSkills         = $draft['skills'] ?? ['Figma', 'UI/UX Design'];
 $rawEdu              = $draft['education_level'] ?? 'Undergraduate';
 $draftEducationLevels = is_array($rawEdu) ? $rawEdu : array_values(array_filter(array_map('trim', explode(',', (string)$rawEdu))));
 if (empty($draftEducationLevels)) {
@@ -271,7 +271,7 @@ $draftQuestions      = !empty($draft['screening_questions']) && is_array($draft[
                                                id="field_location" 
                                                name="location" 
                                                class="emp-input-text" 
-                                               placeholder="City or Remote" 
+                                               placeholder="e.g., Lagos, Nigeria or Remote" 
                                                value="<?= htmlspecialchars($draftLocation) ?>">
                                     </div>
                                 </div>
@@ -475,15 +475,16 @@ $draftQuestions      = !empty($draft['screening_questions']) && is_array($draft[
                                     <!-- Stipend Amount -->
                                     <div>
                                         <label class="emp-field-label">Stipend Amount (Monthly)</label>
-                                        <div style="display: flex; align-items: center; border: 1px solid #E2E8F0; border-radius: 10px; overflow: hidden; background: #fff;" class="emp-field-group">
-                                            <span style="background: #F8FAFC; border-right: 1px solid #E2E8F0; padding: 11px 16px; font-weight: 700; color: #475569; font-size: 14px;">$</span>
+                                        <div class="emp-stipend-input-wrap emp-field-group" :class="{ 'emp-stipend-unpaid-active': isUnpaid }">
+                                            <span class="emp-stipend-prefix">$</span>
                                             <input type="text" 
                                                    name="stipend_amount" 
                                                    class="emp-input-text" 
                                                    :disabled="isUnpaid" 
-                                                   value="<?= htmlspecialchars($draftStipend) ?>" 
-                                                   placeholder="2000" 
-                                                   style="border: none; border-radius: 0;">
+                                                   :value="isUnpaid ? '0' : '<?= htmlspecialchars($draftStipend) ?>'" 
+                                                   :placeholder="isUnpaid ? 'No Fixed Fee (Unpaid / Volunteer)' : '2000'" 
+                                                   style="border: none; border-radius: 0; background: transparent; flex: 1;">
+                                            <span class="emp-unpaid-active-badge" x-show="isUnpaid" x-cloak>No Fixed Fee</span>
                                         </div>
 
                                         <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #475569; cursor: pointer; margin-top: 10px;">
@@ -1073,11 +1074,18 @@ $draftQuestions      = !empty($draft['screening_questions']) && is_array($draft[
                                                     <span style="color: #4F48E6; font-weight: 600;" x-text="exp.required ? 'Required' : 'Optional'"></span>
                                                 </div>
                                             </div>
-                                            <button type="button" class="emp-question-delete" @click="removeExperienceField(idx)" title="Remove field">
-                                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
-                                            </button>
+                                            <div class="emp-question-actions">
+                                                <button type="button" class="emp-question-edit" @click="editExperienceField(idx)" title="Edit field">
+                                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                    </svg>
+                                                </button>
+                                                <button type="button" class="emp-question-delete" @click="removeExperienceField(idx)" title="Remove field">
+                                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </div>
                                         </div>
                                     </template>
                                 </div>
@@ -1113,11 +1121,18 @@ $draftQuestions      = !empty($draft['screening_questions']) && is_array($draft[
                                                 <div class="emp-question-text" x-text="q.text"></div>
                                                 <div class="emp-question-type" x-text="q.type"></div>
                                             </div>
-                                            <button type="button" class="emp-question-delete" @click="removeQuestion(idx)" title="Remove question">
-                                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                </svg>
-                                            </button>
+                                            <div class="emp-question-actions">
+                                                <button type="button" class="emp-question-edit" @click="editQuestion(idx)" title="Edit question">
+                                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                    </svg>
+                                                </button>
+                                                <button type="button" class="emp-question-delete" @click="removeQuestion(idx)" title="Remove question">
+                                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </div>
                                         </div>
                                     </template>
                                 </div>
@@ -1172,7 +1187,7 @@ $draftQuestions      = !empty($draft['screening_questions']) && is_array($draft[
                                     </svg>
                                 </div>
                                 <div>
-                                    <h3 class="db-offer-modal-title" style="margin: 0; font-size: 19px;">Add Experience Field</h3>
+                                    <h3 class="db-offer-modal-title" style="margin: 0; font-size: 19px;" x-text="editingExpIndex !== null ? 'Edit Experience Field' : 'Add Experience Field'">Add Experience Field</h3>
                                     <p style="font-size: 13px; color: #64748B; margin: 3px 0 0 0;">Candidates will provide this in Step 1 of application.</p>
                                 </div>
                             </div>
@@ -1231,7 +1246,7 @@ $draftQuestions      = !empty($draft['screening_questions']) && is_array($draft[
                         <div class="db-offer-modal-actions" style="margin-top: 20px;">
                             <button type="button" class="db-offer-modal-btn-cancel" @click="showExperienceModal = false">Cancel</button>
                             <button type="button" class="db-offer-modal-btn-primary" @click="submitExperienceModal()" style="background-color: #4F48E6;">
-                                <span>Add Field</span>
+                                <span x-text="editingExpIndex !== null ? 'Save Changes' : 'Add Field'">Add Field</span>
                             </button>
                         </div>
                     </div>
@@ -1256,7 +1271,7 @@ $draftQuestions      = !empty($draft['screening_questions']) && is_array($draft[
                                     </svg>
                                 </div>
                                 <div>
-                                    <h3 class="db-offer-modal-title" style="margin: 0; font-size: 19px;">Add Screening Question</h3>
+                                    <h3 class="db-offer-modal-title" style="margin: 0; font-size: 19px;" x-text="editingQuestionIndex !== null ? 'Edit Screening Question' : 'Add Screening Question'">Add Screening Question</h3>
                                     <p style="font-size: 13px; color: #64748B; margin: 3px 0 0 0;">Candidates will be required to answer this during application.</p>
                                 </div>
                             </div>
@@ -1321,7 +1336,7 @@ $draftQuestions      = !empty($draft['screening_questions']) && is_array($draft[
                                     @click="submitQuestionModal()" 
                                     :disabled="wordCount(newQuestionText) > 15 || !newQuestionText.trim()"
                                     :style="(wordCount(newQuestionText) > 15 || !newQuestionText.trim()) ? 'opacity: 0.5; cursor: not-allowed; background-color: #94A3B8;' : 'background-color: #4F48E6;'">
-                                <span>Add Question</span>
+                                <span x-text="editingQuestionIndex !== null ? 'Save Changes' : 'Add Question'">Add Question</span>
                             </button>
                         </div>
                     </div>
@@ -1339,7 +1354,7 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('postInternshipForm', () => {
         const initialData = window.__postInternshipInitialData || {};
         return {
-            skills: Array.isArray(initialData.skills) ? initialData.skills : ['Figma', 'UI/UX Design', 'Wireframing', 'Prototyping', 'Design Systems'],
+            skills: Array.isArray(initialData.skills) && initialData.skills.length > 0 ? initialData.skills : ['Figma', 'UI/UX Design'],
             category: initialData.category || 'Technology',
             type: initialData.type || 'Remote',
             educationLevels: Array.isArray(initialData.educationLevels) 
@@ -1370,11 +1385,13 @@ document.addEventListener('alpine:init', () => {
 
             // Screening Question Modal state
             showQuestionModal: false,
+            editingQuestionIndex: null,
             newQuestionText: '',
             newQuestionType: 'Short Answer',
 
             // Relevant Experience Modal state
             showExperienceModal: false,
+            editingExpIndex: null,
             newExpLabel: '',
             newExpType: 'Text Input',
             newExpRequired: true,
@@ -1514,10 +1531,22 @@ document.addEventListener('alpine:init', () => {
 
             // Relevant Experience Modal Methods
             openExperienceModal() {
+                this.editingExpIndex = null;
                 this.newExpLabel = '';
                 this.newExpType = 'Text Input';
                 this.newExpRequired = true;
                 this.showExperienceModal = true;
+            },
+
+            editExperienceField(index) {
+                this.editingExpIndex = index;
+                const item = this.relevantExperience[index];
+                if (item) {
+                    this.newExpLabel = item.label || '';
+                    this.newExpType = item.type || 'Text Input';
+                    this.newExpRequired = Boolean(item.required);
+                    this.showExperienceModal = true;
+                }
             },
 
             submitExperienceModal() {
@@ -1525,14 +1554,23 @@ document.addEventListener('alpine:init', () => {
                     this.$dispatch('show-toast', { text: 'Please enter field title.', type: 'error' });
                     return;
                 }
-                this.relevantExperience.push({
-                    id: Date.now(),
-                    label: this.newExpLabel.trim(),
-                    type: this.newExpType,
-                    required: this.newExpRequired
-                });
-                this.showExperienceModal = false;
-                this.$dispatch('show-toast', { text: 'Experience field added successfully.', type: 'success' });
+                if (this.editingExpIndex !== null && this.relevantExperience[this.editingExpIndex]) {
+                    this.relevantExperience[this.editingExpIndex].label = this.newExpLabel.trim();
+                    this.relevantExperience[this.editingExpIndex].type = this.newExpType;
+                    this.relevantExperience[this.editingExpIndex].required = this.newExpRequired;
+                    this.showExperienceModal = false;
+                    this.editingExpIndex = null;
+                    this.$dispatch('show-toast', { text: 'Experience field updated successfully.', type: 'success' });
+                } else {
+                    this.relevantExperience.push({
+                        id: Date.now(),
+                        label: this.newExpLabel.trim(),
+                        type: this.newExpType,
+                        required: this.newExpRequired
+                    });
+                    this.showExperienceModal = false;
+                    this.$dispatch('show-toast', { text: 'Experience field added successfully.', type: 'success' });
+                }
             },
 
             removeExperienceField(index) {
@@ -1548,9 +1586,20 @@ document.addEventListener('alpine:init', () => {
             },
 
             openQuestionModal() {
+                this.editingQuestionIndex = null;
                 this.newQuestionText = '';
                 this.newQuestionType = 'Short Answer';
                 this.showQuestionModal = true;
+            },
+
+            editQuestion(index) {
+                this.editingQuestionIndex = index;
+                const item = this.questions[index];
+                if (item) {
+                    this.newQuestionText = item.text || item.question || '';
+                    this.newQuestionType = item.type || 'Short Answer';
+                    this.showQuestionModal = true;
+                }
             },
 
             submitQuestionModal() {
@@ -1563,13 +1612,21 @@ document.addEventListener('alpine:init', () => {
                     this.$dispatch('show-toast', { text: 'Question text cannot exceed 15 words.', type: 'error' });
                     return;
                 }
-                this.questions.push({
-                    id: Date.now(),
-                    text: trimmed,
-                    type: this.newQuestionType
-                });
-                this.showQuestionModal = false;
-                this.$dispatch('show-toast', { text: 'Screening question added successfully.', type: 'success' });
+                if (this.editingQuestionIndex !== null && this.questions[this.editingQuestionIndex]) {
+                    this.questions[this.editingQuestionIndex].text = trimmed;
+                    this.questions[this.editingQuestionIndex].type = this.newQuestionType;
+                    this.showQuestionModal = false;
+                    this.editingQuestionIndex = null;
+                    this.$dispatch('show-toast', { text: 'Screening question updated successfully.', type: 'success' });
+                } else {
+                    this.questions.push({
+                        id: Date.now(),
+                        text: trimmed,
+                        type: this.newQuestionType
+                    });
+                    this.showQuestionModal = false;
+                    this.$dispatch('show-toast', { text: 'Screening question added successfully.', type: 'success' });
+                }
             },
 
             removeQuestion(index) {

@@ -373,13 +373,13 @@ class EmployerController extends Controller
         ];
 
         $draft = $_SESSION['draft_internship'] ?? [
-            'title'             => 'Product Design Intern',
+            'title'             => '',
             'category'          => 'Technology',
             'internship_type'   => 'Remote',
-            'location'          => 'City or Remote',
-            'about'             => 'We are looking for a passionate Product Design Intern to join our remote team. You will work closely with our senior designers and product managers to create intuitive, beautiful, and functional interfaces for the InternConnect platform. This is an incredible opportunity to impact a product used by thousands of students and employers globally.',
+            'location'          => '',
+            'about'             => '',
             'what_you_will_do'  => [
-                'Collaborate with cross-functional teams to define, design, and new features.',
+                'Collaborate with cross-functional teams to define, design, and ship new features.',
                 'Create wireframes, storyboards, user flows, and site maps to effectively communicate interaction and design ideas.',
                 'Conduct user research and evaluate user feedback to enhance the platform\'s UX.'
             ],
@@ -400,7 +400,7 @@ class EmployerController extends Controller
             ],
             'benefits_title' => 'Program Benefits',
             'benefits' => [''],
-            'skills'            => ['Figma', 'UI/UX Design', 'Wireframing', 'Prototyping', 'Design Systems'],
+            'skills'            => ['Figma', 'UI/UX Design'],
             'education_level'   => 'Undergraduate',
             'experience_level'  => 'No Experience',
             'start_date'        => '2026-06-01',
@@ -412,7 +412,7 @@ class EmployerController extends Controller
             'deadline'          => '2026-05-15',
             'num_interns'       => 10,
             'allow_remote'      => true,
-            'interview_type'    => 'Video Interview (Google Meet)',
+            'interview_type'    => 'Video Interview (Online Meeting Link)',
             'screening_questions' => [
                 [
                     'id'    => 1,
