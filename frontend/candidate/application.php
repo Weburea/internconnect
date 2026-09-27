@@ -1,6 +1,14 @@
 <?php
 $extraCss = ['assets/css/application.css'];
 $oldInput = $oldInput ?? [];
+
+$screeningQuestions = !empty($internship['screening_questions']) && is_array($internship['screening_questions'])
+    ? $internship['screening_questions']
+    : [];
+
+$relevantExpFields = !empty($internship['relevant_experience']) && is_array($internship['relevant_experience'])
+    ? $internship['relevant_experience']
+    : [];
 ?>
 
 <script>
@@ -605,11 +613,11 @@ document.addEventListener('alpine:init', () => {
                                 <!-- Uploaded Files Box -->
                                 <div x-show="fileUploaded" class="mb-6">
                                     <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Uploaded File</p>
-                                    <div class="border border-gray-200 rounded-xl p-5 flex flex-col md:flex-row gap-5 items-start justify-between bg-[#F8FAFC] shadow-sm">
-                                        <div class="flex items-start gap-4 min-w-0 flex-1">
+                                    <div class="border border-gray-200 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row gap-4 sm:gap-5 items-start sm:items-center justify-between bg-[#F8FAFC] shadow-sm w-full box-border overflow-hidden">
+                                        <div class="flex items-center gap-3 sm:gap-4 min-w-0 flex-1 overflow-hidden">
                                             <!-- Visual file icon -->
-                                            <div class="h-14 w-11 bg-white border border-gray-300 rounded-lg shadow-sm flex-shrink-0 relative overflow-hidden flex flex-col p-1 justify-between">
-                                                <div class="absolute right-0 top-0 h-3.5 w-3.5 bg-red-500 text-white font-bold text-[6px] flex items-center justify-center rounded-bl uppercase">PDF</div>
+                                            <div class="h-12 w-10 sm:h-14 sm:w-11 bg-white border border-gray-300 rounded-lg shadow-sm flex-shrink-0 relative overflow-hidden flex flex-col p-1 justify-between">
+                                                <div class="absolute right-0 top-0 h-3.5 w-3.5 bg-red-500 text-white font-bold text-[6px] flex items-center justify-center rounded-bl uppercase" x-text="uploadedFileExt ? uploadedFileExt.toUpperCase() : 'PDF'">PDF</div>
                                                 <div class="space-y-1 mt-2.5">
                                                     <div class="h-[1.5px] bg-gray-300 w-full rounded"></div>
                                                     <div class="h-[1.5px] bg-gray-300 w-5/6 rounded"></div>
@@ -617,36 +625,43 @@ document.addEventListener('alpine:init', () => {
                                                 </div>
                                                 <div class="h-[1.5px] bg-primary w-1/2 rounded"></div>
                                             </div>
-                                            <div class="min-w-0 flex-1">
-                                                <p class="text-base font-bold text-primary-text mb-0.5 break-all" x-text="uploadedFileName"></p>
-                                                <p class="text-sm text-gray-500" x-text="uploadedFileSize + ' • Uploaded just now'"></p>
+                                            <div class="min-w-0 flex-1 overflow-hidden">
+                                                <p class="text-sm sm:text-base font-bold text-primary-text mb-0.5 truncate" :title="uploadedFileName" x-text="uploadedFileName"></p>
+                                                <p class="text-xs sm:text-sm text-gray-500" x-text="uploadedFileSize + ' • Uploaded just now'"></p>
                                                 <!-- Status badges -->
-                                                <div class="flex flex-wrap items-center gap-2 mt-2">
-                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-green-50 text-green-700 border border-green-200">Ready for review</span>
-                                                    <span class="text-[10px] text-gray-400">✓ Parsed by InternConnect AI</span>
+                                                <div class="flex flex-wrap items-center gap-2 mt-1.5">
+                                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200" style="white-space: nowrap !important; flex-shrink: 0 !important;">Ready for review</span>
+                                                    <span class="inline-flex items-center gap-1 text-[10px] text-gray-400" style="white-space: nowrap !important; flex-shrink: 0 !important;">
+                                                        <svg class="w-3 h-3 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                        </svg>
+                                                        Parsed by InternConnect AI
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
                                         
-                                         <!-- Actions -->
-                                         <div class="flex gap-2 w-full sm:w-auto justify-stretch sm:justify-end flex-shrink-0 mt-1 sm:mt-0">
-                                             <button type="button" @click="showPreviewModal = true"
-                                                     class="flex-1 sm:flex-none border border-gray-300 text-gray-700 hover:bg-gray-50 text-xs font-semibold py-2.5 sm:py-2 px-3 rounded-lg transition active:scale-95 flex items-center justify-center gap-1.5 shadow-sm">
-                                                 <svg class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                 </svg>
-                                                 <span style="white-space: nowrap;">View File</span>
-                                             </button>
-                                             <button type="button" @click="removeResume()"
-                                                     class="flex-1 sm:flex-none border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold py-2.5 sm:py-2 px-3 rounded-lg transition active:scale-95 flex items-center justify-center gap-1.5 shadow-sm">
-                                                 <svg class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                 </svg>
-                                                 <span style="white-space: nowrap;">Delete</span>
-                                             </button>
-                                         </div>
-                                     </div>
-                                 </div>
+                                        <!-- Actions -->
+                                        <div class="flex items-center gap-3 w-full sm:w-auto justify-end flex-shrink-0 mt-3 sm:mt-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-gray-200">
+                                            <button type="button" @click="showPreviewModal = true"
+                                                    class="flex-1 sm:flex-initial border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 text-xs font-semibold py-2.5 px-4 sm:px-4.5 rounded-lg transition active:scale-95 inline-flex items-center justify-center gap-2 shadow-sm"
+                                                    style="white-space: nowrap !important; flex-shrink: 0 !important;">
+                                                <svg class="h-4 w-4 flex-shrink-0 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zm6 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                <span>View File</span>
+                                            </button>
+                                            <button type="button" @click="removeResume()"
+                                                    class="flex-1 sm:flex-initial border border-red-200 bg-white text-red-600 hover:bg-red-50 text-xs font-semibold py-2.5 px-4 sm:px-4.5 rounded-lg transition active:scale-95 inline-flex items-center justify-center gap-2 shadow-sm"
+                                                    style="white-space: nowrap !important; flex-shrink: 0 !important;">
+                                                <svg class="h-4 w-4 flex-shrink-0 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                                <span>Delete</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
 
                                 <!-- Live Preview Panel inside page -->
                                 <div x-show="fileUploaded" class="mt-6 border border-gray-200 rounded-2xl bg-white p-4 sm:p-6 shadow-sm">
@@ -938,7 +953,12 @@ document.addEventListener('alpine:init', () => {
                                                 </div>
                                                 <div class="min-w-0 flex-1">
                                                     <p class="text-sm font-bold text-primary-text break-all" x-text="portfolioFileName"></p>
-                                                    <span class="text-[10px] font-semibold text-emerald-600">✓ Credential Attached</span>
+                                                    <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-600">
+                                                        <svg class="w-3 h-3 text-emerald-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                                        </svg>
+                                                        Credential Attached
+                                                    </span>
                                                 </div>
                                             </div>
                                             <button type="button" @click="removePortfolio()"
@@ -960,6 +980,51 @@ document.addEventListener('alpine:init', () => {
                                             <input type="text" name="figma_link" x-model="figmaLink" placeholder="https://www.figma.com/file/..."
                                                    class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white focus:border-transparent transition-colors text-gray-700 placeholder-gray-400 text-sm shadow-sm">
                                         </div>
+
+                                        <?php 
+                                        $customQuestions = array_filter($screeningQuestions ?? [], function($q) {
+                                            $def = ['Why are you interested in joining', 'Describe your proudest project', 'What are your primary learning goals', 'Attach NYSC credentials', 'Link for Portfolio', 'Figma Link'];
+                                            foreach ($def as $d) {
+                                                if (stripos($q['question'] ?? '', $d) !== false) return false;
+                                            }
+                                            return true;
+                                        });
+                                        ?>
+                                        <?php if (!empty($customQuestions)): ?>
+                                            <div class="mt-8 pt-6 border-t border-gray-100 space-y-6">
+                                                <h4 class="text-xs font-bold uppercase tracking-wider text-primary">Additional Questions from Employer</h4>
+                                                <?php foreach ($customQuestions as $cqIdx => $cq): ?>
+                                                    <div>
+                                                        <label class="block text-sm font-bold text-gray-900 mb-2">
+                                                            <?= htmlspecialchars($cq['question'] ?? '') ?>
+                                                            <?php if (!empty($cq['required'])): ?><span class="text-red-500">*</span><?php endif; ?>
+                                                        </label>
+                                                        <?php if (($cq['type'] ?? '') === 'long_answer'): ?>
+                                                            <textarea name="custom_q_<?= $cq['id'] ?? $cqIdx ?>" rows="3"
+                                                                      placeholder="<?= htmlspecialchars($cq['placeholder'] ?? 'Your answer...') ?>"
+                                                                      class="w-full px-5 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-gray-700 placeholder-gray-400 text-sm shadow-sm resize-none"></textarea>
+                                                        <?php elseif (($cq['type'] ?? '') === 'yes_no'): ?>
+                                                            <div class="flex items-center gap-4">
+                                                                <label class="inline-flex items-center gap-2 cursor-pointer text-sm font-semibold text-gray-700">
+                                                                    <input type="radio" name="custom_q_<?= $cq['id'] ?? $cqIdx ?>" value="yes" class="accent-primary"> Yes
+                                                                </label>
+                                                                <label class="inline-flex items-center gap-2 cursor-pointer text-sm font-semibold text-gray-700">
+                                                                    <input type="radio" name="custom_q_<?= $cq['id'] ?? $cqIdx ?>" value="no" class="accent-primary"> No
+                                                                </label>
+                                                            </div>
+                                                        <?php elseif (($cq['type'] ?? '') === 'link'): ?>
+                                                            <input type="url" name="custom_q_<?= $cq['id'] ?? $cqIdx ?>"
+                                                                   placeholder="<?= htmlspecialchars($cq['placeholder'] ?? 'https://...') ?>"
+                                                                   class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white text-gray-700 placeholder-gray-400 text-sm shadow-sm">
+                                                        <?php else: ?>
+                                                            <input type="text" name="custom_q_<?= $cq['id'] ?? $cqIdx ?>"
+                                                                   placeholder="<?= htmlspecialchars($cq['placeholder'] ?? 'Your answer...') ?>"
+                                                                   class="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-gray-700 placeholder-gray-400 text-sm shadow-sm">
+                                                        <?php endif; ?>
+                                                    </div>
+                                                <?php endforeach; ?>
+                                            </div>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
 
@@ -1084,8 +1149,10 @@ document.addEventListener('alpine:init', () => {
                                                     <p class="text-xs text-gray-400 font-bold uppercase tracking-wider mb-0.5">Resume / CV</p>
                                                     <p class="text-sm font-bold text-primary-text truncate" x-text="uploadedFileName"></p>
                                                 </div>
-                                                <div class="h-6 w-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0 text-xs font-bold shadow-sm">
-                                                    ✓
+                                                <div class="h-6 w-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0 shadow-sm">
+                                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                    </svg>
                                                 </div>
                                             </div>
 
@@ -1098,8 +1165,10 @@ document.addEventListener('alpine:init', () => {
                                                     <p class="text-xs text-gray-400 font-bold uppercase tracking-wider mb-0.5">NYSC Credentials</p>
                                                     <p class="text-sm font-bold text-primary-text truncate" x-text="portfolioFileName"></p>
                                                 </div>
-                                                <div class="h-6 w-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0 text-xs font-bold shadow-sm">
-                                                    ✓
+                                                <div class="h-6 w-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0 shadow-sm">
+                                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                    </svg>
                                                 </div>
                                             </div>
 
@@ -1114,8 +1183,10 @@ document.addEventListener('alpine:init', () => {
                                                     <p class="text-xs text-gray-400 font-bold uppercase tracking-wider mb-0.5">Portfolio Link</p>
                                                     <p class="text-sm font-bold text-primary-text truncate" x-text="portfolioLink"></p>
                                                 </div>
-                                                <div class="h-6 w-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0 text-xs font-bold shadow-sm">
-                                                    ✓
+                                                <div class="h-6 w-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0 shadow-sm">
+                                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                    </svg>
                                                 </div>
                                             </div>
 
@@ -1131,8 +1202,10 @@ document.addEventListener('alpine:init', () => {
                                                     <p class="text-xs text-gray-400 font-bold uppercase tracking-wider mb-0.5">Figma Link</p>
                                                     <p class="text-sm font-bold text-primary-text truncate" x-text="figmaLink"></p>
                                                 </div>
-                                                <div class="h-6 w-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0 text-xs font-bold shadow-sm">
-                                                    ✓
+                                                <div class="h-6 w-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center flex-shrink-0 shadow-sm">
+                                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                    </svg>
                                                 </div>
                                             </div>
                                         </div>

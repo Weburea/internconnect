@@ -144,6 +144,10 @@ class InternshipController extends Controller
 
     public function apply(array $params = []): void
     {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
         // Mock internship dataset for application view
         $internships = [
             'senior-product-design-intern' => [
@@ -162,6 +166,78 @@ class InternshipController extends Controller
 
         $slug = $params['slug'] ?? 'software-engineer-intern';
         $internship = $internships[$slug] ?? $internships['software-engineer-intern'];
+
+        $defaultRelevantExperience = [
+            ['id' => 1, 'title' => 'Job Title', 'type' => 'short_answer', 'placeholder' => 'Frontend Developer Intern', 'required' => true],
+            ['id' => 2, 'title' => 'Company', 'type' => 'short_answer', 'placeholder' => 'TechLabs Nigeria', 'required' => true],
+            ['id' => 3, 'title' => 'Salary Expectation ($/month)', 'type' => 'short_answer', 'placeholder' => '2,500', 'required' => true]
+        ];
+
+        $defaultScreeningQuestions = [
+            [
+                'id' => 1,
+                'question' => 'Why are you interested in joining ' . ($internship['company'] ?? 'Nexora') . ' specifically?',
+                'type' => 'long_answer',
+                'type_label' => 'Long Answer',
+                'placeholder' => "Share your motivation and how your values align with " . ($internship['company'] ?? 'Nexora') . "'s mission...",
+                'max_words' => 500,
+                'required' => true
+            ],
+            [
+                'id' => 2,
+                'question' => 'Describe your proudest project or process.',
+                'type' => 'long_answer',
+                'type_label' => 'Long Answer',
+                'placeholder' => 'What problem did you solve? What was your specific impact?',
+                'max_words' => 500,
+                'required' => true
+            ],
+            [
+                'id' => 3,
+                'question' => 'What are your primary learning goals for this internship?',
+                'type' => 'long_answer',
+                'type_label' => 'Long Answer',
+                'placeholder' => 'What skills or knowledge do you hope to acquire?',
+                'max_words' => 300,
+                'required' => true
+            ],
+            [
+                'id' => 4,
+                'question' => 'Attach NYSC credentials (optional)',
+                'type' => 'file_upload',
+                'type_label' => 'File Upload (Portfolio / Document)',
+                'file_hint' => 'PDF, PNG or JPG · Max 10MB',
+                'required' => false
+            ],
+            [
+                'id' => 5,
+                'question' => 'Link for Portfolio',
+                'type' => 'link',
+                'type_label' => 'Link / URL',
+                'placeholder' => 'https://myportfolio.com',
+                'required' => false
+            ],
+            [
+                'id' => 6,
+                'question' => 'Figma Link',
+                'type' => 'link',
+                'type_label' => 'Link / URL',
+                'placeholder' => 'https://www.figma.com/file/...',
+                'required' => false
+            ]
+        ];
+
+        if (!empty($_SESSION['draft_internship']['relevant_experience'])) {
+            $internship['relevant_experience'] = $_SESSION['draft_internship']['relevant_experience'];
+        } else {
+            $internship['relevant_experience'] = $defaultRelevantExperience;
+        }
+
+        if (!empty($_SESSION['draft_internship']['screening_questions'])) {
+            $internship['screening_questions'] = $_SESSION['draft_internship']['screening_questions'];
+        } else {
+            $internship['screening_questions'] = $defaultScreeningQuestions;
+        }
 
         $this->renderView('candidate/application', [
             'title'      => 'Apply to ' . $internship['company'] . ' — InternConnect',

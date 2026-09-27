@@ -546,11 +546,13 @@
 }
 
 .emp-richtext-editor p {
-    margin: 0 0 12px 0;
+    margin: 0 0 14px 0 !important;
+    min-height: 1.2em;
+    line-height: 1.7;
 }
 
 .emp-richtext-editor p:last-child {
-    margin-bottom: 0;
+    margin-bottom: 0 !important;
 }
 
 .emp-richtext-editor:empty:before {
@@ -2437,47 +2439,39 @@ input:checked + .emp-slider:before {
     flex-shrink: 0 !important;
 }
 
-/* ── "What We're Looking For" 4 Qualification Cards Builder ── */
-.emp-qual-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-}
-
-@media (max-width: 640px) {
-    .emp-qual-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-.emp-qual-card {
-    background: #FFFFFF;
-    border: 1px solid #E2E8F0;
-    border-radius: 14px;
-    padding: 16px;
+/* ── "What We're Looking For" Single-Line Qualification Cards Builder ── */
+.emp-qual-list {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    transition: all 0.2s ease;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
 }
 
-.emp-qual-card:hover {
-    border-color: #CBD5E1;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
-}
-
-.emp-qual-header {
+.emp-qual-row {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 10px 14px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 8px;
+    gap: 12px;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+.emp-qual-row:focus-within {
+    border-color: #4F48E6;
+    box-shadow: 0 0 0 3px rgba(79, 72, 230, 0.08);
+}
+
+.emp-qual-icon-picker {
+    position: relative;
+    flex-shrink: 0 !important;
 }
 
 .emp-qual-icon-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
     background: #EEF2FF;
     border: 1px solid #C7D2FE;
     color: #4F48E6;
@@ -2487,6 +2481,18 @@ input:checked + .emp-slider:before {
     cursor: pointer;
     transition: all 0.15s ease;
     flex-shrink: 0 !important;
+    animation: empIconHintPulse 3s infinite ease-in-out;
+}
+
+@keyframes empIconHintPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 0 rgba(79, 72, 230, 0.4);
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 0 0 6px rgba(79, 72, 230, 0);
+        transform: scale(1.05);
+    }
 }
 
 .emp-qual-icon-btn:hover {
@@ -2494,12 +2500,8 @@ input:checked + .emp-slider:before {
 }
 
 .emp-qual-icon-btn svg {
-    width: 18px;
-    height: 18px;
-}
-
-.emp-qual-icon-picker {
-    position: relative;
+    width: 16px;
+    height: 16px;
 }
 
 .emp-qual-icon-menu {
@@ -2508,14 +2510,15 @@ input:checked + .emp-slider:before {
     left: 0;
     background: #FFFFFF;
     border: 1px solid #E2E8F0;
-    border-radius: 12px;
-    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
-    padding: 8px;
+    border-radius: 14px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.15);
+    padding: 10px;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 6px;
-    z-index: 50;
-    width: 140px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    z-index: 60;
+    width: 230px;
+    max-width: 90vw;
 }
 
 .emp-qual-icon-opt {
@@ -2549,6 +2552,8 @@ input:checked + .emp-slider:before {
 }
 
 .emp-qual-title-input {
+    width: 210px;
+    flex-shrink: 0;
     font-size: 13.5px;
     font-weight: 700;
     color: #0F172A;
@@ -2557,7 +2562,6 @@ input:checked + .emp-slider:before {
     border-radius: 8px;
     padding: 8px 12px;
     outline: none;
-    width: 100%;
     box-sizing: border-box;
     transition: all 0.15s ease;
 }
@@ -2569,7 +2573,9 @@ input:checked + .emp-slider:before {
 }
 
 .emp-qual-desc-input {
-    font-size: 12.5px;
+    flex: 1;
+    min-width: 0;
+    font-size: 13px;
     color: #475569;
     line-height: 1.5;
     background: #F8FAFC;
@@ -2577,10 +2583,7 @@ input:checked + .emp-slider:before {
     border-radius: 8px;
     padding: 8px 12px;
     outline: none;
-    resize: vertical;
-    min-height: 60px;
     font-family: inherit;
-    width: 100%;
     box-sizing: border-box;
     transition: all 0.15s ease;
 }
@@ -2589,6 +2592,24 @@ input:checked + .emp-slider:before {
     border-color: #4F48E6;
     background: #FFFFFF;
     box-shadow: 0 0 0 2px rgba(79, 72, 230, 0.1);
+}
+
+@media (max-width: 768px) {
+    .emp-qual-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    .emp-qual-row-top {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%;
+    }
+    .emp-qual-title-input {
+        width: 100%;
+        flex: 1;
+    }
 }
 
 /* ── Review Page Preview Alignment ── */
@@ -2601,48 +2622,59 @@ input:checked + .emp-slider:before {
 }
 
 .emp-review-qual-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     margin-top: 14px;
-}
-
-@media (max-width: 640px) {
-    .emp-review-qual-grid {
-        grid-template-columns: 1fr;
-    }
 }
 
 .emp-review-qual-card {
     background: #FFFFFF;
     border: 1px solid #E2E8F0;
-    border-radius: 14px;
-    padding: 18px;
+    border-radius: 12px;
+    padding: 12px 16px;
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
+@media (max-width: 640px) {
+    .emp-review-qual-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+}
+
 .emp-review-qual-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
     background: #EEF2FF;
     color: #4F48E6;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 4px;
+    flex-shrink: 0;
 }
 
 .emp-review-qual-icon svg {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
+}
+
+.emp-review-qual-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    flex: 1;
 }
 
 .emp-review-qual-title {
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 700;
     color: #0F172A;
     margin: 0;
@@ -2676,5 +2708,150 @@ input:checked + .emp-slider:before {
 .emp-review-benefit-icon svg {
     width: 14px;
     height: 14px;
+}
+
+/* ── Section Header Information Icon (i) & Popover (Key Responsibilities, Looking For, Benefits) ── */
+.emp-card-info-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0 !important;
+    margin-left: auto;
+}
+
+.emp-card-info-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #EEF2FF;
+    border: 1px solid #C7D2FE;
+    color: #4F48E6;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    padding: 0;
+    flex-shrink: 0 !important;
+}
+
+.emp-card-info-btn:hover {
+    background: #E0E7FF;
+    color: #3730A3;
+    border-color: #A5B4FC;
+    transform: scale(1.06);
+}
+
+.emp-card-info-btn svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0 !important;
+}
+
+.emp-card-info-popover {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 280px;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 14px 16px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    z-index: 50;
+    text-align: left;
+}
+
+.emp-card-info-popover-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #0F172A;
+    margin-bottom: 4px;
+}
+
+.emp-card-info-popover-text {
+    font-size: 12px;
+    color: #64748B;
+    line-height: 1.45;
+    margin: 0;
+}
+
+/* ── Review Page Experience & Questions Responsive Cards ── */
+.emp-review-experience-box {
+    margin-top: 26px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    padding: 18px 20px;
+}
+
+.emp-review-question-box {
+    margin-top: 20px;
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 14px;
+    padding: 18px 20px;
+}
+
+.emp-review-item-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 9px 14px;
+    gap: 12px;
+}
+
+.emp-review-item-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+}
+
+.emp-review-item-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1E293B;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.emp-review-item-badge {
+    font-size: 11px;
+    font-weight: 600;
+    color: #4F48E6;
+    background: #EEF2FF;
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+.emp-review-item-pill {
+    font-size: 11px;
+    color: #64748B;
+    background: #F1F5F9;
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+
+@media (max-width: 640px) {
+    .emp-review-item-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        padding: 10px 12px;
+    }
+    .emp-review-item-badge,
+    .emp-review-item-pill {
+        align-self: flex-start;
+    }
 }
 

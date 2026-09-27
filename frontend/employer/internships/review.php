@@ -62,6 +62,14 @@ $benefits              = !empty($draft['benefits']) && is_array($draft['benefits
         'Return Offer Potential'
     ];
 
+$category         = $draft['category'] ?? 'Technology';
+$openings         = $draft['openings'] ?? 10;
+$rawEdu           = $draft['education_level'] ?? 'Undergraduate';
+$educationLevelsList = is_array($rawEdu) ? $rawEdu : array_values(array_filter(array_map('trim', explode(',', (string)$rawEdu))));
+if (empty($educationLevelsList)) {
+    $educationLevelsList = ['Undergraduate'];
+}
+
 $skills           = !empty($draft['skills']) && is_array($draft['skills'])
     ? $draft['skills']
     : ['Figma', 'Prototyping', 'User Research', 'UI Design'];
@@ -71,6 +79,21 @@ if (!empty($draft['is_unpaid'])) {
     $stipendAmount = 'Unpaid';
 }
 $deadline         = !empty($draft['deadline']) ? date('M j, Y', strtotime($draft['deadline'])) : 'May 15, 2026';
+
+$relevantExperience = !empty($draft['relevant_experience']) && is_array($draft['relevant_experience'])
+    ? $draft['relevant_experience']
+    : [
+        ['id' => 1, 'title' => 'Job Title', 'type' => 'short_answer', 'placeholder' => 'Frontend Developer Intern', 'required' => true],
+        ['id' => 2, 'title' => 'Company', 'type' => 'short_answer', 'placeholder' => 'TechLabs Nigeria', 'required' => true],
+        ['id' => 3, 'title' => 'Salary Expectation ($/month)', 'type' => 'short_answer', 'placeholder' => '2,500', 'required' => true]
+    ];
+
+$screeningQuestions = !empty($draft['screening_questions']) && is_array($draft['screening_questions'])
+    ? $draft['screening_questions']
+    : [
+        ['id' => 1, 'question' => 'Why are you interested in joining this specific internship role?', 'type' => 'short_answer', 'type_label' => 'Short Answer', 'required' => true],
+        ['id' => 2, 'question' => 'Share a link to your portfolio or GitHub profile.', 'type' => 'link', 'type_label' => 'Link / URL', 'required' => false]
+    ];
 
 if (!function_exists('renderQualIcon')) {
     function renderQualIcon(string $type): string
@@ -85,7 +108,16 @@ if (!function_exists('renderQualIcon')) {
             'target'        => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
             'detail'        => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
             'sparkles'      => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>',
-            'light-bulb'    => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>'
+            'light-bulb'    => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>',
+            'briefcase'     => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>',
+            'rocket'        => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.59 14.37a6 6 0 01-5.84 7.38v-4.8m5.84-2.58a14.98 14.98 0 006.16-12.12A14.98 14.98 0 009.63 8.41m5.96 5.96a14.926 14.926 0 01-5.841 2.58m-.119-7.38a6 6 0 00-7.38 5.84h4.8m2.58-5.84a14.927 14.927 0 00-2.58 5.84m2.699-2.58a3 3 0 114.243-4.243 3 3 0 01-4.243 4.243z"/></svg>',
+            'award'         => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>',
+            'chart'         => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>',
+            'laptop'        => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>',
+            'shield'        => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>',
+            'clock'         => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+            'book'          => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>',
+            'palette'       => '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>'
         ];
         return $icons[$type] ?? $icons['target'];
     }
@@ -159,7 +191,9 @@ if (!function_exists('renderQualIcon')) {
                                         </span>
                                     </div>
                                     <div class="emp-review-meta-pills">
+                                        <span class="emp-meta-pill"><?= htmlspecialchars($category) ?></span>
                                         <span class="emp-meta-pill"><?= htmlspecialchars($type) ?></span>
+                                        <span class="emp-meta-pill"><?= htmlspecialchars((string)$openings) ?> <?= (int)$openings === 1 ? 'Opening' : 'Openings' ?></span>
                                         <span class="emp-meta-pill">Paid (<?= htmlspecialchars($stipendAmount) ?>)</span>
                                     </div>
                                 </div>
@@ -196,7 +230,7 @@ if (!function_exists('renderQualIcon')) {
                                 </ul>
                             </div>
 
-                            <!-- What We're Looking For (2x2 Grid Matching Detail Page) -->
+                            <!-- What We're Looking For (Single-line cards) -->
                             <div style="margin-top: 24px;">
                                 <h3 class="emp-review-section-title" style="margin-bottom: 14px;"><?= htmlspecialchars($lookingForTitle) ?></h3>
                                 <div class="emp-review-qual-grid">
@@ -205,8 +239,12 @@ if (!function_exists('renderQualIcon')) {
                                             <div class="emp-review-qual-icon">
                                                 <?= renderQualIcon($card['icon'] ?? 'target') ?>
                                             </div>
-                                            <h4 class="emp-review-qual-title"><?= htmlspecialchars($card['title'] ?? '') ?></h4>
-                                            <p class="emp-review-qual-desc"><?= htmlspecialchars($card['desc'] ?? '') ?></p>
+                                            <div class="emp-review-qual-info">
+                                                <h4 class="emp-review-qual-title"><?= htmlspecialchars($card['title'] ?? '') ?></h4>
+                                                <?php if (!empty($card['desc'])): ?>
+                                                    <p class="emp-review-qual-desc"><?= htmlspecialchars($card['desc']) ?></p>
+                                                <?php endif; ?>
+                                            </div>
                                         </div>
                                     <?php endforeach; ?>
                                 </div>
@@ -219,6 +257,18 @@ if (!function_exists('renderQualIcon')) {
                                     <?php foreach ($skills as $skill): ?>
                                         <span style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; padding: 6px 14px; font-size: 12.5px; font-weight: 600; color: #1E293B; box-shadow: 0 1px 2px rgba(0,0,0,0.03); white-space: nowrap !important; flex-shrink: 0 !important;">
                                             <?= htmlspecialchars($skill) ?>
+                                        </span>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+
+                            <!-- Target Education Level -->
+                            <div style="margin-top: 18px;">
+                                <h4 style="font-size: 12px; font-weight: 700; color: #64748B; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.05em;">Target Education Level</h4>
+                                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                    <?php foreach ($educationLevelsList as $eduItem): ?>
+                                        <span style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 99px; padding: 5px 14px; font-size: 12px; font-weight: 600; color: #334155; box-shadow: 0 1px 2px rgba(0,0,0,0.03); white-space: nowrap !important; flex-shrink: 0 !important;">
+                                            <?= htmlspecialchars($eduItem) ?>
                                         </span>
                                     <?php endforeach; ?>
                                 </div>
@@ -251,6 +301,84 @@ if (!function_exists('renderQualIcon')) {
                                     </p>
                                 </div>
                             </div>
+
+                            <!-- Relevant Experience Fields Preview -->
+                            <?php if (!empty($relevantExperience)): ?>
+                                <div class="emp-review-experience-box">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; background: #EEF2FF; color: #4F48E6;">
+                                                <svg style="width: 15px; height: 15px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                                </svg>
+                                            </span>
+                                            <h4 style="font-size: 13.5px; font-weight: 700; color: #0F172A; margin: 0;">Candidate Experience Required (Step 1)</h4>
+                                        </div>
+                                        <span style="font-size: 11.5px; font-weight: 600; color: #64748B; background: #FFFFFF; border: 1px solid #CBD5E1; padding: 2px 8px; border-radius: 99px;">
+                                            <?= count($relevantExperience) ?> fields
+                                        </span>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <?php foreach ($relevantExperience as $idx => $field): ?>
+                                            <?php 
+                                                $rawTitle = $field['title'] ?? $field['label'] ?? ('Field ' . ($idx + 1));
+                                                $cleanTitle = preg_replace('/^\d+\.\s*/', '', (string)$rawTitle);
+                                                $fieldBadge = $field['type'] ?? $field['placeholder'] ?? 'Text Input';
+                                            ?>
+                                            <div class="emp-review-item-row">
+                                                <div class="emp-review-item-left">
+                                                    <span style="font-size: 11.5px; font-weight: 700; color: #4F48E6; flex-shrink: 0;"><?= ($idx + 1) ?>.</span>
+                                                    <span class="emp-review-item-title"><?= htmlspecialchars($cleanTitle) ?></span>
+                                                    <?php if (!empty($field['required'])): ?>
+                                                        <span style="color: #EF4444; font-size: 12px; font-weight: 700; flex-shrink: 0;" title="Required">*</span>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <span class="emp-review-item-pill">
+                                                    <?= htmlspecialchars($fieldBadge) ?>
+                                                </span>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Screening Questions Preview -->
+                            <?php if (!empty($screeningQuestions)): ?>
+                                <div class="emp-review-question-box">
+                                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                        <div style="display: flex; align-items: center; gap: 8px;">
+                                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; background: #EEF2FF; color: #4F48E6;">
+                                                <svg style="width: 15px; height: 15px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </span>
+                                            <h4 style="font-size: 13.5px; font-weight: 700; color: #0F172A; margin: 0;">Screening Questions (Step 3)</h4>
+                                        </div>
+                                        <span style="font-size: 11.5px; font-weight: 600; color: #64748B; background: #FFFFFF; border: 1px solid #CBD5E1; padding: 2px 8px; border-radius: 99px;">
+                                            <?= count($screeningQuestions) ?> questions
+                                        </span>
+                                    </div>
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <?php foreach ($screeningQuestions as $qIdx => $sq): ?>
+                                            <?php 
+                                                $questionText = $sq['question'] ?? $sq['text'] ?? ('Question ' . ($qIdx + 1));
+                                                $questionType = $sq['type_label'] ?? $sq['type'] ?? 'Short Answer';
+                                            ?>
+                                            <div class="emp-review-item-row">
+                                                <div class="emp-review-item-left">
+                                                    <span style="font-size: 11.5px; font-weight: 700; color: #4F48E6; flex-shrink: 0; margin-top: 1px;">Q<?= ($qIdx + 1) ?>.</span>
+                                                    <span class="emp-review-item-title" title="<?= htmlspecialchars($questionText) ?>">
+                                                        <?= htmlspecialchars($questionText) ?>
+                                                    </span>
+                                                </div>
+                                                <span class="emp-review-item-badge">
+                                                    <?= htmlspecialchars($questionType) ?>
+                                                </span>
+                                            </div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
 
                             <!-- Smart Tip Callout Banner -->
                             <div class="emp-tip-callout">
@@ -311,18 +439,18 @@ if (!function_exists('renderQualIcon')) {
                         </div>
 
                         <!-- ── Card 2: Expected Performance ── -->
-                        <div class="emp-form-card">
+                        <div class="emp-optimization-card" style="margin-bottom: 20px;">
                             <h3 class="emp-card-title" style="margin-bottom: 16px;">Expected Performance</h3>
 
                             <div class="emp-perf-grid">
                                 <!-- Applicants Tile -->
-                                <div class="emp-perf-tile">
+                                <div class="emp-perf-tile" style="background: #FFFFFF; border-color: #DBEAFE;">
                                     <div class="emp-perf-num">120+</div>
                                     <div class="emp-perf-sub">Expected Applicants</div>
                                 </div>
 
                                 <!-- Visibility Tile -->
-                                <div class="emp-perf-tile">
+                                <div class="emp-perf-tile" style="background: #FFFFFF; border-color: #DBEAFE;">
                                     <div class="emp-perf-num">
                                         <svg style="width: 20px; height: 20px; color: #4F48E6;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -336,7 +464,7 @@ if (!function_exists('renderQualIcon')) {
                         </div>
 
                         <!-- ── Card 3: Target Audience Match ── -->
-                        <div class="emp-form-card">
+                        <div class="emp-optimization-card" style="margin-bottom: 20px;">
                             <h3 class="emp-card-title" style="margin-bottom: 16px;">Target Audience Match</h3>
 
                             <div style="margin-bottom: 14px;">
@@ -349,9 +477,9 @@ if (!function_exists('renderQualIcon')) {
                             <div>
                                 <span style="font-size: 11.5px; font-weight: 600; color: #64748B; text-transform: uppercase; letter-spacing: 0.05em;">Top Matching Skills Detected</span>
                                 <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
-                                    <span style="background: #EEF2FF; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 600; color: #4F48E6; white-space: nowrap !important; flex-shrink: 0 !important;">Figma</span>
-                                    <span style="background: #EEF2FF; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 600; color: #4F48E6; white-space: nowrap !important; flex-shrink: 0 !important;">Research</span>
-                                    <span style="background: #EEF2FF; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 600; color: #4F48E6; white-space: nowrap !important; flex-shrink: 0 !important;">Prototyping</span>
+                                    <span style="background: #FFFFFF; border: 1px solid #DBEAFE; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 600; color: #4F48E6; white-space: nowrap !important; flex-shrink: 0 !important;">Figma</span>
+                                    <span style="background: #FFFFFF; border: 1px solid #DBEAFE; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 600; color: #4F48E6; white-space: nowrap !important; flex-shrink: 0 !important;">Research</span>
+                                    <span style="background: #FFFFFF; border: 1px solid #DBEAFE; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 600; color: #4F48E6; white-space: nowrap !important; flex-shrink: 0 !important;">Prototyping</span>
                                 </div>
                             </div>
                         </div>

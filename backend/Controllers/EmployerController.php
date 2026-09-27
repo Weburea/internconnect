@@ -389,42 +389,17 @@ class EmployerController extends Controller
                 'Clear communication and eagerness to learn from senior mentors in a fast-paced environment.'
             ],
             'responsibilities_title' => 'Key Responsibilities',
-            'responsibilities' => [
-                'Collaborate with cross-functional teams to define, design, and ship new features.',
-                'Create wireframes, storyboards, user flows, and site maps to effectively communicate interaction ideas.',
-                'Conduct user research and evaluate candidate/student feedback to enhance the platform experience.',
-                'Participate in design critiques and mentor peer contributors in a fast-paced environment.'
-            ],
+            'responsibilities' => [''],
             'looking_for_title' => "What We're Looking For",
             'looking_for_cards' => [
                 [
-                    'icon' => 'academic-cap',
-                    'title' => 'Design / CS Background',
-                    'desc' => 'Pursuing or completed a degree in Design, Computer Science, Human-Computer Interaction, or related field.'
-                ],
-                [
-                    'icon' => 'code',
-                    'title' => 'Prototyping Skills',
-                    'desc' => 'Proficiency with modern design and prototyping tools such as Figma, FigJam, or Adobe XD.'
-                ],
-                [
-                    'icon' => 'users',
-                    'title' => 'Team Player',
-                    'desc' => 'Comfortable working in collaborative sprints and communicating blockers proactively.'
-                ],
-                [
-                    'icon' => 'target',
-                    'title' => 'Problem Solver',
-                    'desc' => 'Strong analytical mindset with a passion for crafting intuitive digital experiences.'
-                ],
+                    'icon'  => 'target',
+                    'title' => '',
+                    'desc'  => ''
+                ]
             ],
             'benefits_title' => 'Program Benefits',
-            'benefits' => [
-                'Competitive Stipend',
-                'Remote-first Culture',
-                'Learning & Development Budget',
-                'Return Offer Potential'
-            ],
+            'benefits' => [''],
             'skills'            => ['Figma', 'UI/UX Design', 'Wireframing', 'Prototyping', 'Design Systems'],
             'education_level'   => 'Undergraduate',
             'experience_level'  => 'No Experience',
@@ -490,25 +465,61 @@ class EmployerController extends Controller
                     $screeningQuestions = $decoded;
                 }
             }
+            if (empty($screeningQuestions)) {
+                $screeningQuestions = [
+                    ['id' => 1, 'question' => 'Why are you interested in this specific internship role?', 'text' => 'Why are you interested in this specific internship role?', 'type' => 'Short Answer', 'type_label' => 'Short Answer'],
+                    ['id' => 2, 'question' => 'Share a link to your portfolio or GitHub profile.', 'text' => 'Share a link to your portfolio or GitHub profile.', 'type' => 'Link / URL', 'type_label' => 'Link / URL'],
+                ];
+            } else {
+                foreach ($screeningQuestions as &$sq) {
+                    $txt = $sq['question'] ?? $sq['text'] ?? '';
+                    $sq['question'] = $txt;
+                    $sq['text'] = $txt;
+                    $typ = $sq['type_label'] ?? $sq['type'] ?? 'Short Answer';
+                    $sq['type'] = $typ;
+                    $sq['type_label'] = $typ;
+                }
+                unset($sq);
+            }
+
+            $relevantExperience = [];
+            if (!empty($_POST['relevant_experience'])) {
+                $decoded = json_decode($_POST['relevant_experience'], true);
+                if (is_array($decoded)) {
+                    $relevantExperience = $decoded;
+                }
+            }
+            if (empty($relevantExperience)) {
+                $relevantExperience = [
+                    ['id' => 1, 'label' => '1. Job Title', 'title' => 'Job Title', 'type' => 'Text Input', 'placeholder' => 'Text Input', 'required' => true],
+                    ['id' => 2, 'label' => '2. Company', 'title' => 'Company', 'type' => 'Text Input', 'placeholder' => 'Text Input', 'required' => true],
+                    ['id' => 3, 'label' => '3. Salary Expectation ($/month)', 'title' => 'Salary Expectation ($/month)', 'type' => 'Currency / Number', 'placeholder' => 'Currency / Number', 'required' => true],
+                ];
+            } else {
+                foreach ($relevantExperience as &$item) {
+                    if (empty($item['title']) && !empty($item['label'])) {
+                        $item['title'] = preg_replace('/^\d+\.\s*/', '', (string)$item['label']);
+                    }
+                    if (empty($item['placeholder'])) {
+                        $item['placeholder'] = $item['type'] ?? 'Input';
+                    }
+                }
+                unset($item);
+            }
 
             $responsibilities = [];
-            if (!empty($_POST['responsibilities'])) {
+            if (isset($_POST['responsibilities'])) {
                 $decoded = json_decode($_POST['responsibilities'], true);
                 if (is_array($decoded)) {
-                    $responsibilities = array_values(array_filter(array_map('trim', $decoded)));
+                    $responsibilities = $decoded;
                 }
             }
             if (empty($responsibilities)) {
-                $responsibilities = [
-                    'Collaborate with cross-functional teams to define, design, and ship new features.',
-                    'Create wireframes, storyboards, user flows, and site maps to effectively communicate interaction ideas.',
-                    'Conduct user research and evaluate candidate/student feedback to enhance the platform experience.',
-                    'Participate in design critiques and mentor peer contributors in a fast-paced environment.'
-                ];
+                $responsibilities = [''];
             }
 
             $lookingForCards = [];
-            if (!empty($_POST['looking_for_cards'])) {
+            if (isset($_POST['looking_for_cards'])) {
                 $decoded = json_decode($_POST['looking_for_cards'], true);
                 if (is_array($decoded)) {
                     $lookingForCards = $decoded;
@@ -517,42 +528,22 @@ class EmployerController extends Controller
             if (empty($lookingForCards)) {
                 $lookingForCards = [
                     [
-                        'icon' => 'academic-cap',
-                        'title' => 'Design / CS Background',
-                        'desc' => 'Pursuing or completed a degree in Design, Computer Science, Human-Computer Interaction, or related field.'
-                    ],
-                    [
-                        'icon' => 'code',
-                        'title' => 'Prototyping Skills',
-                        'desc' => 'Proficiency with modern design and prototyping tools such as Figma, FigJam, or Adobe XD.'
-                    ],
-                    [
-                        'icon' => 'users',
-                        'title' => 'Team Player',
-                        'desc' => 'Comfortable working in collaborative sprints and communicating blockers proactively.'
-                    ],
-                    [
-                        'icon' => 'target',
-                        'title' => 'Problem Solver',
-                        'desc' => 'Strong analytical mindset with a passion for crafting intuitive digital experiences.'
-                    ],
+                        'icon'  => 'target',
+                        'title' => '',
+                        'desc'  => ''
+                    ]
                 ];
             }
 
             $benefits = [];
-            if (!empty($_POST['benefits'])) {
+            if (isset($_POST['benefits'])) {
                 $decoded = json_decode($_POST['benefits'], true);
                 if (is_array($decoded)) {
-                    $benefits = array_values(array_filter(array_map('trim', $decoded)));
+                    $benefits = $decoded;
                 }
             }
             if (empty($benefits)) {
-                $benefits = [
-                    'Competitive Stipend',
-                    'Remote-first Culture',
-                    'Learning & Development Budget',
-                    'Return Offer Potential'
-                ];
+                $benefits = [''];
             }
 
             $_SESSION['draft_internship'] = [
@@ -582,6 +573,7 @@ class EmployerController extends Controller
                 'num_interns'           => (int)($_POST['num_interns'] ?? 10),
                 'allow_remote'          => isset($_POST['allow_remote']),
                 'interview_type'        => trim($_POST['interview_type'] ?? 'Video Interview (Google Meet)'),
+                'relevant_experience'   => $relevantExperience,
                 'screening_questions'   => $screeningQuestions,
             ];
 
@@ -671,6 +663,15 @@ class EmployerController extends Controller
             'stipend_amount'        => '2,000',
             'is_unpaid'             => false,
             'deadline'              => '2026-05-15',
+            'relevant_experience'   => [
+                ['id' => 1, 'title' => 'Job Title', 'type' => 'short_answer', 'placeholder' => 'Frontend Developer Intern', 'required' => true],
+                ['id' => 2, 'title' => 'Company', 'type' => 'short_answer', 'placeholder' => 'TechLabs Nigeria', 'required' => true],
+                ['id' => 3, 'title' => 'Salary Expectation ($/month)', 'type' => 'short_answer', 'placeholder' => '2,500', 'required' => true]
+            ],
+            'screening_questions'   => [
+                ['id' => 1, 'question' => 'Why are you interested in joining this specific internship role?', 'type' => 'short_answer', 'placeholder' => 'Short Answer', 'required' => true],
+                ['id' => 2, 'question' => 'Share a link to your portfolio or GitHub profile.', 'type' => 'link', 'placeholder' => 'https://...', 'required' => false]
+            ],
         ];
 
         $this->renderView('employer/internships/review', [
