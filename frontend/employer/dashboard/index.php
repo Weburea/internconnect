@@ -778,20 +778,6 @@ $avatar      = $employer['avatar'] ?? null;
         <!-- Dashboard Footer -->
         <?php include __DIR__ . '/../../shared/components/db-footer.php'; ?>
 
-        <!-- Mobile Sidebar Toggle Script -->
-        <script>
-        (function() {
-            var hamburger = document.getElementById('db-hamburger');
-            var sidebar   = document.querySelector('.db-sidebar');
-            var overlay   = document.getElementById('db-sidebar-overlay');
-            if (!hamburger || !sidebar || !overlay) return;
-            function toggleSidebar() {
-                sidebar.classList.toggle('is-open');
-                overlay.classList.toggle('is-open');
-            }
-            hamburger.addEventListener('click', toggleSidebar);
-            overlay.addEventListener('click', toggleSidebar);
-        })();
-        </script>
+
     </div><!-- /.db-main -->
 </div><!-- /.db-shell -->

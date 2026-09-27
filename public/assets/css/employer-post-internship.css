@@ -9,6 +9,9 @@
     max-width: 1240px;
     margin: 0 auto;
     padding: 24px 32px 64px 32px;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
@@ -16,7 +19,9 @@
         padding: 0 0 100px 0;
         width: 100%;
         max-width: 100%;
+        min-width: 0;
         box-sizing: border-box;
+        overflow-x: hidden;
     }
 }
 
@@ -103,11 +108,17 @@
     grid-template-columns: minmax(0, 1.8fr) minmax(0, 1.2fr);
     gap: 28px;
     align-items: start;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 @media (max-width: 1024px) {
     .emp-post-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr) !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
 }
 
@@ -116,6 +127,10 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 /* ── Form Card ── */
@@ -126,6 +141,10 @@
     padding: 24px 28px;
     box-shadow: 0 1px 3px rgba(0, 6, 35, 0.03);
     transition: box-shadow 0.2s ease;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .emp-form-card:hover {
@@ -137,6 +156,8 @@
         padding: 18px 14px;
         border-radius: 14px;
         width: 100%;
+        max-width: 100%;
+        min-width: 0;
         box-sizing: border-box;
     }
 }
@@ -2382,18 +2403,24 @@ input:checked + .emp-slider:before {
     align-items: center;
     gap: 8px;
     margin-bottom: 0;
+    min-width: 0;
+    flex: 1;
+    max-width: 100%;
 }
 
 .emp-title-edit-container {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     background: #F8FAFC;
     border: 1px dashed #CBD5E1;
     border-radius: 10px;
-    padding: 4px 12px 4px 8px;
+    padding: 4px 10px 4px 8px;
     transition: all 0.15s ease;
     cursor: text;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .emp-title-edit-container:hover,
@@ -2411,8 +2438,9 @@ input:checked + .emp-slider:before {
     border: none;
     outline: none;
     padding: 4px 4px;
-    width: auto;
-    min-width: 220px;
+    width: 100%;
+    min-width: 0;
+    flex: 1;
     font-family: inherit;
 }
 
@@ -2432,6 +2460,15 @@ input:checked + .emp-slider:before {
     pointer-events: none;
     text-transform: uppercase;
     letter-spacing: 0.04em;
+}
+
+@media (max-width: 640px) {
+    .emp-title-edit-hint span {
+        display: none !important;
+    }
+    .emp-title-edit-hint {
+        padding: 4px 6px;
+    }
 }
 
 .emp-title-edit-hint svg {
@@ -2455,6 +2492,9 @@ input:checked + .emp-slider:before {
     border: 1px solid #E2E8F0;
     border-radius: 12px;
     padding: 8px 12px;
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
     transition: border-color 0.15s ease, background 0.15s ease;
 }
 
@@ -2483,6 +2523,7 @@ input:checked + .emp-slider:before {
 
 .emp-dyn-input {
     flex: 1;
+    min-width: 0;
     border: none;
     background: transparent;
     outline: none;
@@ -2708,19 +2749,34 @@ input:checked + .emp-slider:before {
 
 @media (max-width: 768px) {
     .emp-qual-row {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
+        display: grid !important;
+        grid-template-columns: auto minmax(0, 1fr) auto !important;
+        gap: 8px !important;
+        align-items: center !important;
+        padding: 10px !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
     }
-    .emp-qual-row-top {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        width: 100%;
+    .emp-qual-icon-picker {
+        grid-column: 1 !important;
+        grid-row: 1 !important;
     }
     .emp-qual-title-input {
-        width: 100%;
-        flex: 1;
+        grid-column: 2 !important;
+        grid-row: 1 !important;
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+    .emp-qual-row .emp-dyn-delete-btn {
+        grid-column: 3 !important;
+        grid-row: 1 !important;
+    }
+    .emp-qual-desc-input {
+        grid-column: 1 / -1 !important;
+        grid-row: 2 !important;
+        width: 100% !important;
+        min-width: 0 !important;
     }
 }
 
