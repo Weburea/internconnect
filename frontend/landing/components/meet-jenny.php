@@ -447,7 +447,7 @@ if (!empty($sessionUser)) {
 @media (min-width: 1024px) {
     .meet-jenny-grid-container {
         display: grid;
-        grid-template-columns: minmax(280px, 320px) 300px minmax(280px, 320px);
+        grid-template-columns: minmax(300px, 330px) 296px minmax(300px, 330px);
         grid-template-rows: auto 1fr auto;
         grid-template-areas:
             "top-left    center    top-right"
@@ -455,79 +455,81 @@ if (!empty($sessionUser)) {
             "bot-left    center    bot-right";
         align-items: center;
         justify-content: center;
-        max-width: 1040px;
+        max-width: 970px;
         width: 100%;
         min-height: 560px;
         margin: 0 auto;
-        column-gap: 24px;
-        row-gap: 32px;
+        column-gap: 0;
+        row-gap: 26px;
         position: relative;
         z-index: 5;
     }
 
-    /* Scattered Staggered Offsets (Non-linear, Organic per Image 4) */
+    /* Staggered & Overlapping Offsets (Cards enter/float over the phone mockup per annotations) */
     .card-top-left {
+        --card-x: -12px;
+        --card-y: -20px;
         grid-area: top-left;
         align-self: start;
-        justify-self: start;
-        transform: translate(-14px, -12px);
+        justify-self: end;
         z-index: 12;
     }
     .card-mid-left {
+        --card-x: 58px; /* Pushed into phone mockup screen */
+        --card-y: -4px;
         grid-area: mid-left;
         align-self: center;
         justify-self: end;
-        transform: translate(14px, 0); /* Tucked closer to phone center */
-        z-index: 14;
+        z-index: 16;
     }
     .card-bot-left {
+        --card-x: 28px; /* Pushed close to phone, overlapping bottom-left corner */
+        --card-y: 20px;
         grid-area: bot-left;
         align-self: end;
-        justify-self: start;
-        transform: translate(-18px, 14px); /* Stepped out to bottom-left */
-        z-index: 13;
+        justify-self: end;
+        z-index: 14;
     }
 
     .card-top-right {
+        --card-x: -54px; /* Pushed into phone mockup screen */
+        --card-y: -18px;
         grid-area: top-right;
         align-self: start;
-        justify-self: end;
-        transform: translate(16px, -8px); /* Stepped out to top-right */
-        z-index: 12;
+        justify-self: start;
+        z-index: 16;
     }
     .card-mid-right {
+        --card-x: -14px; /* Close to phone right flank */
+        --card-y: 6px;
         grid-area: mid-right;
         align-self: center;
         justify-self: start;
-        transform: translate(-12px, 8px); /* Tucked closer to phone center, slightly lower */
-        z-index: 14;
+        z-index: 12;
     }
     .card-bot-right {
+        --card-x: -62px; /* Pushed into phone mockup screen */
+        --card-y: 22px;
         grid-area: bot-right;
         align-self: end;
-        justify-self: end;
-        transform: translate(20px, 16px); /* Stepped out to bottom-right */
-        z-index: 13;
+        justify-self: start;
+        z-index: 16;
     }
 }
 
 @media (min-width: 1024px) and (max-width: 1199px) {
     .meet-jenny-grid-container {
-        grid-template-columns: 270px 290px 270px;
-        max-width: 860px;
+        grid-template-columns: minmax(280px, 305px) 280px minmax(280px, 305px);
+        max-width: 890px;
+        column-gap: 0;
     }
     .meet-jenny-card {
-        width: 270px !important;
-        padding: 10px 12px !important;
+        width: 100% !important;
+        max-width: 305px !important;
+        padding: 10px 14px !important;
     }
-    .card-top-left  { margin-right: -16px; }
-    .card-mid-left  { margin-right: -8px; }
-    .card-bot-left  { margin-right: -20px; }
-    .card-top-right { margin-left: -14px; }
-    .card-mid-right { margin-left: -22px; }
-    .card-bot-right { margin-left: -10px; }
     .meet-jenny-card-title {
-        font-size: 12.5px !important;
+        font-size: 13px !important;
     }
     .meet-jenny-card-sub {
         font-size: 11px !important;
@@ -596,7 +598,7 @@ if (!empty($sessionUser)) {
     position: relative;
     width: 100%;
     height: 100%;
-    background: #EAECEF;
+    background: #E0E0E5;
     border-radius: 40px;
     overflow: hidden;
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12) inset;
@@ -647,12 +649,12 @@ if (!empty($sessionUser)) {
     background: #0F172A;
 }
 
-/* Inner Screen Content - 100% Screen Fill with Native Crisp Jenny */
+/* Inner Screen Content - Full Length Screen Coverage with Vertical Mobile Jenny */
 .meet-jenny-phone-body {
     position: relative;
     width: 100%;
     height: 100%;
-    background: #EAECEF;
+    background: #E0E0E5;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -668,7 +670,7 @@ if (!empty($sessionUser)) {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #EAECEF;
+    background: #E0E0E5;
     overflow: hidden;
     margin: 0;
 }
@@ -676,10 +678,10 @@ if (!empty($sessionUser)) {
 .meet-jenny-phone-gif {
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    object-position: center center;
-    transform: none; /* Native resolution - zero pixelation or zoom blur */
-    background: #EAECEF;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    background: #E0E0E5;
 }
 
 /* Home Bar */
@@ -693,6 +695,7 @@ if (!empty($sessionUser)) {
     background: #0F172A;
     border-radius: 2px;
     opacity: 0.35;
+    z-index: 25;
 }
 
 @media (max-width: 1023px) {
@@ -719,25 +722,26 @@ if (!empty($sessionUser)) {
 
 @media (min-width: 1024px) {
     .meet-jenny-card {
-        width: 100%;
-        max-width: 310px;
+        width: max-content;
+        min-width: 295px;
+        max-width: 335px;
         opacity: 0;
-        transform: translateY(20px);
+        transform: translate(var(--card-x, 0), calc(var(--card-y, 0) + 24px));
         transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease;
     }
 
     /* Staggered Scroll-in Entrance Triggered by IntersectionObserver */
-    .meet-jenny-grid-container.is-visible .card-top-left  { opacity: 1; transform: translateY(0); transition-delay: 0ms; }
-    .meet-jenny-grid-container.is-visible .card-top-right { opacity: 1; transform: translateY(0); transition-delay: 130ms; }
-    .meet-jenny-grid-container.is-visible .card-mid-left  { opacity: 1; transform: translateY(0); transition-delay: 260ms; }
-    .meet-jenny-grid-container.is-visible .card-mid-right { opacity: 1; transform: translateY(0); transition-delay: 390ms; }
-    .meet-jenny-grid-container.is-visible .card-bot-left  { opacity: 1; transform: translateY(0); transition-delay: 520ms; }
-    .meet-jenny-grid-container.is-visible .card-bot-right { opacity: 1; transform: translateY(0); transition-delay: 650ms; }
+    .meet-jenny-grid-container.is-visible .card-top-left  { opacity: 1; transform: translate(var(--card-x, 0), var(--card-y, 0)); transition-delay: 0ms; }
+    .meet-jenny-grid-container.is-visible .card-top-right { opacity: 1; transform: translate(var(--card-x, 0), var(--card-y, 0)); transition-delay: 130ms; }
+    .meet-jenny-grid-container.is-visible .card-mid-left  { opacity: 1; transform: translate(var(--card-x, 0), var(--card-y, 0)); transition-delay: 260ms; }
+    .meet-jenny-grid-container.is-visible .card-mid-right { opacity: 1; transform: translate(var(--card-x, 0), var(--card-y, 0)); transition-delay: 390ms; }
+    .meet-jenny-grid-container.is-visible .card-bot-left  { opacity: 1; transform: translate(var(--card-x, 0), var(--card-y, 0)); transition-delay: 520ms; }
+    .meet-jenny-grid-container.is-visible .card-bot-right { opacity: 1; transform: translate(var(--card-x, 0), var(--card-y, 0)); transition-delay: 650ms; }
 }
 
 .meet-jenny-card:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 18px 38px -4px rgba(0, 6, 35, 0.13), 0 4px 12px -2px rgba(0, 6, 35, 0.06);
+    transform: translate(var(--card-x, 0), calc(var(--card-y, 0) - 4px)) scale(1.02);
+    box-shadow: 0 18px 38px -4px rgba(0, 6, 35, 0.14), 0 4px 12px -2px rgba(0, 6, 35, 0.06);
     z-index: 25;
 }
 
@@ -785,8 +789,6 @@ if (!empty($sessionUser)) {
     color: #000623;
     line-height: 1.25;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .meet-jenny-card-sub {
@@ -795,8 +797,6 @@ if (!empty($sessionUser)) {
     color: #64748B;
     line-height: 1.25;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .meet-jenny-card-badge {
@@ -954,12 +954,12 @@ if (!empty($sessionUser)) {
                             <div class="meet-jenny-island-sensor"></div>
                         </div>
 
-                        <!-- Inner Screen Content - 100% Zoomed Jenny Showcase -->
+                        <!-- Inner Screen Content - Full Screen Mobile Jenny Showcase -->
                         <div class="meet-jenny-phone-body">
-                            <!-- Jenny Looping GIF - Fills frame, zoomed, studio background blend -->
+                            <!-- Jenny Looping GIF - Fills phone screen completely from edge to edge -->
                             <div class="meet-jenny-phone-gif-wrap">
                                 <img 
-                                    src="https://res.cloudinary.com/weburea/image/upload/v1790735673/jenny_ai_intro_frykbn.gif" 
+                                    src="https://res.cloudinary.com/weburea/image/upload/v1790745255/jenny_ai_mob_eds5by.gif" 
                                     alt="Jenny AI assistant" 
                                     class="meet-jenny-phone-gif"
                                     loading="eager"
