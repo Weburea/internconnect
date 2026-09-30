@@ -196,31 +196,46 @@ graph TD
 
 ### Component Details
 1. **Card 1: Complete Your Profile (Top Left - 50% Desktop Width)**:
-   - **Credentials Visual**: 3 stacked cards with rich, colored badge icons (Curriculum Vitae / ATS PDF, Academic Verification / University Transcript, Skill Matrix / 94% Proficiency) with animated green checkmarks and subtle scanning highlights.
-   - **Animation**: Infinite smooth staggered scan cycling across credential rows.
-   - **Content**: Clean H3, explanatory copy, and micro-tags.
+   - **Credentials Visual**: 3 stacked cards with rich colored badge icons:
+     1. *Curriculum Vitae* (PDF · ATS Optimized) with rose badge.
+     2. *Personal & Identity Data* (Verified Candidate Dossier) with blue badge.
+     3. *Academic Information* (**University Certification Checkup**) with emerald badge.
+   - **Animation**: Infinite smooth staggered scan cycling across credential rows with verified checkmarks.
+   - **Spacing & Breathing Room**: Generously expanded margin (`36px` desktop / `28px` mobile) between the credential cards and `Complete Your Profile` header text to prevent visual crowding.
+   - **Corner Emitter**: Saturated crimson/rose emitter pulse (`.process-emitter-red`).
 
 2. **Card 2: Smart Portfolio Intake & Radar (Top Right - 50% Desktop Width)**:
-   - **Radar Canvas**: InternConnect Brand Indigo gradient (`linear-gradient(135deg, #4F48E6 0%, #3730A3 50%, #000623 100%)`).
+   - **Radar Canvas**: InternConnect Brand Indigo gradient (`linear-gradient(145deg, #4F48E6 0%, #3730A3 55%, #000623 100%)`).
    - **Concentric Breathing Radar Waves**: Translucent ripple rings expanding outward.
-   - **Center Hub**: Glowing upload circle with floating arrow.
+   - **Center Hub**: Glowing upload circle with vertical bobbing animation.
    - **Orbiting Artifact Pills**: Figma prototype, GitHub code repository, PDF case study drifting smoothly.
    - **Status Badge**: Floating pill with Jenny AI waving mascot avatar (`jenny_ai_hi.png`) + "AI Intake Complete" + emerald green checkmark.
-   - **Content**: Clean H3, explanatory copy, and micro-tags.
+   - **Spacing & Breathing Room**: Generously expanded top spacing (`36px` desktop / `28px` mobile) above `Direct Portfolio Upload`.
+   - **Corner Emitter**: Saturated electric purple emitter pulse (`.process-emitter-purple`).
 
 3. **Card 3: AI-Powered Interview Scheduling & Match Coordination (Bottom - Full Width)**:
    - **Left Column**:
-     - Jenny AI Badge: `Powered by Jenny AI Coordination`
+     - Jenny AI Badge: `Powered by Jenny AI Coordination` with official icon.
      - Clean H3 & copy explaining timezone synchronization, 1-click Google Meet provisioning, and pre-interview scorecards.
-     - Single-line CTA button: `Experience AI Scheduling →`.
-   - **Right Column**:
-     - Interactive Calendar Widget: Month view ("November 2026"), weekday labels, date grid with active booked date `18` glowing with pulse indicator.
-     - Floating Interview Card: "Wednesday, 18 Nov · 10:30 AM (WAT)", candidate details, "Join Google Meet" action.
-     - Floating AI Scorecard Pill: Jenny AI mascot badge + "95% Candidate Match".
+     - Single-line CTA button: `Explore Opportunities →` with zero wrapping.
+   - **Right Column (Interactive Calendar with Banner-Style Simulated Cursor & Month Switcher)**:
+     - **Interactive Month Navigation**: Arrow controls `<` and `>` seamlessly browse between November 2026, December 2026, and January 2027 with accurate calendar grids and timezone tags (`WAT (UTC+1)`).
+     - **Clickable Date Booking**: All available dates feature subtle indicator dots and are interactive. Clicking a date triggers a smooth ripple ring (`processDateRipple`), confirms the slot, and reactively updates the Upcoming Interview card.
+     - **Simulated Banner Cursor Tour**: When idle, an automated demo cursor (`Recruiter`) smoothly glides between dates, presses/clicks with ripple feedback, marks the slot confirmed (`Slot Reserved ✓`), and updates the interview card repeatedly. Fades out on user interaction.
+     - **Floating Upcoming Interview Card**: Dynamically syncs with selected dates and times with candidate Sarah Peters and a live `Join Now` status pill.
+     - **Floating AI Match Score Badge**: `95% Match Score · UI/UX Role` with Jenny AI brand icon.
+
+4. **Animated Bento Grid Flow Lines (Pipeline Stream Architecture)**:
+   - **Left Flow Beam (Crimson/Rose into Brand Indigo)**: Traces along the left outer contour of Card 1 down into Card 3 and across its bottom left.
+   - **Right Flow Beam (Electric Purple/Violet into Blue)**: Traces along the right outer contour of Card 2 down into Card 3 and across its bottom right.
+   - **Center Connector Beam**: Flows from between Card 1 and Card 2 directly into Card 3's top coordination header.
+   - **Light Mode Visibility**: Saturated, vibrant gradient paths with soft glow drop-shadow filters (`filter: drop-shadow(...)`), clearly visible on light mode with smooth continuous travel animation.
+   - **Pointer-Events Inactive**: Placed on `z-index: 10` with `pointer-events: none;`, ensuring zero interference with card clicks and zero horizontal overflow on mobile.
 
 ### Zero-Regression Enforcement
 - **No Accent Border Strips**: Only clean, subtle neutral borders (`border: 1px solid #E2E8F0;`).
-- **Zero Horizontal Overflow**: All flex containers enforce `min-width: 0;`, grids use `minmax(0, 1fr) !important;` on mobile.
+- **Zero Horizontal Overflow**: Verified at 360px, 375px, 440px, and 1440px (`scrollWidth === clientWidth`).
 - **Strictly No Emojis**: 100% SVG vector marks matching the design system.
 - **Single-Line Button Integrity**: All buttons enforce `white-space: nowrap !important; flex-shrink: 0 !important;`.
 - **Cloudinary Integration**: Assets served through `asset()` helper.
+
