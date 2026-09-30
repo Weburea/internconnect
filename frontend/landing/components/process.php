@@ -27,7 +27,7 @@ declare(strict_types=1);
 
 @media (min-width: 1024px) {
     .process-section-wrap {
-        padding: 56px 0 36px 0;
+        padding: 56px 0 0 0;
     }
 }
 
@@ -167,26 +167,51 @@ declare(strict_types=1);
     stroke-width: 3.5px;
     stroke-linecap: round;
     fill: none;
-    stroke-dasharray: 220 1600;
-    animation: processBeamTravel 8.5s linear infinite;
+    stroke-dasharray: 220 1800;
+    animation: processBeamTravel 10s linear infinite;
 }
 
 .process-beam-left {
-    animation-duration: 8.5s;
+    animation-duration: 10s;
 }
 
 .process-beam-right {
-    animation-duration: 8.5s;
-    animation-delay: 0.3s;
+    animation-duration: 10s;
+    animation-delay: 0.15s;
 }
 
 @keyframes processBeamTravel {
     0% {
         stroke-dashoffset: 1820;
+        opacity: 0;
+    }
+    2% {
+        opacity: 1;
+    }
+    43% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+    }
+    45% {
+        stroke-dashoffset: -10;
+        opacity: 0;
     }
     100% {
-        stroke-dashoffset: 0;
+        stroke-dashoffset: -10;
+        opacity: 0;
     }
+}
+
+.process-node-pulse {
+    animation: processNodePulse 10s cubic-bezier(0, 0, 0.2, 1) infinite;
+    transform-origin: 500px 981px;
+}
+
+@keyframes processNodePulse {
+    0%, 42% { r: 6px; opacity: 0; }
+    43% { r: 6px; opacity: 0.85; }
+    46% { r: 18px; opacity: 0.3; }
+    48%, 100% { r: 24px; opacity: 0; }
 }
 
 /* ─── Bento Grid Layout ─── */
@@ -1270,6 +1295,9 @@ declare(strict_types=1);
                 <!-- Bottom Center Destination Convergence Node (500, 981) where Enterprise flow cleanly finishes -->
                 <circle cx="500" cy="981" r="6" fill="#000623" stroke="#FFFFFF" stroke-width="2" />
                 <circle class="process-node-pulse" cx="500" cy="981" r="14" fill="#000623" opacity="0.2" />
+
+                <!-- Vertical Dotted Conduit Connecting to Jenny Section Below -->
+                <path class="process-flow-track" d="M 500 981 L 500 1000" />
             </svg>
 
             <!-- Bento Grid System -->

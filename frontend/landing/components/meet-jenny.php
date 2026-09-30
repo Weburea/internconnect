@@ -28,7 +28,7 @@ if (!empty($sessionUser)) {
 
 @media (min-width: 1024px) {
     .meet-jenny-section {
-        padding: 48px 0 100px 0;
+        padding: 0 0 90px 0;
     }
 }
 
@@ -87,33 +87,52 @@ if (!empty($sessionUser)) {
     stroke-width: 3.5px;
     stroke-linecap: round;
     fill: none;
-    stroke-dasharray: 220 1800;
-    animation: jennyBeamTravel 8.5s linear infinite;
+    stroke-dasharray: 220 2000;
+    animation: jennyBeamTravel 10s linear infinite;
 }
 
 .meet-jenny-beam-left {
-    animation-duration: 8.5s;
+    animation-duration: 10s;
 }
 
 .meet-jenny-beam-right {
-    animation-duration: 8.5s;
-    animation-delay: 0.3s;
+    animation-duration: 10s;
+    animation-delay: 0.15s;
 }
 
 @keyframes jennyBeamTravel {
-    0% { stroke-dashoffset: 2020; }
-    100% { stroke-dashoffset: 0; }
+    0%, 43% {
+        stroke-dashoffset: 2020;
+        opacity: 0;
+    }
+    45% {
+        stroke-dashoffset: 2020;
+        opacity: 1;
+    }
+    89% {
+        stroke-dashoffset: 0;
+        opacity: 1;
+    }
+    92% {
+        stroke-dashoffset: -10;
+        opacity: 0;
+    }
+    100% {
+        stroke-dashoffset: -10;
+        opacity: 0;
+    }
 }
 
 .jenny-node-pulse {
-    animation: jennyNodePulse 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+    animation: jennyNodePulse 10s cubic-bezier(0, 0, 0.2, 1) infinite;
     transform-origin: 500px 930px;
 }
 
 @keyframes jennyNodePulse {
-    0% { r: 6px; opacity: 0.8; }
-    50% { r: 16px; opacity: 0.2; }
-    100% { r: 24px; opacity: 0; }
+    0%, 88% { r: 6px; opacity: 0; }
+    89% { r: 6px; opacity: 0.85; }
+    92% { r: 18px; opacity: 0.3; }
+    94%, 100% { r: 24px; opacity: 0; }
 }
 
 /* ─── Section Header ─── */
@@ -217,7 +236,7 @@ if (!empty($sessionUser)) {
     }
 }
 
-/* ─── CSS Grid Container for Exact Mathematical Card Alignment ─── */
+/* ─── CSS Grid Container for Exact Card Alignment Around Phone Mockup ─── */
 .meet-jenny-grid-container {
     position: relative;
     z-index: 5;
@@ -228,18 +247,19 @@ if (!empty($sessionUser)) {
 @media (min-width: 1024px) {
     .meet-jenny-grid-container {
         display: grid;
-        grid-template-columns: minmax(270px, 320px) minmax(320px, 450px) minmax(270px, 320px);
+        grid-template-columns: 310px 300px 310px;
         grid-template-rows: auto 1fr auto;
         grid-template-areas:
-            "top-left    .         top-right"
+            "top-left    center    top-right"
             "mid-left    center    mid-right"
-            "bot-left    .         bot-right";
+            "bot-left    center    bot-right";
         align-items: center;
-        justify-content: space-between;
-        max-width: 1160px;
+        justify-content: center;
+        max-width: 1040px;
         width: 100%;
-        height: 500px;
+        height: 540px;
         margin: 0 auto;
+        column-gap: 28px;
     }
 
     .card-top-left  { grid-area: top-left;  align-self: start; justify-self: start; }
@@ -251,6 +271,9 @@ if (!empty($sessionUser)) {
 }
 
 @media (min-width: 1024px) and (max-width: 1199px) {
+    .meet-jenny-grid-container {
+        column-gap: 16px;
+    }
     .meet-jenny-card {
         width: 270px !important;
         padding: 10px 12px !important;
@@ -263,60 +286,280 @@ if (!empty($sessionUser)) {
     }
 }
 
-/* ─── Center GIF Container (Frameless, Borderless, Soft Mask Blend) ─── */
-.meet-jenny-media-box {
+/* ─── Center Phone Mockup (Portrait Format, Blended Background) ─── */
+.meet-jenny-phone-mockup {
+    grid-area: center;
+    align-self: center;
+    justify-self: center;
     position: relative;
-    background-color: #FFFFFF;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 296px;
+    height: 540px;
+    background: linear-gradient(145deg, #2D2926 0%, #1A1816 50%, #2D2926 100%); /* Premium titanium frame */
+    border-radius: 48px;
+    padding: 9px;
+    box-shadow: 
+        0 25px 60px -15px rgba(0, 6, 35, 0.22),
+        0 0 0 1px rgba(255, 255, 255, 0.16) inset,
+        0 0 0 3px #1F1D1B inset;
+    box-sizing: border-box;
+    z-index: 5;
+}
+
+/* Side Hardware Buttons */
+.meet-jenny-phone-btn-action {
+    position: absolute;
+    left: -3px;
+    top: 90px;
+    width: 3px;
+    height: 22px;
+    background: #44403C;
+    border-radius: 2px 0 0 2px;
+}
+.meet-jenny-phone-btn-vol-up {
+    position: absolute;
+    left: -3px;
+    top: 125px;
+    width: 3px;
+    height: 42px;
+    background: #44403C;
+    border-radius: 2px 0 0 2px;
+}
+.meet-jenny-phone-btn-vol-down {
+    position: absolute;
+    left: -3px;
+    top: 180px;
+    width: 3px;
+    height: 42px;
+    background: #44403C;
+    border-radius: 2px 0 0 2px;
+}
+.meet-jenny-phone-btn-power {
+    position: absolute;
+    right: -3px;
+    top: 140px;
+    width: 3px;
+    height: 56px;
+    background: #44403C;
+    border-radius: 0 2px 2px 0;
+}
+
+/* Inner Phone Screen (Solid #FFFFFF background that 100% blends with GIF!) */
+.meet-jenny-phone-screen {
+    position: relative;
     width: 100%;
+    height: 100%;
+    background: #FFFFFF;
+    border-radius: 40px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08) inset;
     box-sizing: border-box;
 }
 
-@media (min-width: 1024px) {
-    .meet-jenny-media-box {
-        grid-area: center;
-        align-self: center;
-        justify-self: center;
-        width: 450px;
-        height: 290px;
-    }
-}
-
-@media (max-width: 1023px) {
-    .meet-jenny-media-box {
-        max-width: 440px;
-        margin: 0 auto 28px auto;
-        aspect-ratio: 16 / 9;
-    }
-}
-
-/* Subtle Ambient Glow Behind Jenny */
-.meet-jenny-media-glow {
+/* Dynamic Island */
+.meet-jenny-phone-island {
     position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90px;
+    height: 24px;
+    background: #000000;
+    border-radius: 14px;
+    z-index: 25;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 9px;
+    box-sizing: border-box;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+.meet-jenny-island-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #111827;
+    position: relative;
+}
+.meet-jenny-island-dot::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 2.5px;
+    height: 2.5px;
+    border-radius: 50%;
+    background: rgba(79, 72, 230, 0.55);
+}
+
+.meet-jenny-island-sensor {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #0F172A;
+}
+
+/* Top Status Bar */
+.meet-jenny-phone-status {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 36px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 20;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #0F172A;
+    pointer-events: none;
+    box-sizing: border-box;
+}
+
+.meet-jenny-status-icons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #0F172A;
+}
+
+/* Inner Screen Content */
+.meet-jenny-phone-body {
+    position: relative;
     width: 100%;
     height: 100%;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(79, 72, 230, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
-    pointer-events: none;
-    z-index: 1;
+    background: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 38px 12px 10px 12px;
+    box-sizing: border-box;
 }
 
-.meet-jenny-gif-el {
+/* In-Screen App Top Bar */
+.meet-jenny-inapp-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px 4px;
+}
+
+.meet-jenny-inapp-brand {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.meet-jenny-inapp-badge {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: #4F48E6;
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.meet-jenny-inapp-title {
+    font-size: 11.5px;
+    font-weight: 800;
+    color: #000623;
+}
+
+.meet-jenny-inapp-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 3.5px;
+    padding: 2px 7px;
+    border-radius: 9999px;
+    background: #F0FDF4;
+    border: 1px solid #DCFCE7;
+    color: #16A34A;
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.meet-jenny-live-dot {
+    width: 4.5px;
+    height: 4.5px;
+    border-radius: 50%;
+    background: #16A34A;
+}
+
+/* GIF Inside Phone - Spans Full Width & Perfectly Blends */
+.meet-jenny-phone-gif-wrap {
     position: relative;
-    z-index: 2;
+    width: 100%;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    overflow: hidden;
+    margin: 4px 0;
+}
+
+.meet-jenny-phone-gif {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    background-color: #FFFFFF;
-    border: none !important;
-    outline: none !important;
-    box-shadow: none !important;
-    -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, #000000 28%, rgba(0, 0, 0, 0.82) 48%, rgba(0, 0, 0, 0.35) 68%, transparent 84%);
-    mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, #000000 28%, rgba(0, 0, 0, 0.82) 48%, rgba(0, 0, 0, 0.35) 68%, transparent 84%);
-    pointer-events: none;
-    user-select: none;
+    background: #FFFFFF;
+}
+
+/* In-Screen Assistant Card */
+.meet-jenny-phone-card {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 8px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+}
+
+.meet-jenny-phone-card-text {
+    font-size: 10px;
+    font-weight: 600;
+    color: #334155;
+    line-height: 1.3;
+}
+
+.meet-jenny-phone-card-btn {
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #FFFFFF;
+    background: #4F48E6;
+    padding: 3px 8px;
+    border-radius: 9999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+/* Home Bar */
+.meet-jenny-phone-home {
+    width: 90px;
+    height: 3.5px;
+    background: #0F172A;
+    border-radius: 2px;
+    margin: 4px auto 0 auto;
+    opacity: 0.25;
+}
+
+@media (max-width: 1023px) {
+    .meet-jenny-phone-mockup {
+        width: 270px;
+        height: 490px;
+        margin: 0 auto 28px auto;
+    }
 }
 
 /* ─── Floating Feature Cards (Clean SaaS Styling & Staggered Scroll-In) ─── */
@@ -335,7 +578,8 @@ if (!empty($sessionUser)) {
 
 @media (min-width: 1024px) {
     .meet-jenny-card {
-        width: 320px;
+        width: 100%;
+        max-width: 310px;
         opacity: 0;
         transform: translateY(20px);
         transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease;
@@ -519,20 +763,23 @@ if (!empty($sessionUser)) {
                     </filter>
                 </defs>
 
-                <!-- Top Center Entry Origin Node (500, 0) -->
-                <circle cx="500" cy="0" r="5" fill="#4F48E6" stroke="#FFFFFF" stroke-width="2" />
+                <!-- Vertical Dotted Line Connecting from Process Node (Image 1) -->
+                <path class="meet-jenny-flow-track" d="M 500 0 L 500 48" />
 
-                <!-- Left Branch (Purple): Enters from top at (497, 0), travels down 48px vertical corridor, branches left at Y=68, curves down left flank at X=11, curves along bottom at Y=900 (120px+ clear below bottom cards) to center convergence (497, 930), then exits toward next section -->
-                <path class="meet-jenny-flow-track" d="M 497 0 L 497 48 Q 497 68, 475 68 L 33 68 Q 11 68, 11 88 L 11 878 Q 11 900, 33 900 L 475 900 Q 497 900, 497 915 L 497 930 L 497 970" />
-                <path class="meet-jenny-flow-beam meet-jenny-beam-left" d="M 497 0 L 497 48 Q 497 68, 475 68 L 33 68 Q 11 68, 11 88 L 11 878 Q 11 900, 33 900 L 475 900 Q 497 900, 497 915 L 497 930 L 497 970" stroke="url(#jennyFlowLeftGrad)" filter="url(#jennyGlowPurple)" />
+                <!-- Left Branch (Purple): Enters from top at (497, 0), travels down 48px vertical corridor, branches left at Y=68, curves down left flank at X=11, curves along bottom at Y=900 (120px+ clear below bottom cards) to center convergence (497, 930) -->
+                <path class="meet-jenny-flow-track" d="M 497 0 L 497 48 Q 497 68, 475 68 L 33 68 Q 11 68, 11 88 L 11 878 Q 11 900, 33 900 L 475 900 Q 497 900, 497 915 L 497 930" />
+                <path class="meet-jenny-flow-beam meet-jenny-beam-left" d="M 497 0 L 497 48 Q 497 68, 475 68 L 33 68 Q 11 68, 11 88 L 11 878 Q 11 900, 33 900 L 475 900 Q 497 900, 497 915 L 497 930" stroke="url(#jennyFlowLeftGrad)" filter="url(#jennyGlowPurple)" />
 
-                <!-- Right Branch (Dark Mode Navy): Enters from top at (503, 0), travels down 48px vertical corridor, branches right at Y=68, curves down right flank at X=989, curves along bottom at Y=900 (120px+ clear below bottom cards) to center convergence (503, 930), then exits toward next section -->
-                <path class="meet-jenny-flow-track" d="M 503 0 L 503 48 Q 503 68, 525 68 L 967 68 Q 989 68, 989 88 L 989 878 Q 989 900, 967 900 L 525 900 Q 503 900, 503 915 L 503 930 L 503 970" />
-                <path class="meet-jenny-flow-beam meet-jenny-beam-right" d="M 503 0 L 503 48 Q 503 68, 525 68 L 967 68 Q 989 68, 989 88 L 989 878 Q 989 900, 967 900 L 525 900 Q 503 900, 503 915 L 503 930 L 503 970" stroke="url(#jennyFlowDarkGrad)" filter="url(#jennyGlowDark)" />
+                <!-- Right Branch (Dark Mode Navy): Enters from top at (503, 0), travels down 48px vertical corridor, branches right at Y=68, curves down right flank at X=989, curves along bottom at Y=900 (120px+ clear below bottom cards) to center convergence (503, 930) -->
+                <path class="meet-jenny-flow-track" d="M 503 0 L 503 48 Q 503 68, 525 68 L 967 68 Q 989 68, 989 88 L 989 878 Q 989 900, 967 900 L 525 900 Q 503 900, 503 915 L 503 930" />
+                <path class="meet-jenny-flow-beam meet-jenny-beam-right" d="M 503 0 L 503 48 Q 503 68, 525 68 L 967 68 Q 989 68, 989 88 L 989 878 Q 989 900, 967 900 L 525 900 Q 503 900, 503 915 L 503 930" stroke="url(#jennyFlowDarkGrad)" filter="url(#jennyGlowDark)" />
 
                 <!-- Bottom Center Destination Convergence Node (500, 930) -->
                 <circle cx="500" cy="930" r="6" fill="#000623" stroke="#FFFFFF" stroke-width="2" />
                 <circle class="jenny-node-pulse" cx="500" cy="930" r="14" fill="#4F48E6" opacity="0.25" />
+
+                <!-- Vertical Dotted Line Continuing Down Below Jenny (Image 4) -->
+                <path class="meet-jenny-flow-track" d="M 500 930 L 500 970" />
             </svg>
 
             <!-- Section Header (Positioned at Top-Center of Stage) -->
@@ -549,18 +796,80 @@ if (!empty($sessionUser)) {
                 </p>
             </div>
 
-            <!-- CSS Grid Container with Named Areas for Consistent Card Alignment -->
+            <!-- CSS Grid Container with Named Areas for Consistent Card Alignment Around Phone Mockup -->
             <div class="meet-jenny-grid-container" id="meet-jenny-grid-wrap">
 
-                <!-- Center Media Box: Jenny AI Native Looping GIF (Frameless, Borderless, Soft Mask Blend) -->
-                <div class="meet-jenny-media-box">
-                    <div class="meet-jenny-media-glow"></div>
-                    <img 
-                        src="https://res.cloudinary.com/weburea/image/upload/v1790735673/jenny_ai_intro_frykbn.gif" 
-                        alt="Jenny AI assistant" 
-                        class="meet-jenny-gif-el"
-                        loading="eager"
-                    >
+                <!-- Center: Realistic Portrait Phone Mockup with Jenny Looping GIF -->
+                <div class="meet-jenny-phone-mockup">
+                    <!-- Physical Hardware Buttons -->
+                    <div class="meet-jenny-phone-btn-action"></div>
+                    <div class="meet-jenny-phone-btn-vol-up"></div>
+                    <div class="meet-jenny-phone-btn-vol-down"></div>
+                    <div class="meet-jenny-phone-btn-power"></div>
+
+                    <!-- Inner Phone Screen (Solid #FFFFFF background that 100% blends with GIF!) -->
+                    <div class="meet-jenny-phone-screen">
+                        <!-- Dynamic Island -->
+                        <div class="meet-jenny-phone-island">
+                            <div class="meet-jenny-island-dot"></div>
+                            <div class="meet-jenny-island-sensor"></div>
+                        </div>
+
+                        <!-- iOS Top Status Bar (Dark text on white screen) -->
+                        <div class="meet-jenny-phone-status">
+                            <span class="meet-jenny-status-time">9:41</span>
+                            <div class="meet-jenny-status-icons">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 3C7.5 3 3.7 4.9 1 8l11 13 11-13C20.3 4.9 16.5 3 12 3z"/>
+                                </svg>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M2 17h20v4H2v-4zm0-6h14v4H2v-4zm0-6h8v4H2V5z"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Inner Screen Content -->
+                        <div class="meet-jenny-phone-body">
+                            <!-- App Top Header Inside Phone -->
+                            <div class="meet-jenny-inapp-bar">
+                                <div class="meet-jenny-inapp-brand">
+                                    <div class="meet-jenny-inapp-badge">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                        </svg>
+                                    </div>
+                                    <span class="meet-jenny-inapp-title">Jenny AI</span>
+                                </div>
+                                <div class="meet-jenny-inapp-live">
+                                    <span class="meet-jenny-live-dot"></span>
+                                    <span>Active</span>
+                                </div>
+                            </div>
+
+                            <!-- Jenny Looping GIF - Fills width and blends seamlessly with the #FFFFFF phone screen! -->
+                            <div class="meet-jenny-phone-gif-wrap">
+                                <img 
+                                    src="https://res.cloudinary.com/weburea/image/upload/v1790735673/jenny_ai_intro_frykbn.gif" 
+                                    alt="Jenny AI assistant" 
+                                    class="meet-jenny-phone-gif"
+                                    loading="eager"
+                                >
+                            </div>
+
+                            <!-- Interactive Assistant Prompt Inside Phone Screen -->
+                            <div class="meet-jenny-phone-card">
+                                <div class="meet-jenny-phone-card-text">
+                                    Ready to automate your next career milestone?
+                                </div>
+                                <div class="meet-jenny-phone-card-btn">
+                                    <span>Ask Jenny</span>
+                                </div>
+                            </div>
+
+                            <!-- Home Indicator Bar -->
+                            <div class="meet-jenny-phone-home"></div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Card 1: Top-Left (Update Your CV) -->

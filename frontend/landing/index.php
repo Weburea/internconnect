@@ -10,9 +10,6 @@
 <!-- Meet Jenny AI Video Showcase Section -->
 <?php include __DIR__ . '/components/meet-jenny.php'; ?>
 
-<!-- Mobile Experience & Device Preview Section -->
-<?php include __DIR__ . '/components/mobile-preview.php'; ?>
-
 <!-- Features Section -->
 <?php include __DIR__ . '/components/features.php'; ?>
 
