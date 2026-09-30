@@ -4,6 +4,9 @@
 <!-- Statistics Banner -->
 <?php include __DIR__ . '/components/statistics.php'; ?>
 
+<!-- Streamlined Process & AI Workflow Bento Section -->
+<?php include __DIR__ . '/components/process.php'; ?>
+
 <!-- Features Section -->
 <?php include __DIR__ . '/components/features.php'; ?>
 
