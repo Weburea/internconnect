@@ -508,8 +508,8 @@ if (!empty($sessionUser)) {
         z-index: 12;
     }
     .card-bot-right {
-        --card-x: -62px; /* Pushed into phone mockup screen */
-        --card-y: 22px;
+        --card-x: -140px; /* Shifted left across phone bottom to cover and hide jitter.video watermark */
+        --card-y: 6px;
         grid-area: bot-right;
         align-self: end;
         justify-self: start;
@@ -527,6 +527,10 @@ if (!empty($sessionUser)) {
         width: 100% !important;
         max-width: 305px !important;
         padding: 10px 14px !important;
+    }
+    .card-bot-right {
+        --card-x: -130px;
+        --card-y: 6px;
     }
     .meet-jenny-card-title {
         font-size: 13px !important;
@@ -684,6 +688,19 @@ if (!empty($sessionUser)) {
     background: #E0E0E5;
 }
 
+/* Watermark Mask on Desktop & Tablet (Blends perfectly with studio background) */
+.meet-jenny-watermark-mask {
+    position: absolute;
+    bottom: 14px;
+    right: 36px;
+    width: 96px;
+    height: 32px;
+    background: #E0E0E5;
+    border-radius: 4px;
+    z-index: 8;
+    pointer-events: none;
+}
+
 /* Home Bar */
 .meet-jenny-phone-home {
     position: absolute;
@@ -701,8 +718,18 @@ if (!empty($sessionUser)) {
 @media (max-width: 1023px) {
     .meet-jenny-phone-mockup {
         width: 270px;
-        height: 490px;
+        height: 480px;
         margin: 0 auto 28px auto;
+    }
+    
+    /* Mobile Zoom: Zooms into Jenny's smiling face, headphones, and chest; crops out jitter.video below screen (Image 2) */
+    .meet-jenny-phone-gif {
+        transform: scale(1.72) !important;
+        transform-origin: center 10% !important;
+    }
+    
+    .meet-jenny-watermark-mask {
+        display: none; /* Already pushed off-screen and cropped by zoom */
     }
 }
 
@@ -964,6 +991,8 @@ if (!empty($sessionUser)) {
                                     class="meet-jenny-phone-gif"
                                     loading="eager"
                                 >
+                                <!-- Studio watermark mask (seamlessly concealed under 24/7 Career Guidance card) -->
+                                <div class="meet-jenny-watermark-mask" aria-hidden="true"></div>
                             </div>
 
                             <!-- Home Indicator Bar -->
