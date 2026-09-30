@@ -122,6 +122,21 @@ declare(strict_types=1);
     box-sizing: border-box;
 }
 
+@media (min-width: 1024px) {
+    .process-bento-canvas-wrap {
+        padding: 4px 18px 28px 18px;
+    }
+}
+
+@media (max-width: 1023px) {
+    .process-bento-flow-svg {
+        display: none !important;
+    }
+    .process-bento-canvas-wrap {
+        padding: 0 !important;
+    }
+}
+
 /* SVG Flow Circuit Stream Overlay (Desktop & Tablet) */
 .process-bento-flow-svg {
     position: absolute;
@@ -135,19 +150,19 @@ declare(strict_types=1);
 }
 
 .process-flow-track {
-    stroke: #CBD5E1;
+    stroke: #E2E8F0;
     stroke-width: 2px;
     stroke-dasharray: 6 6;
-    opacity: 0.65;
+    opacity: 0.85;
     fill: none;
 }
 
 .process-flow-beam {
-    stroke-width: 4px;
+    stroke-width: 3.5px;
     stroke-linecap: round;
     fill: none;
-    stroke-dasharray: 160 520;
-    animation: processBeamTravel 4.5s linear infinite;
+    stroke-dasharray: 220 1600;
+    animation: processBeamTravel 4.6s linear infinite;
 }
 
 .process-beam-left {
@@ -155,19 +170,13 @@ declare(strict_types=1);
 }
 
 .process-beam-right {
-    animation-duration: 4.9s;
-    animation-delay: 1s;
-}
-
-.process-beam-center {
-    animation-duration: 3.6s;
-    animation-delay: 0.5s;
-    stroke-dasharray: 90 320;
+    animation-duration: 4.6s;
+    animation-delay: 0.15s;
 }
 
 @keyframes processBeamTravel {
     0% {
-        stroke-dashoffset: 680;
+        stroke-dashoffset: 1820;
     }
     100% {
         stroke-dashoffset: 0;
@@ -218,37 +227,6 @@ declare(strict_types=1);
         padding: 20px 16px;
         border-radius: 20px;
     }
-}
-
-/* Corner Pipeline Emitter Dots */
-.process-stream-emitter {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 4;
-}
-
-.process-emitter-red {
-    top: 14px;
-    left: 14px;
-    background: #E11D48;
-    box-shadow: 0 0 12px #E11D48;
-    animation: processEmitterGlow 2.5s infinite ease-in-out;
-}
-
-.process-emitter-purple {
-    top: 14px;
-    right: 14px;
-    background: #7C3AED;
-    box-shadow: 0 0 12px #7C3AED;
-    animation: processEmitterGlow 2.5s infinite ease-in-out 0.8s;
-}
-
-@keyframes processEmitterGlow {
-    0%, 100% { opacity: 0.5; transform: scale(0.9); }
-    50% { opacity: 1; transform: scale(1.15); }
 }
 
 /* Generous Breathing Room between Visual Mockup and Header Text */
@@ -786,21 +764,14 @@ declare(strict_types=1);
     border-radius: 50%;
     border: 1px solid #E2E8F0;
     background: #FFFFFF;
-    color: #475569;
+    color: #94A3B8;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    pointer-events: none !important;
+    cursor: default !important;
     padding: 0;
     flex-shrink: 0;
-}
-
-.process-cal-arrow-btn:hover {
-    background: #EEF2FF;
-    color: #4F48E6;
-    border-color: #C7D2FE;
-    transform: scale(1.05);
 }
 
 .process-cal-tz {
@@ -834,63 +805,71 @@ declare(strict_types=1);
 .process-cal-day {
     font-size: 12px;
     color: #334155;
-    height: 30px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
-    font-weight: 500;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    transition: all 0.18s ease;
     position: relative;
     padding: 0;
+    pointer-events: none !important;
+    cursor: default !important;
+    user-select: none !important;
 }
 
-.process-cal-day:hover:not(.is-muted):not(.is-active) {
-    background: #EEF2FF;
-    color: #4F48E6;
-    font-weight: 700;
-}
-
-.process-cal-day.is-muted {
-    color: #CBD5E1;
-    cursor: default;
-}
-
-.process-cal-day.is-active {
-    background: #4F48E6;
-    color: #FFFFFF;
-    font-weight: 700;
-    border-radius: 50%;
+/* Strict 1:1 Mathematical Circle for Date Numbers */
+.process-cal-day-num {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+    max-width: 28px !important;
+    max-height: 28px !important;
+    border-radius: 50% !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: #334155;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
-    box-shadow: 0 3px 12px rgba(79, 72, 230, 0.45);
+    box-sizing: border-box !important;
+}
+
+.process-cal-day.is-muted .process-cal-day-num {
+    color: #CBD5E1;
+}
+
+.process-cal-day.is-active .process-cal-day-num {
+    background: #4F48E6 !important;
+    color: #FFFFFF !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 14px rgba(79, 72, 230, 0.45) !important;
     animation: processDatePulse 2.5s infinite ease-in-out;
 }
 
-.process-cal-day.is-accepted {
-    animation: processDateRipple 0.5s ease-out;
+.process-cal-day.is-accepted .process-cal-day-num {
+    animation: processDateRipple 0.55s ease-out;
 }
 
 @keyframes processDateRipple {
     0% {
-        transform: scale(0.85);
-        box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.7);
+        transform: scale(0.8);
+        box-shadow: 0 0 0 0 rgba(79, 72, 230, 0.7);
     }
     50% {
-        transform: scale(1.15);
-        box-shadow: 0 0 0 8px rgba(22, 163, 74, 0);
+        transform: scale(1.18);
+        box-shadow: 0 0 0 7px rgba(79, 72, 230, 0);
     }
     100% {
         transform: scale(1);
     }
 }
 
-.process-cal-day.is-available:not(.is-active):not(.is-muted)::after {
+.process-cal-day.is-available:not(.is-active):not(.is-muted) .process-cal-day-num::after {
     content: '';
     position: absolute;
-    bottom: 2px;
+    bottom: 1.5px;
     width: 4px;
     height: 4px;
     border-radius: 50%;
@@ -1233,42 +1212,36 @@ declare(strict_types=1);
         <!-- Bento Grid Canvas Wrapper with Animated Flowing Pipeline Beams -->
         <div class="process-bento-canvas-wrap">
             
-            <!-- SVG Flow Circuit Stream Overlay (Top to Bottom Flow: Red/Rose Left, Purple Right, Center Connector) -->
-            <svg class="process-bento-flow-svg" viewBox="0 0 1000 800" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- SVG Flow Circuit Stream Overlay (Desktop & Tablet: Center Origin, Left Purple / Right Red Split, Bottom-Center Convergence) -->
+            <svg class="process-bento-flow-svg" viewBox="0 0 1000 840" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <defs>
-                    <!-- Left Stream Gradient: Saturated Rose-Red into Brand Indigo -->
-                    <linearGradient id="processFlowLeftGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <!-- Left Stream Gradient: Vibrant Purple/Violet into Brand Indigo -->
+                    <linearGradient id="processFlowLeftGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+                        <stop offset="0%" stop-color="#4F48E6"/>
+                        <stop offset="30%" stop-color="#7C3AED"/>
+                        <stop offset="70%" stop-color="#8B5CF6"/>
+                        <stop offset="100%" stop-color="#4F48E6"/>
+                    </linearGradient>
+
+                    <!-- Right Stream Gradient: Saturated Rose/Red into Coral-Rose -->
+                    <linearGradient id="processFlowRightGrad" x1="50%" y1="0%" x2="50%" y2="100%">
                         <stop offset="0%" stop-color="#E11D48"/>
                         <stop offset="30%" stop-color="#F43F5E"/>
-                        <stop offset="70%" stop-color="#6366F1"/>
-                        <stop offset="100%" stop-color="#4F48E6"/>
+                        <stop offset="70%" stop-color="#FB7185"/>
+                        <stop offset="100%" stop-color="#E11D48"/>
                     </linearGradient>
 
-                    <!-- Right Stream Gradient: Electric Violet/Purple into Cyan-Indigo -->
-                    <linearGradient id="processFlowRightGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stop-color="#7C3AED"/>
-                        <stop offset="30%" stop-color="#A855F7"/>
-                        <stop offset="70%" stop-color="#3B82F6"/>
-                        <stop offset="100%" stop-color="#4F48E6"/>
-                    </linearGradient>
-
-                    <!-- Center Connector Gradient -->
-                    <linearGradient id="processFlowCenterGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stop-color="#4F48E6"/>
-                        <stop offset="50%" stop-color="#6366F1"/>
-                        <stop offset="100%" stop-color="#38BDF8"/>
-                    </linearGradient>
-
-                    <filter id="processGlowLeft" x="-30%" y="-30%" width="160%" height="160%">
-                        <feGaussianBlur stdDeviation="3.5" result="blur"/>
+                    <!-- Glow Filters -->
+                    <filter id="processGlowPurple" x="-25%" y="-25%" width="150%" height="150%">
+                        <feGaussianBlur stdDeviation="3" result="blur"/>
                         <feMerge>
                             <feMergeNode in="blur"/>
                             <feMergeNode in="SourceGraphic"/>
                         </feMerge>
                     </filter>
 
-                    <filter id="processGlowRight" x="-30%" y="-30%" width="160%" height="160%">
-                        <feGaussianBlur stdDeviation="3.5" result="blur"/>
+                    <filter id="processGlowRed" x="-25%" y="-25%" width="150%" height="150%">
+                        <feGaussianBlur stdDeviation="3" result="blur"/>
                         <feMerge>
                             <feMergeNode in="blur"/>
                             <feMergeNode in="SourceGraphic"/>
@@ -1276,19 +1249,19 @@ declare(strict_types=1);
                     </filter>
                 </defs>
 
-                <!-- Left Flow Guide Track (Subtle Neutral Track) -->
-                <path class="process-flow-track" d="M 24 2 L 2 24 L 2 340 Q 2 368, 24 368 L 24 392 Q 2 392, 2 416 L 2 776 Q 2 798, 24 798 L 380 798" />
-                <!-- Left Flowing Animated Beam (Vibrant Red/Rose) -->
-                <path class="process-flow-beam process-beam-left" d="M 24 2 L 2 24 L 2 340 Q 2 368, 24 368 L 24 392 Q 2 392, 2 416 L 2 776 Q 2 798, 24 798 L 380 798" stroke="url(#processFlowLeftGrad)" filter="url(#processGlowLeft)" />
+                <!-- Left Branch (Purple): Starts at Top-Center (500, 4), runs down center gap to 358, turns left across horizontal gap, runs down left outside Card 3, curves along bottom to center (500, 825) -->
+                <path class="process-flow-track" d="M 500 4 L 500 358 Q 500 378, 480 378 L 24 378 Q 6 378, 6 398 L 6 805 Q 6 825, 26 825 L 500 825" />
+                <path class="process-flow-beam process-beam-left" d="M 500 4 L 500 358 Q 500 378, 480 378 L 24 378 Q 6 378, 6 398 L 6 805 Q 6 825, 26 825 L 500 825" stroke="url(#processFlowLeftGrad)" filter="url(#processGlowPurple)" />
 
-                <!-- Right Flow Guide Track (Subtle Neutral Track) -->
-                <path class="process-flow-track" d="M 976 2 L 998 24 L 998 340 Q 998 368, 976 368 L 976 392 Q 998 392, 998 416 L 998 776 Q 998 798, 976 798 L 620 798" />
-                <!-- Right Flowing Animated Beam (Vibrant Purple) -->
-                <path class="process-flow-beam process-beam-right" d="M 976 2 L 998 24 L 998 340 Q 998 368, 976 368 L 976 392 Q 998 392, 998 416 L 998 776 Q 998 798, 976 798 L 620 798" stroke="url(#processFlowRightGrad)" filter="url(#processGlowRight)" />
+                <!-- Right Branch (Red): Starts at Top-Center (500, 4), runs down center gap to 358, turns right across horizontal gap, runs down right outside Card 3, curves along bottom to center (500, 825) -->
+                <path class="process-flow-track" d="M 500 4 L 500 358 Q 500 378, 520 378 L 976 378 Q 994 378, 994 398 L 994 805 Q 994 825, 974 825 L 500 825" />
+                <path class="process-flow-beam process-beam-right" d="M 500 4 L 500 358 Q 500 378, 520 378 L 976 378 Q 994 378, 994 398 L 994 805 Q 994 825, 974 825 L 500 825" stroke="url(#processFlowRightGrad)" filter="url(#processGlowRed)" />
 
-                <!-- Center Connector Pipeline (Profile & Portfolio converging into Card 3) -->
-                <path class="process-flow-track" d="M 500 10 L 500 392" />
-                <path class="process-flow-beam process-beam-center" d="M 500 10 L 500 392" stroke="url(#processFlowCenterGrad)" />
+                <!-- Top Center Origin Node (500, 4) -->
+                <circle cx="500" cy="4" r="5" fill="#4F48E6" stroke="#FFFFFF" stroke-width="2" />
+
+                <!-- Bottom Center Destination Convergence Node (500, 825) -->
+                <circle cx="500" cy="825" r="6" fill="#4F48E6" stroke="#FFFFFF" stroke-width="2" />
             </svg>
 
             <!-- Bento Grid System -->
@@ -1296,8 +1269,6 @@ declare(strict_types=1);
 
                 <!-- Card 1 (Top Left): Complete Your Profile -->
                 <div class="process-card">
-                    <!-- Stream Emitter Accent (Top Left) -->
-                    <span class="process-stream-emitter process-emitter-red" aria-hidden="true"></span>
 
                     <!-- Visual Stage -->
                     <div class="process-profile-stage">
@@ -1380,8 +1351,6 @@ declare(strict_types=1);
 
                 <!-- Card 2 (Top Right): Direct Portfolio Upload & Radar -->
                 <div class="process-card">
-                    <!-- Stream Emitter Accent (Top Right) -->
-                    <span class="process-stream-emitter process-emitter-purple" aria-hidden="true"></span>
 
                     <!-- Visual Canvas with Concentric Radar Waves -->
                     <div class="process-radar-stage">
@@ -1512,9 +1481,7 @@ declare(strict_types=1);
                     <!-- Right Column: Interactive Animated Calendar & Live Floating Cards -->
                     <div class="process-calendar-stage" 
                          x-data="processSchedulerComponent()" 
-                         x-init="initScheduler()"
-                         @mouseenter="handleMouseEnter()" 
-                         @mouseleave="handleMouseLeave()">
+                         x-init="initScheduler()">
 
                         <!-- Calendar Widget Card -->
                         <div class="process-calendar-card" id="process-cal-container">
@@ -1522,7 +1489,7 @@ declare(strict_types=1);
                             <div class="process-cal-cursor" 
                                  :class="{ 'is-clicking': isCursorClicking }"
                                  :style="cursorStyle" 
-                                 x-show="showDemoCursor && !isHovered" 
+                                 x-show="showDemoCursor" 
                                  x-transition:enter="transition ease-out duration-300"
                                  x-transition:enter-start="opacity-0 scale-75"
                                  x-transition:enter-end="opacity-100 scale-100"
@@ -1535,20 +1502,20 @@ declare(strict_types=1);
                                 <span class="process-cursor-pill">Recruiter</span>
                             </div>
 
-                            <!-- Header with Month Switcher Controls -->
+                            <!-- Header with Month Display -->
                             <div class="process-cal-header">
                                 <div class="process-cal-month-nav">
-                                    <button type="button" @click="prevMonth()" class="process-cal-arrow-btn" aria-label="Previous Month" title="Previous Month">
+                                    <div class="process-cal-arrow-btn" aria-hidden="true">
                                         <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                                         </svg>
-                                    </button>
-                                    <span class="process-cal-month" x-text="currentMonthData.name">November 2026</span>
-                                    <button type="button" @click="nextMonth()" class="process-cal-arrow-btn" aria-label="Next Month" title="Next Month">
+                                    </div>
+                                    <span class="process-cal-month" x-text="currentMonthData.name">December 2026</span>
+                                    <div class="process-cal-arrow-btn" aria-hidden="true">
                                         <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                                         </svg>
-                                    </button>
+                                    </div>
                                 </div>
                                 <span class="process-cal-tz" x-text="currentMonthData.tz">WAT (UTC+1)</span>
                             </div>
@@ -1564,32 +1531,33 @@ declare(strict_types=1);
                                 <span>Su</span>
                             </div>
 
-                            <!-- Dynamic Interactive Days Grid -->
+                            <!-- Dynamic Autonomous Days Grid (True 1:1 Circle, Non-Clickable) -->
                             <div class="process-cal-grid">
                                 <!-- Leading Muted Days -->
                                 <template x-for="prevDay in currentMonthData.leadingMuted" :key="'prev-' + prevDay">
-                                    <span class="process-cal-day is-muted" x-text="prevDay"></span>
+                                    <div class="process-cal-day is-muted">
+                                        <span class="process-cal-day-num" x-text="prevDay"></span>
+                                    </div>
                                 </template>
 
                                 <!-- Active Month Days -->
                                 <template x-for="day in currentMonthData.daysCount" :key="'day-' + day">
-                                    <button type="button" 
-                                            class="process-cal-day" 
-                                            :id="'cal-day-' + monthIndex + '-' + day"
-                                            :class="{ 
-                                                'is-active': selectedDay === day && selectedMonth === monthIndex,
-                                                'is-accepted': justAccepted && selectedDay === day && selectedMonth === monthIndex,
-                                                'is-available': isDayAvailable(day)
-                                            }"
-                                            @click="selectDay(day, true)"
-                                            :title="isDayAvailable(day) ? 'Click to book interview slot' : 'Select date'">
-                                        <span x-text="day"></span>
-                                    </button>
+                                    <div class="process-cal-day" 
+                                         :id="'cal-day-' + monthIndex + '-' + day"
+                                         :class="{ 
+                                             'is-active': selectedDay === day && selectedMonth === monthIndex,
+                                             'is-accepted': justAccepted && selectedDay === day && selectedMonth === monthIndex,
+                                             'is-available': isDayAvailable(day)
+                                         }">
+                                        <span class="process-cal-day-num" x-text="day"></span>
+                                    </div>
                                 </template>
 
                                 <!-- Trailing Muted Days -->
                                 <template x-for="nextDay in currentMonthData.trailingMuted" :key="'next-' + nextDay">
-                                    <span class="process-cal-day is-muted" x-text="nextDay"></span>
+                                    <div class="process-cal-day is-muted">
+                                        <span class="process-cal-day-num" x-text="nextDay"></span>
+                                    </div>
                                 </template>
                             </div>
                         </div>
@@ -1597,8 +1565,8 @@ declare(strict_types=1);
                         <!-- Floating AI Candidate Match Score Badge (Top Right) -->
                         <div class="process-floating-match">
                             <img src="<?= asset('assets/images/jenny_ai/jenny_icon.png') ?>" alt="Jenny AI" class="process-match-icon">
-                            <span class="process-match-text">95% Match Score</span>
-                            <span class="process-match-sub">· UI/UX Role</span>
+                            <span class="process-match-text" x-text="currentCandidate.matchScore + ' Match Score'">95% Match Score</span>
+                            <span class="process-match-sub" x-text="'· ' + currentCandidate.role">· UI/UX Role</span>
                         </div>
 
                         <!-- Floating Upcoming Interview Card (Bottom Left) -->
@@ -1613,12 +1581,12 @@ declare(strict_types=1);
                                         Slot Reserved
                                     </span>
                                 </div>
-                                <span class="process-interview-time" x-text="currentFormattedTime">Wed · 10:30–11:15</span>
+                                <span class="process-interview-time" x-text="currentFormattedTime">Tue · 09:30–10:15</span>
                             </div>
                             <div class="process-interview-body">
                                 <div class="process-interview-candidate">
                                     <img src="<?= asset('assets/images/jenny_ai/jenny_ai_hi.png') ?>" alt="Candidate" class="process-interview-avatar">
-                                    <span class="process-interview-name">Sarah Peters</span>
+                                    <span class="process-interview-name" x-text="currentCandidate.name">Sarah Peters</span>
                                 </div>
                                 <span class="process-interview-btn">
                                     <span class="process-interview-live-dot"></span>
@@ -1637,23 +1605,28 @@ declare(strict_types=1);
 
 <script>
 /**
- * Interactive Scheduler Component with Banner Format Animation & Auto-Tour
+ * Autonomous Scheduler Showcase Component with True 1:1 Circle & Auto-Tour
  */
 function processSchedulerComponent() {
     return {
-        monthIndex: 0,
-        selectedDay: 18,
-        selectedMonth: 0,
-        selectedTime: '10:30–11:15',
-        justAccepted: false,
-        isHovered: false,
+        monthIndex: 1, // Default December 2026 (matches user screenshot)
+        selectedDay: 15,
+        selectedMonth: 1,
+        justAccepted: true,
         showDemoCursor: true,
         isCursorClicking: false,
         cursorX: 180,
         cursorY: 140,
         demoStep: 0,
         demoTimer: null,
-        resetTimer: null,
+
+        candidates: {
+            '1-15': { name: 'Sarah Peters', role: 'UI/UX Role', matchScore: '95%' },
+            '1-18': { name: 'David Okonjo', role: 'Frontend Engineer', matchScore: '98%' },
+            '1-8': { name: 'Amara Vance', role: 'Product Design', matchScore: '92%' },
+            '0-20': { name: 'Kelechi Eze', role: 'Backend Intern', matchScore: '94%' },
+            '0-18': { name: 'Sarah Peters', role: 'UI/UX Role', matchScore: '95%' }
+        },
 
         monthsData: [
             {
@@ -1687,31 +1660,21 @@ function processSchedulerComponent() {
                     18: 'Fri · 16:00–16:45',
                     22: 'Tue · 11:00–11:45'
                 }
-            },
-            {
-                name: 'January 2027',
-                tz: 'WAT (UTC+1)',
-                daysCount: 31,
-                leadingMuted: [28, 29, 30, 31],
-                trailingMuted: [1, 2, 3, 4, 5, 6, 7],
-                availableDays: [7, 12, 15, 20, 25],
-                slotTimes: {
-                    7: 'Thu · 10:30–11:15',
-                    12: 'Tue · 14:00–14:45',
-                    15: 'Fri · 11:00–11:45',
-                    20: 'Wed · 15:30–16:15',
-                    25: 'Mon · 10:00–10:45'
-                }
             }
         ],
 
         get currentMonthData() {
-            return this.monthsData[this.monthIndex];
+            return this.monthsData[this.monthIndex] || this.monthsData[1];
+        },
+
+        get currentCandidate() {
+            const key = `${this.selectedMonth}-${this.selectedDay}`;
+            return this.candidates[key] || { name: 'Sarah Peters', role: 'UI/UX Role', matchScore: '95%' };
         },
 
         get currentFormattedTime() {
             const m = this.monthsData[this.selectedMonth] || this.currentMonthData;
-            return m.slotTimes[this.selectedDay] || (this.selectedDay + ' ' + m.name.substring(0, 3) + ' · 11:00–11:45');
+            return m.slotTimes[this.selectedDay] || (this.selectedDay + ' ' + m.name.substring(0, 3) + ' · 10:00–10:45');
         },
 
         get cursorStyle() {
@@ -1722,75 +1685,29 @@ function processSchedulerComponent() {
             return this.currentMonthData.availableDays.includes(day);
         },
 
-        prevMonth() {
-            this.monthIndex = (this.monthIndex === 0) ? this.monthsData.length - 1 : this.monthIndex - 1;
-            this.handleUserInteraction();
-        },
-
-        nextMonth() {
-            this.monthIndex = (this.monthIndex === this.monthsData.length - 1) ? 0 : this.monthIndex + 1;
-            this.handleUserInteraction();
-        },
-
-        selectDay(day, isUserClick = false) {
-            this.selectedDay = day;
-            this.selectedMonth = this.monthIndex;
-            this.justAccepted = true;
-
-            if (this.resetTimer) clearTimeout(this.resetTimer);
-            this.resetTimer = setTimeout(() => {
-                this.justAccepted = false;
-            }, 1800);
-
-            if (isUserClick) {
-                this.handleUserInteraction();
-            }
-        },
-
-        handleUserInteraction() {
-            this.showDemoCursor = false;
-            if (this.demoTimer) clearInterval(this.demoTimer);
-        },
-
-        handleMouseEnter() {
-            this.isHovered = true;
-            this.showDemoCursor = false;
-        },
-
-        handleMouseLeave() {
-            this.isHovered = false;
-            // Resume demo after 4s idle
-            if (!this.demoTimer) {
-                this.startDemoLoop(3500);
-            }
-        },
-
         initScheduler() {
             this.$nextTick(() => {
-                this.updateCursorPositionToDay(18);
-                this.startDemoLoop(2000);
+                this.updateCursorPositionToDay(15);
+                setTimeout(() => {
+                    this.justAccepted = false;
+                }, 2000);
+                this.startDemoLoop(2400);
             });
         },
 
-        startDemoLoop(initialDelay = 2000) {
+        startDemoLoop(initialDelay = 2400) {
             if (window.innerWidth <= 640) return; // Skip simulated cursor on small mobile
 
             const demoSequence = [
-                { month: 0, day: 18 },
-                { month: 0, day: 20 },
-                { month: 0, day: 24 },
-                { month: 1, day: 8 },
                 { month: 1, day: 15 },
+                { month: 1, day: 18 },
+                { month: 1, day: 8 },
+                { month: 0, day: 20 },
                 { month: 0, day: 18 }
             ];
 
             setTimeout(() => {
-                if (this.isHovered) return;
-                this.showDemoCursor = true;
-
                 this.demoTimer = setInterval(() => {
-                    if (this.isHovered) return;
-
                     this.demoStep = (this.demoStep + 1) % demoSequence.length;
                     const target = demoSequence[this.demoStep];
 
@@ -1802,16 +1719,21 @@ function processSchedulerComponent() {
                     this.$nextTick(() => {
                         this.updateCursorPositionToDay(target.day);
 
-                        // Simulate click press after cursor arrives
+                        // Trigger click tap after cursor arrives
                         setTimeout(() => {
-                            if (this.isHovered) return;
                             this.isCursorClicking = true;
-                            this.selectDay(target.day, false);
+                            this.selectedDay = target.day;
+                            this.selectedMonth = target.month;
+                            this.justAccepted = true;
 
                             setTimeout(() => {
                                 this.isCursorClicking = false;
-                            }, 250);
-                        }, 550);
+                            }, 220);
+
+                            setTimeout(() => {
+                                this.justAccepted = false;
+                            }, 2000);
+                        }, 500);
                     });
                 }, 3800);
             }, initialDelay);
@@ -1822,9 +1744,10 @@ function processSchedulerComponent() {
             const dayEl = document.getElementById(`cal-day-${this.monthIndex}-${day}`);
 
             if (container && dayEl) {
+                const numEl = dayEl.querySelector('.process-cal-day-num') || dayEl;
                 const cRect = container.getBoundingClientRect();
-                const dRect = dayEl.getBoundingClientRect();
-                this.cursorX = Math.round(dRect.left - cRect.left + dRect.width / 2 - 4);
+                const dRect = numEl.getBoundingClientRect();
+                this.cursorX = Math.round(dRect.left - cRect.left + dRect.width / 2 - 3);
                 this.cursorY = Math.round(dRect.top - cRect.top + dRect.height / 2 - 2);
             }
         }
