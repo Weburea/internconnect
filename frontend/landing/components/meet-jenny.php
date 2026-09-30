@@ -255,29 +255,82 @@ if (!empty($sessionUser)) {
             "bot-left    center    bot-right";
         align-items: center;
         justify-content: center;
-        max-width: 1040px;
+        max-width: 980px;
         width: 100%;
         height: 540px;
         margin: 0 auto;
-        column-gap: 28px;
+        column-gap: 0;
+        position: relative;
+        z-index: 5;
     }
 
-    .card-top-left  { grid-area: top-left;  align-self: start; justify-self: start; }
-    .card-top-right { grid-area: top-right; align-self: start; justify-self: end; }
-    .card-mid-left  { grid-area: mid-left;  align-self: center; justify-self: start; }
-    .card-mid-right { grid-area: mid-right; align-self: center; justify-self: end; }
-    .card-bot-left  { grid-area: bot-left;  align-self: end; justify-self: start; }
-    .card-bot-right { grid-area: bot-right; align-self: end; justify-self: end; }
+    /* Scattered Overlaps & Individual Offsets Across Phone Frame */
+    .card-top-left {
+        grid-area: top-left;
+        align-self: start;
+        justify-self: end;
+        margin-right: -24px;
+        margin-top: -6px;
+        z-index: 12;
+    }
+    .card-mid-left {
+        grid-area: mid-left;
+        align-self: center;
+        justify-self: end;
+        margin-right: -12px;
+        margin-top: -26px; /* Tucked closer to top card for organic scatter */
+        z-index: 14;
+    }
+    .card-bot-left {
+        grid-area: bot-left;
+        align-self: end;
+        justify-self: end;
+        margin-right: -32px; /* Deeper overlap into bottom phone corner */
+        margin-bottom: -10px;
+        z-index: 13;
+    }
+
+    .card-top-right {
+        grid-area: top-right;
+        align-self: start;
+        justify-self: start;
+        margin-left: -20px;
+        margin-top: 10px; /* Asymmetric vertical stagger */
+        z-index: 12;
+    }
+    .card-mid-right {
+        grid-area: mid-right;
+        align-self: center;
+        justify-self: start;
+        margin-left: -36px; /* Deep overlap into right phone edge */
+        margin-top: 22px; /* Shifted lower towards bottom-right */
+        z-index: 14;
+    }
+    .card-bot-right {
+        grid-area: bot-right;
+        align-self: end;
+        justify-self: start;
+        margin-left: -16px;
+        margin-bottom: -8px;
+        z-index: 13;
+    }
 }
 
 @media (min-width: 1024px) and (max-width: 1199px) {
     .meet-jenny-grid-container {
-        column-gap: 16px;
+        grid-template-columns: 270px 290px 270px;
+        max-width: 860px;
     }
     .meet-jenny-card {
         width: 270px !important;
         padding: 10px 12px !important;
     }
+    .card-top-left  { margin-right: -16px; }
+    .card-mid-left  { margin-right: -8px; }
+    .card-bot-left  { margin-right: -20px; }
+    .card-top-right { margin-left: -14px; }
+    .card-mid-right { margin-left: -22px; }
+    .card-bot-right { margin-left: -10px; }
     .meet-jenny-card-title {
         font-size: 12.5px !important;
     }
@@ -343,28 +396,26 @@ if (!empty($sessionUser)) {
     border-radius: 0 2px 2px 0;
 }
 
-/* Inner Phone Screen (Solid #FFFFFF background that 100% blends with GIF!) */
+/* Inner Phone Screen (Seamlessly blended with GIF's studio background!) */
 .meet-jenny-phone-screen {
     position: relative;
     width: 100%;
     height: 100%;
-    background: #FFFFFF;
+    background: #D4D4D9;
     border-radius: 40px;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08) inset;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12) inset;
     box-sizing: border-box;
 }
 
 /* Dynamic Island */
 .meet-jenny-phone-island {
     position: absolute;
-    top: 8px;
+    top: 10px;
     left: 50%;
     transform: translateX(-50%);
-    width: 90px;
-    height: 24px;
+    width: 86px;
+    height: 22px;
     background: #000000;
     border-radius: 14px;
     z-index: 25;
@@ -373,7 +424,7 @@ if (!empty($sessionUser)) {
     justify-content: space-between;
     padding: 0 9px;
     box-sizing: border-box;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
 }
 
 .meet-jenny-island-dot {
@@ -401,147 +452,53 @@ if (!empty($sessionUser)) {
     background: #0F172A;
 }
 
-/* Top Status Bar */
-.meet-jenny-phone-status {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 36px;
-    padding: 0 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    z-index: 20;
-    font-size: 11.5px;
-    font-weight: 700;
-    color: #0F172A;
-    pointer-events: none;
-    box-sizing: border-box;
-}
-
-.meet-jenny-status-icons {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    color: #0F172A;
-}
-
-/* Inner Screen Content */
+/* Inner Screen Content - 100% Screen Fill with Zoomed Jenny */
 .meet-jenny-phone-body {
     position: relative;
     width: 100%;
     height: 100%;
-    background: #FFFFFF;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 38px 12px 10px 12px;
+    background: #D4D4D9;
+    overflow: hidden;
     box-sizing: border-box;
 }
 
-/* In-Screen App Top Bar */
-.meet-jenny-inapp-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 2px 4px;
-}
-
-.meet-jenny-inapp-brand {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.meet-jenny-inapp-badge {
-    width: 22px;
-    height: 22px;
-    border-radius: 6px;
-    background: #4F48E6;
-    color: #FFFFFF;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.meet-jenny-inapp-title {
-    font-size: 11.5px;
-    font-weight: 800;
-    color: #000623;
-}
-
-.meet-jenny-inapp-live {
-    display: inline-flex;
-    align-items: center;
-    gap: 3.5px;
-    padding: 2px 7px;
-    border-radius: 9999px;
-    background: #F0FDF4;
-    border: 1px solid #DCFCE7;
-    color: #16A34A;
-    font-size: 9px;
-    font-weight: 700;
-}
-
-.meet-jenny-live-dot {
-    width: 4.5px;
-    height: 4.5px;
-    border-radius: 50%;
-    background: #16A34A;
-}
-
-/* GIF Inside Phone - Spans Full Width & Perfectly Blends */
+/* Full Bleed GIF Container with Studio Background Blend */
 .meet-jenny-phone-gif-wrap {
-    position: relative;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    flex: 1;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #FFFFFF;
+    background: #D4D4D9;
     overflow: hidden;
-    margin: 4px 0;
+    margin: 0;
 }
 
 .meet-jenny-phone-gif {
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    background: #FFFFFF;
+    object-fit: cover;
+    object-position: center 36%;
+    transform: scale(1.36);
+    filter: contrast(1.02);
+    background: #D4D4D9;
 }
 
-/* In-Screen Assistant Card */
-.meet-jenny-phone-card {
-    background: #F8FAFC;
-    border: 1px solid #E2E8F0;
-    border-radius: 12px;
-    padding: 8px 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 6px;
-}
-
-.meet-jenny-phone-card-text {
-    font-size: 10px;
-    font-weight: 600;
-    color: #334155;
-    line-height: 1.3;
-}
-
-.meet-jenny-phone-card-btn {
-    font-size: 9.5px;
-    font-weight: 700;
-    color: #FFFFFF;
-    background: #4F48E6;
-    padding: 3px 8px;
-    border-radius: 9999px;
-    white-space: nowrap;
-    flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
+/* Home Bar */
+.meet-jenny-phone-home {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 92px;
+    height: 4px;
+    background: #0F172A;
+    border-radius: 2px;
+    opacity: 0.35;
+    z-index: 20;
 }
 
 /* Home Bar */
@@ -568,7 +525,7 @@ if (!empty($sessionUser)) {
     border: 1px solid #E2E8F0;
     border-radius: 16px;
     padding: 12px 16px;
-    box-shadow: 0 4px 20px -2px rgba(0, 6, 35, 0.05), 0 1px 3px rgba(0, 6, 35, 0.03);
+    box-shadow: 0 12px 28px -4px rgba(0, 6, 35, 0.08), 0 3px 8px -2px rgba(0, 6, 35, 0.04);
     display: flex;
     align-items: center;
     gap: 12px;
@@ -595,8 +552,9 @@ if (!empty($sessionUser)) {
 }
 
 .meet-jenny-card:hover {
-    transform: translateY(-3px) scale(1.015);
-    box-shadow: 0 12px 28px -4px rgba(0, 6, 35, 0.09);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 18px 38px -4px rgba(0, 6, 35, 0.13), 0 4px 12px -2px rgba(0, 6, 35, 0.06);
+    z-index: 25;
 }
 
 .meet-jenny-card-icon {
@@ -807,7 +765,7 @@ if (!empty($sessionUser)) {
                     <div class="meet-jenny-phone-btn-vol-down"></div>
                     <div class="meet-jenny-phone-btn-power"></div>
 
-                    <!-- Inner Phone Screen (Solid #FFFFFF background that 100% blends with GIF!) -->
+                    <!-- Inner Phone Screen (Seamlessly blended with GIF's studio background!) -->
                     <div class="meet-jenny-phone-screen">
                         <!-- Dynamic Island -->
                         <div class="meet-jenny-phone-island">
@@ -815,38 +773,9 @@ if (!empty($sessionUser)) {
                             <div class="meet-jenny-island-sensor"></div>
                         </div>
 
-                        <!-- iOS Top Status Bar (Dark text on white screen) -->
-                        <div class="meet-jenny-phone-status">
-                            <span class="meet-jenny-status-time">9:41</span>
-                            <div class="meet-jenny-status-icons">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 3C7.5 3 3.7 4.9 1 8l11 13 11-13C20.3 4.9 16.5 3 12 3z"/>
-                                </svg>
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M2 17h20v4H2v-4zm0-6h14v4H2v-4zm0-6h8v4H2V5z"/>
-                                </svg>
-                            </div>
-                        </div>
-
-                        <!-- Inner Screen Content -->
+                        <!-- Inner Screen Content - 100% Zoomed Jenny Showcase -->
                         <div class="meet-jenny-phone-body">
-                            <!-- App Top Header Inside Phone -->
-                            <div class="meet-jenny-inapp-bar">
-                                <div class="meet-jenny-inapp-brand">
-                                    <div class="meet-jenny-inapp-badge">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                                        </svg>
-                                    </div>
-                                    <span class="meet-jenny-inapp-title">Jenny AI</span>
-                                </div>
-                                <div class="meet-jenny-inapp-live">
-                                    <span class="meet-jenny-live-dot"></span>
-                                    <span>Active</span>
-                                </div>
-                            </div>
-
-                            <!-- Jenny Looping GIF - Fills width and blends seamlessly with the #FFFFFF phone screen! -->
+                            <!-- Jenny Looping GIF - Fills frame, zoomed, studio background blend -->
                             <div class="meet-jenny-phone-gif-wrap">
                                 <img 
                                     src="https://res.cloudinary.com/weburea/image/upload/v1790735673/jenny_ai_intro_frykbn.gif" 
@@ -854,16 +783,6 @@ if (!empty($sessionUser)) {
                                     class="meet-jenny-phone-gif"
                                     loading="eager"
                                 >
-                            </div>
-
-                            <!-- Interactive Assistant Prompt Inside Phone Screen -->
-                            <div class="meet-jenny-phone-card">
-                                <div class="meet-jenny-phone-card-text">
-                                    Ready to automate your next career milestone?
-                                </div>
-                                <div class="meet-jenny-phone-card-btn">
-                                    <span>Ask Jenny</span>
-                                </div>
                             </div>
 
                             <!-- Home Indicator Bar -->
