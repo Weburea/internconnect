@@ -7,6 +7,9 @@
 <!-- Streamlined Process & AI Workflow Bento Section -->
 <?php include __DIR__ . '/components/process.php'; ?>
 
+<!-- Meet Jenny AI Video Showcase Section -->
+<?php include __DIR__ . '/components/meet-jenny.php'; ?>
+
 <!-- Features Section -->
 <?php include __DIR__ . '/components/features.php'; ?>
 

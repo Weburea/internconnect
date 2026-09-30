@@ -19,9 +19,15 @@ declare(strict_types=1);
     box-sizing: border-box;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 768px) and (max-width: 1023px) {
     .process-section-wrap {
-        padding: 56px 0 100px 0;
+        padding: 56px 0 80px 0;
+    }
+}
+
+@media (min-width: 1024px) {
+    .process-section-wrap {
+        padding: 56px 0 0 0;
     }
 }
 
@@ -1263,6 +1269,12 @@ declare(strict_types=1);
 
                 <!-- Bottom Center Destination Convergence Node (500, 981) -->
                 <circle cx="500" cy="981" r="6" fill="#000623" stroke="#FFFFFF" stroke-width="2" />
+
+                <!-- Continuous Circuit Conduit Extending Down to Meet Jenny Section -->
+                <path class="process-flow-track" d="M 497 981 L 497 1000" />
+                <path class="process-flow-track" d="M 503 981 L 503 1000" />
+                <path class="process-flow-beam process-beam-left" d="M 497 981 L 497 1000" stroke="url(#processFlowLeftGrad)" filter="url(#processGlowPurple)" />
+                <path class="process-flow-beam process-beam-right" d="M 503 981 L 503 1000" stroke="url(#processFlowDarkGrad)" filter="url(#processGlowDark)" />
             </svg>
 
             <!-- Bento Grid System -->
