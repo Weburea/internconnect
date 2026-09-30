@@ -87,52 +87,14 @@ if (!empty($sessionUser)) {
     stroke-width: 3.5px;
     stroke-linecap: round;
     fill: none;
-    stroke-dasharray: 220 2000;
-    animation: jennyBeamTravel 10s linear infinite;
-}
-
-.meet-jenny-beam-left {
-    animation-duration: 10s;
-}
-
-.meet-jenny-beam-right {
-    animation-duration: 10s;
-    animation-delay: 0.15s;
-}
-
-@keyframes jennyBeamTravel {
-    0%, 43% {
-        stroke-dashoffset: 2020;
-        opacity: 0;
-    }
-    45% {
-        stroke-dashoffset: 2020;
-        opacity: 1;
-    }
-    89% {
-        stroke-dashoffset: 0;
-        opacity: 1;
-    }
-    92% {
-        stroke-dashoffset: -10;
-        opacity: 0;
-    }
-    100% {
-        stroke-dashoffset: -10;
-        opacity: 0;
-    }
+    opacity: 0;
+    will-change: stroke-dashoffset, opacity;
 }
 
 .jenny-node-pulse {
-    animation: jennyNodePulse 10s cubic-bezier(0, 0, 0.2, 1) infinite;
     transform-origin: 500px 930px;
-}
-
-@keyframes jennyNodePulse {
-    0%, 88% { r: 6px; opacity: 0; }
-    89% { r: 6px; opacity: 0.85; }
-    92% { r: 18px; opacity: 0.3; }
-    94%, 100% { r: 24px; opacity: 0; }
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
 }
 
 /* ─── Section Header ─── */

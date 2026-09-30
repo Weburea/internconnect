@@ -4111,7 +4111,8 @@ img,video {
    ───────────────────────────────────────────────────────────── */
 .site-main-header {
   background-color: #FFFFFF;
-  border-bottom: 1px solid #F1F5F9;
+  border-bottom: none !important;
+  box-shadow: none !important;
   position: sticky;
   top: 0;
   z-index: 50;
@@ -4126,6 +4127,7 @@ img,video {
 }
 
 .header-inner {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -4162,6 +4164,9 @@ img,video {
 @media (min-width: 960px) {
   .header-desktop-links {
     display: flex;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
   }
 }
 
@@ -8141,14 +8146,29 @@ img,video {
   }
 }
 
+/* ─── InternConnect Premium Purple Custom Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
 
+::-webkit-scrollbar-track {
+  background: #F8FAFC;
+}
 
+::-webkit-scrollbar-thumb {
+  background: #4F48E6;
+  border-radius: 9999px;
+  border: 2px solid #F8FAFC;
+  transition: background 0.2s ease;
+}
 
+::-webkit-scrollbar-thumb:hover {
+  background: #3730A3;
+}
 
-
-
-
-
-
-
-
+/* Firefox scrollbar */
+html, body {
+  scrollbar-width: thin;
+  scrollbar-color: #4F48E6 #F8FAFC;
+}

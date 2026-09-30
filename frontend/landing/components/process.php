@@ -167,51 +167,14 @@ declare(strict_types=1);
     stroke-width: 3.5px;
     stroke-linecap: round;
     fill: none;
-    stroke-dasharray: 220 1800;
-    animation: processBeamTravel 10s linear infinite;
-}
-
-.process-beam-left {
-    animation-duration: 10s;
-}
-
-.process-beam-right {
-    animation-duration: 10s;
-    animation-delay: 0.15s;
-}
-
-@keyframes processBeamTravel {
-    0% {
-        stroke-dashoffset: 1820;
-        opacity: 0;
-    }
-    2% {
-        opacity: 1;
-    }
-    43% {
-        stroke-dashoffset: 0;
-        opacity: 1;
-    }
-    45% {
-        stroke-dashoffset: -10;
-        opacity: 0;
-    }
-    100% {
-        stroke-dashoffset: -10;
-        opacity: 0;
-    }
+    opacity: 0;
+    will-change: stroke-dashoffset, opacity;
 }
 
 .process-node-pulse {
-    animation: processNodePulse 10s cubic-bezier(0, 0, 0.2, 1) infinite;
     transform-origin: 500px 981px;
-}
-
-@keyframes processNodePulse {
-    0%, 42% { r: 6px; opacity: 0; }
-    43% { r: 6px; opacity: 0.85; }
-    46% { r: 18px; opacity: 0.3; }
-    48%, 100% { r: 24px; opacity: 0; }
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
 }
 
 /* ─── Bento Grid Layout ─── */
@@ -946,18 +909,18 @@ declare(strict_types=1);
 /* Floating Upcoming Interview Card */
 .process-floating-interview {
     position: absolute;
-    bottom: -16px;
-    left: 12px;
+    bottom: -18px;
+    left: -8px;
     background: #FFFFFF;
     border: 1px solid #E2E8F0;
     border-radius: 16px;
-    padding: 12px 16px;
-    box-shadow: 0 14px 34px -4px rgba(0, 6, 35, 0.12);
+    padding: 11px 14px;
+    box-shadow: 0 14px 34px -4px rgba(0, 6, 35, 0.12), 0 3px 10px -2px rgba(0, 6, 35, 0.04);
     display: flex;
     flex-direction: column;
     gap: 8px;
-    max-width: 280px;
-    width: calc(100% - 24px);
+    width: calc(100% + 16px);
+    max-width: 352px;
     box-sizing: border-box;
     z-index: 10;
     animation: processFloatUp 4s ease-in-out infinite;
@@ -978,18 +941,26 @@ declare(strict_types=1);
     align-items: center;
     justify-content: space-between;
     gap: 6px;
+    width: 100%;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
 }
 
 .process-interview-title-wrap {
     display: flex;
     align-items: center;
     gap: 6px;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
 }
 
 .process-interview-title {
-    font-size: 11.5px;
+    font-size: 11px;
     font-weight: 700;
     color: #000623;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    letter-spacing: -0.01em;
 }
 
 .process-interview-confirmed-badge {
@@ -1000,8 +971,10 @@ declare(strict_types=1);
     border-radius: 9999px;
     background: #DCFCE7;
     color: #15803D;
-    font-size: 10px;
+    font-size: 9.5px;
     font-weight: 700;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
     animation: processPulseCheck 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -1011,9 +984,12 @@ declare(strict_types=1);
 }
 
 .process-interview-time {
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 600;
     color: #4F48E6;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    margin-left: auto;
 }
 
 .process-interview-body {
@@ -1208,15 +1184,41 @@ declare(strict_types=1);
         left: auto;
         width: 100%;
         max-width: 100%;
-        margin-top: 4px;
-        padding: 10px 12px;
+        margin-top: 8px;
+        padding: 9px 12px;
         animation: none;
+        box-sizing: border-box;
     }
-    .process-interview-name {
-        font-size: 11.5px;
+    .process-interview-header {
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+        gap: 4px !important;
+    }
+    .process-interview-title {
+        font-size: 10.5px !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+    }
+    .process-interview-confirmed-badge {
+        font-size: 8.5px !important;
+        padding: 1.5px 5px !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
     }
     .process-interview-time {
-        font-size: 10.5px;
+        font-size: 9.5px !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
+    }
+    .process-interview-name {
+        font-size: 11px !important;
+        white-space: nowrap !important;
+    }
+    .process-interview-btn {
+        font-size: 9.5px !important;
+        padding: 3px 8px !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
     }
     .process-cal-cursor {
         display: none !important; /* Hide simulated cursor on mobile touch */
@@ -1786,4 +1788,150 @@ function processSchedulerComponent() {
         }
     };
 }
+
+/**
+ * Scroll-Driven Circuit Flow Engine (Effortless Process -> Meet Jenny Conduit Flow)
+ * Dynamically binds SVG laser pulse progression to page scroll position with seamless inter-section handoff.
+ */
+document.addEventListener('DOMContentLoaded', function() {
+    // Only execute on desktop displays where SVG flow circuits are active
+    if (window.innerWidth < 1024) return;
+
+    const processSection = document.getElementById('process-section');
+    const jennySection = document.getElementById('meet-jenny-block');
+    if (!processSection || !jennySection) return;
+
+    const pBeamLeft = processSection.querySelector('.process-beam-left');
+    const pBeamRight = processSection.querySelector('.process-beam-right');
+    const jBeamLeft = jennySection.querySelector('.meet-jenny-beam-left');
+    const jBeamRight = jennySection.querySelector('.meet-jenny-beam-right');
+    const pPulseNode = processSection.querySelector('.process-node-pulse');
+    const jPulseNode = jennySection.querySelector('.jenny-node-pulse');
+
+    if (!pBeamLeft || !jBeamLeft) return;
+
+    let lenPLeft = 0;
+    let lenPRight = 0;
+    let lenJLeft = 0;
+    let lenJRight = 0;
+    const beamLen = 220; // Length of traveling energy pulse
+
+    function initPathLengths() {
+        lenPLeft = pBeamLeft.getTotalLength();
+        lenPRight = pBeamRight ? pBeamRight.getTotalLength() : lenPLeft;
+        lenJLeft = jBeamLeft.getTotalLength();
+        lenJRight = jBeamRight ? jBeamRight.getTotalLength() : lenJLeft;
+
+        pBeamLeft.style.strokeDasharray = `${beamLen} ${lenPLeft + beamLen}`;
+        if (pBeamRight) pBeamRight.style.strokeDasharray = `${beamLen} ${lenPRight + beamLen}`;
+        jBeamLeft.style.strokeDasharray = `${beamLen} ${lenJLeft + beamLen}`;
+        if (jBeamRight) jBeamRight.style.strokeDasharray = `${beamLen} ${lenJRight + beamLen}`;
+    }
+
+    initPathLengths();
+
+    let ticking = false;
+
+    function updateCircuitFlow() {
+        const vh = window.innerHeight;
+        const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+
+        // Viewport trigger focus line (55% down screen)
+        const triggerY = scrollY + vh * 0.55;
+
+        // Measure Section Geometry
+        const pRect = processSection.getBoundingClientRect();
+        const pTop = pRect.top + scrollY;
+        const pHeight = processSection.offsetHeight;
+
+        const jRect = jennySection.getBoundingClientRect();
+        const jTop = jRect.top + scrollY;
+        const jHeight = jennySection.offsetHeight;
+
+        // 1. Process Section Scroll Progress [0, 1]
+        // Kicks in when reading line enters process section, completes at section bottom
+        let pProg = (triggerY - (pTop + 40)) / (pHeight - 80);
+        pProg = Math.max(0, Math.min(1, pProg));
+
+        // 2. Jenny Section Scroll Progress [0, 1]
+        // Starts exactly when process section concludes (seamless handoff through conduit)
+        let jProg = (triggerY - jTop) / (jHeight - 100);
+        jProg = Math.max(0, Math.min(1, jProg));
+
+        // Animate Process Energy Beams
+        if (pProg > 0 && pProg < 1) {
+            pBeamLeft.style.opacity = '1';
+            if (pBeamRight) pBeamRight.style.opacity = '1';
+
+            const offsetPLeft = beamLen - pProg * (lenPLeft + beamLen);
+            const offsetPRight = beamLen - pProg * (lenPRight + beamLen);
+
+            pBeamLeft.style.strokeDashoffset = offsetPLeft;
+            if (pBeamRight) pBeamRight.style.strokeDashoffset = offsetPRight;
+        } else if (pProg >= 1) {
+            pBeamLeft.style.opacity = '0';
+            if (pBeamRight) pBeamRight.style.opacity = '0';
+        } else {
+            pBeamLeft.style.opacity = '0';
+            if (pBeamRight) pBeamRight.style.opacity = '0';
+        }
+
+        // Process Convergence Node Glow Trigger
+        if (pPulseNode) {
+            if (pProg > 0.88 && pProg < 1.0) {
+                pPulseNode.style.opacity = '0.75';
+                pPulseNode.style.transform = 'scale(1.35)';
+            } else {
+                pPulseNode.style.opacity = '0';
+                pPulseNode.style.transform = 'scale(1)';
+            }
+        }
+
+        // Animate Jenny Energy Beams (crawls through vertical conduit lines first, then branches out)
+        if (jProg > 0 && jProg < 1) {
+            jBeamLeft.style.opacity = '1';
+            if (jBeamRight) jBeamRight.style.opacity = '1';
+
+            const offsetJLeft = beamLen - jProg * (lenJLeft + beamLen);
+            const offsetJRight = beamLen - jProg * (lenJRight + beamLen);
+
+            jBeamLeft.style.strokeDashoffset = offsetJLeft;
+            if (jBeamRight) jBeamRight.style.strokeDashoffset = offsetJRight;
+        } else {
+            jBeamLeft.style.opacity = '0';
+            if (jBeamRight) jBeamRight.style.opacity = '0';
+        }
+
+        // Jenny Convergence Node Glow Trigger
+        if (jPulseNode) {
+            if (jProg > 0.90 && jProg < 1.0) {
+                jPulseNode.style.opacity = '0.75';
+                jPulseNode.style.transform = 'scale(1.35)';
+            } else {
+                jPulseNode.style.opacity = '0';
+                jPulseNode.style.transform = 'scale(1)';
+            }
+        }
+
+        ticking = false;
+    }
+
+    function onScroll() {
+        if (!ticking) {
+            window.requestAnimationFrame(updateCircuitFlow);
+            ticking = true;
+        }
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', () => {
+        if (window.innerWidth >= 1024) {
+            initPathLengths();
+            updateCircuitFlow();
+        }
+    });
+
+    // Initial positioning
+    updateCircuitFlow();
+});
 </script>
