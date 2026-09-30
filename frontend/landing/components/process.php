@@ -124,7 +124,7 @@ declare(strict_types=1);
 
 @media (min-width: 1024px) {
     .process-bento-canvas-wrap {
-        padding: 4px 18px 28px 18px;
+        padding: 4px 34px 44px 34px;
     }
 }
 
@@ -197,7 +197,8 @@ declare(strict_types=1);
 @media (min-width: 1024px) {
     .process-bento-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 32px;
+        row-gap: 40px;
+        column-gap: 32px;
     }
 }
 
@@ -1212,8 +1213,8 @@ declare(strict_types=1);
         <!-- Bento Grid Canvas Wrapper with Animated Flowing Pipeline Beams -->
         <div class="process-bento-canvas-wrap">
             
-            <!-- SVG Flow Circuit Stream Overlay (Desktop & Tablet: Center Origin, Left Purple / Right Red Split, Bottom-Center Convergence) -->
-            <svg class="process-bento-flow-svg" viewBox="0 0 1000 840" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- SVG Flow Circuit Stream Overlay (Desktop & Tablet: Center Origin, Left Purple / Right Dark Mode Navy Split, Generous Card Clearance) -->
+            <svg class="process-bento-flow-svg" viewBox="0 0 1000 1000" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <defs>
                     <!-- Left Stream Gradient: Vibrant Purple/Violet into Brand Indigo -->
                     <linearGradient id="processFlowLeftGrad" x1="50%" y1="0%" x2="50%" y2="100%">
@@ -1223,12 +1224,12 @@ declare(strict_types=1);
                         <stop offset="100%" stop-color="#4F48E6"/>
                     </linearGradient>
 
-                    <!-- Right Stream Gradient: Saturated Rose/Red into Coral-Rose -->
-                    <linearGradient id="processFlowRightGrad" x1="50%" y1="0%" x2="50%" y2="100%">
-                        <stop offset="0%" stop-color="#E11D48"/>
-                        <stop offset="30%" stop-color="#F43F5E"/>
-                        <stop offset="70%" stop-color="#FB7185"/>
-                        <stop offset="100%" stop-color="#E11D48"/>
+                    <!-- Right Stream Gradient: Official InternConnect Brand Dark Mode Navy -->
+                    <linearGradient id="processFlowDarkGrad" x1="50%" y1="0%" x2="50%" y2="100%">
+                        <stop offset="0%" stop-color="#000623"/>
+                        <stop offset="30%" stop-color="#1E293B"/>
+                        <stop offset="70%" stop-color="#0F172A"/>
+                        <stop offset="100%" stop-color="#000623"/>
                     </linearGradient>
 
                     <!-- Glow Filters -->
@@ -1240,8 +1241,8 @@ declare(strict_types=1);
                         </feMerge>
                     </filter>
 
-                    <filter id="processGlowRed" x="-25%" y="-25%" width="150%" height="150%">
-                        <feGaussianBlur stdDeviation="3" result="blur"/>
+                    <filter id="processGlowDark" x="-25%" y="-25%" width="150%" height="150%">
+                        <feGaussianBlur stdDeviation="2.5" result="blur"/>
                         <feMerge>
                             <feMergeNode in="blur"/>
                             <feMergeNode in="SourceGraphic"/>
@@ -1249,19 +1250,19 @@ declare(strict_types=1);
                     </filter>
                 </defs>
 
-                <!-- Left Branch (Purple): Starts at Top-Center (500, 4), runs down center gap to 358, turns left across horizontal gap, runs down left outside Card 3, curves along bottom to center (500, 825) -->
-                <path class="process-flow-track" d="M 500 4 L 500 358 Q 500 378, 480 378 L 24 378 Q 6 378, 6 398 L 6 805 Q 6 825, 26 825 L 500 825" />
-                <path class="process-flow-beam process-beam-left" d="M 500 4 L 500 358 Q 500 378, 480 378 L 24 378 Q 6 378, 6 398 L 6 805 Q 6 825, 26 825 L 500 825" stroke="url(#processFlowLeftGrad)" filter="url(#processGlowPurple)" />
+                <!-- Left Branch (Purple): Starts at Top-Center (500, 4), runs down center gap to 445, turns left across horizontal gap at Y=467, runs down left outside Card 3 at X=11, curves along bottom at Y=981 to center (500, 981) -->
+                <path class="process-flow-track" d="M 500 4 L 500 445 Q 500 467, 475 467 L 33 467 Q 11 467, 11 489 L 11 959 Q 11 981, 33 981 L 500 981" />
+                <path class="process-flow-beam process-beam-left" d="M 500 4 L 500 445 Q 500 467, 475 467 L 33 467 Q 11 467, 11 489 L 11 959 Q 11 981, 33 981 L 500 981" stroke="url(#processFlowLeftGrad)" filter="url(#processGlowPurple)" />
 
-                <!-- Right Branch (Red): Starts at Top-Center (500, 4), runs down center gap to 358, turns right across horizontal gap, runs down right outside Card 3, curves along bottom to center (500, 825) -->
-                <path class="process-flow-track" d="M 500 4 L 500 358 Q 500 378, 520 378 L 976 378 Q 994 378, 994 398 L 994 805 Q 994 825, 974 825 L 500 825" />
-                <path class="process-flow-beam process-beam-right" d="M 500 4 L 500 358 Q 500 378, 520 378 L 976 378 Q 994 378, 994 398 L 994 805 Q 994 825, 974 825 L 500 825" stroke="url(#processFlowRightGrad)" filter="url(#processGlowRed)" />
+                <!-- Right Branch (Dark Mode Navy): Starts at Top-Center (500, 4), runs down center gap to 445, turns right across horizontal gap at Y=467, runs down right outside Card 3 at X=989, curves along bottom at Y=981 to center (500, 981) -->
+                <path class="process-flow-track" d="M 500 4 L 500 445 Q 500 467, 525 467 L 967 467 Q 989 467, 989 489 L 989 959 Q 989 981, 967 981 L 500 981" />
+                <path class="process-flow-beam process-beam-right" d="M 500 4 L 500 445 Q 500 467, 525 467 L 967 467 Q 989 467, 989 489 L 989 959 Q 989 981, 967 981 L 500 981" stroke="url(#processFlowDarkGrad)" filter="url(#processGlowDark)" />
 
                 <!-- Top Center Origin Node (500, 4) -->
                 <circle cx="500" cy="4" r="5" fill="#4F48E6" stroke="#FFFFFF" stroke-width="2" />
 
-                <!-- Bottom Center Destination Convergence Node (500, 825) -->
-                <circle cx="500" cy="825" r="6" fill="#4F48E6" stroke="#FFFFFF" stroke-width="2" />
+                <!-- Bottom Center Destination Convergence Node (500, 981) -->
+                <circle cx="500" cy="981" r="6" fill="#000623" stroke="#FFFFFF" stroke-width="2" />
             </svg>
 
             <!-- Bento Grid System -->
