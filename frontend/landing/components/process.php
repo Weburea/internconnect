@@ -27,7 +27,7 @@ declare(strict_types=1);
 
 @media (min-width: 1024px) {
     .process-section-wrap {
-        padding: 56px 0 0 0;
+        padding: 56px 0 36px 0;
     }
 }
 
@@ -168,16 +168,16 @@ declare(strict_types=1);
     stroke-linecap: round;
     fill: none;
     stroke-dasharray: 220 1600;
-    animation: processBeamTravel 4.6s linear infinite;
+    animation: processBeamTravel 8.5s linear infinite;
 }
 
 .process-beam-left {
-    animation-duration: 4.6s;
+    animation-duration: 8.5s;
 }
 
 .process-beam-right {
-    animation-duration: 4.6s;
-    animation-delay: 0.15s;
+    animation-duration: 8.5s;
+    animation-delay: 0.3s;
 }
 
 @keyframes processBeamTravel {
@@ -1267,14 +1267,9 @@ declare(strict_types=1);
                 <!-- Top Center Origin Node (500, 4) -->
                 <circle cx="500" cy="4" r="5" fill="#4F48E6" stroke="#FFFFFF" stroke-width="2" />
 
-                <!-- Bottom Center Destination Convergence Node (500, 981) -->
+                <!-- Bottom Center Destination Convergence Node (500, 981) where Enterprise flow cleanly finishes -->
                 <circle cx="500" cy="981" r="6" fill="#000623" stroke="#FFFFFF" stroke-width="2" />
-
-                <!-- Continuous Circuit Conduit Extending Down to Meet Jenny Section -->
-                <path class="process-flow-track" d="M 497 981 L 497 1000" />
-                <path class="process-flow-track" d="M 503 981 L 503 1000" />
-                <path class="process-flow-beam process-beam-left" d="M 497 981 L 497 1000" stroke="url(#processFlowLeftGrad)" filter="url(#processGlowPurple)" />
-                <path class="process-flow-beam process-beam-right" d="M 503 981 L 503 1000" stroke="url(#processFlowDarkGrad)" filter="url(#processGlowDark)" />
+                <circle class="process-node-pulse" cx="500" cy="981" r="14" fill="#000623" opacity="0.2" />
             </svg>
 
             <!-- Bento Grid System -->

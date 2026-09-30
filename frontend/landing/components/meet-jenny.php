@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 /**
- * Component: Landing Page - "Meet Jenny" AI Assistant Video Showcase Section
+ * Component: Landing Page - "Meet Jenny" AI Assistant Showcase Section
  * Location: Directly below "Streamlined Process & AI Workflow Bento Section" (process.php)
- * Continuous pipeline circuit with borderless video blend and 6 floating feature cards.
+ * Continuous pipeline circuit with borderless GIF blend and 6 floating feature cards arranged via CSS Grid.
  */
 
 $sessionUser = $_SESSION['profile_name'] ?? ($_SESSION['user']['first_name'] ?? null);
@@ -20,7 +20,7 @@ if (!empty($sessionUser)) {
 .meet-jenny-section {
     position: relative;
     background-color: #FFFFFF;
-    padding: 30px 0 90px 0;
+    padding: 40px 0 80px 0;
     width: 100%;
     overflow: hidden;
     box-sizing: border-box;
@@ -28,7 +28,7 @@ if (!empty($sessionUser)) {
 
 @media (min-width: 1024px) {
     .meet-jenny-section {
-        padding: 0 0 110px 0;
+        padding: 48px 0 100px 0;
     }
 }
 
@@ -50,7 +50,7 @@ if (!empty($sessionUser)) {
 @media (min-width: 1024px) {
     .meet-jenny-canvas-wrap {
         padding: 0 34px;
-        min-height: 750px;
+        min-height: 980px;
     }
 }
 
@@ -87,27 +87,27 @@ if (!empty($sessionUser)) {
     stroke-width: 3.5px;
     stroke-linecap: round;
     fill: none;
-    stroke-dasharray: 220 1600;
-    animation: jennyBeamTravel 4.6s linear infinite;
+    stroke-dasharray: 220 1800;
+    animation: jennyBeamTravel 8.5s linear infinite;
 }
 
 .meet-jenny-beam-left {
-    animation-duration: 4.6s;
+    animation-duration: 8.5s;
 }
 
 .meet-jenny-beam-right {
-    animation-duration: 4.6s;
-    animation-delay: 0.15s;
+    animation-duration: 8.5s;
+    animation-delay: 0.3s;
 }
 
 @keyframes jennyBeamTravel {
-    0% { stroke-dashoffset: 1820; }
+    0% { stroke-dashoffset: 2020; }
     100% { stroke-dashoffset: 0; }
 }
 
 .jenny-node-pulse {
     animation: jennyNodePulse 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
-    transform-origin: 500px 730px;
+    transform-origin: 500px 930px;
 }
 
 @keyframes jennyNodePulse {
@@ -133,8 +133,8 @@ if (!empty($sessionUser)) {
 
 @media (min-width: 1024px) {
     .meet-jenny-header {
-        padding-top: 48px;
-        margin-bottom: 24px;
+        padding-top: 56px;
+        margin-bottom: 28px;
     }
 }
 
@@ -217,49 +217,83 @@ if (!empty($sessionUser)) {
     }
 }
 
-/* ─── Center Stage Area ─── */
-.meet-jenny-stage {
+/* ─── CSS Grid Container for Exact Mathematical Card Alignment ─── */
+.meet-jenny-grid-container {
     position: relative;
-    z-index: 4;
+    z-index: 5;
     width: 100%;
     box-sizing: border-box;
 }
 
 @media (min-width: 1024px) {
-    .meet-jenny-stage {
-        height: 520px;
-        position: relative;
+    .meet-jenny-grid-container {
+        display: grid;
+        grid-template-columns: minmax(270px, 320px) minmax(320px, 450px) minmax(270px, 320px);
+        grid-template-rows: auto 1fr auto;
+        grid-template-areas:
+            "top-left    .         top-right"
+            "mid-left    center    mid-right"
+            "bot-left    .         bot-right";
+        align-items: center;
+        justify-content: space-between;
+        max-width: 1160px;
+        width: 100%;
+        height: 500px;
+        margin: 0 auto;
+    }
+
+    .card-top-left  { grid-area: top-left;  align-self: start; justify-self: start; }
+    .card-top-right { grid-area: top-right; align-self: start; justify-self: end; }
+    .card-mid-left  { grid-area: mid-left;  align-self: center; justify-self: start; }
+    .card-mid-right { grid-area: mid-right; align-self: center; justify-self: end; }
+    .card-bot-left  { grid-area: bot-left;  align-self: end; justify-self: start; }
+    .card-bot-right { grid-area: bot-right; align-self: end; justify-self: end; }
+}
+
+@media (min-width: 1024px) and (max-width: 1199px) {
+    .meet-jenny-card {
+        width: 270px !important;
+        padding: 10px 12px !important;
+    }
+    .meet-jenny-card-title {
+        font-size: 12.5px !important;
+    }
+    .meet-jenny-card-sub {
+        font-size: 11px !important;
     }
 }
 
-/* ─── Video Container (Frameless, Borderless, Soft Mask Blend) ─── */
-.meet-jenny-video-box {
+/* ─── Center GIF Container (Frameless, Borderless, Soft Mask Blend) ─── */
+.meet-jenny-media-box {
     position: relative;
-    z-index: 5;
     background-color: #FFFFFF;
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
-    max-width: 480px;
-    margin: 0 auto;
     box-sizing: border-box;
 }
 
 @media (min-width: 1024px) {
-    .meet-jenny-video-box {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 470px;
-        height: 310px;
-        max-width: 470px;
+    .meet-jenny-media-box {
+        grid-area: center;
+        align-self: center;
+        justify-self: center;
+        width: 450px;
+        height: 290px;
     }
 }
 
-/* Subtle Ambient Glow Behind Video */
-.meet-jenny-video-glow {
+@media (max-width: 1023px) {
+    .meet-jenny-media-box {
+        max-width: 440px;
+        margin: 0 auto 28px auto;
+        aspect-ratio: 16 / 9;
+    }
+}
+
+/* Subtle Ambient Glow Behind Jenny */
+.meet-jenny-media-glow {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -269,7 +303,7 @@ if (!empty($sessionUser)) {
     z-index: 1;
 }
 
-.meet-jenny-video-el {
+.meet-jenny-gif-el {
     position: relative;
     z-index: 2;
     width: 100%;
@@ -282,9 +316,10 @@ if (!empty($sessionUser)) {
     -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, #000000 28%, rgba(0, 0, 0, 0.82) 48%, rgba(0, 0, 0, 0.35) 68%, transparent 84%);
     mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, #000000 28%, rgba(0, 0, 0, 0.82) 48%, rgba(0, 0, 0, 0.35) 68%, transparent 84%);
     pointer-events: none;
+    user-select: none;
 }
 
-/* ─── Floating Feature Cards ─── */
+/* ─── Floating Feature Cards (Clean SaaS Styling & Staggered Scroll-In) ─── */
 .meet-jenny-card {
     background: #FFFFFF;
     border: 1px solid #E2E8F0;
@@ -295,8 +330,24 @@ if (!empty($sessionUser)) {
     align-items: center;
     gap: 12px;
     box-sizing: border-box;
-    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease;
     user-select: none;
+}
+
+@media (min-width: 1024px) {
+    .meet-jenny-card {
+        width: 320px;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease;
+    }
+
+    /* Staggered Scroll-in Entrance Triggered by IntersectionObserver */
+    .meet-jenny-grid-container.is-visible .card-top-left  { opacity: 1; transform: translateY(0); transition-delay: 0ms; }
+    .meet-jenny-grid-container.is-visible .card-top-right { opacity: 1; transform: translateY(0); transition-delay: 130ms; }
+    .meet-jenny-grid-container.is-visible .card-mid-left  { opacity: 1; transform: translateY(0); transition-delay: 260ms; }
+    .meet-jenny-grid-container.is-visible .card-mid-right { opacity: 1; transform: translateY(0); transition-delay: 390ms; }
+    .meet-jenny-grid-container.is-visible .card-bot-left  { opacity: 1; transform: translateY(0); transition-delay: 520ms; }
+    .meet-jenny-grid-container.is-visible .card-bot-right { opacity: 1; transform: translateY(0); transition-delay: 650ms; }
 }
 
 .meet-jenny-card:hover {
@@ -363,7 +414,7 @@ if (!empty($sessionUser)) {
 }
 
 .meet-jenny-card-badge {
-    font-size: 10.5px;
+    font-size: 10px;
     font-weight: 700;
     padding: 3px 8px;
     border-radius: 9999px;
@@ -372,85 +423,19 @@ if (!empty($sessionUser)) {
     border: 1px solid #E2E8F0;
     white-space: nowrap;
     flex-shrink: 0;
+    margin-left: auto;
 }
 
-/* Desktop Absolute Positioning Around Jenny */
-@media (min-width: 1024px) {
-    .meet-jenny-cards-wrap {
-        position: static;
-    }
-    
-    .meet-jenny-card {
-        position: absolute;
-        width: 310px;
-        z-index: 6;
-    }
-    
-    /* Left Flank */
-    .card-top-left {
-        top: 6%;
-        left: 32px;
-        animation: jennyFloatA 4.2s ease-in-out infinite alternate;
-    }
-    
-    .card-mid-left {
-        top: 44%;
-        left: 14px;
-        animation: jennyFloatB 4.6s ease-in-out 0.8s infinite alternate;
-    }
-    
-    .card-bot-left {
-        top: 80%;
-        left: 34px;
-        animation: jennyFloatA 5.0s ease-in-out 1.6s infinite alternate;
-    }
-    
-    /* Right Flank */
-    .card-top-right {
-        top: 6%;
-        right: 32px;
-        animation: jennyFloatB 4.4s ease-in-out 0.4s infinite alternate;
-    }
-    
-    .card-mid-right {
-        top: 44%;
-        right: 14px;
-        animation: jennyFloatA 4.8s ease-in-out 1.2s infinite alternate;
-    }
-    
-    .card-bot-right {
-        top: 80%;
-        right: 34px;
-        animation: jennyFloatB 5.2s ease-in-out 2.0s infinite alternate;
-    }
-}
-
-@keyframes jennyFloatA {
-    0% { transform: translateY(0px); }
-    100% { transform: translateY(-7px); }
-}
-
-@keyframes jennyFloatB {
-    0% { transform: translateY(0px); }
-    100% { transform: translateY(6px); }
-}
-
-/* Tablet & Mobile Grid Layout */
+/* Tablet & Mobile Layout */
 @media (max-width: 1023px) {
-    .meet-jenny-stage {
+    .meet-jenny-grid-container {
         display: flex;
         flex-direction: column;
         align-items: center;
         width: 100%;
     }
     
-    .meet-jenny-video-box {
-        margin-bottom: 28px;
-        max-width: 440px;
-        aspect-ratio: 16 / 9;
-    }
-    
-    .meet-jenny-cards-wrap {
+    .meet-jenny-cards-mobile-wrap {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 12px;
@@ -464,7 +449,7 @@ if (!empty($sessionUser)) {
 }
 
 @media (max-width: 640px) {
-    .meet-jenny-cards-wrap {
+    .meet-jenny-cards-mobile-wrap {
         grid-template-columns: minmax(0, 1fr) !important;
         gap: 10px;
         width: 100% !important;
@@ -494,11 +479,11 @@ if (!empty($sessionUser)) {
 <section class="meet-jenny-section" id="meet-jenny-block">
     <div class="meet-jenny-container">
         
-        <!-- Canvas Wrapper (Holds Continuous Flow Circuit & Stage) -->
+        <!-- Canvas Wrapper (Holds Continuous Flow Circuit & CSS Grid Stage) -->
         <div class="meet-jenny-canvas-wrap">
 
-            <!-- SVG Flow Circuit Stream Overlay (Desktop: Dual Incoming Center Origin, Flank Enveloping, Center Convergence) -->
-            <svg class="meet-jenny-flow-svg" viewBox="0 0 1000 750" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- SVG Flow Circuit Stream Overlay (Desktop: Clean Vertical Distance Entry, Wide Flank Enveloping, 120px+ Under-Card Bottom Clearance) -->
+            <svg class="meet-jenny-flow-svg" viewBox="0 0 1000 970" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <defs>
                     <!-- Left Stream Gradient: Vibrant Purple/Violet into Brand Indigo -->
                     <linearGradient id="jennyFlowLeftGrad" x1="50%" y1="0%" x2="50%" y2="100%">
@@ -534,17 +519,20 @@ if (!empty($sessionUser)) {
                     </filter>
                 </defs>
 
-                <!-- Left Branch (Purple): Enters at Top-Center (497, 0), runs down to Y=22, turns left to X=33, curves down along left flank at X=11, curves along bottom at Y=710 to center convergence (497, 730) -->
-                <path class="meet-jenny-flow-track" d="M 497 0 L 497 10 Q 497 22, 475 22 L 33 22 Q 11 22, 11 44 L 11 688 Q 11 710, 33 710 L 475 710 Q 497 710, 497 722 L 497 730" />
-                <path class="meet-jenny-flow-beam meet-jenny-beam-left" d="M 497 0 L 497 10 Q 497 22, 475 22 L 33 22 Q 11 22, 11 44 L 11 688 Q 11 710, 33 710 L 475 710 Q 497 710, 497 722 L 497 730" stroke="url(#jennyFlowLeftGrad)" filter="url(#jennyGlowPurple)" />
+                <!-- Top Center Entry Origin Node (500, 0) -->
+                <circle cx="500" cy="0" r="5" fill="#4F48E6" stroke="#FFFFFF" stroke-width="2" />
 
-                <!-- Right Branch (Dark Mode Navy): Enters at Top-Center (503, 0), runs down to Y=22, turns right to X=967, curves down along right flank at X=989, curves along bottom at Y=710 to center convergence (503, 730) -->
-                <path class="meet-jenny-flow-track" d="M 503 0 L 503 10 Q 503 22, 525 22 L 967 22 Q 989 22, 989 44 L 989 688 Q 989 710, 967 710 L 525 710 Q 503 710, 503 722 L 503 730" />
-                <path class="meet-jenny-flow-beam meet-jenny-beam-right" d="M 503 0 L 503 10 Q 503 22, 525 22 L 967 22 Q 989 22, 989 44 L 989 688 Q 989 710, 967 710 L 525 710 Q 503 710, 503 722 L 503 730" stroke="url(#jennyFlowDarkGrad)" filter="url(#jennyGlowDark)" />
+                <!-- Left Branch (Purple): Enters from top at (497, 0), travels down 48px vertical corridor, branches left at Y=68, curves down left flank at X=11, curves along bottom at Y=900 (120px+ clear below bottom cards) to center convergence (497, 930), then exits toward next section -->
+                <path class="meet-jenny-flow-track" d="M 497 0 L 497 48 Q 497 68, 475 68 L 33 68 Q 11 68, 11 88 L 11 878 Q 11 900, 33 900 L 475 900 Q 497 900, 497 915 L 497 930 L 497 970" />
+                <path class="meet-jenny-flow-beam meet-jenny-beam-left" d="M 497 0 L 497 48 Q 497 68, 475 68 L 33 68 Q 11 68, 11 88 L 11 878 Q 11 900, 33 900 L 475 900 Q 497 900, 497 915 L 497 930 L 497 970" stroke="url(#jennyFlowLeftGrad)" filter="url(#jennyGlowPurple)" />
 
-                <!-- Bottom Center Destination Convergence Node (500, 730) -->
-                <circle cx="500" cy="730" r="6" fill="#000623" stroke="#FFFFFF" stroke-width="2" />
-                <circle class="jenny-node-pulse" cx="500" cy="730" r="14" fill="#4F48E6" opacity="0.25" />
+                <!-- Right Branch (Dark Mode Navy): Enters from top at (503, 0), travels down 48px vertical corridor, branches right at Y=68, curves down right flank at X=989, curves along bottom at Y=900 (120px+ clear below bottom cards) to center convergence (503, 930), then exits toward next section -->
+                <path class="meet-jenny-flow-track" d="M 503 0 L 503 48 Q 503 68, 525 68 L 967 68 Q 989 68, 989 88 L 989 878 Q 989 900, 967 900 L 525 900 Q 503 900, 503 915 L 503 930 L 503 970" />
+                <path class="meet-jenny-flow-beam meet-jenny-beam-right" d="M 503 0 L 503 48 Q 503 68, 525 68 L 967 68 Q 989 68, 989 88 L 989 878 Q 989 900, 967 900 L 525 900 Q 503 900, 503 915 L 503 930 L 503 970" stroke="url(#jennyFlowDarkGrad)" filter="url(#jennyGlowDark)" />
+
+                <!-- Bottom Center Destination Convergence Node (500, 930) -->
+                <circle cx="500" cy="930" r="6" fill="#000623" stroke="#FFFFFF" stroke-width="2" />
+                <circle class="jenny-node-pulse" cx="500" cy="930" r="14" fill="#4F48E6" opacity="0.25" />
             </svg>
 
             <!-- Section Header (Positioned at Top-Center of Stage) -->
@@ -561,112 +549,102 @@ if (!empty($sessionUser)) {
                 </p>
             </div>
 
-            <!-- Center Stage Layout with Frameless Video & 6 Floating Feature Cards -->
-            <div class="meet-jenny-stage">
+            <!-- CSS Grid Container with Named Areas for Consistent Card Alignment -->
+            <div class="meet-jenny-grid-container" id="meet-jenny-grid-wrap">
 
-                <!-- Center Video Container (Frameless, Borderless, Soft Mask Blend) -->
-                <div class="meet-jenny-video-box">
-                    <div class="meet-jenny-video-glow"></div>
-                    <video 
-                        id="jenny-intro-video"
-                        class="meet-jenny-video-el"
-                        src="https://res.cloudinary.com/weburea/video/upload/v1790732325/jenny_ai_intro_x6cdop.mp4"
-                        autoplay 
-                        loop 
-                        muted 
-                        playsinline 
-                        preload="auto"
-                        aria-label="Meet Jenny AI Introduction Video"
-                    ></video>
+                <!-- Center Media Box: Jenny AI Native Looping GIF (Frameless, Borderless, Soft Mask Blend) -->
+                <div class="meet-jenny-media-box">
+                    <div class="meet-jenny-media-glow"></div>
+                    <img 
+                        src="https://res.cloudinary.com/weburea/image/upload/v1790735673/jenny_ai_intro_frykbn.gif" 
+                        alt="Jenny AI assistant" 
+                        class="meet-jenny-gif-el"
+                        loading="eager"
+                    >
                 </div>
 
-                <!-- 6 Floating Feature Cards (Per Hand-Drawn Sketch Layout) -->
-                <div class="meet-jenny-cards-wrap">
-
-                    <!-- Card 1: Top-Left (Update Your CV) -->
-                    <div class="meet-jenny-card card-top-left">
-                        <div class="meet-jenny-card-icon meet-jenny-icon-purple">
-                            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                        </div>
-                        <div class="meet-jenny-card-text">
-                            <span class="meet-jenny-card-title">Update Your CV</span>
-                            <span class="meet-jenny-card-sub">ATS format & keyword scoring</span>
-                        </div>
-                        <span class="meet-jenny-card-badge">96% ATS</span>
+                <!-- Card 1: Top-Left (Update Your CV) -->
+                <div class="meet-jenny-card card-top-left">
+                    <div class="meet-jenny-card-icon meet-jenny-icon-purple">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
                     </div>
-
-                    <!-- Card 2: Middle-Left (Direct Google Meet Sync) -->
-                    <div class="meet-jenny-card card-mid-left">
-                        <div class="meet-jenny-card-icon meet-jenny-icon-violet">
-                            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                            </svg>
-                        </div>
-                        <div class="meet-jenny-card-text">
-                            <span class="meet-jenny-card-title">Google Meet Sync</span>
-                            <span class="meet-jenny-card-sub">Instant 1-click video links</span>
-                        </div>
-                        <span class="meet-jenny-card-badge">Auto Link</span>
+                    <div class="meet-jenny-card-text">
+                        <span class="meet-jenny-card-title">Update Your CV</span>
+                        <span class="meet-jenny-card-sub">ATS format & keyword scoring</span>
                     </div>
+                    <span class="meet-jenny-card-badge">96% ATS</span>
+                </div>
 
-                    <!-- Card 3: Bottom-Left (AI Competency Match) -->
-                    <div class="meet-jenny-card card-bot-left">
-                        <div class="meet-jenny-card-icon meet-jenny-icon-purple">
-                            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                            </svg>
-                        </div>
-                        <div class="meet-jenny-card-text">
-                            <span class="meet-jenny-card-title">AI Competency Match</span>
-                            <span class="meet-jenny-card-sub">Role alignment & skill depth</span>
-                        </div>
-                        <span class="meet-jenny-card-badge">Top 5%</span>
+                <!-- Card 2: Middle-Left (Interview Link Sync — Renamed from Google Meet Sync) -->
+                <div class="meet-jenny-card card-mid-left">
+                    <div class="meet-jenny-card-icon meet-jenny-icon-violet">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
                     </div>
-
-                    <!-- Card 4: Top-Right (Schedule Interviews) -->
-                    <div class="meet-jenny-card card-top-right">
-                        <div class="meet-jenny-card-icon meet-jenny-icon-navy">
-                            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                        </div>
-                        <div class="meet-jenny-card-text">
-                            <span class="meet-jenny-card-title">Schedule Interviews</span>
-                            <span class="meet-jenny-card-sub">Automated slot coordination</span>
-                        </div>
-                        <span class="meet-jenny-card-badge">Zero Lag</span>
+                    <div class="meet-jenny-card-text">
+                        <span class="meet-jenny-card-title">Interview Link Sync</span>
+                        <span class="meet-jenny-card-sub">Instant video call links for any platform</span>
                     </div>
+                    <span class="meet-jenny-card-badge">Any Platform</span>
+                </div>
 
-                    <!-- Card 5: Middle-Right (Track Applications) -->
-                    <div class="meet-jenny-card card-mid-right">
-                        <div class="meet-jenny-card-icon meet-jenny-icon-emerald">
-                            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
-                            </svg>
-                        </div>
-                        <div class="meet-jenny-card-text">
-                            <span class="meet-jenny-card-title">Track Applications</span>
-                            <span class="meet-jenny-card-sub">Live milestone status alerts</span>
-                        </div>
-                        <span class="meet-jenny-card-badge">Real-Time</span>
+                <!-- Card 3: Bottom-Left (AI Competency Match) -->
+                <div class="meet-jenny-card card-bot-left">
+                    <div class="meet-jenny-card-icon meet-jenny-icon-purple">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
                     </div>
-
-                    <!-- Card 6: Bottom-Right (24/7 Placement Guidance) -->
-                    <div class="meet-jenny-card card-bot-right">
-                        <div class="meet-jenny-card-icon meet-jenny-icon-navy">
-                            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                            </svg>
-                        </div>
-                        <div class="meet-jenny-card-text">
-                            <span class="meet-jenny-card-title">24/7 Placement Guidance</span>
-                            <span class="meet-jenny-card-sub">Proactive recruiter mentoring</span>
-                        </div>
-                        <span class="meet-jenny-card-badge">Always On</span>
+                    <div class="meet-jenny-card-text">
+                        <span class="meet-jenny-card-title">AI Competency Match</span>
+                        <span class="meet-jenny-card-sub">Role alignment & skill depth</span>
                     </div>
+                    <span class="meet-jenny-card-badge">Top 5%</span>
+                </div>
 
+                <!-- Card 4: Top-Right (Schedule Interviews) -->
+                <div class="meet-jenny-card card-top-right">
+                    <div class="meet-jenny-card-icon meet-jenny-icon-navy">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <div class="meet-jenny-card-text">
+                        <span class="meet-jenny-card-title">Schedule Interviews</span>
+                        <span class="meet-jenny-card-sub">Automated slot coordination</span>
+                    </div>
+                    <span class="meet-jenny-card-badge">Zero Lag</span>
+                </div>
+
+                <!-- Card 5: Middle-Right (Track Applications) -->
+                <div class="meet-jenny-card card-mid-right">
+                    <div class="meet-jenny-card-icon meet-jenny-icon-emerald">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                        </svg>
+                    </div>
+                    <div class="meet-jenny-card-text">
+                        <span class="meet-jenny-card-title">Track Applications</span>
+                        <span class="meet-jenny-card-sub">Live milestone status alerts</span>
+                    </div>
+                    <span class="meet-jenny-card-badge">Real-Time</span>
+                </div>
+
+                <!-- Card 6: Bottom-Right (24/7 Career Guidance) -->
+                <div class="meet-jenny-card card-bot-right">
+                    <div class="meet-jenny-card-icon meet-jenny-icon-navy">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                    </div>
+                    <div class="meet-jenny-card-text">
+                        <span class="meet-jenny-card-title">24/7 Career Guidance</span>
+                        <span class="meet-jenny-card-sub">Proactive recruiter mentoring</span>
+                    </div>
+                    <span class="meet-jenny-card-badge">Always On</span>
                 </div>
 
             </div>
@@ -678,27 +656,29 @@ if (!empty($sessionUser)) {
 
 <script>
 /**
- * Autonomous Autoplay Assurance for Jenny AI Introduction Video
+ * Staggered Scroll-In Entrance Animation for Jenny Feature Cards
  */
 document.addEventListener('DOMContentLoaded', function() {
-    const video = document.getElementById('jenny-intro-video');
-    if (video) {
-        video.muted = true;
-        const playPromise = video.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(function() {
-                // Browser autoplay security fallback: play on first scroll or interaction
-                const triggerPlay = function() {
-                    video.play().catch(function() {});
-                    window.removeEventListener('scroll', triggerPlay);
-                    window.removeEventListener('touchstart', triggerPlay);
-                    window.removeEventListener('click', triggerPlay);
-                };
-                window.addEventListener('scroll', triggerPlay, { passive: true, once: true });
-                window.addEventListener('touchstart', triggerPlay, { passive: true, once: true });
-                window.addEventListener('click', triggerPlay, { passive: true, once: true });
+    const gridWrap = document.getElementById('meet-jenny-grid-wrap');
+    if (!gridWrap) return;
+
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    gridWrap.classList.add('is-visible');
+                    observer.unobserve(entry.target);
+                }
             });
-        }
+        }, {
+            threshold: 0.22,
+            rootMargin: '0px 0px -40px 0px'
+        });
+
+        observer.observe(gridWrap);
+    } else {
+        // Fallback for older browsers
+        gridWrap.classList.add('is-visible');
     }
 });
 </script>
