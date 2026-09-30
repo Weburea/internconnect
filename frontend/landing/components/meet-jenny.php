@@ -207,6 +207,206 @@ if (!empty($sessionUser)) {
     color: #4F48E6;
 }
 
+/* ─── Brand Selection Box & Animated Color-Synchronized Spinning Cursor for Jenny (Figma Style) ─── */
+.jenny-brand-highlight {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 14px 4px 12px;
+    border: 1.5px solid #4F48E6;
+    border-radius: 8px;
+    background: rgba(79, 72, 230, 0.04);
+    color: #4F48E6;
+    box-shadow: 0 0 0 1px rgba(79, 72, 230, 0.12);
+    vertical-align: middle;
+    margin: 0 4px;
+    animation: jennyBoxColorCircuit 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.jenny-brand-highlight .jenny-handle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background-color: #FFFFFF;
+    border: 1.5px solid #4F48E6;
+    border-radius: 1px;
+    z-index: 2;
+    transition: all 0.3s ease;
+    animation: jennyHandleColorCircuit 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.jenny-handle-tl { top: -4px; left: -4px; }
+.jenny-handle-tr { top: -4px; right: -4px; }
+.jenny-handle-bl { bottom: -4px; left: -4px; }
+.jenny-handle-br { bottom: -4px; right: -4px; }
+
+/* Large sharp cursor pointer with color-synchronized fill and glow, spinning & hovering across 4 corners */
+.jenny-cursor-pointer {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 10;
+    animation: jennyCursorCircuit 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    transform-origin: 20% 20%;
+}
+
+.jenny-cursor-svg {
+    width: 28px;
+    height: 28px;
+    color: #4F48E6;
+    animation: jennyCursorColorCircuit 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.jenny-cursor-path {
+    fill: currentColor;
+    stroke: #FFFFFF;
+    stroke-width: 1.6;
+    stroke-linejoin: round;
+}
+
+@keyframes jennyCursorCircuit {
+    0%, 100% {
+        top: calc(100% - 6px);
+        left: calc(100% - 6px);
+        transform: rotate(0deg) scale(1);
+    }
+    8% {
+        top: calc(100% - 6px);
+        left: calc(100% - 6px);
+        transform: rotate(-12deg) scale(0.86);
+    }
+    14% {
+        top: calc(100% - 6px);
+        left: calc(100% - 6px);
+        transform: rotate(0deg) scale(1);
+    }
+    20% {
+        transform: rotate(180deg) scale(1.12);
+    }
+    28% {
+        top: calc(100% - 6px);
+        left: -14px;
+        transform: rotate(360deg) scale(1);
+    }
+    33% {
+        top: calc(100% - 6px);
+        left: -14px;
+        transform: rotate(348deg) scale(0.86);
+    }
+    38% {
+        top: calc(100% - 6px);
+        left: -14px;
+        transform: rotate(360deg) scale(1);
+    }
+    44% {
+        transform: rotate(540deg) scale(1.12);
+    }
+    50% {
+        top: -18px;
+        left: -14px;
+        transform: rotate(720deg) scale(1);
+    }
+    55% {
+        top: -18px;
+        left: -14px;
+        transform: rotate(708deg) scale(0.86);
+    }
+    60% {
+        top: -18px;
+        left: -14px;
+        transform: rotate(720deg) scale(1);
+    }
+    66% {
+        transform: rotate(900deg) scale(1.12);
+    }
+    72% {
+        top: -18px;
+        left: calc(100% - 6px);
+        transform: rotate(1080deg) scale(1);
+    }
+    77% {
+        top: -18px;
+        left: calc(100% - 6px);
+        transform: rotate(1068deg) scale(0.86);
+    }
+    82% {
+        top: -18px;
+        left: calc(100% - 6px);
+        transform: rotate(1080deg) scale(1);
+    }
+    87% {
+        transform: rotate(1260deg) scale(1.12);
+    }
+    92% {
+        top: calc(100% - 6px);
+        left: calc(100% - 6px);
+        transform: rotate(1440deg) scale(1);
+    }
+}
+
+@keyframes jennyCursorColorCircuit {
+    0%, 16% {
+        color: #4F48E6;
+        filter: drop-shadow(0 4px 10px rgba(79, 72, 230, 0.5));
+    }
+    26%, 40% {
+        color: #FF5722;
+        filter: drop-shadow(0 4px 10px rgba(255, 87, 34, 0.5));
+    }
+    48%, 62% {
+        color: #4F48E6;
+        filter: drop-shadow(0 4px 10px rgba(79, 72, 230, 0.5));
+    }
+    70%, 84% {
+        color: #FF5722;
+        filter: drop-shadow(0 4px 10px rgba(255, 87, 34, 0.5));
+    }
+    92%, 100% {
+        color: #4F48E6;
+        filter: drop-shadow(0 4px 10px rgba(79, 72, 230, 0.5));
+    }
+}
+
+@keyframes jennyBoxColorCircuit {
+    0%, 16% {
+        border-color: #4F48E6;
+        background: rgba(79, 72, 230, 0.05);
+        box-shadow: 0 0 0 2px rgba(79, 72, 230, 0.18), 0 8px 20px -4px rgba(79, 72, 230, 0.14);
+    }
+    26%, 40% {
+        border-color: #FF5722;
+        background: rgba(255, 87, 34, 0.05);
+        box-shadow: 0 0 0 2px rgba(255, 87, 34, 0.18), 0 8px 20px -4px rgba(255, 87, 34, 0.14);
+    }
+    48%, 62% {
+        border-color: #4F48E6;
+        background: rgba(79, 72, 230, 0.05);
+        box-shadow: 0 0 0 2px rgba(79, 72, 230, 0.18), 0 8px 20px -4px rgba(79, 72, 230, 0.14);
+    }
+    70%, 84% {
+        border-color: #FF5722;
+        background: rgba(255, 87, 34, 0.05);
+        box-shadow: 0 0 0 2px rgba(255, 87, 34, 0.18), 0 8px 20px -4px rgba(255, 87, 34, 0.14);
+    }
+    92%, 100% {
+        border-color: #4F48E6;
+        background: rgba(79, 72, 230, 0.05);
+        box-shadow: 0 0 0 2px rgba(79, 72, 230, 0.18), 0 8px 20px -4px rgba(79, 72, 230, 0.14);
+    }
+}
+
+@keyframes jennyHandleColorCircuit {
+    0%, 16% { border-color: #4F48E6; }
+    26%, 40% { border-color: #FF5722; }
+    48%, 62% { border-color: #4F48E6; }
+    70%, 84% { border-color: #FF5722; }
+    92%, 100% { border-color: #4F48E6; }
+}
+
 .meet-jenny-brand-accent {
     color: #000623;
 }
@@ -236,7 +436,7 @@ if (!empty($sessionUser)) {
     }
 }
 
-/* ─── CSS Grid Container for Exact Card Alignment Around Phone Mockup ─── */
+/* ─── CSS Grid Container for Scattered Card Alignment Around Phone Mockup ─── */
 .meet-jenny-grid-container {
     position: relative;
     z-index: 5;
@@ -247,7 +447,7 @@ if (!empty($sessionUser)) {
 @media (min-width: 1024px) {
     .meet-jenny-grid-container {
         display: grid;
-        grid-template-columns: 310px 300px 310px;
+        grid-template-columns: minmax(280px, 320px) 300px minmax(280px, 320px);
         grid-template-rows: auto 1fr auto;
         grid-template-areas:
             "top-left    center    top-right"
@@ -255,63 +455,58 @@ if (!empty($sessionUser)) {
             "bot-left    center    bot-right";
         align-items: center;
         justify-content: center;
-        max-width: 980px;
+        max-width: 1040px;
         width: 100%;
-        height: 540px;
+        min-height: 560px;
         margin: 0 auto;
-        column-gap: 0;
+        column-gap: 24px;
+        row-gap: 32px;
         position: relative;
         z-index: 5;
     }
 
-    /* Scattered Overlaps & Individual Offsets Across Phone Frame */
+    /* Scattered Staggered Offsets (Non-linear, Organic per Image 4) */
     .card-top-left {
         grid-area: top-left;
         align-self: start;
-        justify-self: end;
-        margin-right: -24px;
-        margin-top: -6px;
+        justify-self: start;
+        transform: translate(-14px, -12px);
         z-index: 12;
     }
     .card-mid-left {
         grid-area: mid-left;
         align-self: center;
         justify-self: end;
-        margin-right: -12px;
-        margin-top: -26px; /* Tucked closer to top card for organic scatter */
+        transform: translate(14px, 0); /* Tucked closer to phone center */
         z-index: 14;
     }
     .card-bot-left {
         grid-area: bot-left;
         align-self: end;
-        justify-self: end;
-        margin-right: -32px; /* Deeper overlap into bottom phone corner */
-        margin-bottom: -10px;
+        justify-self: start;
+        transform: translate(-18px, 14px); /* Stepped out to bottom-left */
         z-index: 13;
     }
 
     .card-top-right {
         grid-area: top-right;
         align-self: start;
-        justify-self: start;
-        margin-left: -20px;
-        margin-top: 10px; /* Asymmetric vertical stagger */
+        justify-self: end;
+        transform: translate(16px, -8px); /* Stepped out to top-right */
         z-index: 12;
     }
     .card-mid-right {
         grid-area: mid-right;
         align-self: center;
         justify-self: start;
-        margin-left: -36px; /* Deep overlap into right phone edge */
-        margin-top: 22px; /* Shifted lower towards bottom-right */
+        transform: translate(-12px, 8px); /* Tucked closer to phone center, slightly lower */
         z-index: 14;
     }
     .card-bot-right {
         grid-area: bot-right;
         align-self: end;
-        justify-self: start;
-        margin-left: -16px;
-        margin-bottom: -8px;
+        justify-self: end;
+        transform: translate(20px, 16px); /* Stepped out to bottom-right */
         z-index: 13;
     }
 }
@@ -401,7 +596,7 @@ if (!empty($sessionUser)) {
     position: relative;
     width: 100%;
     height: 100%;
-    background: #D4D4D9;
+    background: #EAECEF;
     border-radius: 40px;
     overflow: hidden;
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12) inset;
@@ -452,27 +647,28 @@ if (!empty($sessionUser)) {
     background: #0F172A;
 }
 
-/* Inner Screen Content - 100% Screen Fill with Zoomed Jenny */
+/* Inner Screen Content - 100% Screen Fill with Native Crisp Jenny */
 .meet-jenny-phone-body {
     position: relative;
     width: 100%;
     height: 100%;
-    background: #D4D4D9;
+    background: #EAECEF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     overflow: hidden;
     box-sizing: border-box;
 }
 
 /* Full Bleed GIF Container with Studio Background Blend */
 .meet-jenny-phone-gif-wrap {
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: relative;
     width: 100%;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #D4D4D9;
+    background: #EAECEF;
     overflow: hidden;
     margin: 0;
 }
@@ -480,11 +676,10 @@ if (!empty($sessionUser)) {
 .meet-jenny-phone-gif {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    object-position: center 36%;
-    transform: scale(1.36);
-    filter: contrast(1.02);
-    background: #D4D4D9;
+    object-fit: contain;
+    object-position: center center;
+    transform: none; /* Native resolution - zero pixelation or zoom blur */
+    background: #EAECEF;
 }
 
 /* Home Bar */
@@ -498,17 +693,6 @@ if (!empty($sessionUser)) {
     background: #0F172A;
     border-radius: 2px;
     opacity: 0.35;
-    z-index: 20;
-}
-
-/* Home Bar */
-.meet-jenny-phone-home {
-    width: 90px;
-    height: 3.5px;
-    background: #0F172A;
-    border-radius: 2px;
-    margin: 4px auto 0 auto;
-    opacity: 0.25;
 }
 
 @media (max-width: 1023px) {
@@ -721,9 +905,6 @@ if (!empty($sessionUser)) {
                     </filter>
                 </defs>
 
-                <!-- Vertical Dotted Line Connecting from Process Node (Image 1) -->
-                <path class="meet-jenny-flow-track" d="M 500 0 L 500 48" />
-
                 <!-- Left Branch (Purple): Enters from top at (497, 0), travels down 48px vertical corridor, branches left at Y=68, curves down left flank at X=11, curves along bottom at Y=900 (120px+ clear below bottom cards) to center convergence (497, 930) -->
                 <path class="meet-jenny-flow-track" d="M 497 0 L 497 48 Q 497 68, 475 68 L 33 68 Q 11 68, 11 88 L 11 878 Q 11 900, 33 900 L 475 900 Q 497 900, 497 915 L 497 930" />
                 <path class="meet-jenny-flow-beam meet-jenny-beam-left" d="M 497 0 L 497 48 Q 497 68, 475 68 L 33 68 Q 11 68, 11 88 L 11 878 Q 11 900, 33 900 L 475 900 Q 497 900, 497 915 L 497 930" stroke="url(#jennyFlowLeftGrad)" filter="url(#jennyGlowPurple)" />
@@ -747,7 +928,7 @@ if (!empty($sessionUser)) {
                     <span>Autonomous AI Internship Partner</span>
                 </div>
                 <h2 class="meet-jenny-title">
-                    Hi<?= $firstName ? ' ' . htmlspecialchars($firstName) : '' ?>, I'm <span class="meet-jenny-accent">Jenny</span> — welcome to <span class="meet-jenny-brand-accent">InternConnect</span>
+                    Hi<?= $firstName ? ' ' . htmlspecialchars($firstName) : '' ?>, I'm <span class="jenny-brand-highlight"><span>Jenny</span><span class="jenny-handle jenny-handle-tl" aria-hidden="true"></span><span class="jenny-handle jenny-handle-tr" aria-hidden="true"></span><span class="jenny-handle jenny-handle-bl" aria-hidden="true"></span><span class="jenny-handle jenny-handle-br" aria-hidden="true"></span><span class="jenny-cursor-pointer" aria-hidden="true"><svg class="jenny-cursor-svg" viewBox="0 0 24 24"><path class="jenny-cursor-path" d="M3 3l7 18 3.5-7.5L21 10 3 3z"/></svg></span></span> — welcome to <span class="meet-jenny-brand-accent">InternConnect</span>
                 </h2>
                 <p class="meet-jenny-subtext">
                     Your 24/7 dedicated AI partner guiding your career path—optimizing your CV, automating recruiter interviews, and delivering verified internship placements.

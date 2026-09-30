@@ -541,7 +541,7 @@ declare(strict_types=1);
 }
 
 .process-orbit-3 {
-    bottom: 24px;
+    bottom: 84px;
     right: 22px;
     animation: processOrbitDrift3 5s ease-in-out infinite 1.4s;
 }
@@ -1281,23 +1281,20 @@ declare(strict_types=1);
                     </filter>
                 </defs>
 
-                <!-- Left Branch (Purple): Starts at Top-Center (500, 4), runs down center gap to 445, turns left across horizontal gap at Y=467, runs down left outside Card 3 at X=11, curves along bottom at Y=981 to center (500, 981) -->
-                <path class="process-flow-track" d="M 500 4 L 500 445 Q 500 467, 475 467 L 33 467 Q 11 467, 11 489 L 11 959 Q 11 981, 33 981 L 500 981" />
-                <path class="process-flow-beam process-beam-left" d="M 500 4 L 500 445 Q 500 467, 475 467 L 33 467 Q 11 467, 11 489 L 11 959 Q 11 981, 33 981 L 500 981" stroke="url(#processFlowLeftGrad)" filter="url(#processGlowPurple)" />
+                <!-- Left Branch (Purple): Starts at Top-Center (500, 4), runs down center gap to 445, turns left across horizontal gap at Y=467, runs down left outside Card 3 at X=11, curves along bottom at Y=981 to (497, 981) and continues down to (497, 1000) -->
+                <path class="process-flow-track" d="M 500 4 L 500 445 Q 500 467, 475 467 L 33 467 Q 11 467, 11 489 L 11 959 Q 11 981, 33 981 L 475 981 Q 497 981, 497 988 L 497 1000" />
+                <path class="process-flow-beam process-beam-left" d="M 500 4 L 500 445 Q 500 467, 475 467 L 33 467 Q 11 467, 11 489 L 11 959 Q 11 981, 33 981 L 475 981 Q 497 981, 497 988 L 497 1000" stroke="url(#processFlowLeftGrad)" filter="url(#processGlowPurple)" />
 
-                <!-- Right Branch (Dark Mode Navy): Starts at Top-Center (500, 4), runs down center gap to 445, turns right across horizontal gap at Y=467, runs down right outside Card 3 at X=989, curves along bottom at Y=981 to center (500, 981) -->
-                <path class="process-flow-track" d="M 500 4 L 500 445 Q 500 467, 525 467 L 967 467 Q 989 467, 989 489 L 989 959 Q 989 981, 967 981 L 500 981" />
-                <path class="process-flow-beam process-beam-right" d="M 500 4 L 500 445 Q 500 467, 525 467 L 967 467 Q 989 467, 989 489 L 989 959 Q 989 981, 967 981 L 500 981" stroke="url(#processFlowDarkGrad)" filter="url(#processGlowDark)" />
+                <!-- Right Branch (Dark Mode Navy): Starts at Top-Center (500, 4), runs down center gap to 445, turns right across horizontal gap at Y=467, runs down right outside Card 3 at X=989, curves along bottom at Y=981 to (503, 981) and continues down to (503, 1000) -->
+                <path class="process-flow-track" d="M 500 4 L 500 445 Q 500 467, 525 467 L 967 467 Q 989 467, 989 489 L 989 959 Q 989 981, 967 981 L 525 981 Q 503 981, 503 988 L 503 1000" />
+                <path class="process-flow-beam process-beam-right" d="M 500 4 L 500 445 Q 500 467, 525 467 L 967 467 Q 989 467, 989 489 L 989 959 Q 989 981, 967 981 L 525 981 Q 503 981, 503 988 L 503 1000" stroke="url(#processFlowDarkGrad)" filter="url(#processGlowDark)" />
 
                 <!-- Top Center Origin Node (500, 4) -->
                 <circle cx="500" cy="4" r="5" fill="#4F48E6" stroke="#FFFFFF" stroke-width="2" />
 
-                <!-- Bottom Center Destination Convergence Node (500, 981) where Enterprise flow cleanly finishes -->
+                <!-- Bottom Center Destination Convergence Node where Enterprise flow cleanly finishes -->
                 <circle cx="500" cy="981" r="6" fill="#000623" stroke="#FFFFFF" stroke-width="2" />
                 <circle class="process-node-pulse" cx="500" cy="981" r="14" fill="#000623" opacity="0.2" />
-
-                <!-- Vertical Dotted Conduit Connecting to Jenny Section Below -->
-                <path class="process-flow-track" d="M 500 981 L 500 1000" />
             </svg>
 
             <!-- Bento Grid System -->
