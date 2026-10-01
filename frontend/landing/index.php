@@ -22,3 +22,6 @@
 
 <!-- Call to Action Section -->
 <?php include __DIR__ . '/components/cta.php'; ?>
+
+<!-- Frequently Asked Questions (FAQ) Section -->
+<?php include __DIR__ . '/components/faq.php'; ?>

@@ -28,7 +28,7 @@ if (!empty($sessionUser)) {
 
 @media (min-width: 1024px) {
     .meet-jenny-section {
-        padding: 0 0 90px 0;
+        padding: 0 0 140px 0;
     }
 }
 
@@ -49,13 +49,14 @@ if (!empty($sessionUser)) {
 
 @media (min-width: 1024px) {
     .meet-jenny-canvas-wrap {
-        padding: 0 34px;
-        min-height: 980px;
+        padding: 0 34px 60px 34px;
+        min-height: 1040px;
     }
 }
 
 @media (max-width: 1023px) {
-    .meet-jenny-flow-svg {
+    .meet-jenny-flow-svg,
+    .meet-jenny-convergence-wrap {
         display: none !important;
     }
     .meet-jenny-canvas-wrap {
@@ -91,10 +92,44 @@ if (!empty($sessionUser)) {
     will-change: stroke-dashoffset, opacity;
 }
 
+/* True 1:1 Circular Destination Node with Zero Distortion & Pulse (Image 3) */
+.meet-jenny-convergence-wrap {
+    position: absolute;
+    left: 50%;
+    top: calc(100% * (940 / 1020));
+    transform: translate(-50%, -50%);
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.jenny-node-center {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background-color: #000623;
+    border: 2.5px solid #FFFFFF;
+    box-shadow: 0 2px 6px rgba(0, 6, 35, 0.4);
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+}
+
 .jenny-node-pulse {
-    transform-origin: 500px 900px;
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: #4F48E6;
+    opacity: 0.25;
     transition: transform 0.3s ease, opacity 0.3s ease;
-    opacity: 0;
+    transform: scale(1);
+    z-index: 1;
+    flex-shrink: 0;
 }
 
 /* ─── Section Header ─── */
@@ -420,7 +455,7 @@ if (!empty($sessionUser)) {
         max-width: 970px;
         width: 100%;
         min-height: 560px;
-        margin: 0 auto;
+        margin: 0 auto 50px auto;
         column-gap: 0;
         row-gap: 26px;
         position: relative;
@@ -858,7 +893,7 @@ if (!empty($sessionUser)) {
         <div class="meet-jenny-canvas-wrap">
 
             <!-- SVG Flow Circuit Stream Overlay (Desktop: Clean Vertical Distance Entry, Wide Flank Enveloping, 120px+ Under-Card Bottom Clearance) -->
-            <svg class="meet-jenny-flow-svg" viewBox="0 0 1000 970" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <svg class="meet-jenny-flow-svg" viewBox="0 0 1000 1020" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <defs>
                     <!-- Left Stream Gradient: Vibrant Purple/Violet into Brand Indigo -->
                     <linearGradient id="jennyFlowLeftGrad" x1="50%" y1="0%" x2="50%" y2="100%">
@@ -894,18 +929,20 @@ if (!empty($sessionUser)) {
                     </filter>
                 </defs>
 
-                <!-- Left Branch (Purple): Enters from top at (497, 0), travels down 48px vertical corridor, branches left at Y=68, curves down left flank at X=11, curves along bottom at Y=900, stops at center bottom (497, 900) -->
-                <path class="meet-jenny-flow-track" d="M 497 0 L 497 48 Q 497 68, 475 68 L 33 68 Q 11 68, 11 88 L 11 878 Q 11 900, 33 900 L 497 900" />
-                <path class="meet-jenny-flow-beam meet-jenny-beam-left" d="M 497 0 L 497 48 Q 497 68, 475 68 L 33 68 Q 11 68, 11 88 L 11 878 Q 11 900, 33 900 L 497 900" stroke="url(#jennyFlowLeftGrad)" filter="url(#jennyGlowPurple)" />
+                <!-- Left Branch (Purple): Enters from top at (497, 0), travels down 48px vertical corridor, branches left at Y=68, curves down left flank at X=11, curves along bottom at Y=940, stops at center bottom (497, 940) -->
+                <path class="meet-jenny-flow-track" d="M 497 0 L 497 48 Q 497 68, 475 68 L 33 68 Q 11 68, 11 88 L 11 918 Q 11 940, 33 940 L 497 940" />
+                <path class="meet-jenny-flow-beam meet-jenny-beam-left" d="M 497 0 L 497 48 Q 497 68, 475 68 L 33 68 Q 11 68, 11 88 L 11 918 Q 11 940, 33 940 L 497 940" stroke="url(#jennyFlowLeftGrad)" filter="url(#jennyGlowPurple)" />
 
-                <!-- Right Branch (Dark Mode Navy): Enters from top at (503, 0), travels down 48px vertical corridor, branches right at Y=68, curves down right flank at X=989, curves along bottom at Y=900, stops at center bottom (503, 900) -->
-                <path class="meet-jenny-flow-track" d="M 503 0 L 503 48 Q 503 68, 525 68 L 967 68 Q 989 68, 989 88 L 989 878 Q 989 900, 967 900 L 503 900" />
-                <path class="meet-jenny-flow-beam meet-jenny-beam-right" d="M 503 0 L 503 48 Q 503 68, 525 68 L 967 68 Q 989 68, 989 88 L 989 878 Q 989 900, 967 900 L 503 900" stroke="url(#jennyFlowDarkGrad)" filter="url(#jennyGlowDark)" />
-
-                <!-- Bottom Center Destination Convergence Node at center bottom (500, 900) -->
-                <circle cx="500" cy="900" r="6" fill="#000623" stroke="#FFFFFF" stroke-width="2" />
-                <circle class="jenny-node-pulse" cx="500" cy="900" r="14" fill="#4F48E6" opacity="0.25" />
+                <!-- Right Branch (Dark Mode Navy): Enters from top at (503, 0), travels down 48px vertical corridor, branches right at Y=68, curves down right flank at X=989, curves along bottom at Y=940, stops at center bottom (503, 940) -->
+                <path class="meet-jenny-flow-track" d="M 503 0 L 503 48 Q 503 68, 525 68 L 967 68 Q 989 68, 989 88 L 989 918 Q 989 940, 967 940 L 503 940" />
+                <path class="meet-jenny-flow-beam meet-jenny-beam-right" d="M 503 0 L 503 48 Q 503 68, 525 68 L 967 68 Q 989 68, 989 88 L 989 918 Q 989 940, 967 940 L 503 940" stroke="url(#jennyFlowDarkGrad)" filter="url(#jennyGlowDark)" />
             </svg>
+
+            <!-- True 1:1 Circular Destination Convergence Node (Image 3) -->
+            <div class="meet-jenny-convergence-wrap" aria-hidden="true">
+                <div class="jenny-node-pulse"></div>
+                <div class="jenny-node-center"></div>
+            </div>
 
             <!-- Section Header (Positioned at Top-Center of Stage) -->
             <div class="meet-jenny-header">
@@ -942,14 +979,17 @@ if (!empty($sessionUser)) {
 
                         <!-- Inner Screen Content - Full Screen Mobile Jenny Showcase -->
                         <div class="meet-jenny-phone-body">
-                            <!-- Jenny Looping GIF - Fills phone screen completely from edge to edge -->
+                            <!-- Jenny Looping Video - Fills phone screen completely from edge to edge -->
                             <div class="meet-jenny-phone-gif-wrap">
-                                <img 
-                                    src="https://res.cloudinary.com/weburea/image/upload/v1790745255/jenny_ai_mob_eds5by.gif" 
-                                    alt="Jenny AI assistant" 
+                                <video 
+                                    src="https://res.cloudinary.com/weburea/video/upload/v1790873734/jenny_ai_new_gevejm.mp4" 
                                     class="meet-jenny-phone-gif"
-                                    loading="eager"
-                                >
+                                    autoplay 
+                                    loop 
+                                    muted 
+                                    playsinline 
+                                    preload="auto"
+                                ></video>
                                 <!-- Studio watermark mask (seamlessly concealed under 24/7 Career Guidance card) -->
                                 <div class="meet-jenny-watermark-mask" aria-hidden="true"></div>
                             </div>
