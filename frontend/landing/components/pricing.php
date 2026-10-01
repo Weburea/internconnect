@@ -18,15 +18,38 @@ declare(strict_types=1);
                 Choose the right plan to accelerate your career or find the best interns for your organization.
             </p>
             
-            <!-- Billing Switcher -->
-            <div class="flex items-center justify-center gap-4 pt-2">
-                <span class="text-sm font-medium text-gray-500" :class="{ 'text-gray-900 font-bold': billing === 'monthly' }">Monthly</span>
-                <button @click="billing = billing === 'monthly' ? 'yearly' : 'monthly'" type="button" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none" :class="billing === 'yearly' ? 'bg-primary' : 'bg-gray-300'" role="switch" aria-checked="false">
-                    <span aria-hidden="true" class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out" :style="billing === 'yearly' ? 'transform: translateX(20px)' : 'transform: translateX(0px)'"></span>
-                </button>
-                <span class="text-sm font-medium text-gray-500" :class="{ 'text-gray-900 font-bold': billing === 'yearly' }">
-                    Yearly <span class="text-primary font-bold">(Save 20%)</span>
-                </span>
+            <!-- Billing Switcher (Modern Segmented Pill Toggle with Floating Save 20% Tag) -->
+            <div class="flex items-center justify-center pt-2">
+                <div style="position: relative; display: inline-flex; align-items: center; background-color: #EEF2FF; padding: 4px; border-radius: 9999px; border: 1px solid #E0E7FF; user-select: none;">
+                    <!-- Monthly Option -->
+                    <button type="button" 
+                            @click="billing = 'monthly'" 
+                            :style="billing === 'monthly' ? 'background-color: #FFFFFF; color: #4F48E6; font-weight: 700; box-shadow: 0 2px 8px rgba(79, 72, 230, 0.12);' : 'background-color: transparent; color: #475569; font-weight: 600;'"
+                            style="padding: 8px 24px; border-radius: 9999px; font-size: 14px; border: none; cursor: pointer; transition: all 0.2s ease; outline: none;">
+                        Monthly
+                    </button>
+
+                    <!-- Yearly Option Container (Relative for Badge positioning) -->
+                    <div style="position: relative;">
+                        <button type="button" 
+                                @click="billing = 'yearly'" 
+                                :style="billing === 'yearly' ? 'background-color: #FFFFFF; color: #4F48E6; font-weight: 700; box-shadow: 0 2px 8px rgba(79, 72, 230, 0.12);' : 'background-color: transparent; color: #475569; font-weight: 600;'"
+                                style="padding: 8px 24px; border-radius: 9999px; font-size: 14px; border: none; cursor: pointer; transition: all 0.2s ease; outline: none;">
+                            Yearly
+                        </button>
+
+                        <!-- Floating Green Tag Badge (Save 20%) -->
+                        <div style="position: absolute; top: -14px; right: -12px; z-index: 10; pointer-events: none; transform: rotate(4deg);">
+                            <span style="display: inline-flex; align-items: center; gap: 4px; background-color: #5EEAD4; color: #047857; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 9999px; box-shadow: 0 2px 6px rgba(13, 148, 136, 0.25); white-space: nowrap; flex-shrink: 0;">
+                                <svg style="width: 12px; height: 12px; flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                                    <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                                </svg>
+                                <span>Save 20%</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -215,38 +238,9 @@ declare(strict_types=1);
 
         </div>
 
-        <!-- 3. Profile Visibility Cards (Directly Aligned Column-by-Column Under Pricing Cards) -->
-        <div class="max-w-6xl mx-auto mt-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Free Visibility Card (Aligned under Free Card) -->
-                <div style="background-color: #FAF8FF; border: 1px solid #ECE8F8; border-radius: 16px; padding: 22px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: center; min-height: 104px;">
-                    <div style="font-size: 11px; font-weight: 800; color: #9797A3; letter-spacing: 0.08em; text-transform: uppercase; text-align: center; margin-bottom: 6px;">FREE — PROFILE VISIBILITY</div>
-                    <div style="font-size: 14px; font-weight: 700; color: #191C1D; text-align: center; margin-bottom: 12px;">Standard</div>
-                    <div style="width: 100%; background-color: #EAE8F2; height: 6px; border-radius: 9999px; overflow: hidden;">
-                        <div style="width: 30%; background-color: #9797A3; height: 6px; border-radius: 9999px;"></div>
-                    </div>
-                </div>
-
-                <!-- Pro Visibility Card (Aligned under Pro Card) -->
-                <div style="background-color: #FAF8FF; border: 1px solid #ECE8F8; border-radius: 16px; padding: 22px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: center; min-height: 104px;">
-                    <div style="font-size: 11px; font-weight: 800; color: #9797A3; letter-spacing: 0.08em; text-transform: uppercase; text-align: center; margin-bottom: 6px;">PRO — PROFILE VISIBILITY</div>
-                    <div style="font-size: 14px; font-weight: 700; color: #4F48E6; text-align: center; margin-bottom: 12px;">Enhanced</div>
-                    <div style="width: 100%; background-color: #EAE8F2; height: 6px; border-radius: 9999px; overflow: hidden;">
-                        <div style="width: 70%; background-color: #4F48E6; height: 6px; border-radius: 9999px;"></div>
-                    </div>
-                </div>
-
-                <!-- Premium Visibility Card (Aligned under Premium Card) -->
-                <div style="background-color: #FAF8FF; border: 1px solid #ECE8F8; border-radius: 16px; padding: 22px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: center; min-height: 104px;">
-                    <div style="font-size: 11px; font-weight: 800; color: #9797A3; letter-spacing: 0.08em; text-transform: uppercase; text-align: center; margin-bottom: 6px;">PREMIUM — PROFILE VISIBILITY</div>
-                    <div style="font-size: 14px; font-weight: 700; color: #000623; text-align: center; margin-bottom: 12px;">Priority</div>
-                    <div style="width: 100%; background-color: #EAE8F2; height: 6px; border-radius: 9999px; overflow: hidden;">
-                        <div style="width: 100%; background-color: #000623; height: 6px; border-radius: 9999px;"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <p class="text-center italic text-xs text-gray-500 mt-6">
+        <!-- Disclaimer Note -->
+        <div class="max-w-6xl mx-auto mt-10">
+            <p class="text-center italic text-xs text-gray-500">
                 Cancel anytime. No hidden fees. Student discounts available.
             </p>
         </div>

@@ -28,9 +28,9 @@ $featuredRoles = [
         'description' => 'Design beautiful, intuitive user journeys and high-fidelity interactive prototypes for global web applications.',
         'type'        => 'Full-Time',
         'type_class'  => 'badge-fulltime',
-        'duration'    => '6 Months',
+        'category'    => 'Design',
+        'experience'  => 'Internship Role',
         'stipend'     => '₦180,000/mo',
-        'category'    => 'UI Designer',
     ],
     [
         'title'       => 'Digital Marketing Specialist',
@@ -40,9 +40,9 @@ $featuredRoles = [
         'description' => 'Manage multi-channel campaigns, optimize SEO funnels, and scale organic social engagement across tech communities.',
         'type'        => 'Part-Time',
         'type_class'  => 'badge-parttime',
-        'duration'    => '3 Months',
-        'stipend'     => '₦130,000/mo',
         'category'    => 'Marketing',
+        'experience'  => '0 - 1 Year',
+        'stipend'     => '₦130,000/mo',
     ],
     [
         'title'       => 'Backend Developer',
@@ -52,9 +52,9 @@ $featuredRoles = [
         'description' => 'Build resilient REST APIs, optimize high-throughput database queries, and streamline core infrastructure microservices.',
         'type'        => 'Remote',
         'type_class'  => 'badge-remote',
-        'duration'    => '6 Months',
-        'stipend'     => '₦220,000/mo',
         'category'    => 'Engineering',
+        'experience'  => '1 - 2 Years',
+        'stipend'     => '₦220,000/mo',
     ],
     [
         'title'       => 'Mobile App Engineer',
@@ -64,9 +64,9 @@ $featuredRoles = [
         'description' => 'Develop high-performance Flutter & React Native mobile applications with offline sync and crisp native UI components.',
         'type'        => 'Full-Time',
         'type_class'  => 'badge-fulltime',
-        'duration'    => '6 Months',
+        'category'    => 'Mobile Dev',
+        'experience'  => '0 - 1 Year',
         'stipend'     => '₦195,000/mo',
-        'category'    => 'Engineering',
     ],
     [
         'title'       => 'Data Analyst & AI Associate',
@@ -76,9 +76,9 @@ $featuredRoles = [
         'description' => 'Clean and model complex operational datasets, build automated dashboards, and assist with predictive candidate matching.',
         'type'        => 'Hybrid',
         'type_class'  => 'badge-hybrid',
-        'duration'    => '4 Months',
+        'category'    => 'Data & AI',
+        'experience'  => 'No Experience Req.',
         'stipend'     => '₦160,000/mo',
-        'category'    => 'Data',
     ],
     [
         'title'       => 'Product Management Intern',
@@ -88,9 +88,9 @@ $featuredRoles = [
         'description' => 'Conduct user discovery interviews, define product feature specs, and bridge cross-functional sprint teams toward delivery.',
         'type'        => 'Remote',
         'type_class'  => 'badge-remote',
-        'duration'    => '6 Months',
-        'stipend'     => '₦200,000/mo',
         'category'    => 'Product',
+        'experience'  => 'Internship Role',
+        'stipend'     => 'Performance Stipend',
     ],
 ];
 ?>
@@ -666,30 +666,32 @@ $featuredRoles = [
     flex-shrink: 0;
 }
 
-/* Full-Width Action Button */
+/* Full-Width Action Button (Soft light blue/indigo matching candidate dashboard Update Profile) */
 .opportunity-card-btn {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     gap: 8px !important;
     width: 100% !important;
-    padding: 12px 20px !important;
-    background-color: #4F48E6 !important;
-    color: #FFFFFF !important;
-    font-weight: 600 !important;
-    font-size: 14px !important;
+    padding: 11px 20px !important;
+    background-color: #EEF2FF !important;
+    color: #4F48E6 !important;
+    border: 1.5px solid #C7D2FE !important;
+    font-weight: 700 !important;
+    font-size: 13.5px !important;
     border-radius: 12px !important;
     text-decoration: none !important;
     transition: all 0.2s ease !important;
     white-space: nowrap !important;
     flex-shrink: 0 !important;
-    box-shadow: 0 4px 14px rgba(79, 72, 230, 0.22) !important;
+    box-shadow: none !important;
     box-sizing: border-box !important;
 }
 
 .opportunity-card-btn:hover {
-    background-color: #4338CA !important;
-    box-shadow: 0 6px 18px rgba(79, 72, 230, 0.35) !important;
+    background-color: #E0E7FF !important;
+    border-color: #A5B4FC !important;
+    color: #3730A3 !important;
     transform: translateY(-1px);
 }
 
@@ -963,24 +965,25 @@ $featuredRoles = [
                     </div>
 
                     <div>
-                        <!-- Stat Row: Employment Type | Duration | Pay -->
+                        <!-- Stat Row: Category | Experience | Stipend -->
                         <div class="opportunity-stats-row">
-                            <!-- Type -->
+                            <!-- Category (Replaces duplicate work type) -->
                             <div class="opportunity-stat-item">
                                 <svg class="opportunity-stat-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5a2 2 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V5a2 2 0 012-2z"/>
                                 </svg>
-                                <span><?= htmlspecialchars($role['type']) ?></span>
+                                <span><?= htmlspecialchars($role['category']) ?></span>
                             </div>
 
                             <div class="opportunity-stat-divider"></div>
 
-                            <!-- Duration -->
+                            <!-- Experience Level (Replaces raw months) -->
                             <div class="opportunity-stat-item">
                                 <svg class="opportunity-stat-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
                                 </svg>
-                                <span><?= htmlspecialchars($role['duration']) ?></span>
+                                <span><?= htmlspecialchars($role['experience']) ?></span>
                             </div>
 
                             <div class="opportunity-stat-divider"></div>

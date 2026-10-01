@@ -683,7 +683,7 @@ declare(strict_types=1);
     justify-content: center !important;
     gap: 8px !important;
     padding: 12px 26px !important;
-    border-radius: 9999px !important;
+    border-radius: 12px !important;
     background-color: #4F48E6 !important;
     color: #FFFFFF !important;
     font-weight: 600 !important;
