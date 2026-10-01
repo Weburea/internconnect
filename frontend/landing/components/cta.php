@@ -4,61 +4,123 @@ declare(strict_types=1);
 
 /**
  * Component: Landing Page Call-to-Action / Newsletter Section
- * Dark Navy theme (#000623) with floating job badges positioned on the right side,
- * increased card height with star ratings, distinct background colors, and animated curved doodle arrow.
+ * Full-bleed dark navy theme (#000623) across entire section width,
+ * inner tech bento grid card with animated laser circuit lines,
+ * floating company job badges (Google & Paystack), and animated doodle arrow.
  */
 ?>
 <style>
-/* ─── CTA & Newsletter Section ─── */
+/* ─── Full-Bleed Dark Navy CTA & Newsletter Section ─── */
 .cta-section-wrap {
-    padding: 60px 0 90px 0;
-    background-color: #FFFFFF;
+    background-color: #000623 !important;
+    padding: 88px 0 104px 0;
     width: 100%;
+    overflow: hidden;
+    position: relative;
     box-sizing: border-box;
 }
 
 @media (min-width: 1024px) {
     .cta-section-wrap {
-        padding: 80px 0 110px 0;
+        padding: 108px 0 128px 0;
     }
 }
 
 .cta-container {
     max-width: 1240px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 24px;
     width: 100%;
     box-sizing: border-box;
+    position: relative;
+    z-index: 2;
 }
 
-/* Dark Navy Card Container */
+/* ─── Inner Bento Grid Card (High-Tech Dark Radial Glow) ─── */
 .cta-card {
     position: relative;
-    background-color: #000623;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: radial-gradient(circle at 50% 30%, rgba(79, 72, 230, 0.18) 0%, rgba(0, 6, 35, 0.95) 75%), #000623;
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 28px;
     overflow: hidden;
-    padding: 64px 24px 68px 24px;
+    padding: 72px 28px 80px 28px;
     text-align: center;
-    box-shadow: 0 24px 60px -12px rgba(0, 6, 35, 0.45);
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.15);
     box-sizing: border-box;
     width: 100%;
 }
 
 @media (min-width: 768px) {
     .cta-card {
-        padding: 76px 48px 84px 48px;
+        padding: 84px 48px 92px 48px;
     }
 }
 
-/* Subtle Cross Line Pattern */
-.cta-bg-lines {
+/* ─── High-Tech Animated Bento Grid Lines & Laser Beams ─── */
+.cta-bento-grid-lines {
     position: absolute;
     inset: 0;
+    width: 100%;
+    height: 100%;
     pointer-events: none;
-    opacity: 0.18;
+    overflow: hidden;
+    z-index: 1;
 }
 
+.cta-grid-svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Traveling Animated Laser Pulses */
+.cta-laser-beam {
+    stroke-linecap: round;
+    will-change: stroke-dashoffset;
+}
+
+.cta-beam-h1 {
+    stroke-dasharray: 240 960;
+    animation: ctaLaserBeamH1 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.cta-beam-h2 {
+    stroke-dasharray: 220 980;
+    animation: ctaLaserBeamH2 7s cubic-bezier(0.4, 0, 0.2, 1) infinite 1.5s;
+}
+
+.cta-beam-v1 {
+    stroke-dasharray: 140 300;
+    animation: ctaLaserBeamV 5.2s cubic-bezier(0.4, 0, 0.2, 1) infinite 0.6s;
+}
+
+.cta-beam-v2 {
+    stroke-dasharray: 140 300;
+    animation: ctaLaserBeamV 5.8s cubic-bezier(0.4, 0, 0.2, 1) infinite 2.4s;
+}
+
+@keyframes ctaLaserBeamH1 {
+    0% { stroke-dashoffset: 1200; opacity: 0; }
+    15% { opacity: 1; }
+    85% { opacity: 1; }
+    100% { stroke-dashoffset: -240; opacity: 0; }
+}
+
+@keyframes ctaLaserBeamH2 {
+    0% { stroke-dashoffset: -220; opacity: 0; }
+    15% { opacity: 1; }
+    85% { opacity: 1; }
+    100% { stroke-dashoffset: 1200; opacity: 0; }
+}
+
+@keyframes ctaLaserBeamV {
+    0% { stroke-dashoffset: 440; opacity: 0; }
+    20% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { stroke-dashoffset: -140; opacity: 0; }
+}
+
+/* ─── Central Content Stage ─── */
 .cta-inner-content {
     position: relative;
     z-index: 10;
@@ -69,7 +131,32 @@ declare(strict_types=1);
     align-items: center;
 }
 
-/* Typography */
+.cta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    background-color: rgba(79, 72, 230, 0.16);
+    color: #A5B4FC;
+    border: 1px solid rgba(165, 180, 252, 0.25);
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    margin-bottom: 20px;
+    user-select: none;
+}
+
+.cta-pill-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #818CF8;
+    box-shadow: 0 0 8px #818CF8;
+}
+
 .cta-headline {
     font-size: clamp(28px, 4vw, 46px);
     line-height: 1.15;
@@ -87,11 +174,11 @@ declare(strict_types=1);
     margin: 0 0 36px 0;
 }
 
-/* Form Stage (Centered, 100% Unobstructed) */
+/* ─── Form Stage ─── */
 .cta-form-stage {
     position: relative;
     width: 100%;
-    max-width: 480px;
+    max-width: 490px;
     margin: 0 auto;
 }
 
@@ -110,16 +197,17 @@ declare(strict_types=1);
     width: 100%;
     gap: 10px;
     background-color: rgba(255, 255, 255, 0.06);
-    padding: 7px;
-    border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 6px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
     transition: border-color 0.2s ease, background-color 0.2s ease;
     box-sizing: border-box;
 }
 
 .cta-input-row:focus-within {
-    border-color: rgba(255, 255, 255, 0.28);
-    background-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(129, 140, 248, 0.5);
+    background-color: rgba(255, 255, 255, 0.09);
+    box-shadow: 0 0 0 3px rgba(79, 72, 230, 0.2);
 }
 
 @media (min-width: 640px) {
@@ -147,6 +235,7 @@ declare(strict_types=1);
     color: #94A3B8;
 }
 
+/* InternConnect Standard Rounded Button (border-radius: 8px) */
 .cta-subscribe-btn {
     display: inline-flex;
     align-items: center;
@@ -157,10 +246,10 @@ declare(strict_types=1);
     color: #000623;
     background-color: #FFFFFF;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     cursor: pointer;
     transition: all 0.15s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     white-space: nowrap;
     flex-shrink: 0;
 }
@@ -168,7 +257,7 @@ declare(strict_types=1);
 .cta-subscribe-btn:hover {
     background-color: #F8FAFC;
     transform: translateY(-1px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
 }
 
 .cta-disclaimer {
@@ -179,7 +268,7 @@ declare(strict_types=1);
     line-height: 1.5;
 }
 
-/* ─── Premium Floating Job Badges with Stars & Generous Height (Right Side Placement) ─── */
+/* ─── Premium Floating Job Badges with Stars (Right Side Placement) ─── */
 .cta-job-badge {
     display: flex;
     flex-direction: column;
@@ -252,11 +341,11 @@ declare(strict_types=1);
 @media (min-width: 900px) {
     .cta-badge-top-right {
         position: absolute;
-        top: 38px;
+        top: 42px;
         right: 48px;
         background-color: #FFFFFF;
         border: 1px solid rgba(255, 255, 255, 0.95);
-        box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.45), 0 4px 12px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.25);
         animation: ctaFloatTopRight 4.8s ease-in-out infinite;
     }
 
@@ -266,11 +355,11 @@ declare(strict_types=1);
 
     .cta-badge-bottom-right {
         position: absolute;
-        bottom: 44px;
+        bottom: 48px;
         right: 48px;
         background-color: #F0FDF4;
         border: 1px solid #BBF7D0;
-        box-shadow: 0 18px 38px -6px rgba(0, 0, 0, 0.45), 0 4px 12px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 18px 38px -6px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.25);
         animation: ctaFloatBottomRight 5.2s ease-in-out infinite 0.8s;
     }
 
@@ -281,18 +370,18 @@ declare(strict_types=1);
 
 @media (min-width: 900px) and (max-width: 1140px) {
     .cta-badge-top-right {
-        top: 24px;
-        right: 20px;
+        top: 28px;
+        right: 24px;
         transform: scale(0.92);
     }
     .cta-badge-bottom-right {
-        bottom: 24px;
-        right: 20px;
+        bottom: 28px;
+        right: 24px;
         transform: scale(0.92);
     }
 }
 
-/* Continuous Subtle Floating Animations */
+/* Floating Animations */
 @keyframes ctaFloatTopRight {
     0%, 100% {
         transform: translateY(0px) rotate(-1deg);
@@ -311,11 +400,11 @@ declare(strict_types=1);
     }
 }
 
-/* ─── Animated Hand-Drawn Curved Doodle Arrow (Pointing toward Subscribe CTA) ─── */
+/* ─── Animated Hand-Drawn Curved Doodle Arrow ─── */
 .cta-curved-arrow {
     position: absolute;
-    bottom: 92px;
-    right: 300px;
+    bottom: 96px;
+    right: 295px;
     width: 68px;
     height: 52px;
     pointer-events: none;
@@ -324,8 +413,8 @@ declare(strict_types=1);
 
 @media (max-width: 1140px) {
     .cta-curved-arrow {
-        right: 250px;
-        bottom: 84px;
+        right: 245px;
+        bottom: 86px;
     }
 }
 
@@ -373,7 +462,7 @@ declare(strict_types=1);
     }
 }
 
-/* ─── Tablet & Mobile Adaptation (Strict Zero Horizontal Overflow) ─── */
+/* ─── Tablet & Mobile Adaptation ─── */
 @media (max-width: 899px) {
     .cta-curved-arrow {
         display: none !important;
@@ -416,10 +505,45 @@ declare(strict_types=1);
     <div class="cta-container">
         <div class="cta-card">
             
-            <!-- Subtle Diagonal Cross Line Pattern -->
-            <div class="cta-bg-lines" aria-hidden="true">
-                <svg class="w-full h-full" fill="none" viewBox="0 0 100 100" preserveAspectRatio="none">
-                    <path d="M0 0 L100 100 M100 0 L0 100" stroke="#4F48E6" stroke-width="0.45"></path>
+            <!-- High-Tech Animated Bento Grid Background Lines -->
+            <div class="cta-bento-grid-lines" aria-hidden="true">
+                <svg class="cta-grid-svg" viewBox="0 0 1200 440" preserveAspectRatio="none" fill="none">
+                    <defs>
+                        <!-- Traveling Laser Beams -->
+                        <linearGradient id="ctaLaserGradH1" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#4F48E6" stop-opacity="0"/>
+                            <stop offset="50%" stop-color="#818CF8" stop-opacity="1"/>
+                            <stop offset="100%" stop-color="#4F48E6" stop-opacity="0"/>
+                        </linearGradient>
+                        <linearGradient id="ctaLaserGradH2" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#38BDF8" stop-opacity="0"/>
+                            <stop offset="50%" stop-color="#38BDF8" stop-opacity="1"/>
+                            <stop offset="100%" stop-color="#38BDF8" stop-opacity="0"/>
+                        </linearGradient>
+                        <linearGradient id="ctaLaserGradV" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#4F48E6" stop-opacity="0"/>
+                            <stop offset="50%" stop-color="#818CF8" stop-opacity="1"/>
+                            <stop offset="100%" stop-color="#4F48E6" stop-opacity="0"/>
+                        </linearGradient>
+                    </defs>
+
+                    <!-- Static Bento Grid Structural Tracks -->
+                    <line x1="0" y1="110" x2="1200" y2="110" stroke="rgba(255, 255, 255, 0.06)" stroke-width="1"/>
+                    <line x1="0" y1="330" x2="1200" y2="330" stroke="rgba(255, 255, 255, 0.06)" stroke-width="1"/>
+                    <line x1="280" y1="0" x2="280" y2="440" stroke="rgba(255, 255, 255, 0.06)" stroke-width="1"/>
+                    <line x1="920" y1="0" x2="920" y2="440" stroke="rgba(255, 255, 255, 0.06)" stroke-width="1"/>
+
+                    <!-- Animated Traveling Laser Beams on Bento Lines -->
+                    <line class="cta-laser-beam cta-beam-h1" x1="0" y1="110" x2="1200" y2="110" stroke="url(#ctaLaserGradH1)" stroke-width="2"/>
+                    <line class="cta-laser-beam cta-beam-h2" x1="0" y1="330" x2="1200" y2="330" stroke="url(#ctaLaserGradH2)" stroke-width="2"/>
+                    <line class="cta-laser-beam cta-beam-v1" x1="280" y1="0" x2="280" y2="440" stroke="url(#ctaLaserGradV)" stroke-width="2"/>
+                    <line class="cta-laser-beam cta-beam-v2" x1="920" y1="0" x2="920" y2="440" stroke="url(#ctaLaserGradV)" stroke-width="2"/>
+
+                    <!-- Grid Intersection Tech Crosshairs (+) -->
+                    <path d="M 274 110 L 286 110 M 280 104 L 280 116" stroke="#4F48E6" stroke-width="1.5" opacity="0.6"/>
+                    <path d="M 914 110 L 926 110 M 920 104 L 920 116" stroke="#4F48E6" stroke-width="1.5" opacity="0.6"/>
+                    <path d="M 274 330 L 286 330 M 280 324 L 280 336" stroke="#4F48E6" stroke-width="1.5" opacity="0.6"/>
+                    <path d="M 914 330 L 926 330 M 920 324 L 920 336" stroke="#4F48E6" stroke-width="1.5" opacity="0.6"/>
                 </svg>
             </div>
 
@@ -427,21 +551,11 @@ declare(strict_types=1);
             <div class="cta-job-badge cta-badge-top-right" aria-hidden="true">
                 <div class="cta-badge-top-row">
                     <div class="cta-badge-stars">
-                        <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#F59E0B">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#F59E0B">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#F59E0B">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#F59E0B">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#F59E0B">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
+                        <?php for ($i = 0; $i < 5; $i++): ?>
+                            <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#F59E0B">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                        <?php endfor; ?>
                     </div>
                     <div class="cta-badge-logo">
                         <svg width="22" height="22" viewBox="0 0 24 24">
@@ -462,21 +576,11 @@ declare(strict_types=1);
             <div class="cta-job-badge cta-badge-bottom-right" aria-hidden="true">
                 <div class="cta-badge-top-row">
                     <div class="cta-badge-stars">
-                        <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#10B981">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#10B981">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#10B981">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#10B981">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                        <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#10B981">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
+                        <?php for ($i = 0; $i < 5; $i++): ?>
+                            <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#10B981">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                        <?php endfor; ?>
                     </div>
                     <div class="cta-badge-logo">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
@@ -499,8 +603,13 @@ declare(strict_types=1);
                 </svg>
             </div>
             
-            <!-- Center Content (Headline, Subtext, Form — 100% Unobstructed) -->
+            <!-- Center Content (Pill, Headline, Subtext, Form — 100% Unobstructed) -->
             <div class="cta-inner-content">
+                <div class="cta-pill">
+                    <span class="cta-pill-dot" aria-hidden="true"></span>
+                    <span>Weekly Internship Dispatch</span>
+                </div>
+
                 <!-- Headline -->
                 <h2 class="cta-headline">
                     Ready to curate your future?
@@ -528,16 +637,14 @@ declare(strict_types=1);
                     </form>
                 </div>
 
-                <!-- Mobile Badges Row (rendered in document flow below the form on smaller screens) -->
+                <!-- Mobile Badges Row -->
                 <div class="cta-mobile-badges-row lg:hidden">
                     <div class="cta-job-badge cta-badge-top-right">
                         <div class="cta-badge-top-row">
                             <div class="cta-badge-stars">
-                                <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#F59E0B"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#F59E0B"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#F59E0B"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#F59E0B"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#F59E0B"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                <?php for ($i = 0; $i < 5; $i++): ?>
+                                    <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#F59E0B"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                <?php endfor; ?>
                             </div>
                             <div class="cta-badge-logo">
                                 <svg width="22" height="22" viewBox="0 0 24 24">
@@ -557,11 +664,9 @@ declare(strict_types=1);
                     <div class="cta-job-badge cta-badge-bottom-right">
                         <div class="cta-badge-top-row">
                             <div class="cta-badge-stars">
-                                <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#10B981"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#10B981"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#10B981"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#10B981"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                                <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#10B981"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                <?php for ($i = 0; $i < 5; $i++): ?>
+                                    <svg class="cta-star-icon" viewBox="0 0 20 20" fill="#10B981"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                <?php endfor; ?>
                             </div>
                             <div class="cta-badge-logo">
                                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none">

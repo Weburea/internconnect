@@ -5,8 +5,9 @@ declare(strict_types=1);
 /**
  * Component: Landing Page - Frequently Asked Questions (FAQ) Section
  * Location: Directly below Call-to-Action / Newsletter Section (cta.php)
- * Two-column desktop layout (35% left / 60% right, stacked on mobile).
- * Interactive single-open accordion with smooth height animation and morphing plus/minus icon.
+ * Two-column desktop layout:
+ * - Left column: Top headline aligned with first item, bottom subtext & support button aligned with last item.
+ * - Right column: 6 interactive single-open accordion cards with morphing plus/minus toggle icon.
  */
 
 $faqItems = [
@@ -33,22 +34,6 @@ $faqItems = [
     [
         'question' => 'How does InternConnect match me with internships?',
         'answer' => 'Our AI matching engine analyzes your profile skills, academic background, and career interests against verified employer role specifications. You receive scored candidate rankings, tailored position recommendations, and instant alerts whenever matching opportunities go live.'
-    ],
-    [
-        'question' => 'Which platforms or industries does InternConnect cover?',
-        'answer' => 'InternConnect covers top industries including Software Engineering, Product Design, Marketing & Growth, Finance, Data Science, Operations, and Healthcare, partnering with early-stage startups, established scale-ups, and leading corporate enterprises.'
-    ],
-    [
-        'question' => 'How soon can I hear back after applying?',
-        'answer' => 'While employer response times vary, most hiring teams on InternConnect review incoming submissions within 48 to 72 hours. You can monitor each stage of your application in real time directly from your dashboard.'
-    ],
-    [
-        'question' => 'Can employers see my application status in real time?',
-        'answer' => 'Yes. Candidates and recruiters share a synchronized hiring pipeline. As soon as an employer reviews your CV, shortlists your profile, or schedules an interview, your candidate dashboard reflects the updated milestone immediately.'
-    ],
-    [
-        'question' => 'What makes InternConnect different from other job boards?',
-        'answer' => 'InternConnect is exclusively built for early-career interns and forward-thinking companies. In addition to verified listings, we provide autonomous AI career guidance, instant ATS resume scoring, built-in interview scheduling, and guaranteed zero ghost job postings.'
     ]
 ];
 ?>
@@ -57,7 +42,7 @@ $faqItems = [
 .faq-section-wrap {
     position: relative;
     background-color: #F8FAFC;
-    padding: 72px 0 100px 0;
+    padding: 80px 0 108px 0;
     width: 100%;
     overflow: hidden;
     box-sizing: border-box;
@@ -66,7 +51,7 @@ $faqItems = [
 
 @media (min-width: 1024px) {
     .faq-section-wrap {
-        padding: 96px 0 120px 0;
+        padding: 104px 0 128px 0;
     }
 }
 
@@ -78,12 +63,12 @@ $faqItems = [
     box-sizing: border-box;
 }
 
-/* ─── Two-Column Grid Layout (Desktop: 35% / 65%, Stacked on Mobile) ─── */
+/* ─── Two-Column Grid Layout (Desktop: 35% / 65%, Stretch for Top & Bottom Alignment) ─── */
 .faq-grid {
     display: grid;
     grid-template-columns: 360px 1fr;
     gap: 48px;
-    align-items: start;
+    align-items: stretch;
     width: 100%;
     box-sizing: border-box;
 }
@@ -98,24 +83,37 @@ $faqItems = [
 @media (max-width: 1023px) {
     .faq-grid {
         grid-template-columns: minmax(0, 1fr) !important;
-        gap: 36px;
+        gap: 40px;
+        align-items: start;
     }
 }
 
-/* ─── Left Column (Sticky Desktop Headline & CTA) ─── */
+/* ─── Left Column (Top Headline & Bottom-Anchored Support Block per Pixwave Reference) ─── */
 .faq-left-col {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    justify-content: space-between;
+    height: 100%;
+    min-height: 100%;
     width: 100%;
     box-sizing: border-box;
 }
 
-@media (min-width: 1024px) {
+@media (max-width: 1023px) {
     .faq-left-col {
-        position: sticky;
-        top: 104px;
+        height: auto;
+        min-height: auto;
+        gap: 24px;
+        justify-content: flex-start;
     }
+}
+
+.faq-left-top {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .faq-eyebrow-pill {
@@ -152,6 +150,25 @@ $faqItems = [
     word-break: break-word;
 }
 
+/* Anchored to the very bottom of the FAQ section on desktop */
+.faq-left-bottom {
+    margin-top: auto;
+    padding-top: 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media (max-width: 1023px) {
+    .faq-left-bottom {
+        margin-top: 0;
+        padding-top: 0;
+        gap: 18px;
+    }
+}
+
 .faq-subtext {
     font-size: 15.5px;
     line-height: 1.6;
@@ -161,18 +178,18 @@ $faqItems = [
 }
 
 .faq-cta-row {
-    margin-top: 8px;
     display: flex;
     align-items: center;
 }
 
+/* Standard InternConnect Button (Rounded-lg, NOT pill) */
 .faq-contact-btn {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     gap: 8px !important;
-    padding: 13px 26px !important;
-    border-radius: 9999px !important;
+    padding: 12px 24px !important;
+    border-radius: 8px !important;
     background-color: #4F48E6 !important;
     color: #FFFFFF !important;
     font-size: 14.5px !important;
@@ -181,7 +198,7 @@ $faqItems = [
     text-decoration: none !important;
     white-space: nowrap !important;
     flex-shrink: 0 !important;
-    box-shadow: 0 4px 14px rgba(79, 72, 230, 0.28) !important;
+    box-shadow: 0 4px 14px rgba(79, 72, 230, 0.25) !important;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
     width: fit-content;
 }
@@ -189,7 +206,7 @@ $faqItems = [
 .faq-contact-btn:hover {
     background-color: #4338CA !important;
     transform: translateY(-1px) !important;
-    box-shadow: 0 6px 20px rgba(79, 72, 230, 0.36) !important;
+    box-shadow: 0 6px 20px rgba(79, 72, 230, 0.35) !important;
 }
 
 .faq-contact-arrow {
@@ -220,7 +237,7 @@ $faqItems = [
     border-radius: 18px;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 6, 35, 0.03);
-    transition: border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
     width: 100%;
     box-sizing: border-box;
 }
@@ -383,33 +400,37 @@ $faqItems = [
         
         <div class="faq-grid">
             
-            <!-- Left Column: Sticky Headline, Supporting Text & Contact Button -->
+            <!-- Left Column: Top Headline & Bottom Support Block (Pixwave Reference) -->
             <div class="faq-left-col">
-                <div class="faq-eyebrow-pill">
-                    <span class="faq-eyebrow-dot" aria-hidden="true"></span>
-                    <span>Frequently Asked Questions</span>
+                <div class="faq-left-top">
+                    <div class="faq-eyebrow-pill">
+                        <span class="faq-eyebrow-dot" aria-hidden="true"></span>
+                        <span>Frequently Asked Questions</span>
+                    </div>
+                    
+                    <h2 class="faq-headline">
+                        Questions our users ask us.
+                    </h2>
                 </div>
                 
-                <h2 class="faq-headline">
-                    Questions our users ask us.
-                </h2>
-                
-                <p class="faq-subtext">
-                    Our friendly team is always here to help you with quick, clear, and reliable answers whenever you need them.
-                </p>
-                
-                <div class="faq-cta-row">
-                    <a href="<?= url('/help') ?>" class="faq-contact-btn" id="faq-contact-us-btn">
-                        <span>Contact Us</span>
-                        <svg class="faq-contact-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                            <polyline points="12 5 19 12 12 19"></polyline>
-                        </svg>
-                    </a>
+                <div class="faq-left-bottom">
+                    <p class="faq-subtext">
+                        Our friendly team is always here to help you with quick, clear, and reliable answers whenever you need them.
+                    </p>
+                    
+                    <div class="faq-cta-row">
+                        <a href="<?= url('/help') ?>" class="faq-contact-btn" id="faq-help-support-btn">
+                            <span>Help & Support</span>
+                            <svg class="faq-contact-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </a>
+                    </div>
                 </div>
             </div>
 
-            <!-- Right Column: Accordion List -->
+            <!-- Right Column: Accordion List (6 High-Impact Questions, 1st Pre-Opened) -->
             <div class="faq-accordion-list" role="region" aria-label="FAQ Accordion">
                 <?php foreach ($faqItems as $idx => $item): ?>
                     <div 

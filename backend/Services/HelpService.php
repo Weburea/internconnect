@@ -111,6 +111,30 @@ class HelpService
                 'answer'      => 'You can request account deactivation under Profile Settings > Security. Choosing to delete your account will permanently wipe your profile and resume data in compliance with data privacy standards.',
                 'article_url' => url('/help/article/how-do-i-delete-my-account'),
             ],
+            [
+                'slug'        => 'which-platforms-or-industries-does-internconnect-cover',
+                'question'    => 'Which platforms or industries does InternConnect cover?',
+                'answer'      => 'InternConnect covers high-growth industries including Software Engineering, Product Design, Marketing & Growth, Finance, Data Science, Operations, and Healthcare, partnering with vetted startups and leading multinational enterprises.',
+                'article_url' => url('/help'),
+            ],
+            [
+                'slug'        => 'how-soon-can-i-hear-back-after-applying',
+                'question'    => 'How soon can I hear back after applying?',
+                'answer'      => 'While employer response times vary, most hiring teams on InternConnect review incoming applications within 48 to 72 hours. You can monitor the live milestone status of your application in real time directly from your dashboard.',
+                'article_url' => url('/help'),
+            ],
+            [
+                'slug'        => 'can-employers-see-my-application-status-in-real-time',
+                'question'    => 'Can employers see my application status in real time?',
+                'answer'      => 'Yes. Candidates and recruiters share a synchronized hiring pipeline. As soon as an employer reviews your CV, shortlists your profile, or schedules an interview, your candidate dashboard reflects the updated milestone immediately.',
+                'article_url' => url('/help'),
+            ],
+            [
+                'slug'        => 'what-makes-internconnect-different-from-other-job-boards',
+                'question'    => 'What makes InternConnect different from other job boards?',
+                'answer'      => 'InternConnect is purpose-built for early-career interns and modern hiring teams. In addition to verified listings, we provide autonomous AI career guidance, instant ATS resume scoring, built-in video interview scheduling, and guaranteed zero ghost job postings.',
+                'article_url' => url('/help'),
+            ],
         ];
     }
 
