@@ -14,22 +14,22 @@ declare(strict_types=1);
 
 $videoClips = [
     [
-        'url' => 'https://res.cloudinary.com/weburea/video/upload/w_400,q_auto:eco,ac_none/v1790815553/test_1_z86bwq.mp4',
-        'name' => 'Emily R.',
-        'role' => 'Marketing & Growth Intern',
-        'avatar' => 'https://res.cloudinary.com/weburea/image/upload/v1790816969/test_1_mgvqdi.png',
+        'url' => 'https://res.cloudinary.com/weburea/video/upload/w_400,q_auto:eco,ac_none/v1790815553/test_4_l0uhcx.mp4',
+        'name' => 'Anastasia K.',
+        'role' => 'UI/UX Design Intern',
+        'avatar' => 'https://res.cloudinary.com/weburea/image/upload/v1790816969/test_4_adtliv.png',
     ],
     [
         'url' => 'https://res.cloudinary.com/weburea/video/upload/w_400,q_auto:eco,ac_none/v1790815546/test_2_uypp2k.mp4',
         'name' => 'Chioma B.',
-        'role' => 'Brand & Strategy Intern',
+        'role' => 'Talent Lead at TechStack',
         'avatar' => 'https://res.cloudinary.com/weburea/image/upload/v1790816968/test_2_hi8rmz.png',
     ],
     [
-        'url' => 'https://res.cloudinary.com/weburea/video/upload/w_400,q_auto:eco,ac_none/v1790815553/test_4_l0uhcx.mp4',
-        'name' => 'Anastasia K.',
-        'role' => 'Product Design Intern',
-        'avatar' => 'https://res.cloudinary.com/weburea/image/upload/v1790816969/test_4_adtliv.png',
+        'url' => 'https://res.cloudinary.com/weburea/video/upload/w_400,q_auto:eco,ac_none/v1790819428/test_6_erfvcc.mp4',
+        'name' => 'Kendra L.',
+        'role' => 'Head of Talent at Apex Energy',
+        'avatar' => 'https://res.cloudinary.com/weburea/image/upload/v1790819376/test_6_iwxj2z.png',
     ],
     [
         'url' => 'https://res.cloudinary.com/weburea/video/upload/w_400,q_auto:eco,ac_none/v1790815544/test_3_radsqu.mp4',
