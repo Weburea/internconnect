@@ -4,38 +4,38 @@ declare(strict_types=1);
 
 /**
  * Component: Landing Page - Interactive Video & Vertical Marquee Testimonials Section
- * Replaces the old Success Stories / Loved by Students & Employers section.
+ * Location: Directly below Featured Opportunities (opportunities.php)
  * 
- * 3-Column Architecture:
- * - Left & Right Columns: Vertical marquee auto-scrolling social testimonial cards with platform badges (LinkedIn, X, Instagram, Facebook).
- * - Center Column: Instagram/Snapchat Story-style vertical video carousel with 4 clips, segmented progress bars, crossfades, tap navigation, and mute toggle.
- * - Bottom CTA: Existing shared button style for "View More".
+ * Architecture:
+ * - Left & Right Columns: Vertical marquee auto-scrolling social testimonial cards with premium shaded platform badges (LinkedIn, X, Instagram, Facebook).
+ * - Center Column: Autoplaying vertical video story carousel (completely silent/no audio, no hover arrows, IDM-shielded, ultra-fast 1.5MB stream).
+ * - Bottom CTA: Standardized primary pill CTA button matching .process-btn-cta.
  */
 
 $videoClips = [
     [
-        'url' => 'https://res.cloudinary.com/weburea/video/upload/v1790815553/test_1_z86bwq.mp4',
-        'name' => 'Dany Alves',
-        'role' => 'Frontend Engineering Intern',
-        'avatar' => 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
+        'url' => 'https://res.cloudinary.com/weburea/video/upload/w_400,q_auto:eco,ac_none/v1790815553/test_1_z86bwq.mp4',
+        'name' => 'Emily R.',
+        'role' => 'Marketing & Growth Intern',
+        'avatar' => 'https://res.cloudinary.com/weburea/image/upload/v1790816969/test_1_mgvqdi.png',
     ],
     [
-        'url' => 'https://res.cloudinary.com/weburea/video/upload/v1790815546/test_2_uypp2k.mp4',
-        'name' => 'Adaeze C.',
-        'role' => 'Brand & Marketing Intern',
-        'avatar' => 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&auto=format&fit=crop&q=80',
-    ],
-    [
-        'url' => 'https://res.cloudinary.com/weburea/video/upload/v1790815553/test_4_l0uhcx.mp4',
-        'name' => 'Farouk M.',
-        'role' => 'Product Design Intern',
-        'avatar' => 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80',
-    ],
-    [
-        'url' => 'https://res.cloudinary.com/weburea/video/upload/v1790815556/test_5_sxv3oz.mp4',
+        'url' => 'https://res.cloudinary.com/weburea/video/upload/w_400,q_auto:eco,ac_none/v1790815546/test_2_uypp2k.mp4',
         'name' => 'Chioma B.',
-        'role' => 'Data Intelligence Intern',
-        'avatar' => 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=120&auto=format&fit=crop&q=80',
+        'role' => 'Brand & Strategy Intern',
+        'avatar' => 'https://res.cloudinary.com/weburea/image/upload/v1790816968/test_2_hi8rmz.png',
+    ],
+    [
+        'url' => 'https://res.cloudinary.com/weburea/video/upload/w_400,q_auto:eco,ac_none/v1790815553/test_4_l0uhcx.mp4',
+        'name' => 'Anastasia K.',
+        'role' => 'Product Design Intern',
+        'avatar' => 'https://res.cloudinary.com/weburea/image/upload/v1790816969/test_4_adtliv.png',
+    ],
+    [
+        'url' => 'https://res.cloudinary.com/weburea/video/upload/w_400,q_auto:eco,ac_none/v1790815544/test_3_radsqu.mp4',
+        'name' => 'Sipho D.',
+        'role' => 'Software Engineering Intern',
+        'avatar' => 'https://res.cloudinary.com/weburea/image/upload/v1790816968/test_3_kakx5q.png',
     ],
 ];
 ?>
@@ -181,7 +181,7 @@ $videoClips = [
     }
 }
 
-/* ─── Testimonial Social Card (Image 1 reference) ─── */
+/* ─── Testimonial Social Card ─── */
 .testimonial-social-card {
     background: #FFFFFF;
     border: 1px solid #E2E8F0;
@@ -253,14 +253,40 @@ $videoClips = [
     text-overflow: ellipsis;
 }
 
-/* Social Platform Icon Badge */
+/* ─── Premium Shaded Social Platform Badges ─── */
 .testimonial-platform-badge {
-    width: 24px;
-    height: 24px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
     flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.badge-linkedin {
+    background: #F0F7FF;
+    border: 1px solid #D0E7FF;
+    color: #0A66C2;
+}
+
+.badge-instagram {
+    background: #FFF1F5;
+    border: 1px solid #FFE0EB;
+    color: #E1306C;
+}
+
+.badge-x {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    color: #0F172A;
+}
+
+.badge-facebook {
+    background: #EFF6FF;
+    border: 1px solid #DBEAFE;
+    color: #1877F2;
 }
 
 .testimonial-text-content {
@@ -283,6 +309,16 @@ $videoClips = [
     background: #000623;
     box-shadow: 0 25px 60px -12px rgba(0, 6, 35, 0.22), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
     box-sizing: border-box;
+    user-select: none;
+}
+
+/* Protective transparent shield that prevents IDM hover interception & mouse click blocks */
+.testimonials-video-shield {
+    position: absolute;
+    inset: 0;
+    z-index: 15;
+    pointer-events: auto;
+    background: transparent;
     user-select: none;
 }
 
@@ -331,7 +367,7 @@ $videoClips = [
     z-index: 25;
     pointer-events: none;
     padding: 7px 12px;
-    background: rgba(0, 6, 35, 0.45);
+    background: rgba(0, 6, 35, 0.55);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-radius: 9999px;
@@ -342,12 +378,13 @@ $videoClips = [
 }
 
 .testimonials-speaker-avatar {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     object-fit: cover;
-    border: 1.5px solid rgba(255, 255, 255, 0.7);
+    border: 1.5px solid rgba(255, 255, 255, 0.85);
     flex-shrink: 0;
+    background-color: #000623;
 }
 
 .testimonials-speaker-info {
@@ -359,15 +396,15 @@ $videoClips = [
 }
 
 .testimonials-speaker-name {
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 700;
     color: #FFFFFF;
     white-space: nowrap;
 }
 
 .testimonials-speaker-role {
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.82);
+    font-size: 11.5px;
+    color: rgba(255, 255, 255, 0.85);
     font-weight: 500;
     white-space: nowrap;
     overflow: hidden;
@@ -390,65 +427,15 @@ $videoClips = [
     object-fit: cover;
     opacity: 0;
     transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    pointer-events: none;
+    pointer-events: none !important;
     background: #000623;
 }
 
 .testimonials-video-clip.is-active {
     opacity: 1;
-    pointer-events: auto;
 }
 
-/* Tap Navigation Zones (Story Style) */
-.testimonials-tap-zone {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    z-index: 20;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-}
-
-.testimonials-tap-left {
-    left: 0;
-    width: 40%;
-    justify-content: flex-start;
-    padding-left: 12px;
-}
-
-.testimonials-tap-right {
-    right: 0;
-    width: 60%;
-    justify-content: flex-end;
-    padding-right: 12px;
-}
-
-.testimonials-tap-hint {
-    opacity: 0;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: rgba(0, 6, 35, 0.4);
-    backdrop-filter: blur(4px);
-    color: #FFFFFF;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.testimonials-tap-left:hover .testimonials-tap-hint {
-    opacity: 0.85;
-    transform: translateX(4px);
-}
-
-.testimonials-tap-right:hover .testimonials-tap-hint {
-    opacity: 0.85;
-    transform: translateX(-4px);
-}
-
-/* Bottom Floating Control Bar */
+/* Bottom Floating Status Pill */
 .testimonials-bottom-bar {
     position: absolute;
     bottom: 16px;
@@ -456,7 +443,7 @@ $videoClips = [
     right: 16px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     z-index: 25;
     pointer-events: none;
 }
@@ -467,7 +454,7 @@ $videoClips = [
     gap: 6px;
     padding: 4px 10px;
     border-radius: 9999px;
-    background: rgba(0, 6, 35, 0.45);
+    background: rgba(0, 6, 35, 0.5);
     backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.15);
     color: #FFFFFF;
@@ -483,34 +470,39 @@ $videoClips = [
     box-shadow: 0 0 6px #10B981;
 }
 
-.testimonials-mute-btn {
-    pointer-events: auto;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: rgba(0, 6, 35, 0.55);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #FFFFFF;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.testimonials-mute-btn:hover {
-    background: rgba(0, 6, 35, 0.8);
-    transform: scale(1.05);
-}
-
-/* ─── Bottom CTA Wrapper ─── */
+/* ─── Bottom CTA: Standard Platform Button Style ─── */
 .testimonials-cta-wrap {
     margin-top: 48px;
     text-align: center;
     display: flex;
     justify-content: center;
+}
+
+.testimonials-btn-cta {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    padding: 12px 28px !important;
+    border-radius: 9999px !important;
+    background-color: #4F48E6 !important;
+    color: #FFFFFF !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    border: none !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    box-shadow: 0 4px 14px rgba(79, 72, 230, 0.35) !important;
+    width: fit-content !important;
+}
+
+.testimonials-btn-cta:hover {
+    background-color: #4338CA !important;
+    box-shadow: 0 6px 18px rgba(79, 72, 230, 0.45) !important;
+    transform: translateY(-1px);
 }
 
 /* Responsive Breakpoints */
@@ -599,8 +591,8 @@ $videoClips = [
                                     <span class="testimonial-author-handle">@Flux.tech</span>
                                 </div>
                             </div>
-                            <div class="testimonial-platform-badge" title="LinkedIn">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="#0A66C2">
+                            <div class="testimonial-platform-badge badge-linkedin" title="LinkedIn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
                                 </svg>
                             </div>
@@ -620,11 +612,11 @@ $videoClips = [
                                     <span class="testimonial-author-handle">@Google.com</span>
                                 </div>
                             </div>
-                            <div class="testimonial-platform-badge" title="Instagram">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                                    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" stroke="#E1306C" stroke-width="2"/>
-                                    <path stroke="#E1306C" stroke-width="2" d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-                                    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" stroke="#E1306C" stroke-width="2.5" stroke-linecap="round"/>
+                            <div class="testimonial-platform-badge badge-instagram" title="Instagram">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+                                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                                    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" stroke-width="2.5" stroke-linecap="round"/>
                                 </svg>
                             </div>
                         </div>
@@ -643,8 +635,8 @@ $videoClips = [
                                     <span class="testimonial-author-handle">@AnitaK_design</span>
                                 </div>
                             </div>
-                            <div class="testimonial-platform-badge" title="LinkedIn">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="#0A66C2">
+                            <div class="testimonial-platform-badge badge-linkedin" title="LinkedIn">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
                                 </svg>
                             </div>
@@ -664,8 +656,8 @@ $videoClips = [
                                     <span class="testimonial-author-handle">@Flux.tech</span>
                                 </div>
                             </div>
-                            <div class="testimonial-platform-badge">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="#0A66C2"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+                            <div class="testimonial-platform-badge badge-linkedin">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
                             </div>
                         </div>
                         <p class="testimonial-text-content">
@@ -682,8 +674,8 @@ $videoClips = [
                                     <span class="testimonial-author-handle">@Google.com</span>
                                 </div>
                             </div>
-                            <div class="testimonial-platform-badge">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect width="20" height="20" x="2" y="2" rx="5" ry="5" stroke="#E1306C" stroke-width="2"/><path stroke="#E1306C" stroke-width="2" d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" stroke="#E1306C" stroke-width="2.5" stroke-linecap="round"/></svg>
+                            <div class="testimonial-platform-badge badge-instagram">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" stroke-width="2.5" stroke-linecap="round"/></svg>
                             </div>
                         </div>
                         <p class="testimonial-text-content">
@@ -700,8 +692,8 @@ $videoClips = [
                                     <span class="testimonial-author-handle">@AnitaK_design</span>
                                 </div>
                             </div>
-                            <div class="testimonial-platform-badge">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="#0A66C2"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+                            <div class="testimonial-platform-badge badge-linkedin">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
                             </div>
                         </div>
                         <p class="testimonial-text-content">
@@ -715,6 +707,9 @@ $videoClips = [
             <!-- Center Column: Vertical Video Story Carousel (Instagram / Snapchat Style) -->
             <div class="testimonials-video-stage">
                 
+                <!-- Transparent shield layer against IDM hover detection & click interference -->
+                <div class="testimonials-video-shield" aria-hidden="true" oncontextmenu="return false;"></div>
+
                 <!-- Story Progress Bars (4 Segments) -->
                 <div class="testimonials-story-bar-wrap">
                     <?php for ($s = 0; $s < 4; $s++): ?>
@@ -736,7 +731,7 @@ $videoClips = [
                 </div>
 
                 <!-- Stacked Crossfading Video Player -->
-                <div class="testimonials-video-viewport">
+                <div class="testimonials-video-viewport" oncontextmenu="return false;">
                     <?php foreach ($videoClips as $idx => $clip): ?>
                         <video 
                             id="testimonial-vid-<?= $idx ?>"
@@ -745,48 +740,22 @@ $videoClips = [
                             src="<?= htmlspecialchars($clip['url']) ?>"
                             playsinline
                             muted
-                            preload="auto"
+                            preload="metadata"
                             disablePictureInPicture
                             controlsList="nodownload nofullscreen noremoteplayback"
+                            oncontextmenu="return false;"
+                            tabindex="-1"
+                            aria-hidden="true"
                         ></video>
                     <?php endforeach; ?>
                 </div>
 
-                <!-- Story Tap Navigation Overlays -->
-                <div class="testimonials-tap-zone testimonials-tap-left" @click="prevClip()" title="Previous Story">
-                    <span class="testimonials-tap-hint">
-                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                        </svg>
-                    </span>
-                </div>
-                <div class="testimonials-tap-zone testimonials-tap-right" @click="nextClip()" title="Next Story">
-                    <span class="testimonials-tap-hint">
-                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </span>
-                </div>
-
-                <!-- Bottom Floating Bar: Active Indicator + Mute Toggle -->
+                <!-- Bottom Floating Bar: Active Indicator Only (No Audio Controls) -->
                 <div class="testimonials-bottom-bar">
                     <div class="testimonials-status-pill">
                         <span class="testimonials-live-dot"></span>
                         <span x-text="'Story ' + (activeClip + 1) + ' of ' + clips.length"></span>
                     </div>
-
-                    <!-- Mute / Unmute Toggle Button -->
-                    <button type="button" class="testimonials-mute-btn" @click.stop="toggleMute()" :title="isMuted ? 'Unmute Story' : 'Mute Story'">
-                        <!-- Muted Icon -->
-                        <svg x-show="isMuted" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
-                        </svg>
-                        <!-- Sound Waves Icon -->
-                        <svg x-show="!isMuted" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
-                        </svg>
-                    </button>
                 </div>
 
             </div>
@@ -805,8 +774,8 @@ $videoClips = [
                                     <span class="testimonial-author-handle">@Prescot LTD</span>
                                 </div>
                             </div>
-                            <div class="testimonial-platform-badge" title="X (Twitter)">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="#000000">
+                            <div class="testimonial-platform-badge badge-x" title="X (Twitter)">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                                 </svg>
                             </div>
@@ -826,8 +795,8 @@ $videoClips = [
                                     <span class="testimonial-author-handle">@MichaelT_dev</span>
                                 </div>
                             </div>
-                            <div class="testimonial-platform-badge" title="X (Twitter)">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="#000000">
+                            <div class="testimonial-platform-badge badge-x" title="X (Twitter)">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                                 </svg>
                             </div>
@@ -847,8 +816,8 @@ $videoClips = [
                                     <span class="testimonial-author-handle">@GraceE_tech</span>
                                 </div>
                             </div>
-                            <div class="testimonial-platform-badge" title="Facebook">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2">
+                            <div class="testimonial-platform-badge badge-facebook" title="Facebook">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                                 </svg>
                             </div>
@@ -868,8 +837,8 @@ $videoClips = [
                                     <span class="testimonial-author-handle">@Prescot LTD</span>
                                 </div>
                             </div>
-                            <div class="testimonial-platform-badge">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="#000000"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                            <div class="testimonial-platform-badge badge-x">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                             </div>
                         </div>
                         <p class="testimonial-text-content">
@@ -886,8 +855,8 @@ $videoClips = [
                                     <span class="testimonial-author-handle">@MichaelT_dev</span>
                                 </div>
                             </div>
-                            <div class="testimonial-platform-badge">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="#000000"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                            <div class="testimonial-platform-badge badge-x">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                             </div>
                         </div>
                         <p class="testimonial-text-content">
@@ -904,8 +873,8 @@ $videoClips = [
                                     <span class="testimonial-author-handle">@GraceE_tech</span>
                                 </div>
                             </div>
-                            <div class="testimonial-platform-badge">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                            <div class="testimonial-platform-badge badge-facebook">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                             </div>
                         </div>
                         <p class="testimonial-text-content">
@@ -918,11 +887,11 @@ $videoClips = [
 
         </div>
 
-        <!-- Section Bottom CTA using Shared Primary Button Style -->
+        <!-- Section Bottom CTA using Standard Platform Button Style -->
         <div class="testimonials-cta-wrap">
-            <a href="<?= url('/internships') ?>" class="inline-flex items-center justify-center gap-2 font-bold px-8 py-3.5 rounded-full text-white bg-primary hover:bg-primary-hover shadow-lg shadow-primary/25 transition-all duration-200 transform hover:-translate-y-0.5 active:translate-y-0 text-sm" style="white-space: nowrap !important; flex-shrink: 0 !important;">
+            <a href="<?= url('/internships') ?>" class="testimonials-btn-cta">
                 <span>View More</span>
-                <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="flex-shrink: 0 !important;">
+                <svg style="width: 16px; height: 16px; flex-shrink: 0 !important;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                 </svg>
             </a>
@@ -934,12 +903,14 @@ $videoClips = [
 <script>
 /**
  * Instagram/Snapchat Story-Style Video Carousel Alpine Component
+ * - Pure autoplay & loop (No audio, no hover arrows, no click blocks)
+ * - Ultra-fast lightweight Cloudinary video streams with audio completely stripped (ac_none)
+ * - Transparent shield layer preventing IDM download popups
  */
 function testimonialsStoryCarousel() {
     return {
         activeClip: 0,
         progress: 0,
-        isMuted: true,
         clips: <?= json_encode($videoClips, JSON_UNESCAPED_SLASHES) ?>,
         rafId: null,
         fallbackTimer: null,
@@ -957,7 +928,7 @@ function testimonialsStoryCarousel() {
                 const vid = document.getElementById('testimonial-vid-' + idx);
                 if (!vid) return;
 
-                vid.muted = this.isMuted;
+                vid.muted = true;
 
                 vid.addEventListener('ended', () => {
                     this.nextClip();
@@ -984,14 +955,12 @@ function testimonialsStoryCarousel() {
 
             const newVid = document.getElementById('testimonial-vid-' + index);
             if (newVid) {
-                newVid.muted = this.isMuted;
+                newVid.muted = true;
                 newVid.currentTime = 0;
                 const playPromise = newVid.play();
                 if (playPromise !== undefined) {
                     playPromise.catch(() => {
-                        // Ensure muted and retry if browser autoplay blocks unmuted audio
                         newVid.muted = true;
-                        this.isMuted = true;
                         newVid.play().catch(() => {});
                     });
                 }
@@ -1011,25 +980,12 @@ function testimonialsStoryCarousel() {
             // Fallback timer in case video metadata / ended event stalls
             this.fallbackTimer = setTimeout(() => {
                 this.nextClip();
-            }, 9000);
+            }, 8500);
         },
 
         nextClip() {
             const nextIdx = (this.activeClip + 1) % this.clips.length;
             this.playClip(nextIdx);
-        },
-
-        prevClip() {
-            const prevIdx = (this.activeClip - 1 + this.clips.length) % this.clips.length;
-            this.playClip(prevIdx);
-        },
-
-        toggleMute() {
-            this.isMuted = !this.isMuted;
-            const currentVid = document.getElementById('testimonial-vid-' + this.activeClip);
-            if (currentVid) {
-                currentVid.muted = this.isMuted;
-            }
         },
 
         destroy() {
