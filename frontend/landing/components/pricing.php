@@ -18,36 +18,117 @@ declare(strict_types=1);
                 Choose the right plan to accelerate your career or find the best interns for your organization.
             </p>
             
+<style>
+/* ─── Premium Segmented Pricing Switcher (Image 5 Reference) ─── */
+.pricing-switcher-wrap {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin-top: 26px !important;
+    margin-bottom: 6px !important;
+    position: relative !important;
+    width: 100% !important;
+}
+
+.pricing-switcher-track {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    background-color: #EEF2FF !important;
+    border: 1px solid #E0E7FF !important;
+    border-radius: 9999px !important;
+    padding: 5px !important;
+    gap: 6px !important;
+    user-select: none !important;
+    box-sizing: border-box !important;
+}
+
+.pricing-switcher-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 110px !important;
+    padding: 9px 24px !important;
+    border-radius: 9999px !important;
+    font-size: 14.5px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    color: #475569 !important;
+    background-color: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+    outline: none !important;
+}
+
+.pricing-switcher-btn.is-active {
+    background-color: #FFFFFF !important;
+    color: #4F48E6 !important;
+    font-weight: 700 !important;
+    box-shadow: 0 2px 10px rgba(79, 72, 230, 0.16) !important;
+}
+
+.pricing-switcher-btn:hover:not(.is-active) {
+    color: #000623 !important;
+}
+
+/* Floating Save 20% Badge */
+.pricing-save-badge-wrap {
+    position: absolute !important;
+    top: -14px !important;
+    right: -10px !important;
+    z-index: 15 !important;
+    pointer-events: none !important;
+    transform: rotate(5deg) !important;
+    transform-origin: bottom left !important;
+}
+
+.pricing-save-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    background-color: #5EEAD4 !important;
+    color: #047857 !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    padding: 3.5px 9px !important;
+    border-radius: 9999px !important;
+    box-shadow: 0 2px 6px rgba(13, 148, 136, 0.25) !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+}
+</style>
+
             <!-- Billing Switcher (Modern Segmented Pill Toggle with Floating Save 20% Tag) -->
-            <div class="flex items-center justify-center pt-2">
-                <div style="position: relative; display: inline-flex; align-items: center; background-color: #EEF2FF; padding: 4px; border-radius: 9999px; border: 1px solid #E0E7FF; user-select: none;">
+            <div class="pricing-switcher-wrap">
+                <div class="pricing-switcher-track">
                     <!-- Monthly Option -->
                     <button type="button" 
                             @click="billing = 'monthly'" 
-                            :style="billing === 'monthly' ? 'background-color: #FFFFFF; color: #4F48E6; font-weight: 700; box-shadow: 0 2px 8px rgba(79, 72, 230, 0.12);' : 'background-color: transparent; color: #475569; font-weight: 600;'"
-                            style="padding: 8px 24px; border-radius: 9999px; font-size: 14px; border: none; cursor: pointer; transition: all 0.2s ease; outline: none;">
+                            class="pricing-switcher-btn"
+                            :class="{ 'is-active': billing === 'monthly' }">
                         Monthly
                     </button>
 
-                    <!-- Yearly Option Container (Relative for Badge positioning) -->
-                    <div style="position: relative;">
-                        <button type="button" 
-                                @click="billing = 'yearly'" 
-                                :style="billing === 'yearly' ? 'background-color: #FFFFFF; color: #4F48E6; font-weight: 700; box-shadow: 0 2px 8px rgba(79, 72, 230, 0.12);' : 'background-color: transparent; color: #475569; font-weight: 600;'"
-                                style="padding: 8px 24px; border-radius: 9999px; font-size: 14px; border: none; cursor: pointer; transition: all 0.2s ease; outline: none;">
-                            Yearly
-                        </button>
+                    <!-- Yearly Option -->
+                    <button type="button" 
+                            @click="billing = 'yearly'" 
+                            class="pricing-switcher-btn"
+                            :class="{ 'is-active': billing === 'yearly' }">
+                        Yearly
+                    </button>
 
-                        <!-- Floating Green Tag Badge (Save 20%) -->
-                        <div style="position: absolute; top: -14px; right: -12px; z-index: 10; pointer-events: none; transform: rotate(4deg);">
-                            <span style="display: inline-flex; align-items: center; gap: 4px; background-color: #5EEAD4; color: #047857; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 9999px; box-shadow: 0 2px 6px rgba(13, 148, 136, 0.25); white-space: nowrap; flex-shrink: 0;">
-                                <svg style="width: 12px; height: 12px; flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
-                                    <line x1="7" y1="7" x2="7.01" y2="7"></line>
-                                </svg>
-                                <span>Save 20%</span>
-                            </span>
-                        </div>
+                    <!-- Floating Green Tag Badge (Save 20%) -->
+                    <div class="pricing-save-badge-wrap">
+                        <span class="pricing-save-badge">
+                            <svg style="width: 12px; height: 12px; flex-shrink: 0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                                <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                            </svg>
+                            <span>Save 20%</span>
+                        </span>
                     </div>
                 </div>
             </div>

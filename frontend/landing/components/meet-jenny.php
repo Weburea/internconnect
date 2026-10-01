@@ -92,7 +92,7 @@ if (!empty($sessionUser)) {
 }
 
 .jenny-node-pulse {
-    transform-origin: 500px 860px;
+    transform-origin: 500px 900px;
     transition: transform 0.3s ease, opacity 0.3s ease;
     opacity: 0;
 }
@@ -894,17 +894,17 @@ if (!empty($sessionUser)) {
                     </filter>
                 </defs>
 
-                <!-- Left Branch (Purple): Enters from top at (497, 0), travels down 48px vertical corridor, branches left at Y=68, curves down left flank at X=11, curves along bottom at Y=900, curves inward/upward into section to center convergence (497, 860) -->
-                <path class="meet-jenny-flow-track" d="M 497 0 L 497 48 Q 497 68, 475 68 L 33 68 Q 11 68, 11 88 L 11 878 Q 11 900, 33 900 L 460 900 Q 480 900, 480 885 L 480 875 Q 480 860, 497 860" />
-                <path class="meet-jenny-flow-beam meet-jenny-beam-left" d="M 497 0 L 497 48 Q 497 68, 475 68 L 33 68 Q 11 68, 11 88 L 11 878 Q 11 900, 33 900 L 460 900 Q 480 900, 480 885 L 480 875 Q 480 860, 497 860" stroke="url(#jennyFlowLeftGrad)" filter="url(#jennyGlowPurple)" />
+                <!-- Left Branch (Purple): Enters from top at (497, 0), travels down 48px vertical corridor, branches left at Y=68, curves down left flank at X=11, curves along bottom at Y=900, stops at center bottom (497, 900) -->
+                <path class="meet-jenny-flow-track" d="M 497 0 L 497 48 Q 497 68, 475 68 L 33 68 Q 11 68, 11 88 L 11 878 Q 11 900, 33 900 L 497 900" />
+                <path class="meet-jenny-flow-beam meet-jenny-beam-left" d="M 497 0 L 497 48 Q 497 68, 475 68 L 33 68 Q 11 68, 11 88 L 11 878 Q 11 900, 33 900 L 497 900" stroke="url(#jennyFlowLeftGrad)" filter="url(#jennyGlowPurple)" />
 
-                <!-- Right Branch (Dark Mode Navy): Enters from top at (503, 0), travels down 48px vertical corridor, branches right at Y=68, curves down right flank at X=989, curves along bottom at Y=900, curves inward/upward into section to center convergence (503, 860) -->
-                <path class="meet-jenny-flow-track" d="M 503 0 L 503 48 Q 503 68, 525 68 L 967 68 Q 989 68, 989 88 L 989 878 Q 989 900, 967 900 L 540 900 Q 520 900, 520 885 L 520 875 Q 520 860, 503 860" />
-                <path class="meet-jenny-flow-beam meet-jenny-beam-right" d="M 503 0 L 503 48 Q 503 68, 525 68 L 967 68 Q 989 68, 989 88 L 989 878 Q 989 900, 967 900 L 540 900 Q 520 900, 520 885 L 520 875 Q 520 860, 503 860" stroke="url(#jennyFlowDarkGrad)" filter="url(#jennyGlowDark)" />
+                <!-- Right Branch (Dark Mode Navy): Enters from top at (503, 0), travels down 48px vertical corridor, branches right at Y=68, curves down right flank at X=989, curves along bottom at Y=900, stops at center bottom (503, 900) -->
+                <path class="meet-jenny-flow-track" d="M 503 0 L 503 48 Q 503 68, 525 68 L 967 68 Q 989 68, 989 88 L 989 878 Q 989 900, 967 900 L 503 900" />
+                <path class="meet-jenny-flow-beam meet-jenny-beam-right" d="M 503 0 L 503 48 Q 503 68, 525 68 L 967 68 Q 989 68, 989 88 L 989 878 Q 989 900, 967 900 L 503 900" stroke="url(#jennyFlowDarkGrad)" filter="url(#jennyGlowDark)" />
 
-                <!-- Bottom Center Destination Convergence Node safely contained inside section (500, 860) -->
-                <circle cx="500" cy="860" r="6" fill="#000623" stroke="#FFFFFF" stroke-width="2" />
-                <circle class="jenny-node-pulse" cx="500" cy="860" r="14" fill="#4F48E6" opacity="0.25" />
+                <!-- Bottom Center Destination Convergence Node at center bottom (500, 900) -->
+                <circle cx="500" cy="900" r="6" fill="#000623" stroke="#FFFFFF" stroke-width="2" />
+                <circle class="jenny-node-pulse" cx="500" cy="900" r="14" fill="#4F48E6" opacity="0.25" />
             </svg>
 
             <!-- Section Header (Positioned at Top-Center of Stage) -->
