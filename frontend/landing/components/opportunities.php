@@ -134,12 +134,34 @@ $featuredRoles = [
     box-sizing: border-box;
 }
 
-.opportunities-eyebrow {
+.opportunities-eyebrow-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    background-color: #EEF2FF;
+    color: #4F48E6;
+    border: 1px solid #C7D2FE;
     font-size: 12px;
     font-weight: 700;
-    color: #4F48E6;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
+    white-space: nowrap;
+    width: fit-content;
+}
+
+.opportunities-pulse-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: #4F48E6;
+    animation: opportunitiesDotPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes opportunitiesDotPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.35; transform: scale(0.85); }
 }
 
 .opportunities-title {
@@ -243,7 +265,14 @@ $featuredRoles = [
     background: #EEF2FF;
 }
 
-/* Search Input Box */
+/* Search Input Box & Dropdown Wrap */
+.opportunity-search-box-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 350px;
+    box-sizing: border-box;
+}
+
 .opportunity-search-box {
     position: relative;
     display: flex;
@@ -255,11 +284,11 @@ $featuredRoles = [
     box-shadow: 0 2px 8px -2px rgba(0, 6, 35, 0.05);
     transition: all 0.2s ease;
     width: 100%;
-    max-width: 350px;
     box-sizing: border-box;
 }
 
-.opportunity-search-box:focus-within {
+.opportunity-search-box:focus-within,
+.opportunity-search-box.is-focused {
     border-color: #4F48E6;
     box-shadow: 0 0 0 3px rgba(79, 72, 230, 0.12);
 }
@@ -289,6 +318,28 @@ $featuredRoles = [
     font-weight: 400;
 }
 
+.opportunity-search-clear-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #F1F5F9;
+    color: #64748B;
+    border: none;
+    cursor: pointer;
+    margin-right: 6px;
+    flex-shrink: 0;
+    padding: 0;
+    transition: all 0.15s ease;
+}
+
+.opportunity-search-clear-btn:hover {
+    background: #E2E8F0;
+    color: #0F172A;
+}
+
 .opportunity-search-filter-btn {
     display: flex;
     align-items: center;
@@ -304,8 +355,134 @@ $featuredRoles = [
     transition: all 0.2s ease;
 }
 
-.opportunity-search-filter-btn:hover {
+.opportunity-search-filter-btn:hover,
+.opportunity-search-filter-btn.is-active {
     background: #EEF2FF;
+    color: #4F48E6;
+}
+
+.opportunity-dropdown-chevron {
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+}
+
+/* Custom Standard Alpine Dropdown Menu */
+.opportunity-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 100%;
+    min-width: 290px;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 16px;
+    box-shadow: 0 16px 36px -4px rgba(0, 6, 35, 0.12), 0 4px 12px -2px rgba(0, 6, 35, 0.05);
+    z-index: 60;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.opportunity-dropdown-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px 8px 10px;
+    border-bottom: 1px solid #F1F5F9;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #94A3B8;
+}
+
+.opportunity-dropdown-count {
+    color: #4F48E6;
+    font-weight: 600;
+}
+
+.opportunity-dropdown-list {
+    max-height: 240px;
+    overflow-y: auto;
+    padding-top: 4px;
+}
+
+.opportunity-dropdown-list::-webkit-scrollbar {
+    width: 5px;
+}
+
+.opportunity-dropdown-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.opportunity-dropdown-list::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 4px;
+}
+
+.opportunity-dropdown-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.12s ease;
+    user-select: none;
+    margin-bottom: 2px;
+}
+
+.opportunity-dropdown-item:hover {
+    background-color: #F8FAFC;
+    color: #000623;
+}
+
+.opportunity-dropdown-item.is-selected {
+    background-color: #EEF2FF;
+    color: #4F48E6;
+    font-weight: 600;
+}
+
+.opportunity-item-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.opportunity-item-icon-box {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    background: #F1F5F9;
+    color: #64748B;
+}
+
+.opportunity-item-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 13px;
+}
+
+.opportunity-item-pill {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748B;
+    background: #F1F5F9;
+    padding: 2px 7px;
+    border-radius: 9999px;
+    flex-shrink: 0;
+}
+
+.opportunity-dropdown-item.is-selected .opportunity-item-pill {
+    background: #E0E7FF;
     color: #4F48E6;
 }
 
@@ -571,8 +748,14 @@ $featuredRoles = [
         gap: 14px;
     }
     
+    .opportunity-search-box-wrap,
     .opportunity-search-box {
-        max-width: 100%;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    .opportunity-dropdown-menu {
+        min-width: 100% !important;
     }
     
     .opportunities-pills-wrap {
@@ -604,9 +787,12 @@ $featuredRoles = [
 <section id="opportunities-section" class="opportunities-section-wrap" x-data="opportunitiesFilterComponent()">
     <div class="opportunities-container">
         
-        <!-- Section Header (Preserved as requested) -->
+        <!-- Section Header with Official Pill Badge -->
         <div class="opportunities-header-box">
-            <span class="opportunities-eyebrow">Latest Roles</span>
+            <div class="opportunities-eyebrow-pill">
+                <span class="opportunities-pulse-dot"></span>
+                <span>Latest Roles</span>
+            </div>
             <h2 class="opportunities-title">
                 Featured Opportunities
             </h2>
@@ -646,23 +832,103 @@ $featuredRoles = [
                 </button>
             </div>
 
-            <!-- Search Input with Filter Dropdown Icon -->
-            <div class="opportunity-search-box">
-                <svg class="opportunity-search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <input 
-                    type="text" 
-                    x-model="searchQuery"
-                    placeholder="Keywords, Position, Skills" 
-                    class="opportunity-search-input"
-                    aria-label="Search opportunities"
-                />
-                <button type="button" class="opportunity-search-filter-btn" title="Filter options" @click="toggleFilterDropdown()">
-                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+            <!-- Search Input with Dropdown Category Functionality -->
+            <div class="opportunity-search-box-wrap" @click.outside="dropdownOpen = false">
+                <div class="opportunity-search-box" :class="{ 'is-focused': dropdownOpen }" @click="dropdownOpen = true">
+                    <svg class="opportunity-search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
-                </button>
+                    <input 
+                        type="text" 
+                        x-model="searchQuery"
+                        @focus="dropdownOpen = true"
+                        @keydown.escape="dropdownOpen = false"
+                        placeholder="Keywords, Position, Skills" 
+                        class="opportunity-search-input"
+                        aria-label="Search opportunities"
+                    />
+                    <!-- Quick Clear Button -->
+                    <button 
+                        type="button" 
+                        x-show="searchQuery.length > 0" 
+                        @click.stop="searchQuery = ''; selectedCategory = '';" 
+                        class="opportunity-search-clear-btn" 
+                        title="Clear search"
+                        style="display: none;"
+                    >
+                        <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                    <!-- Dropdown Arrow / Filter Toggle Button -->
+                    <button 
+                        type="button" 
+                        class="opportunity-search-filter-btn" 
+                        :class="{ 'is-active': dropdownOpen }"
+                        title="Browse role categories" 
+                        @click.stop="dropdownOpen = !dropdownOpen"
+                    >
+                        <svg class="opportunity-dropdown-chevron" :class="{ 'rotate-180': dropdownOpen }" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Custom Standard Alpine Dropdown Menu -->
+                <div 
+                    x-show="dropdownOpen" 
+                    x-transition:enter="transition ease-out duration-180"
+                    x-transition:enter-start="opacity-0 translate-y-1 scale-98"
+                    x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                    x-transition:leave="transition ease-in duration-120"
+                    x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                    x-transition:leave-end="opacity-0 translate-y-1 scale-98"
+                    class="opportunity-dropdown-menu db-dropdown-menu"
+                    style="display: none;"
+                >
+                    <div class="opportunity-dropdown-header">
+                        <span>Role Categories</span>
+                        <span class="opportunity-dropdown-count" x-text="categoryList.length + ' Available'"></span>
+                    </div>
+
+                    <div class="opportunity-dropdown-list">
+                        <!-- All Categories Option -->
+                        <div 
+                            class="opportunity-dropdown-item db-dropdown-item"
+                            :class="{ 'is-selected': selectedCategory === '' && searchQuery === '' }"
+                            @click="selectCategory('')"
+                        >
+                            <div class="opportunity-item-left">
+                                <div class="opportunity-item-icon-box">
+                                    <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                                    </svg>
+                                </div>
+                                <span class="opportunity-item-title">All Categories</span>
+                            </div>
+                            <span class="opportunity-item-pill">All</span>
+                        </div>
+
+                        <!-- Categories Loop -->
+                        <template x-for="cat in filteredCategories" :key="cat.name">
+                            <div 
+                                class="opportunity-dropdown-item db-dropdown-item"
+                                :class="{ 'is-selected': searchQuery.toLowerCase() === cat.name.toLowerCase() || activeFilters.includes(cat.name) }"
+                                @click="selectCategory(cat.name)"
+                            >
+                                <div class="opportunity-item-left">
+                                    <div class="opportunity-item-icon-box" :style="'color: ' + cat.color + '; background: ' + cat.bg + ';'">
+                                        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" :d="cat.icon" />
+                                        </svg>
+                                    </div>
+                                    <span class="opportunity-item-title" x-text="cat.name"></span>
+                                </div>
+                                <span class="opportunity-item-pill" x-text="cat.count"></span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -760,20 +1026,51 @@ $featuredRoles = [
 function opportunitiesFilterComponent() {
     return {
         searchQuery: '',
+        selectedCategory: '',
+        dropdownOpen: false,
         activeFilters: ['UI Designer', 'Remote', 'Full-Time'],
+
+        categoryList: [
+            { name: 'UI Designer', count: '14 Roles', color: '#4F48E6', bg: '#EEF2FF', icon: 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01' },
+            { name: 'Engineering', count: '28 Roles', color: '#2563EB', bg: '#EFF6FF', icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4' },
+            { name: 'Marketing', count: '15 Roles', color: '#D97706', bg: '#FEF3C7', icon: 'M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z' },
+            { name: 'Data', count: '11 Roles', color: '#059669', bg: '#ECFDF5', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
+            { name: 'Product', count: '8 Roles', color: '#7C3AED', bg: '#F5F3FF', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' },
+            { name: 'Remote', count: '24 Roles', color: '#4F48E6', bg: '#EEF2FF', icon: 'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+            { name: 'Full-Time', count: '30 Roles', color: '#059669', bg: '#ECFDF5', icon: 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' }
+        ],
+
+        get filteredCategories() {
+            if (!this.searchQuery) return this.categoryList;
+            const q = this.searchQuery.toLowerCase();
+            const matches = this.categoryList.filter(c => c.name.toLowerCase().includes(q));
+            return matches.length > 0 ? matches : this.categoryList;
+        },
+
+        selectCategory(catName) {
+            if (!catName) {
+                this.searchQuery = '';
+                this.selectedCategory = '';
+            } else {
+                this.searchQuery = catName;
+                this.selectedCategory = catName;
+                this.addFilter(catName);
+            }
+            this.dropdownOpen = false;
+        },
 
         removeFilter(tag) {
             this.activeFilters = this.activeFilters.filter(t => t !== tag);
+            if (this.selectedCategory === tag) {
+                this.selectedCategory = '';
+                this.searchQuery = '';
+            }
         },
 
         addFilter(tag) {
             if (!this.activeFilters.includes(tag)) {
                 this.activeFilters.push(tag);
             }
-        },
-
-        toggleFilterDropdown() {
-            window.location.href = '<?= url('/internships') ?>';
         },
 
         matchesSearch(role) {
@@ -783,7 +1080,8 @@ function opportunitiesFilterComponent() {
                    role.company.toLowerCase().includes(q) ||
                    role.location.toLowerCase().includes(q) ||
                    role.description.toLowerCase().includes(q) ||
-                   role.category.toLowerCase().includes(q);
+                   role.category.toLowerCase().includes(q) ||
+                   role.type.toLowerCase().includes(q);
         }
     };
 }

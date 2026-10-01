@@ -10,8 +10,6 @@
 <!-- Meet Jenny AI Video Showcase Section -->
 <?php include __DIR__ . '/components/meet-jenny.php'; ?>
 
-<!-- Features Section -->
-<?php include __DIR__ . '/components/features.php'; ?>
 
 <!-- Featured Opportunities Section -->
 <?php include __DIR__ . '/components/opportunities.php'; ?>
