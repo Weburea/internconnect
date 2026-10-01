@@ -470,7 +470,7 @@ $videoClips = [
     box-shadow: 0 0 6px #10B981;
 }
 
-/* ─── Bottom CTA: Standard Platform Button Style ─── */
+/* ─── Footer: View All Link (Clean link format matching Opportunities section) ─── */
 .testimonials-cta-wrap {
     margin-top: 48px;
     text-align: center;
@@ -478,31 +478,32 @@ $videoClips = [
     justify-content: center;
 }
 
-.testimonials-btn-cta {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 8px !important;
-    padding: 12px 28px !important;
-    border-radius: 9999px !important;
-    background-color: #4F48E6 !important;
-    color: #FFFFFF !important;
-    font-weight: 600 !important;
-    font-size: 14px !important;
-    border: none !important;
-    cursor: pointer !important;
-    text-decoration: none !important;
-    transition: all 0.2s ease !important;
+.testimonials-view-all-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #4F48E6;
+    text-decoration: none;
+    transition: color 0.2s ease;
     white-space: nowrap !important;
     flex-shrink: 0 !important;
-    box-shadow: 0 4px 14px rgba(79, 72, 230, 0.35) !important;
-    width: fit-content !important;
 }
 
-.testimonials-btn-cta:hover {
-    background-color: #4338CA !important;
-    box-shadow: 0 6px 18px rgba(79, 72, 230, 0.45) !important;
-    transform: translateY(-1px);
+.testimonials-view-all-link:hover {
+    color: #3730A3;
+}
+
+.testimonials-view-all-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+
+.testimonials-view-all-link:hover .testimonials-view-all-icon {
+    transform: translateX(4px);
 }
 
 /* Responsive Breakpoints */
@@ -887,12 +888,12 @@ $videoClips = [
 
         </div>
 
-        <!-- Section Bottom CTA using Standard Platform Button Style -->
+        <!-- Section Bottom CTA matching View All Opportunities link style -->
         <div class="testimonials-cta-wrap">
-            <a href="<?= url('/internships') ?>" class="testimonials-btn-cta">
-                <span>View More</span>
-                <svg style="width: 16px; height: 16px; flex-shrink: 0 !important;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            <a href="<?= url('/internships') ?>" class="testimonials-view-all-link">
+                <span>View All</span>
+                <svg class="testimonials-view-all-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
             </a>
         </div>
