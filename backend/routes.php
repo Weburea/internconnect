@@ -124,6 +124,10 @@ $router->get('/candidate/ai-assistant/matched', [CandidateController::class, 'ai
 $router->get('/candidate/ai-assistant/find-internships', [CandidateController::class, 'aiMatchedInternships']);
 $router->get('/candidate/ai-assistant/interview-prep', [CandidateController::class, 'aiInterviewPrep']);
 $router->post('/candidate/ai-assistant/interview-prep/evaluate', [CandidateController::class, 'evaluateMockAnswer']);
+$router->get('/candidate/ai-assistant/cover-letter', [CandidateController::class, 'aiCoverLetter']);
+$router->post('/candidate/ai-assistant/cover-letter/generate', [CandidateController::class, 'generateAiCoverLetter']);
+$router->get('/candidate/ai-assistant/career-coach', [CandidateController::class, 'aiCareerCoach']);
+$router->post('/candidate/ai-assistant/career-coach/roadmap', [CandidateController::class, 'generateAiRoadmap']);
 $router->get('/ai-assistant', [CandidateController::class, 'aiAssistant']);
 
 // Employer routes

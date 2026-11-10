@@ -6,6 +6,8 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Services\HelpService;
+use App\Services\AiService;
+use App\Services\CommunicationService;
 
 /**
  * CandidateController
@@ -217,11 +219,12 @@ class CandidateController extends Controller
             'name'        => $_SESSION['profile_name'] ?? 'Sarah Peters',
             'role'        => $_SESSION['profile_role'] ?? 'Student Applicant',
             'avatar'      => $_SESSION['profile_avatar'] ?? asset('assets/images/profile.png'),
-            'profile_pct' => 75,
+            'profile_pct' => 100,
+            'is_pro'      => false,
             'checklist'   => [
                 ['label' => 'Upload Resume',       'done' => true],
                 ['label' => 'Technical Skills',    'done' => true],
-                ['label' => 'Education Details',   'done' => false],
+                ['label' => 'Education Details',   'done' => true],
                 ['label' => 'Experience History',  'done' => true],
             ],
         ];
@@ -319,6 +322,51 @@ class CandidateController extends Controller
             ],
         ];
 
+        $aiRecommendations = [
+            [
+                'title'       => 'UX/UI Designer',
+                'company'     => 'Kiro Labs',
+                'slug'        => 'kiro-labs',
+                'location'    => 'Remote / Lagos',
+                'logo'        => 'https://res.cloudinary.com/weburea/image/upload/v1790902254/kiro_uhmovc.svg',
+                'logo_bg'     => '#000623',
+                'description' => 'Design beautiful, intuitive user journeys and high-fidelity interactive prototypes for global web applications.',
+                'type'        => 'Full-Time',
+                'type_class'  => 'badge-fulltime',
+                'category'    => 'Design',
+                'experience'  => 'Internship Role',
+                'stipend'     => '₦180,000/mo',
+            ],
+            [
+                'title'       => 'Digital Marketing Specialist',
+                'company'     => 'Zod Studio',
+                'slug'        => 'zod-studio',
+                'location'    => 'Hybrid / Abuja',
+                'logo'        => 'https://res.cloudinary.com/weburea/image/upload/v1790902252/zod_fb2rqf.svg',
+                'logo_bg'     => '#FFFFFF',
+                'description' => 'Manage multi-channel campaigns, optimize SEO funnels, and scale organic social engagement across tech communities.',
+                'type'        => 'Part-Time',
+                'type_class'  => 'badge-parttime',
+                'category'    => 'Marketing',
+                'experience'  => '0 - 1 Year',
+                'stipend'     => '₦130,000/mo',
+            ],
+            [
+                'title'       => 'Backend Developer',
+                'company'     => 'Firebase',
+                'slug'        => 'firebase',
+                'location'    => 'Remote / Nigeria',
+                'logo'        => 'https://res.cloudinary.com/weburea/image/upload/v1790902244/firebase-icon_twxbsc.svg',
+                'logo_bg'     => '#FFFFFF',
+                'description' => 'Build resilient REST APIs, optimize high-throughput database queries, and streamline core infrastructure microservices.',
+                'type'        => 'Remote',
+                'type_class'  => 'badge-remote',
+                'category'    => 'Engineering',
+                'experience'  => '1 - 2 Years',
+                'stipend'     => '₦220,000/mo',
+            ],
+        ];
+
         $applications = [
             ['company' => 'TechCorp Inc.',  'role' => 'Software Engineering Intern', 'date' => 'Oct 12, 2023', 'status' => 'Under Review',  'status_class' => 'review'],
             ['company' => 'DesignHub',      'role' => 'UX/UI Design Intern',          'date' => 'Oct 10, 2023', 'status' => 'Interviewing',  'status_class' => 'interviewing'],
@@ -353,13 +401,14 @@ class CandidateController extends Controller
         ];
 
         $this->renderView('candidate/dashboard/index', [
-            'title'           => 'Dashboard — InternConnect',
-            'candidate'       => $candidate,
-            'stats'           => $stats,
-            'recommendations' => $recommendations,
-            'applications'    => $applications,
-            'alerts'          => $alerts,
-            'showLoader'      => false,
+            'title'             => 'Dashboard — InternConnect',
+            'candidate'         => $candidate,
+            'stats'             => $stats,
+            'recommendations'   => $recommendations,
+            'aiRecommendations' => $aiRecommendations,
+            'applications'      => $applications,
+            'alerts'            => $alerts,
+            'showLoader'        => false,
         ], 'dashboard');
     }
 
@@ -381,41 +430,98 @@ class CandidateController extends Controller
 
         $savedInternships = [
             [
-                'title'      => 'Product Design Intern',
-                'company'    => 'Google',
-                'location'   => 'Mountain View, CA',
-                'slug'       => 'senior-product-design-intern',
-                'tags'       => ['Remote', 'Summer 2024', 'Paid'],
-                'logo_class' => 'google',
-                'logo_svg'   => '<svg viewBox="0 0 24 24" width="24" height="24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>',
+                'id'           => 1,
+                'title'        => 'Product Design Intern',
+                'company'      => 'Google',
+                'company_slug' => 'google',
+                'location'     => 'Mountain View, CA',
+                'slug'         => 'product-design-intern-google',
+                'category'     => 'Design',
+                'work_mode'    => 'Remote',
+                'term'         => 'Summer 2024',
+                'stipend'      => '₦200,000/mo',
+                'logo'         => 'https://res.cloudinary.com/weburea/image/upload/v1790902241/google-icon_nqold7.svg',
+                'logo_bg'      => '#FFFFFF',
+                'description'  => 'Design beautiful, intuitive user journeys and high-fidelity interactive prototypes for global web applications.',
             ],
             [
-                'title'      => 'Data Science Fellow',
-                'company'    => 'Spotify',
-                'location'   => 'New York, NY',
-                'slug'       => 'software-engineer-intern',
-                'tags'       => ['Hybrid', 'Fall 2024', 'Paid'],
-                'logo_class' => 'spotify',
-                'logo_svg'   => '<svg viewBox="0 0 24 24" width="24" height="24"><path fill="#1ED760" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424c-.18.295-.565.387-.86.207-2.377-1.454-5.37-1.783-8.895-1.02-.336.074-.668-.14-.744-.478-.075-.337.14-.668.478-.744 3.856-.88 7.15-.503 9.814 1.128.295.18.387.563.207.857zm1.225-2.72c-.226.367-.707.487-1.074.26-2.72-1.672-6.87-2.157-10.08-1.182-.413.125-.85-.107-.978-.52-.128-.414.108-.85.52-.977 3.663-1.11 8.234-.57 11.35 1.348.368.226.488.707.262 1.07zm.107-2.81c-3.262-1.937-8.646-2.12-11.76-1.17-.5.152-1.025-.133-1.177-.635-.152-.5.133-1.027.635-1.178 3.585-1.09 9.513-.883 13.264 1.344.45.267.6.846.333 1.296-.267.45-.847.6-1.297.333z"/></svg>',
+                'id'           => 2,
+                'title'        => 'Data Science Fellow',
+                'company'      => 'Spotify',
+                'company_slug' => 'spotify',
+                'location'     => 'New York, NY',
+                'slug'         => 'data-science-fellow-spotify',
+                'category'     => 'Data Science',
+                'work_mode'    => 'Hybrid',
+                'term'         => 'Fall 2024',
+                'stipend'      => '₦180,000/mo',
+                'logo'         => null,
+                'logo_svg'     => '<svg viewBox="0 0 24 24" width="28" height="28"><path fill="#1ED760" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424c-.18.295-.565.387-.86.207-2.377-1.454-5.37-1.783-8.895-1.02-.336.074-.668-.14-.744-.478-.075-.337.14-.668.478-.744 3.856-.88 7.15-.503 9.814 1.128.295.18.387.563.207.857zm1.225-2.72c-.226.367-.707.487-1.074.26-2.72-1.672-6.87-2.157-10.08-1.182-.413.125-.85-.107-.978-.52-.128-.414.108-.85.52-.977 3.663-1.11 8.234-.57 11.35 1.348.368.226.488.707.262 1.07zm.107-2.81c-3.262-1.937-8.646-2.12-11.76-1.17-.5.152-1.025-.133-1.177-.635-.152-.5.133-1.027.635-1.178 3.585-1.09 9.513-.883 13.264 1.344.45.267.6.846.333 1.296-.267.45-.847.6-1.297.333z"/></svg>',
+                'logo_bg'      => '#191414',
+                'description'  => 'Clean and model complex operational datasets, build automated dashboards, and assist with predictive candidate matching.',
             ],
             [
-                'title'      => 'Marketing Strategy Intern',
-                'company'    => 'Airbnb',
-                'location'   => 'San Francisco, CA',
-                'slug'       => 'senior-product-design-intern',
-                'tags'       => ['Remote', 'Summer 2024'],
-                'logo_class' => 'airbnb',
-                'logo_svg'   => '<svg viewBox="0 0 32 32" width="24" height="24"><path fill="#FF5A5F" d="M16 1c-2.008 0-3.916 1.183-4.834 3.003L1.524 22.955c-1.025 2.03-.541 4.544 1.157 6.06A7.478 7.478 0 0 0 7.625 31c2.723 0 5.253-1.492 6.643-3.926l1.732-3.033 1.733 3.033C19.122 29.508 21.652 31 24.375 31a7.478 7.478 0 0 0 4.944-1.985c1.698-1.516 2.182-4.03 1.157-6.06L20.834 4.003A5.498 5.498 0 0 0 16 1zm0 2.2c1.233 0 2.39.73 2.946 1.834l9.643 18.95c.579 1.144.3 2.502-.686 3.383A5.278 5.278 0 0 1 24.375 28.8c-1.928 0-3.722-1.057-4.706-2.778l-3.669-6.42a1.102 1.102 0 0 0-1.928 0l-3.67 6.42c-.983 1.72-2.777 2.778-4.705 2.778a5.278 5.278 0 0 1-3.527-1.433c-.987-.88-1.266-2.239-.687-3.383l9.643-18.95c.556-1.104 1.713-1.834 2.946-1.834zm0 6.6c-2.099 0-3.8 1.701-3.8 3.8s1.701 3.8 3.8 3.8 3.8-1.701 3.8-3.8-1.701-3.8-3.8-3.8zm0 2.2c.884 0 1.6.716 1.6 1.6 0 .884-.716 1.6-1.6 1.6a1.602 1.602 0 0 1-1.6-1.6c0-.884.716-1.6 1.6-1.6z"/></svg>',
+                'id'           => 3,
+                'title'        => 'Marketing Strategy Intern',
+                'company'      => 'Airbnb',
+                'company_slug' => 'airbnb',
+                'location'     => 'San Francisco, CA',
+                'slug'         => 'marketing-strategy-intern-airbnb',
+                'category'     => 'Marketing',
+                'work_mode'    => 'Remote',
+                'term'         => 'Summer 2024',
+                'stipend'      => '₦150,000/mo',
+                'logo'         => null,
+                'logo_svg'     => '<svg viewBox="0 0 32 32" width="28" height="28"><path fill="#FF5A5F" d="M16 1c-2.008 0-3.916 1.183-4.834 3.003L1.524 22.955c-1.025 2.03-.541 4.544 1.157 6.06A7.478 7.478 0 0 0 7.625 31c2.723 0 5.253-1.492 6.643-3.926l1.732-3.033 1.733 3.033C19.122 29.508 21.652 31 24.375 31a7.478 7.478 0 0 0 4.944-1.985c1.698-1.516 2.182-4.03 1.157-6.06L20.834 4.003A5.498 5.498 0 0 0 16 1zm0 2.2c1.233 0 2.39.73 2.946 1.834l9.643 18.95c.579 1.144.3 2.502-.686 3.383A5.278 5.278 0 0 1 24.375 28.8c-1.928 0-3.722-1.057-4.706-2.778l-3.669-6.42a1.102 1.102 0 0 0-1.928 0l-3.67 6.42c-.983 1.72-2.777 2.778-4.705 2.778a5.278 5.278 0 0 1-3.527-1.433c-.987-.88-1.266-2.239-.687-3.383l9.643-18.95c.556-1.104 1.713-1.834 2.946-1.834zm0 6.6c-2.099 0-3.8 1.701-3.8 3.8s1.701 3.8 3.8 3.8 3.8-1.701 3.8-3.8-1.701-3.8-3.8-3.8zm0 2.2c.884 0 1.6.716 1.6 1.6 0 .884-.716 1.6-1.6 1.6a1.602 1.602 0 0 1-1.6-1.6c0-.884.716-1.6 1.6-1.6z"/></svg>',
+                'logo_bg'      => '#FFFFFF',
+                'description'  => 'Manage multi-channel campaigns, optimize SEO funnels, and scale organic social engagement across tech communities.',
             ],
             [
-                'title'      => 'Software Engineering Intern',
-                'company'    => 'Microsoft',
-                'location'   => 'Redmond, WA',
-                'slug'       => 'software-engineer-intern',
-                'tags'       => ['Onsite', 'Winter 2024', 'Paid'],
-                'logo_class' => 'microsoft',
-                'logo_svg'   => '<svg viewBox="0 0 23 23" width="24" height="24"><path fill="#F25022" d="M0 0h11v11H0z"/><path fill="#7FBA00" d="M12 0h11v11H12z"/><path fill="#00A4EF" d="M0 12h11v11H0z"/><path fill="#FFB900" d="M12 12h11v11H12z"/></svg>',
-            ]
+                'id'           => 4,
+                'title'        => 'Software Engineering Intern',
+                'company'      => 'Microsoft',
+                'company_slug' => 'microsoft',
+                'location'     => 'Redmond, WA',
+                'slug'         => 'software-engineering-intern-microsoft',
+                'category'     => 'Engineering',
+                'work_mode'    => 'Hybrid',
+                'term'         => 'Winter 2024',
+                'stipend'      => '₦220,000/mo',
+                'logo'         => null,
+                'logo_svg'     => '<svg viewBox="0 0 23 23" width="28" height="28"><path fill="#F25022" d="M0 0h11v11H0z"/><path fill="#7FBA00" d="M12 0h11v11H12z"/><path fill="#00A4EF" d="M0 12h11v11H0z"/><path fill="#FFB900" d="M12 12h11v11H12z"/></svg>',
+                'logo_bg'      => '#F8FAFC',
+                'description'  => 'Build resilient cloud services, optimize high-throughput distributed database queries, and streamline developer infrastructure.',
+            ],
+            [
+                'id'           => 5,
+                'title'        => 'UX/UI Designer',
+                'company'      => 'Kiro Labs',
+                'company_slug' => 'kiro-labs',
+                'location'     => 'Remote / Lagos',
+                'slug'         => 'ux-ui-designer-kiro',
+                'category'     => 'Design',
+                'work_mode'    => 'Remote',
+                'term'         => 'Full-Time Role',
+                'stipend'      => '₦180,000/mo',
+                'logo'         => 'https://res.cloudinary.com/weburea/image/upload/v1790902254/kiro_uhmovc.svg',
+                'logo_bg'      => '#000623',
+                'description'  => 'Design beautiful, intuitive user journeys and high-fidelity interactive prototypes for global web applications.',
+            ],
+            [
+                'id'           => 6,
+                'title'        => 'Backend Developer',
+                'company'      => 'Firebase',
+                'company_slug' => 'firebase',
+                'location'     => 'Remote / Nigeria',
+                'slug'         => 'backend-developer-firebase',
+                'category'     => 'Engineering',
+                'work_mode'    => 'Remote',
+                'term'         => '1 - 2 Years',
+                'stipend'      => '₦220,000/mo',
+                'logo'         => 'https://res.cloudinary.com/weburea/image/upload/v1790902244/firebase-icon_twxbsc.svg',
+                'logo_bg'      => '#FFFFFF',
+                'description'  => 'Build resilient REST APIs, optimize high-throughput database queries, and streamline core infrastructure microservices.',
+            ],
         ];
 
         $this->renderView('candidate/saved/index', [
@@ -1011,6 +1117,30 @@ class CandidateController extends Controller
             ]
         ];
 
+        // Merge active scheduled interview if set by employer
+        if (!empty($_SESSION['active_upcoming_interview'])) {
+            $sessInt = $_SESSION['active_upcoming_interview'];
+            if (!empty($sessInt['company_name'])) {
+                $interview['company'] = $sessInt['company_name'];
+            }
+            if (!empty($sessInt['candidate_role'])) {
+                $interview['role'] = $sessInt['candidate_role'];
+            }
+            if (!empty($sessInt['status'])) {
+                $interview['status'] = $sessInt['status'];
+            }
+            if (!empty($sessInt['interview_date'])) {
+                $interview['date'] = $sessInt['interview_date'];
+            }
+            if (!empty($sessInt['interview_time'])) {
+                $interview['time'] = $sessInt['interview_time'];
+            }
+            if (!empty($sessInt['meeting_link'])) {
+                $interview['meet_link'] = $sessInt['meeting_link'];
+                $interview['meet_code'] = str_replace(['https://', 'http://'], '', $sessInt['meeting_link']);
+            }
+        }
+
         $this->renderView('candidate/interview/invite', [
             'title'     => 'Upcoming Interview — Vanguard Design — InternConnect',
             'candidate' => $candidate,
@@ -1272,6 +1402,1097 @@ class CandidateController extends Controller
             'candidate' => $candidate,
             'article'   => $article,
         ], 'dashboard');
+    }
+
+    /**
+     * Notifications Center View
+     * Route: /notifications, /candidate/notifications
+     */
+    public function notifications(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $uri = strtok($_SERVER['REQUEST_URI'] ?? '', '?');
+        if (str_ends_with($uri, '/notifications') && !str_ends_with($uri, '/candidate/notifications')) {
+            header('Location: ' . url('/candidate/notifications'), true, 302);
+            exit;
+        }
+
+        $candidate = [
+            'name'   => $_SESSION['profile_name'] ?? 'Sarah Peters',
+            'role'   => $_SESSION['profile_role'] ?? 'Student Applicant',
+            'avatar' => $_SESSION['profile_avatar'] ?? asset('assets/images/profile.png'),
+        ];
+
+        $rawNotifs = CommunicationService::getNotifications('candidate');
+        $notifications = [];
+        foreach ($rawNotifs as $n) {
+            $type = $n['type'] ?? 'system';
+            $label = 'View Details';
+            if ($type === 'interview') $label = 'View Interview';
+            elseif ($type === 'offer') $label = 'Review Offer';
+            elseif ($type === 'application') $label = 'Track Application';
+            elseif ($type === 'ai') $label = 'Explore Roles';
+
+            $notifications[] = [
+                'id'         => (int)($n['id'] ?? 1),
+                'type'       => $type,
+                'title'      => $n['title'] ?? 'Platform Update',
+                'desc'       => $n['message'] ?? ($n['desc'] ?? ''),
+                'time'       => $n['time_ago'] ?? ($n['time'] ?? 'Just now'),
+                'is_read'    => (bool)($n['is_read'] ?? false),
+                'link'       => !empty($n['action_url']) ? $n['action_url'] : ($n['link'] ?? url('/candidate/notifications')),
+                'link_label' => $n['link_label'] ?? $label,
+            ];
+        }
+
+        $this->renderView('candidate/notifications/index', [
+            'title'         => 'Notifications Center — InternConnect',
+            'activeNav'     => 'notifications',
+            'candidate'     => $candidate,
+            'notifications' => $notifications,
+        ], 'dashboard');
+    }
+
+    /**
+     * AI Career Assistant Landing Hub
+     * Route: /candidate/ai-assistant
+     */
+    public function aiAssistant(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (isset($_GET['plan'])) {
+            $requestedPlan = strtolower(trim((string)$_GET['plan']));
+            if (in_array($requestedPlan, ['free', 'pro', 'premium'], true)) {
+                $_SESSION['candidate_plan'] = $requestedPlan;
+            }
+        }
+
+        $candPlan = $_SESSION['candidate_plan'] ?? 'pro';
+
+        // Free plan gate: redirect or prompt upgrade
+        if ($candPlan === 'free') {
+            header('Location: ' . url('/pricing?plan=pro&ref=ai-assistant'));
+            exit;
+        }
+
+        $candidate = [
+            'name'        => $_SESSION['profile_name'] ?? 'Sarah Peters',
+            'first_name'  => 'Sarah',
+            'role'        => $_SESSION['profile_role'] ?? 'Student Applicant',
+            'avatar'      => $_SESSION['profile_avatar'] ?? asset('assets/images/profile.png'),
+            'plan'        => $candPlan,
+            'profile_pct' => 100,
+        ];
+
+        // AI Matched Internships (Screenshot 1)
+        $aiMatchedInternships = [
+            [
+                'id'          => 1,
+                'role'        => 'Backend Engineering Intern',
+                'company'     => 'Paystack',
+                'stipend'     => '₦200,000/month',
+                'location'    => 'Lagos',
+                'duration'    => '3 months',
+                'match_pct'   => 96,
+                'match_reason'=> 'Matches your API development skill',
+                'logo_text'   => 'PW',
+                'logo_bg'     => '#059669',
+                'logo_color'  => '#FFFFFF',
+                'slug'        => 'backend-developer-paystack',
+            ],
+            [
+                'id'          => 2,
+                'role'        => 'Data Analyst Intern',
+                'company'     => 'Andela',
+                'stipend'     => '₦150,000/month',
+                'location'    => 'Remote',
+                'duration'    => '3 months',
+                'match_pct'   => 89,
+                'match_reason'=> 'Matches your SQL & Python coursework',
+                'logo_text'   => 'AN',
+                'logo_bg'     => '#2563EB',
+                'logo_color'  => '#FFFFFF',
+                'slug'        => 'data-analyst-andela',
+            ],
+        ];
+
+        // Premium Exclusive Features / High-Pay Remote Roles (Screenshot 4: 3-column opportunity cards)
+        $premiumRoles = [
+            [
+                'title'       => 'UX/UI Designer',
+                'company'     => 'Kiro Labs',
+                'slug'        => 'kiro-labs',
+                'location'    => 'Remote / Global',
+                'logo'        => 'https://res.cloudinary.com/weburea/image/upload/v1790902254/kiro_uhmovc.svg',
+                'logo_bg'     => '#000623',
+                'description' => 'Design scalable design systems and high-fidelity interactive user journeys for global enterprise software.',
+                'type'        => 'Full-Time',
+                'type_class'  => 'badge-fulltime',
+                'category'    => 'Design',
+                'experience'  => 'Internship Role',
+                'stipend'     => '₦350,000/mo ($2,400)',
+                'is_premium'  => true,
+            ],
+            [
+                'title'       => 'Digital Marketing Specialist',
+                'company'     => 'Zod Studio',
+                'slug'        => 'zod-studio',
+                'location'    => 'Remote / Global',
+                'logo'        => 'https://res.cloudinary.com/weburea/image/upload/v1790902252/zod_fb2rqf.svg',
+                'logo_bg'     => '#FFFFFF',
+                'description' => 'Scale global organic growth funnels, orchestrate marketing automation, and launch cross-border campaigns.',
+                'type'        => 'Part-Time',
+                'type_class'  => 'badge-parttime',
+                'category'    => 'Marketing',
+                'experience'  => '0 - 1 Year',
+                'stipend'     => '₦300,000/mo ($2,000)',
+                'is_premium'  => true,
+            ],
+            [
+                'title'       => 'Backend Developer',
+                'company'     => 'Firebase',
+                'slug'        => 'firebase',
+                'location'    => 'Remote / Global',
+                'logo'        => 'https://res.cloudinary.com/weburea/image/upload/v1790902244/firebase-icon_twxbsc.svg',
+                'logo_bg'     => '#FFFFFF',
+                'description' => 'Architect high-throughput real-time APIs, distributed event streams, and global serverless functions.',
+                'type'        => 'Remote',
+                'type_class'  => 'badge-remote',
+                'category'    => 'Engineering',
+                'experience'  => '1 - 2 Years',
+                'stipend'     => '₦480,000/mo ($3,200)',
+                'is_premium'  => true,
+            ],
+        ];
+
+        $this->renderView('candidate/ai-assistant/index', [
+            'title'                => 'AI Career Assistant — InternConnect',
+            'activeNav'            => 'ai-assistant',
+            'candidate'            => $candidate,
+            'candPlan'             => $candPlan,
+            'aiMatchedInternships' => $aiMatchedInternships,
+            'premiumRoles'         => $premiumRoles,
+        ], 'dashboard');
+    }
+
+    /**
+     * AI CV Analyze Setup View
+     * Route: /candidate/ai-assistant/cv-analyze
+     */
+    public function aiCvAnalyze(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (isset($_GET['plan'])) {
+            $requestedPlan = strtolower(trim((string)$_GET['plan']));
+            if (in_array($requestedPlan, ['free', 'pro', 'premium'], true)) {
+                $_SESSION['candidate_plan'] = $requestedPlan;
+            }
+        }
+
+        $candPlan = $_SESSION['candidate_plan'] ?? 'pro';
+        if ($candPlan === 'free') {
+            header('Location: ' . url('/pricing?plan=pro&ref=ai-cv-analyze'));
+            exit;
+        }
+
+        $candidate = [
+            'name'       => $_SESSION['profile_name'] ?? 'Sarah Peters',
+            'first_name' => 'Sarah',
+            'role'       => $_SESSION['profile_role'] ?? 'Student Applicant',
+            'avatar'     => $_SESSION['profile_avatar'] ?? asset('assets/images/profile.png'),
+            'plan'       => $candPlan,
+        ];
+
+        $currentCv = [
+            'name'        => 'Sarah_Peters_CV.pdf',
+            'uploaded_at' => 'Aug 20, 2026',
+            'size'        => '2.4 MB',
+        ];
+
+        $targetRoles = [
+            'Product Designer',
+            'UI/UX Designer',
+            'Software Engineer',
+            'Frontend Developer',
+            'Backend Developer',
+            'Data Analyst',
+            'Product Manager',
+        ];
+
+        $suggestedPills = [
+            'Product Design Intern',
+            'UX/UI Design Intern',
+            'Product Management Intern',
+        ];
+
+        $this->renderView('candidate/ai-assistant/cv-analyze', [
+            'title'          => 'Analyze Your CV — AI Career Assistant — InternConnect',
+            'activeNav'      => 'ai-assistant',
+            'candidate'      => $candidate,
+            'candPlan'       => $candPlan,
+            'currentCv'      => $currentCv,
+            'targetRoles'    => $targetRoles,
+            'suggestedPills' => $suggestedPills,
+        ], 'dashboard');
+    }
+
+    /**
+     * Process CV Analysis Form
+     * Route: POST /candidate/ai-assistant/cv-analyze
+     */
+    public function processAiCvAnalyze(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $targetRole = trim(strip_tags($_POST['target_role'] ?? 'Product Designer'));
+        $opportunity = trim(strip_tags($_POST['opportunity'] ?? ''));
+
+        $cvText = '';
+        $fileName = 'Sarah_Peters_CV.pdf';
+
+        // Check if new file uploaded
+        if (!empty($_FILES['cv_file']['tmp_name']) && is_uploaded_file($_FILES['cv_file']['tmp_name'])) {
+            $uploadedName = $_FILES['cv_file']['name'] ?? 'Uploaded_CV.pdf';
+            $ext = (string)pathinfo($uploadedName, PATHINFO_EXTENSION);
+            $cvText = AiService::extractCvText($_FILES['cv_file']['tmp_name'], $ext);
+            $fileName = $uploadedName;
+            $_SESSION['candidate_current_cv'] = [
+                'name' => $fileName,
+                'uploaded_at' => date('M j, Y'),
+                'size' => round($_FILES['cv_file']['size'] / 1024) . ' KB',
+            ];
+        }
+
+        $candidateProfile = [
+            'user_id' => $_SESSION['candidate_id'] ?? 1,
+            'name'    => $_SESSION['profile_name'] ?? 'Sarah Peters',
+            'skills'  => $_SESSION['profile_skills'] ?? [],
+        ];
+
+        $analysis = AiService::analyzeCv($cvText, $targetRole, $opportunity, $candidateProfile);
+        $analysis['file_name'] = $fileName;
+
+        $_SESSION['ai_cv_analysis'] = $analysis;
+
+        header('Location: ' . url('/candidate/ai-assistant/cv-results'));
+        exit;
+    }
+
+    /**
+     * AI CV Analysis Results View
+     * Route: /candidate/ai-assistant/cv-results
+     */
+    public function aiCvResults(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (isset($_GET['plan'])) {
+            $requestedPlan = strtolower(trim((string)$_GET['plan']));
+            if (in_array($requestedPlan, ['free', 'pro', 'premium'], true)) {
+                $_SESSION['candidate_plan'] = $requestedPlan;
+            }
+        }
+
+        $candPlan = $_SESSION['candidate_plan'] ?? 'pro';
+        if ($candPlan === 'free') {
+            header('Location: ' . url('/pricing?plan=pro&ref=ai-cv-results'));
+            exit;
+        }
+
+        $candidate = [
+            'name'       => $_SESSION['profile_name'] ?? 'Sarah Peters',
+            'first_name' => 'Sarah',
+            'role'       => $_SESSION['profile_role'] ?? 'Student Applicant',
+            'avatar'     => $_SESSION['profile_avatar'] ?? asset('assets/images/profile.png'),
+            'plan'       => $candPlan,
+        ];
+
+        $analysis = $_SESSION['ai_cv_analysis'] ?? null;
+        if ($analysis === null) {
+            $candidateProfile = [
+                'user_id' => $_SESSION['candidate_id'] ?? 1,
+                'name'    => $candidate['name'],
+                'skills'  => [],
+            ];
+            $analysis = AiService::analyzeCv('', 'Product Designer', 'Google, Product Design Intern', $candidateProfile);
+            $analysis['file_name'] = 'Sarah_Peters_CV.pdf';
+        }
+
+        $this->renderView('candidate/ai-assistant/cv-results', [
+            'title'     => 'AI CV Analysis Results — InternConnect',
+            'activeNav' => 'ai-assistant',
+            'candidate' => $candidate,
+            'candPlan'  => $candPlan,
+            'analysis'  => $analysis,
+        ], 'dashboard');
+    }
+
+    /**
+     * AI Matched Internships List View
+     * Route: /candidate/ai-assistant/matched
+     */
+    public function aiMatchedInternships(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (isset($_GET['plan'])) {
+            $requestedPlan = strtolower(trim((string)$_GET['plan']));
+            if (in_array($requestedPlan, ['free', 'pro', 'premium'], true)) {
+                $_SESSION['candidate_plan'] = $requestedPlan;
+            }
+        }
+
+        $candPlan = $_SESSION['candidate_plan'] ?? 'pro';
+
+        // Free plan gate: redirect to pricing
+        if ($candPlan === 'free') {
+            header('Location: ' . url('/pricing?plan=pro&ref=ai-matched'));
+            exit;
+        }
+
+        $candidate = [
+            'name'       => $_SESSION['user_name'] ?? 'Sarah Peters',
+            'first_name' => explode(' ', $_SESSION['user_name'] ?? 'Sarah Peters')[0],
+            'email'      => $_SESSION['user_email'] ?? 'sarah.peters@university.edu.ng',
+            'role'       => 'Student Applicant',
+            'university' => 'University of Lagos (UNILAG)',
+            'course'     => 'Computer Science & Human-Computer Interaction',
+            'year'       => 'Final Year (400L)',
+            'plan'       => $candPlan,
+        ];
+
+        $matchedInternships = [
+            [
+                'id'            => 1,
+                'role'          => 'Product Design Intern',
+                'company'       => 'Flutterwave',
+                'initials'      => 'FW',
+                'logo_bg'       => '#4F46E5',
+                'stipend'       => '₦150,000/month',
+                'location'      => 'Lagos',
+                'duration'      => '3 months',
+                'match_score'   => 96,
+                'match_tier'    => 'Excellent Match',
+                'match_reason'  => 'Matches your product design experience and Figma skills.',
+                'skills'        => ['Figma', 'UX Research', 'Prototyping', 'Product Design'],
+                'potential_gap' => null,
+                'slug'          => 'product-design-intern-flutterwave',
+                'is_saved'      => false,
+            ],
+            [
+                'id'            => 2,
+                'role'          => 'UX Design Intern',
+                'company'       => 'Paystack',
+                'initials'      => 'PS',
+                'logo_bg'       => '#0F172A',
+                'stipend'       => '₦200,000/month',
+                'location'      => 'Remote',
+                'duration'      => '6 months',
+                'match_score'   => 91,
+                'match_tier'    => 'Strong Match',
+                'match_reason'  => 'Strong alignment with your UX research background.',
+                'skills'        => ['UX Research', 'Wireframing', 'Prototyping'],
+                'potential_gap' => null,
+                'slug'          => 'ux-design-intern-paystack',
+                'is_saved'      => true,
+            ],
+            [
+                'id'            => 3,
+                'role'          => 'Junior Product Designer',
+                'company'       => 'Kuda Bank',
+                'initials'      => 'KB',
+                'logo_bg'       => '#40196D',
+                'stipend'       => '₦180,000/month',
+                'location'      => 'Lagos',
+                'duration'      => '3 months',
+                'match_score'   => 88,
+                'match_tier'    => 'Good Match',
+                'match_reason'  => 'Strong alignment with visual design and user flow principles.',
+                'skills'        => ['Design Systems', 'Figma', 'User Testing'],
+                'potential_gap' => null,
+                'slug'          => 'junior-product-designer-kuda',
+                'is_saved'      => false,
+            ],
+            [
+                'id'            => 4,
+                'role'          => 'Design Systems Intern',
+                'company'       => 'Moniepoint',
+                'initials'      => 'MP',
+                'logo_bg'       => '#003399',
+                'stipend'       => '₦160,000/month',
+                'location'      => 'Remote',
+                'duration'      => '3 months',
+                'match_score'   => 76,
+                'match_tier'    => 'Good Match',
+                'match_reason'  => 'Matches your core Figma skills and design documentation interest.',
+                'skills'        => ['Figma Tokens', 'Component Libraries', 'Auto Layout'],
+                'potential_gap' => [
+                    'title' => 'Design systems tokens & GitHub workflow',
+                    'desc'  => 'This requirement appears in the internship description but is not clearly represented in your profile.',
+                ],
+                'slug'          => 'design-systems-intern-moniepoint',
+                'is_saved'      => false,
+            ],
+            [
+                'id'            => 5,
+                'role'          => 'Product Operations & Design Intern',
+                'company'       => 'Piggyvest',
+                'initials'      => 'PV',
+                'logo_bg'       => '#0D60D8',
+                'stipend'       => '₦140,000/month',
+                'location'      => 'Lagos',
+                'duration'      => '6 months',
+                'match_score'   => 68,
+                'match_tier'    => 'Fair Match',
+                'match_reason'  => 'Your user journey mapping and problem-solving skills align well with team workflows.',
+                'skills'        => ['Journey Mapping', 'Notion', 'Wireframing'],
+                'potential_gap' => [
+                    'title' => 'SQL & Product Analytics (Mixpanel)',
+                    'desc'  => 'The hiring team prefers candidates with basic product analytics tracking familiarity.',
+                ],
+                'slug'          => 'product-ops-design-piggyvest',
+                'is_saved'      => false,
+            ],
+            [
+                'id'            => 6,
+                'role'          => 'UI Engineer Intern',
+                'company'       => 'Interswitch',
+                'initials'      => 'IS',
+                'logo_bg'       => '#E01A22',
+                'stipend'       => '₦175,000/month',
+                'location'      => 'Lagos',
+                'duration'      => '6 months',
+                'match_score'   => 62,
+                'match_tier'    => 'Fair Match',
+                'match_reason'  => 'Matches your UI design fundamentals and component architecture understanding.',
+                'skills'        => ['HTML/CSS', 'Tailwind CSS', 'Figma to Code'],
+                'potential_gap' => [
+                    'title' => 'Frontend Framework Experience (React/Vue)',
+                    'desc'  => 'Role requires basic implementation in React which is missing from your recent projects.',
+                ],
+                'slug'          => 'ui-engineer-intern-interswitch',
+                'is_saved'      => false,
+            ],
+        ];
+
+        $this->renderView('candidate/ai-assistant/matched', [
+            'title'              => 'AI Matched Internships — InternConnect',
+            'activeNav'          => 'ai-assistant',
+            'candidate'          => $candidate,
+            'candPlan'           => $candPlan,
+            'matchedInternships' => $matchedInternships,
+            'totalCount'         => 12,
+        ], 'dashboard');
+    }
+
+    /**
+     * AI Find Internships Filter View
+     * Route: /candidate/ai-assistant/find-internships
+     */
+    public function aiFindInternships(): void
+    {
+        $this->aiMatchedInternships();
+    }
+
+    /**
+     * AI Mock Interview Assistant View
+     * Route: /candidate/ai-assistant/interview-prep
+     */
+    public function aiInterviewPrep(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (isset($_GET['plan'])) {
+            $requestedPlan = strtolower(trim((string)$_GET['plan']));
+            if (in_array($requestedPlan, ['free', 'pro', 'premium'], true)) {
+                $_SESSION['candidate_plan'] = $requestedPlan;
+            }
+        }
+
+        $candPlan = $_SESSION['candidate_plan'] ?? 'pro';
+        if ($candPlan === 'free') {
+            header('Location: ' . url('/pricing?plan=pro&ref=ai-mock-interview'));
+            exit;
+        }
+
+        $candidate = [
+            'name'       => $_SESSION['user_name'] ?? 'Sarah Peters',
+            'first_name' => explode(' ', $_SESSION['user_name'] ?? 'Sarah Peters')[0],
+            'email'      => $_SESSION['user_email'] ?? 'sarah.peters@university.edu.ng',
+            'role'       => 'Student Applicant',
+            'plan'       => $candPlan,
+            'user_id'    => $_SESSION['user_id'] ?? 1,
+        ];
+
+        // Determine target role from GET or previous CV analysis
+        $targetRole = trim((string)($_GET['role'] ?? ($_SESSION['ai_cv_analysis']['target_role'] ?? 'Product Designer')));
+        $targetCompany = trim((string)($_GET['company'] ?? 'Paystack'));
+
+        $rolesList = [
+            'Product Designer',
+            'Frontend Developer',
+            'Backend Developer',
+            'Data Analyst',
+            'Product Manager',
+        ];
+
+        $companiesList = [
+            'Paystack',
+            'Flutterwave',
+            'Kuda Bank',
+            'Moniepoint',
+            'Interswitch',
+            'Piggyvest',
+            'Tech Startup',
+        ];
+
+        $questions = AiService::getInterviewQuestions($targetRole);
+
+        $this->renderView('candidate/ai-assistant/interview-prep', [
+            'title'          => 'AI Mock Interview Assistant — InternConnect',
+            'activeNav'      => 'ai-assistant',
+            'candidate'      => $candidate,
+            'candPlan'       => $candPlan,
+            'targetRole'     => $targetRole,
+            'targetCompany'  => $targetCompany,
+            'rolesList'      => $rolesList,
+            'companiesList'  => $companiesList,
+            'questions'      => $questions,
+        ], 'dashboard');
+    }
+
+    /**
+     * Evaluate Candidate Mock Interview Answer via AJAX
+     * Route: POST /candidate/ai-assistant/interview-prep/evaluate
+     */
+    public function evaluateMockAnswer(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        header('Content-Type: application/json; charset=UTF-8');
+
+        $input = json_decode((string)file_get_contents('php://input'), true);
+        if (!is_array($input)) {
+            $input = $_POST;
+        }
+
+        $role     = trim((string)($input['role'] ?? 'Product Designer'));
+        $question = trim((string)($input['question'] ?? ''));
+        $answer   = trim((string)($input['answer'] ?? ''));
+
+        if (empty($answer)) {
+            echo json_encode([
+                'success' => false,
+                'error'   => 'Please provide your answer before requesting evaluation.',
+            ]);
+            exit;
+        }
+
+        $evaluation = AiService::evaluateInterviewAnswer($role, $question, $answer, [
+            'user_id' => $_SESSION['user_id'] ?? 1,
+        ]);
+
+        echo json_encode([
+            'success'    => true,
+            'evaluation' => $evaluation,
+        ]);
+        exit;
+    }
+
+    /**
+     * Candidate Direct 1-on-1 Messages
+     * Route: /candidate/messages, /candidate/messages/{id}, /messages
+     */
+    public function messages(array $params = []): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $candidate = [
+            'name'       => $_SESSION['user_name'] ?? 'Sarah Peters',
+            'role'       => 'Student Applicant',
+            'email'      => $_SESSION['user_email'] ?? 'sarah.peters@student.unilag.edu.ng',
+            'avatar'     => $_SESSION['user_avatar'] ?? null,
+            'is_pro'     => true,
+            'plan'       => 'pro',
+        ];
+
+        $activeThreadId = isset($params['id']) ? (int)$params['id'] : 1;
+
+        $conversations = [
+            [
+                'id'              => 1,
+                'company_name'    => 'Nexura Technologies',
+                'company_initials'=> 'NT',
+                'recruiter_name'  => 'Tunde Bakare',
+                'recruiter_role'  => 'Talent Acquisition Team',
+                'role'            => 'UI/UX Design Intern',
+                'recruiter_avatar'=> 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=faces',
+                'status'          => 'online',
+                'last_active'     => 'Online now',
+                'last_time'       => '10:42 AM',
+                'last_message'    => 'Received and confirmed! I\'ve accepted the calendar invite for Thursday.',
+                'unread'          => 0,
+                'messages'        => [
+                    [
+                        'id'     => 101,
+                        'sender' => 'candidate',
+                        'text'   => 'Hello! Thank you for reviewing my design portfolio. I was very excited to see the UI/UX internship opening at Nexura Technologies.',
+                        'time'   => 'Yesterday, 10:15 AM',
+                        'status' => 'read',
+                    ],
+                    [
+                        'id'     => 102,
+                        'sender' => 'recruiter',
+                        'text'   => 'Hi Sarah! We reviewed your Oakland banking app case study and were really impressed with the user flow and design tokens.',
+                        'time'   => 'Yesterday, 10:22 AM',
+                        'status' => 'read',
+                    ],
+                    [
+                        'id'     => 103,
+                        'sender' => 'candidate',
+                        'text'   => 'Thank you so much! I really enjoyed working on the accessibility guidelines for that project. I\'m available anytime this week for the technical round.',
+                        'time'   => 'Yesterday, 10:28 AM',
+                        'status' => 'read',
+                    ],
+                    [
+                        'id'     => 104,
+                        'sender' => 'recruiter',
+                        'text'   => 'Wonderful. We just sent an interview invitation for Thursday at 10:00 AM via Google Meet. Looking forward to speaking!',
+                        'time'   => 'Yesterday, 10:35 AM',
+                        'status' => 'read',
+                    ],
+                    [
+                        'id'     => 105,
+                        'sender' => 'candidate',
+                        'text'   => 'Received and confirmed! I\'ve accepted the calendar invite for Thursday.',
+                        'time'   => '10:42 AM',
+                        'status' => 'read',
+                    ],
+                ],
+            ],
+            [
+                'id'              => 2,
+                'company_name'    => 'Paystack',
+                'company_initials'=> 'PS',
+                'recruiter_name'  => 'Chidinma Eze',
+                'recruiter_role'  => 'People Operations Lead',
+                'role'            => 'Frontend Engineering Intern',
+                'recruiter_avatar'=> 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100&h=100&fit=crop&crop=faces',
+                'status'          => 'online',
+                'last_active'     => 'Active 20m ago',
+                'last_time'       => '11:15 AM',
+                'last_message'    => 'Yes, you will receive the invitation link within the next 24 hours. Best of luck!',
+                'unread'          => 1,
+                'messages'        => [
+                    [
+                        'id'     => 201,
+                        'sender' => 'recruiter',
+                        'text'   => 'Hello Sarah, your application has been shortlisted for the next technical assessment stage.',
+                        'time'   => 'Yesterday, 4:10 PM',
+                        'status' => 'read',
+                    ],
+                    [
+                        'id'     => 202,
+                        'sender' => 'candidate',
+                        'text'   => 'Thank you Chidinma! Should I expect the HackerRank assessment via email?',
+                        'time'   => 'Yesterday, 4:45 PM',
+                        'status' => 'read',
+                    ],
+                    [
+                        'id'     => 203,
+                        'sender' => 'recruiter',
+                        'text'   => 'Yes, you will receive the invitation link within the next 24 hours. Best of luck!',
+                        'time'   => '11:15 AM',
+                        'status' => 'delivered',
+                    ],
+                ],
+            ],
+            [
+                'id'              => 3,
+                'company_name'    => 'Moniepoint',
+                'company_initials'=> 'MP',
+                'recruiter_name'  => 'Femi Adeyemi',
+                'recruiter_role'  => 'Technical Talent Partner',
+                'role'            => 'Software Engineer Intern',
+                'recruiter_avatar'=> 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=faces',
+                'status'          => 'offline',
+                'last_active'     => 'Active 2h ago',
+                'last_time'       => 'Yesterday',
+                'last_message'    => 'Thanks for turning it in ahead of the deadline! Our design panel is reviewing submissions today.',
+                'unread'          => 0,
+                'messages'        => [
+                    [
+                        'id'     => 301,
+                        'sender' => 'candidate',
+                        'text'   => 'Good afternoon Femi, I submitted my take-home project repository link yesterday evening.',
+                        'time'   => 'Oct 23, 2:10 PM',
+                        'status' => 'read',
+                    ],
+                    [
+                        'id'     => 302,
+                        'sender' => 'recruiter',
+                        'text'   => 'Thanks for turning it in ahead of the deadline! Our design panel is reviewing submissions today.',
+                        'time'   => 'Oct 23, 3:30 PM',
+                        'status' => 'read',
+                    ],
+                ],
+            ],
+            [
+                'id'              => 4,
+                'company_name'    => 'Google',
+                'company_initials'=> 'GO',
+                'recruiter_name'  => 'David Chen',
+                'recruiter_role'  => 'University Programs Recruiter',
+                'role'            => 'Product Design Intern',
+                'recruiter_avatar'=> 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=faces',
+                'status'          => 'offline',
+                'last_active'     => 'Active 1d ago',
+                'last_time'       => '2 days ago',
+                'last_message'    => 'Hi Sarah, thank you for applying! We are currently reviewing 2026 intake applications.',
+                'unread'          => 1,
+                'messages'        => [
+                    [
+                        'id'     => 401,
+                        'sender' => 'recruiter',
+                        'text'   => 'Hi Sarah, thank you for applying! We are currently reviewing 2026 intake applications.',
+                        'time'   => '2 days ago',
+                        'status' => 'delivered',
+                    ],
+                ],
+            ],
+        ];
+
+        foreach ($conversations as &$c) {
+            $c['messages'] = CommunicationService::getThreadMessages($c['id'], $c['messages']);
+            if (!empty($c['messages'])) {
+                $lastMsg = end($c['messages']);
+                $c['last_message'] = $lastMsg['text'] ?? $c['last_message'];
+                $c['last_time'] = $lastMsg['time'] ?? $c['last_time'];
+            }
+        }
+        unset($c);
+
+        $this->renderView('candidate/messages/index', [
+            'title'          => 'Messages & Inquiries — Candidate Portal — InternConnect',
+            'activeNav'      => 'messages',
+            'candidate'      => $candidate,
+            'conversations'  => $conversations,
+            'activeThreadId' => $activeThreadId,
+        ], 'dashboard');
+    }
+
+    /**
+     * Send a candidate direct message
+     */
+    public function sendMessage(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+        $threadId = (int)($input['thread_id'] ?? 1);
+        $content = trim((string)($input['content'] ?? ($input['text'] ?? '')));
+        $senderName = $_SESSION['profile_name'] ?? ($_SESSION['user_name'] ?? 'Sarah Peters');
+
+        if ($content === '') {
+            http_response_code(422);
+            header('Content-Type: application/json');
+            echo json_encode(['error' => 'Message content cannot be empty']);
+            exit;
+        }
+
+        $msg = CommunicationService::sendDirectMessage($threadId, 'candidate', $senderName, $content);
+
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'message' => $msg]);
+        exit;
+    }
+
+    /**
+     * Mark a candidate notification as read
+     */
+    public function markNotificationRead(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+        $id = (int)($input['id'] ?? 0);
+
+        CommunicationService::markNotificationRead($id, 'candidate');
+
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true]);
+        exit;
+    }
+
+    /**
+     * Mark all candidate notifications as read
+     */
+    public function markAllNotificationsRead(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        CommunicationService::markAllNotificationsRead('candidate');
+
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true]);
+        exit;
+    }
+
+    /**
+     * Candidate responds to interview invitation (Confirm or Reschedule)
+     */
+    public function respondInterview(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+        $interviewId = (int)($input['interview_id'] ?? 1);
+        $status = (string)($input['status'] ?? 'Confirmed');
+        $candidateName = $_SESSION['profile_name'] ?? 'Sarah Peters';
+
+        $meta = [
+            'candidate_name'  => $candidateName,
+            'reason'          => $input['reason'] ?? '',
+            'reschedule_date' => $input['reschedule_date'] ?? '',
+            'reschedule_time' => $input['reschedule_time'] ?? '',
+            'notes'           => $input['notes'] ?? '',
+        ];
+
+        $updated = CommunicationService::updateInterviewStatus($interviewId, $status, $meta);
+
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'interview' => $updated]);
+        exit;
+    }
+
+    /**
+     * API to fetch latest thread messages for live synchronization
+     */
+    public function getThreadMessagesApi(array $params = []): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $threadId = (int)($params['id'] ?? 1);
+        $messages = CommunicationService::getThreadMessages($threadId);
+
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'messages' => $messages]);
+        exit;
+    }
+
+    /**
+     * View: AI Cover Letter Generator (Version 2.0 / Phase 5 AI Feature)
+     * Route: /candidate/ai-assistant/cover-letter
+     */
+    public function aiCoverLetter(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $candidate = [
+            'id'          => $_SESSION['user_id'] ?? 1,
+            'name'        => $_SESSION['profile_name'] ?? 'Sarah Peters',
+            'first_name'  => 'Sarah',
+            'role'        => $_SESSION['profile_role'] ?? 'UI/UX Design Intern',
+            'school'      => $_SESSION['candidate_school'] ?? 'University of Lagos (UNILAG)',
+            'degree'      => 'B.Sc Systems Engineering',
+            'avatar'      => $_SESSION['profile_avatar'] ?? asset('assets/images/profile.png'),
+            'skills'      => ['Figma', 'UI Design', 'Wireframing', 'User Research', 'Prototyping'],
+        ];
+
+        // Sample Target Roles/Internships for quick selection
+        $targetJobs = [
+            [
+                'id'       => 1,
+                'company'  => 'Paystack',
+                'role'     => 'UI/UX Design Intern',
+                'location' => 'Lagos, Nigeria (Hybrid)',
+                'industry' => 'Fintech / Payments',
+                'logo_bg'  => '#059669',
+                'initials' => 'PW'
+            ],
+            [
+                'id'       => 2,
+                'company'  => 'Flutterwave',
+                'role'     => 'Product Design Intern',
+                'location' => 'Remote, Africa',
+                'industry' => 'Fintech / Global Infrastructure',
+                'logo_bg'  => '#F59E0B',
+                'initials' => 'FL'
+            ],
+            [
+                'id'       => 3,
+                'company'  => 'Nexura Technologies',
+                'role'     => 'Frontend Developer Intern',
+                'location' => 'Lagos, Nigeria',
+                'industry' => 'Enterprise SaaS',
+                'logo_bg'  => '#4F48E6',
+                'initials' => 'NX'
+            ],
+            [
+                'id'       => 4,
+                'company'  => 'Interswitch Group',
+                'role'     => 'Software Engineer Intern',
+                'location' => 'Victoria Island, Lagos',
+                'industry' => 'Digital Commerce',
+                'logo_bg'  => '#0EA5E9',
+                'initials' => 'IS'
+            ]
+        ];
+
+        // Pre-generate default initial cover letter
+        $defaultJob = $targetJobs[0];
+        $initialLetter = AiService::generateCoverLetter($candidate, $defaultJob, 'professional');
+
+        $this->renderView('candidate/ai-assistant/cover-letter', [
+            'title'         => 'AI Cover Letter Generator — InternConnect',
+            'activeNav'     => 'ai-assistant',
+            'candidate'     => $candidate,
+            'targetJobs'    => $targetJobs,
+            'initialLetter' => $initialLetter,
+        ], 'dashboard');
+    }
+
+    /**
+     * API: Generate AI Cover Letter via AJAX
+     * Route: /candidate/ai-assistant/cover-letter/generate
+     */
+    public function generateAiCoverLetter(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+
+        $candidate = [
+            'id'     => $_SESSION['user_id'] ?? 1,
+            'name'   => $_SESSION['profile_name'] ?? 'Sarah Peters',
+            'school' => $_SESSION['candidate_school'] ?? 'University of Lagos (UNILAG)',
+            'degree' => 'B.Sc Systems Engineering',
+            'skills' => !empty($input['skills']) && is_array($input['skills']) 
+                        ? $input['skills'] 
+                        : ['Figma', 'UI Design', 'Wireframing', 'User Research', 'Prototyping'],
+        ];
+
+        $jobData = [
+            'company'  => trim((string)($input['company'] ?? 'Paystack')),
+            'role'     => trim((string)($input['role'] ?? 'UI/UX Design Intern')),
+            'location' => trim((string)($input['location'] ?? 'Lagos, Nigeria (Hybrid)')),
+        ];
+
+        $tone = trim((string)($input['tone'] ?? 'professional'));
+
+        $result = AiService::generateCoverLetter($candidate, $jobData, $tone);
+
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'letter' => $result]);
+        exit;
+    }
+
+    /**
+     * View: AI Career Coach & Skill Roadmap (Version 2.0 / Phase 5 AI Feature)
+     * Route: /candidate/ai-assistant/career-coach
+     */
+    public function aiCareerCoach(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $candidate = [
+            'id'          => $_SESSION['user_id'] ?? 1,
+            'name'        => $_SESSION['profile_name'] ?? 'Sarah Peters',
+            'first_name'  => 'Sarah',
+            'role'        => $_SESSION['profile_role'] ?? 'UI/UX Design Intern',
+            'school'      => $_SESSION['candidate_school'] ?? 'University of Lagos (UNILAG)',
+            'avatar'      => $_SESSION['profile_avatar'] ?? asset('assets/images/profile.png'),
+            'skills'      => ['Figma', 'User Research', 'Wireframing', 'Prototyping', 'Design Systems'],
+        ];
+
+        $disciplines = [
+            'Product Designer',
+            'UI/UX Designer',
+            'Software Engineer',
+            'Frontend Developer',
+            'Backend Developer',
+            'Data Analyst',
+            'Product Manager'
+        ];
+
+        $selectedRole = (string)($_GET['role'] ?? 'Product Designer');
+        if (!in_array($selectedRole, $disciplines, true)) {
+            $selectedRole = 'Product Designer';
+        }
+
+        $roadmap = AiService::generateCareerRoadmap($candidate, $selectedRole);
+
+        $this->renderView('candidate/ai-assistant/career-coach', [
+            'title'        => 'AI Career Coach & Skill Roadmap — InternConnect',
+            'activeNav'    => 'ai-assistant',
+            'candidate'    => $candidate,
+            'disciplines'  => $disciplines,
+            'selectedRole' => $selectedRole,
+            'roadmap'      => $roadmap,
+        ], 'dashboard');
+    }
+
+    /**
+     * API: Generate AI Roadmap via AJAX
+     * Route: /candidate/ai-assistant/career-coach/roadmap
+     */
+    public function generateAiRoadmap(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+        $targetRole = trim((string)($input['target_role'] ?? 'Product Designer'));
+
+        $candidate = [
+            'id'     => $_SESSION['user_id'] ?? 1,
+            'name'   => $_SESSION['profile_name'] ?? 'Sarah Peters',
+            'school' => $_SESSION['candidate_school'] ?? 'University of Lagos (UNILAG)',
+            'skills' => ['Figma', 'User Research', 'Wireframing', 'Prototyping', 'Design Systems'],
+        ];
+
+        $result = AiService::generateCareerRoadmap($candidate, $targetRole);
+
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'roadmap' => $result]);
+        exit;
     }
 }
 
