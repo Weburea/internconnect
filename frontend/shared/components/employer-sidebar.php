@@ -59,12 +59,12 @@ $activeNav   = $activeNav ?? 'dashboard';
             <span>Post Internship</span>
         </a>
 
-        <!-- 3. My Internships -->
-        <a href="<?= url('/employer/internships') ?>" class="db-nav-link <?= in_array($activeNav, ['internships', 'my_internships'], true) ? 'is-active' : '' ?>">
+        <!-- 3. Posted Internships -->
+        <a href="<?= url('/employer/internships') ?>" class="db-nav-link <?= in_array($activeNav, ['internships', 'my_internships', 'posted_internships'], true) ? 'is-active' : '' ?>">
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
             </svg>
-            <span>My Internships</span>
+            <span>Posted Internships</span>
         </a>
 
         <!-- 4. Candidates -->
@@ -91,8 +91,16 @@ $activeNav   = $activeNav ?? 'dashboard';
             <span>Interviews</span>
         </a>
 
+        <!-- 7. Analytics & Reports (Phase 5 Enterprise) -->
+        <a href="<?= url('/employer/analytics') ?>" class="db-nav-link <?= in_array($activeNav, ['analytics', 'reports', 'hiring_analytics'], true) ? 'is-active' : '' ?>" <?= in_array($activeNav, ['analytics', 'reports', 'hiring_analytics'], true) ? 'aria-current="page"' : '' ?>>
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            <span>Analytics &amp; Reports</span>
+        </a>
+
         <!-- 7. Messages -->
-        <a href="<?= url('/employer/dashboard') ?>" class="db-nav-link <?= $activeNav === 'messages' ? 'is-active' : '' ?>" style="display: flex; align-items: center; justify-content: space-between;">
+        <a href="<?= url('/employer/messages') ?>" class="db-nav-link <?= $activeNav === 'messages' ? 'is-active' : '' ?>" style="display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 12px;">
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
@@ -102,7 +110,27 @@ $activeNav   = $activeNav ?? 'dashboard';
             <span style="background: #4F47E6; color: #fff; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 99px;">3</span>
         </a>
 
-        <!-- 8. Profile Settings -->
+        <!-- 8. AI Assistant (Free for Employers, Jenny AI mark) -->
+        <a href="<?= url('/employer/ai-assistant') ?>" class="db-nav-link <?= in_array($activeNav, ['ai_assistant', 'ai-assistant'], true) ? 'is-active' : '' ?>" <?= in_array($activeNav, ['ai_assistant', 'ai-assistant'], true) ? 'aria-current="page"' : '' ?>>
+            <svg style="width: 18px; height: 18px; flex-shrink: 0;" viewBox="0 0 74 83" fill="currentColor">
+                <path d="M73.74 32.4627V59.9427C67.93 59.7673 62.2767 61.8422 57.9596 65.7344C53.6426 69.6267 50.9952 75.0356 50.57 80.8327C50.52 81.3027 50.48 81.8327 50.46 82.2827H23.57C23.57 82.0227 23.48 81.7627 23.43 81.5127C20.73 67.1427 16.41 63.2427 0 59.6527V32.6527C13.34 31.5727 27.12 37.6527 36.92 47.9327C46 38.3527 58.99 31.8927 73.74 32.4627Z"/>
+                <path d="M37.0001 0.0031237C40.4833 0.0367014 43.8785 1.10075 46.7578 3.06112C49.637 5.02149 51.8715 7.79043 53.1794 11.0188C54.4873 14.2473 54.8101 17.7906 54.1071 21.2023C53.4042 24.6139 51.7069 27.741 49.2293 30.1894C46.7516 32.6378 43.6046 34.2979 40.1849 34.9604C36.7652 35.6228 33.2259 35.258 30.0132 33.9119C26.8005 32.5658 24.0583 30.2987 22.1322 27.3963C20.2061 24.494 19.1824 21.0864 19.1901 17.6031C19.1737 15.2695 19.6247 12.9562 20.5166 10.7997C21.4084 8.64315 22.7231 6.68703 24.383 5.04669C26.0429 3.40635 28.0145 2.11499 30.1814 1.24877C32.3484 0.382549 34.6669 -0.040991 37.0001 0.0031237Z"/>
+            </svg>
+            <span>AI Assistant</span>
+        </a>
+
+        <!-- 9. Notifications -->
+        <a href="<?= url('/employer/notifications') ?>" class="db-nav-link <?= in_array($activeNav, ['notifications', 'notification'], true) ? 'is-active' : '' ?>" style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                </svg>
+                <span>Notifications</span>
+            </div>
+            <span style="background: #EEF2FF; color: #4F48E6; font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 99px; border: 1px solid #C7D2FE;">4</span>
+        </a>
+
+        <!-- 9. Profile Settings -->
         <a href="<?= url('/employer/profile') ?>" class="db-nav-link <?= in_array($activeNav, ['profile', 'settings', 'profile_settings']) ? 'is-active' : '' ?>" <?= in_array($activeNav, ['profile', 'settings', 'profile_settings']) ? 'aria-current="page"' : '' ?>>
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />

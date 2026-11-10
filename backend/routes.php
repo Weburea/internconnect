@@ -9,11 +9,28 @@ use App\Controllers\InternshipController;
 use App\Controllers\CandidateController;
 use App\Controllers\EmployerController;
 use App\Controllers\PaymentController;
+use App\Controllers\ApiController;
+use App\Controllers\AdminController;
 
 /** @var Router $router */
 
 $router->get('/', [HomeController::class, 'index']);
 $router->get('/pricing', [HomeController::class, 'pricing']);
+$router->get('/elearning', [HomeController::class, 'elearning']);
+$router->get('/how-it-works', [HomeController::class, 'howItWorks']);
+$router->get('/contact', [HomeController::class, 'contact']);
+$router->get('/about', [HomeController::class, 'about']);
+$router->get('/testimonials', [HomeController::class, 'testimonials']);
+$router->get('/success-stories', [HomeController::class, 'testimonials']);
+$router->get('/refund', [HomeController::class, 'refund']);
+$router->get('/cookies', [HomeController::class, 'cookies']);
+$router->get('/privacy', [HomeController::class, 'privacy']);
+$router->get('/terms', [HomeController::class, 'terms']);
+$router->get('/sitemap.xml', [HomeController::class, 'sitemap']);
+$router->get('/robots.txt', [HomeController::class, 'robots']);
+
+// API Endpoints
+$router->get('/api/universities', [ApiController::class, 'universities']);
 $router->get('/payments', [PaymentController::class, 'checkout']);
 $router->get('/pricing/upgrade', [PaymentController::class, 'checkout']);
 $router->get('/checkout', [PaymentController::class, 'checkout']);
@@ -84,6 +101,31 @@ $router->get('/help/article', [CandidateController::class, 'helpArticle']);
 $router->get('/help/article/{slug}', [CandidateController::class, 'helpArticle']);
 $router->get('/help/{category}/{slug}', [CandidateController::class, 'helpArticle']);
 
+// Notifications routes
+$router->get('/notifications', [CandidateController::class, 'notifications']);
+$router->get('/candidate/notifications', [CandidateController::class, 'notifications']);
+$router->post('/candidate/notifications/mark-read', [CandidateController::class, 'markNotificationRead']);
+$router->post('/candidate/notifications/mark-all-read', [CandidateController::class, 'markAllNotificationsRead']);
+
+// Candidate 1-on-1 Messages
+$router->get('/candidate/messages', [CandidateController::class, 'messages']);
+$router->get('/candidate/messages/thread/{id}', [CandidateController::class, 'getThreadMessagesApi']);
+$router->get('/candidate/messages/{id}', [CandidateController::class, 'messages']);
+$router->get('/messages', [CandidateController::class, 'messages']);
+$router->post('/candidate/messages/send', [CandidateController::class, 'sendMessage']);
+$router->post('/candidate/interview/respond', [CandidateController::class, 'respondInterview']);
+
+// Candidate AI Career Assistant routes (Pro & Premium)
+$router->get('/candidate/ai-assistant', [CandidateController::class, 'aiAssistant']);
+$router->get('/candidate/ai-assistant/cv-analyze', [CandidateController::class, 'aiCvAnalyze']);
+$router->post('/candidate/ai-assistant/cv-analyze', [CandidateController::class, 'processAiCvAnalyze']);
+$router->get('/candidate/ai-assistant/cv-results', [CandidateController::class, 'aiCvResults']);
+$router->get('/candidate/ai-assistant/matched', [CandidateController::class, 'aiMatchedInternships']);
+$router->get('/candidate/ai-assistant/find-internships', [CandidateController::class, 'aiMatchedInternships']);
+$router->get('/candidate/ai-assistant/interview-prep', [CandidateController::class, 'aiInterviewPrep']);
+$router->post('/candidate/ai-assistant/interview-prep/evaluate', [CandidateController::class, 'evaluateMockAnswer']);
+$router->get('/ai-assistant', [CandidateController::class, 'aiAssistant']);
+
 // Employer routes
 $router->get('/employer/dashboard', [EmployerController::class, 'dashboard']);
 $router->get('/employer/company', [EmployerController::class, 'companyProfile']);
@@ -93,9 +135,10 @@ $router->post('/employer/profile', [EmployerController::class, 'updateProfileSet
 $router->get('/employer/settings', [EmployerController::class, 'profileSettings']);
 $router->post('/employer/settings', [EmployerController::class, 'updateProfileSettings']);
 $router->get('/employer/profile/settings', [EmployerController::class, 'profileSettings']);
-$router->get('/companies', [EmployerController::class, 'companyProfile']);
-$router->get('/company', [EmployerController::class, 'companyProfile']);
-$router->get('/company/{slug}', [EmployerController::class, 'companyProfile']);
+$router->get('/companies', [EmployerController::class, 'publicCompanyProfile']);
+$router->get('/company', [EmployerController::class, 'publicCompanyProfile']);
+$router->get('/company/{slug}', [EmployerController::class, 'publicCompanyProfile']);
+$router->get('/companies/{slug}', [EmployerController::class, 'publicCompanyProfile']);
 
 // Employer My Internships & Post Internship flow
 $router->get('/employer/internships', [EmployerController::class, 'myInternships']);
@@ -119,11 +162,61 @@ $router->get('/employer/candidate/{id}', [EmployerController::class, 'candidateP
 $router->get('/employer/interviews', [EmployerController::class, 'interviews']);
 $router->get('/employer/interviews/schedule', [EmployerController::class, 'scheduleInterview']);
 $router->get('/employer/interviews/schedule/{id}', [EmployerController::class, 'scheduleInterview']);
+$router->post('/employer/interviews/schedule', [EmployerController::class, 'processScheduleInterview']);
+
+// Employer 1-on-1 Messages
+$router->get('/employer/messages', [EmployerController::class, 'messages']);
+$router->get('/employer/messages/thread/{id}', [EmployerController::class, 'getThreadMessagesApi']);
+$router->get('/employer/messages/{id}', [EmployerController::class, 'messages']);
+$router->post('/employer/messages/send', [EmployerController::class, 'sendMessage']);
+
+// Employer Notifications
+$router->get('/employer/notifications', [EmployerController::class, 'notifications']);
+$router->post('/employer/notifications/mark-read', [EmployerController::class, 'markNotificationRead']);
+$router->post('/employer/notifications/mark-all-read', [EmployerController::class, 'markAllNotificationsRead']);
+
+// Employer AI Assistant (Free for Employers, Jenny AI)
+$router->get('/employer/ai-assistant', [EmployerController::class, 'aiAssistant']);
+
+// Employer Enterprise Analytics & Data Exports (Phase 5)
+$router->get('/employer/analytics', [EmployerController::class, 'analytics']);
+$router->get('/employer/analytics/export/candidates', [EmployerController::class, 'exportCandidates']);
+$router->get('/employer/analytics/export/interviews', [EmployerController::class, 'exportInterviews']);
+$router->get('/employer/analytics/export/billing', [EmployerController::class, 'exportBilling']);
 
 // Internship & Application routes
 $router->get('/internships', [InternshipController::class, 'index']);
+$router->get('/search', [InternshipController::class, 'search']);
 $router->get('/internship/{slug}', [InternshipController::class, 'show']);
 $router->get('/apply/{slug}', [InternshipController::class, 'apply']);
 $router->post('/apply/{slug}', [CandidateController::class, 'submitApplication']);
+
+// ==============================================================================
+// ADMIN MISSION CONTROL ROUTES & ACCESS CONTROL SUITE
+// ==============================================================================
+$router->get('/admin/login', [AdminController::class, 'login']);
+$router->post('/admin/login', [AdminController::class, 'loginPost']);
+$router->get('/admin/login/2fa', [AdminController::class, 'twoFactor']);
+$router->post('/admin/login/2fa', [AdminController::class, 'twoFactorPost']);
+$router->get('/admin/forgot-password', [AdminController::class, 'forgotPassword']);
+$router->post('/admin/forgot-password', [AdminController::class, 'forgotPasswordPost']);
+$router->get('/admin/reset-password', [AdminController::class, 'resetPassword']);
+$router->post('/admin/reset-password', [AdminController::class, 'resetPasswordPost']);
+$router->get('/admin/logout', [AdminController::class, 'logout']);
+$router->post('/admin/logout', [AdminController::class, 'logout']);
+$router->get('/admin', [AdminController::class, 'overview']);
+$router->get('/admin/overview', [AdminController::class, 'overview']);
+$router->get('/admin/dashboard', [AdminController::class, 'overview']);
+$router->get('/admin/interns', [AdminController::class, 'interns']);
+$router->get('/admin/employers', [AdminController::class, 'employers']);
+$router->get('/admin/ai', [AdminController::class, 'ai']);
+$router->get('/admin/ai/chat', [AdminController::class, 'aiChat']);
+$router->get('/admin/elearning', [AdminController::class, 'elearning']);
+$router->get('/admin/subscriptions', [AdminController::class, 'subscriptions']);
+$router->get('/admin/settings', [AdminController::class, 'settings']);
+$router->get('/admin/settings/team', [AdminController::class, 'settingsTeam']);
+$router->get('/admin/document/stream', [AdminController::class, 'streamDocument']);
+$router->get('/admin/api/live-sessions', [AdminController::class, 'liveSessions']);
+
 
 
