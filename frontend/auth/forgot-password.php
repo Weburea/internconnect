@@ -142,8 +142,8 @@ $isError = ($_GET['error'] ?? '') === 'invalid';
         <div class="flex-shrink-0 flex justify-between items-center text-[12px] text-[#464555] font-medium uppercase tracking-wider pt-4">
             <span>&copy; 2024 INTERNCONNECT.</span>
             <div class="space-x-6">
-                <a href="#" class="hover:text-[#191C1D] transition-colors">PRIVACY</a>
-                <a href="#" class="hover:text-[#191C1D] transition-colors">TERMS</a>
+                <a href="<?= url('/privacy') ?>" class="hover:text-[#191C1D] transition-colors">PRIVACY</a>
+                <a href="<?= url('/terms') ?>" class="hover:text-[#191C1D] transition-colors">TERMS</a>
             </div>
         </div>
 

@@ -238,6 +238,40 @@ $avatar = $candidate['avatar'] ?? null;
     color: #4F47E6;
     font-weight: 600;
 }
+/* Let settings columns shrink to the viewport on phones */
+.db-settings-grid > * { min-width: 0; }
+
+/* Email change confirmation */
+.cand-email-verify { margin-top: 10px; padding: 12px; border-radius: 10px; background: #EEF2FF; }
+.cand-email-verify-text { margin: 0 0 10px; font-size: 12.5px; color: #3730A3; line-height: 1.5; }
+.cand-dev-code { display: inline-block; margin-left: 4px; padding: 1px 8px; border-radius: 9999px; background: #FFFFFF; color: #4F48E6; font-weight: 700; font-size: 11.5px; }
+.cand-email-verify-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.cand-email-verify-row .db-input { flex: 1 1 140px; min-width: 0; height: 40px; letter-spacing: .2em; }
+.cand-verify-btn, .cand-verify-cancel { height: 40px; padding: 0 14px; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+.cand-verify-btn { border: 1px solid #4F48E6; background: #4F48E6; color: #FFFFFF; }
+.cand-verify-btn:hover { background: #4338CA; }
+.cand-verify-cancel { border: 1px solid #C7D2FE; background: #FFFFFF; color: #475569; }
+.db-upload-zone.is-uploading { opacity: .6; pointer-events: none; }
+/* Location preferences */
+.cand-segmented { display: inline-flex; width: 100%; padding: 4px; background: #F1F5F9; border-radius: 10px; gap: 4px; box-sizing: border-box; }
+.cand-segment { flex: 1; height: 36px; border: 0; border-radius: 8px; background: transparent; font-size: 13px; font-weight: 600; color: #475569; cursor: pointer; white-space: nowrap; transition: background .15s ease, color .15s ease, box-shadow .15s ease; }
+.cand-segment.is-active { background: #FFFFFF; color: #4F48E6; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08); }
+.cand-city-box { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 48px; padding: 8px 8px 8px 10px; border: 1px solid #E2E8F0; border-radius: 10px; background: #FFFFFF; cursor: text; box-sizing: border-box; }
+.cand-city-box:focus-within { border-color: #4F48E6; box-shadow: 0 0 0 3px rgba(79, 72, 230, 0.1); }
+.cand-city-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 6px 4px 10px; border-radius: 9999px; background: #EEF2FF; color: #4F48E6; font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+.cand-city-chip button { width: 18px; height: 18px; border: 0; border-radius: 50%; background: transparent; color: #6366F1; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; }
+.cand-city-chip button:hover { background: #E0E7FF; }
+.cand-city-chip svg { width: 11px; height: 11px; }
+.cand-city-box input { flex: 1; min-width: 140px; border: 0 !important; outline: 0 !important; box-shadow: none !important; background: transparent !important; font-size: 13.5px; color: #0F172A; padding: 4px 2px !important; }
+.cand-city-add { height: 30px; padding: 0 12px; border: 1px solid #E2E8F0; border-radius: 8px; background: #FFFFFF; font-size: 12.5px; font-weight: 700; color: #4F48E6; cursor: pointer; white-space: nowrap; }
+.cand-city-add:disabled { color: #94A3B8; cursor: not-allowed; }
+.cand-remote-toggle { display: flex; align-items: center; gap: 10px; margin-top: 16px; font-size: 13.5px; color: #334155; cursor: pointer; user-select: none; }
+.cand-remote-toggle input { position: absolute; opacity: 0; pointer-events: none; }
+.cand-switch { position: relative; width: 38px; height: 22px; border-radius: 9999px; background: #CBD5E1; flex-shrink: 0; transition: background .2s ease; }
+.cand-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 1px 2px rgba(0,0,0,0.15); transition: transform .2s ease; }
+.cand-remote-toggle input:checked + .cand-switch { background: #4F48E6; }
+.cand-remote-toggle input:checked + .cand-switch::after { transform: translateX(16px); }
+.cand-remote-toggle input:focus-visible + .cand-switch { box-shadow: 0 0 0 3px rgba(79, 72, 230, 0.2); }
 </style>
 <script>
 function candidateProfileSettings() {
@@ -272,12 +306,36 @@ function candidateProfileSettings() {
             this.removeAvatar = true;
             this.$dispatch('show-toast', { text: 'Profile photo removed. Click Save Changes to apply.', type: 'info' });
         },
+        showCurrentPass: false,
+        showNewPass: false,
+        showConfirmPass: false,
+        // Location preferences (Step 7 of onboarding)
+        locationPref: <?= json_encode($candidate['location'] ?? '') ?>,
+        openToRelocating: <?= json_encode($candidate['open_to_relocating'] ?? 'Yes') ?>,
+        preferredCities: <?= json_encode(array_values($candidate['preferred_locations'] ?? [])) ?>,
+        newCity: '',
+        includeRemote: <?= json_encode((bool)($candidate['include_remote'] ?? true)) ?>,
+        addCity() {
+            const city = this.newCity.trim();
+            if (city && !this.preferredCities.some(c => c.toLowerCase() === city.toLowerCase())) {
+                this.preferredCities.push(city);
+            }
+            this.newCity = '';
+        },
+        removeCity(city) {
+            this.preferredCities = this.preferredCities.filter(c => c !== city);
+        },
         selectedInterests: <?= json_encode($candidate['interests'] ?? ['UI/UX Design', 'Software Engineering', 'Product Management']) ?>,
-        allInterests: [
+        coreInterests: [
             'UI/UX Design', 'Software Engineering', 'Product Management', 'Data Science', 'AI/ML',
             'Marketing', 'Sales', 'Finance', 'Operations', 'Cybersecurity', 'Cloud Computing',
             'DevOps', 'Graphic Design', 'Content Creation', 'HR'
         ],
+        // Specialisations picked during onboarding stay visible even if they are not core categories
+        get allInterests() {
+            const extra = this.selectedInterests.filter(i => !this.coreInterests.includes(i));
+            return [...this.coreInterests, ...extra];
+        },
         toggleInterest(interest) {
             if (this.selectedInterests.includes(interest)) {
                 this.selectedInterests = this.selectedInterests.filter(i => i !== interest);
@@ -301,20 +359,29 @@ function candidateProfileSettings() {
         githubEdit: <?= json_encode($candidate['github'] ?? '') ?>,
         editingLinks: false,
         successAlert: <?= json_encode($success ? (string)$success : '') ?>,
-        resumeFile: 'Sarah_Peters_CV_2024.pdf',
-        resumeSize: '1.2 MB',
-        resumeUploaded: 'Oct 12, 2023',
+        // Resume: stored privately on the server (ResumeStorage), streamed via /candidate/profile/resume
+        resumeFile: <?= json_encode($candidate['resume']['name'] ?? '') ?>,
+        resumeSize: <?= json_encode($candidate['resume']['size_label'] ?? '') ?>,
+        resumeUploaded: <?= json_encode($candidate['resume']['uploaded_on'] ?? '') ?>,
+        resumeUploading: false,
         dragging: false,
         showPreviewModal: false,
-        uploadedFileName: 'Sarah_Peters_CV_2024.pdf',
-        uploadedFileSize: '1.2 MB',
-        uploadedFileUrl: <?= json_encode(asset('dummy.pdf')) ?>,
-        uploadedFileExt: 'pdf',
+        uploadedFileName: <?= json_encode($candidate['resume']['name'] ?? '') ?>,
+        uploadedFileSize: <?= json_encode($candidate['resume']['size_label'] ?? '') ?>,
+        uploadedFileUrl: <?= json_encode($candidate['resume']['url'] ?? '') ?>,
+        uploadedFileExt: <?= json_encode($candidate['resume']['ext'] ?? '') ?>,
+        errorAlert: <?= json_encode($error ? (string)$error : '') ?>,
         init() {
             if (this.successAlert) {
                 this.$nextTick(() => {
                     this.$dispatch('show-toast', { text: this.successAlert, type: 'success' });
                     this.successAlert = '';
+                });
+            }
+            if (this.errorAlert) {
+                this.$nextTick(() => {
+                    this.$dispatch('show-toast', { text: this.errorAlert, type: 'error' });
+                    this.errorAlert = '';
                 });
             }
         },
@@ -326,61 +393,70 @@ function candidateProfileSettings() {
             this.$dispatch('show-toast', { text: 'Quick links updated successfully!', type: 'success' });
         },
         triggerFileInput() {
+            if (this.resumeUploading) return;
             this.$refs.fileInput.click();
         },
         handleFileDrop(e) {
             this.dragging = false;
             if (e.dataTransfer.files.length > 0) {
-                const file = e.dataTransfer.files[0];
-                this.uploadMockFile(file);
+                this.uploadResume(e.dataTransfer.files[0]);
             }
         },
         handleFileSelect(e) {
             if (e.target.files.length > 0) {
-                const file = e.target.files[0];
-                this.uploadMockFile(file);
+                this.uploadResume(e.target.files[0]);
             }
+            e.target.value = '';
         },
-        uploadMockFile(file) {
-            if (!file) return;
-            if (file.size > 5 * 1024 * 1024) {
-                this.$dispatch('show-toast', { text: 'The selected file exceeds the 5MB limit. Please upload a smaller file.', type: 'warning' });
+        applyResume(r) {
+            this.resumeFile = r ? r.name : '';
+            this.resumeSize = r ? r.size_label : '';
+            this.resumeUploaded = r ? r.uploaded_on : '';
+            this.uploadedFileName = this.resumeFile;
+            this.uploadedFileSize = this.resumeSize;
+            this.uploadedFileExt = r ? r.ext : '';
+            this.uploadedFileUrl = r ? r.url : '';
+        },
+        async uploadResume(file) {
+            if (!file || this.resumeUploading) return;
+            if (file.size > 10 * 1024 * 1024) {
+                this.$dispatch('show-toast', { text: 'The selected file exceeds the 10MB limit. Please upload a smaller file.', type: 'warning' });
                 return;
             }
             const ext = file.name.split('.').pop().toLowerCase();
-            if (!['pdf', 'docx', 'rtf'].includes(ext)) {
-                this.$dispatch('show-toast', { text: 'Unsupported file type. Please upload a PDF, DOCX, or RTF document.', type: 'warning' });
+            if (!['pdf', 'docx'].includes(ext)) {
+                this.$dispatch('show-toast', { text: 'Unsupported file type. Please upload a PDF or DOCX document.', type: 'warning' });
                 return;
             }
-            if (this.uploadedFileUrl && this.uploadedFileUrl !== <?= json_encode(asset('dummy.pdf')) ?> && this.uploadedFileUrl.startsWith('blob:')) {
-                URL.revokeObjectURL(this.uploadedFileUrl);
+            this.resumeUploading = true;
+            try {
+                const form = new FormData();
+                form.append('resume', file);
+                const res = await fetch(<?= json_encode(url('/candidate/profile/resume')) ?>, { method: 'POST', headers: { 'Accept': 'application/json' }, body: form });
+                const json = await res.json().catch(() => ({}));
+                if (!res.ok || !json.success) {
+                    this.$dispatch('show-toast', { text: json.error || 'Upload failed. Please try again.', type: 'error' });
+                    return;
+                }
+                this.applyResume(json.resume);
+                this.$dispatch('show-toast', { text: 'Resume uploaded successfully!', type: 'success' });
+            } catch (err) {
+                this.$dispatch('show-toast', { text: 'Network error while uploading. Please try again.', type: 'error' });
+            } finally {
+                this.resumeUploading = false;
             }
-            this.resumeFile = file.name;
-            this.resumeSize = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
-            const options = { month: 'short', day: 'numeric', year: 'numeric' };
-            this.resumeUploaded = new Date().toLocaleDateString('en-US', options);
-            
-            this.uploadedFileName = file.name;
-            this.uploadedFileSize = this.resumeSize;
-            this.uploadedFileExt = ext;
-            this.uploadedFileUrl = URL.createObjectURL(file);
-            
-            this.$dispatch('show-toast', { text: 'Resume uploaded successfully!', type: 'success' });
         },
-        deleteResume() {
-            if (this.uploadedFileUrl && this.uploadedFileUrl !== <?= json_encode(asset('dummy.pdf')) ?> && this.uploadedFileUrl.startsWith('blob:')) {
-                URL.revokeObjectURL(this.uploadedFileUrl);
+        async deleteResume() {
+            try {
+                const res = await fetch(<?= json_encode(url('/candidate/profile/resume/delete')) ?>, { method: 'POST', headers: { 'Accept': 'application/json' } });
+                if (!res.ok) throw new Error('delete failed');
+                this.applyResume(null);
+                this.showPreviewModal = false;
+                this.$dispatch('show-toast', { text: 'Resume removed.', type: 'info' });
+            } catch (err) {
+                this.$dispatch('show-toast', { text: 'Could not remove the resume. Please try again.', type: 'error' });
             }
-            this.resumeFile = '';
-            this.resumeSize = '';
-            this.resumeUploaded = '';
-            this.uploadedFileName = '';
-            this.uploadedFileSize = '';
-            this.uploadedFileExt = '';
-            this.uploadedFileUrl = '';
-            this.$dispatch('show-toast', { text: 'Resume removed.', type: 'info' });
-        }
-    };
+        }    };
 }
 </script>
 <div class="db-shell" x-data="candidateProfileSettings()">
@@ -475,6 +551,22 @@ function candidateProfileSettings() {
                                     <label for="input-email" class="db-label">Email Address</label>
                                     <input type="email" name="email" id="input-email" class="db-input"
                                         value="<?= htmlspecialchars($candidate['email'] ?? 'sarah.peters@design-intern.com') ?>" required>
+                                    <?php if (!empty($candidate['pending_email'])): ?>
+                                    <!-- Pending email change: confirm with the 6-digit code (inputs belong to #email-verify-form) -->
+                                    <div class="cand-email-verify" role="status">
+                                        <p class="cand-email-verify-text">
+                                            Confirm <strong><?= htmlspecialchars($candidate['pending_email']) ?></strong> with the 6-digit code we sent.
+                                            <?php if (!empty($candidate['pending_email_dev_code'])): ?>
+                                                <span class="cand-dev-code">Local dev code: <?= htmlspecialchars($candidate['pending_email_dev_code']) ?></span>
+                                            <?php endif; ?>
+                                        </p>
+                                        <div class="cand-email-verify-row">
+                                            <input type="text" name="email_code" form="email-verify-form" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="\d{6}" placeholder="6-digit code" class="db-input" aria-label="Email confirmation code" required>
+                                            <button type="submit" form="email-verify-form" class="cand-verify-btn">Confirm</button>
+                                            <button type="submit" form="email-cancel-form" class="cand-verify-cancel" formnovalidate>Cancel</button>
+                                        </div>
+                                    </div>
+                                    <?php endif; ?>
                                 </div>
                                 <div class="db-form-group">
                                     <label for="input-phone" class="db-label">Phone Number</label>
@@ -666,6 +758,64 @@ function candidateProfileSettings() {
                             </div>
                         </div>
 
+                        <!-- 4. Location Preferences Card (Synced from Step 7 of 7) -->
+                        <div class="db-settings-card">
+                            <div class="db-settings-card-header">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <svg style="width: 18px; height: 18px; color: #4F47E6;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    <h3 class="db-settings-card-title" style="margin: 0;">Location Preferences</h3>
+                                </div>
+                                <button type="submit" class="db-btn-save" id="btn-save-location">
+                                    <svg style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    </svg>
+                                    <span>Save Changes</span>
+                                </button>
+                            </div>
+
+                            <div class="db-form-row">
+                                <div class="db-form-group">
+                                    <label for="input-location" class="db-label">Current Location</label>
+                                    <input type="text" name="location" id="input-location" class="db-input" x-model="locationPref" placeholder="e.g. Lagos, Nigeria">
+                                </div>
+                                <div class="db-form-group">
+                                    <span class="db-label" id="label-relocating">Open to Relocating?</span>
+                                    <div class="cand-segmented" role="radiogroup" aria-labelledby="label-relocating">
+                                        <button type="button" role="radio" class="cand-segment" :class="{ 'is-active': openToRelocating === 'Yes' }" :aria-checked="openToRelocating === 'Yes'" @click="openToRelocating = 'Yes'">Yes</button>
+                                        <button type="button" role="radio" class="cand-segment" :class="{ 'is-active': openToRelocating === 'No' }" :aria-checked="openToRelocating === 'No'" @click="openToRelocating = 'No'">No, stay local</button>
+                                    </div>
+                                    <input type="hidden" name="open_to_relocating" :value="openToRelocating">
+                                </div>
+                            </div>
+
+                            <div class="db-form-group db-form-group-full" style="margin-top: 4px;">
+                                <label for="input-new-city" class="db-label">Where do you want job suggestions from?</label>
+                                <div class="cand-city-box" @click="$refs.cityInput.focus()">
+                                    <template x-for="city in preferredCities" :key="city">
+                                        <span class="cand-city-chip">
+                                            <span x-text="city"></span>
+                                            <button type="button" @click.stop="removeCity(city)" :aria-label="'Remove ' + city">
+                                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                            </button>
+                                        </span>
+                                    </template>
+                                    <input type="text" id="input-new-city" x-ref="cityInput" x-model="newCity" @keydown.enter.prevent="addCity()" @keydown.comma.prevent="addCity()" placeholder="Add a city and press Enter">
+                                    <button type="button" class="cand-city-add" @click.stop="addCity()" :disabled="!newCity.trim()">Add</button>
+                                </div>
+                                <input type="hidden" name="preferred_locations" :value="JSON.stringify(preferredCities)">
+                            </div>
+
+                            <label class="cand-remote-toggle">
+                                <input type="checkbox" x-model="includeRemote">
+                                <span class="cand-switch" aria-hidden="true"></span>
+                                <span>Include remote-only roles regardless of location</span>
+                            </label>
+                            <input type="hidden" name="include_remote" :value="includeRemote ? '1' : '0'">
+                        </div>
+
                         <!-- 3. Experience Assets Card (Renamed from Resume & Portfolio) -->
                         <div class="db-settings-card">
                             <div class="db-settings-card-header">
@@ -685,10 +835,10 @@ function candidateProfileSettings() {
                                 <label class="db-label" style="display: block; margin-bottom: 8px;">Resume / CV Document</label>
                                 <!-- File input (hidden) -->
                                 <input type="file" x-ref="fileInput" @change="handleFileSelect" style="display: none;"
-                                    accept=".pdf,.docx,.rtf">
+                                    accept=".pdf,.docx">
 
                                 <!-- Drag-and-drop Zone -->
-                                <div class="db-upload-zone" :class="{ 'dragging': dragging }"
+                                <div class="db-upload-zone" :class="{ 'dragging': dragging, 'is-uploading': resumeUploading }" :aria-busy="resumeUploading"
                                     @dragover.prevent="dragging = true" @dragleave.prevent="dragging = false"
                                     @drop.prevent="handleFileDrop" @click="triggerFileInput">
                                     <div class="db-upload-icon-wrap">
@@ -697,11 +847,11 @@ function candidateProfileSettings() {
                                                 d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                         </svg>
                                     </div>
-                                    <h5>Upload your latest resume</h5>
+                                    <h5 x-text="resumeUploading ? 'Uploading your resume...' : (resumeFile ? 'Replace your resume' : 'Upload your latest resume')">Upload your latest resume</h5>
                                     <p>Drag and drop or <span
                                             style="color: #4F47E6; font-weight: 700; text-decoration: underline;">browse</span>
                                         your files</p>
-                                    <span>PDF, DOCX, or RTF up to 5MB</span>
+                                    <span>PDF or DOCX up to 10MB</span>
                                 </div>
 
                                 <!-- Uploaded Resume Pill -->
@@ -806,7 +956,7 @@ function candidateProfileSettings() {
                         </div>
 
                         <!-- 4. Notification Preferences Card -->
-                        <div class="db-settings-card">
+                        <div class="db-settings-card" id="notification-preferences" style="scroll-margin-top: 90px;">
                             <div class="db-settings-card-header">
                                 <h3 class="db-settings-card-title">Notification Preferences</h3>
                                 <button type="submit" class="db-btn-save" id="btn-save-notif">
@@ -861,6 +1011,12 @@ function candidateProfileSettings() {
                             </div>
                         </div>
 
+                    </form>
+                    <form action="<?= url('/candidate/profile') ?>" method="POST" id="email-verify-form" hidden>
+                        <input type="hidden" name="action" value="verify_email">
+                    </form>
+                    <form action="<?= url('/candidate/profile') ?>" method="POST" id="email-cancel-form" hidden>
+                        <input type="hidden" name="action" value="cancel_email">
                     </form>
 
                     <!-- 5. Account Management / Deactivate Card -->

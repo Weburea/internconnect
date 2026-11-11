@@ -155,6 +155,31 @@ $avatar    = $candidate['avatar'] ?? null;
 
             </div>
 
+            <!-- Interactive AI Mock Interview Launcher Banner -->
+            <div style="background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; padding: 20px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; box-shadow: 0 2px 8px rgba(0, 6, 35, 0.03);">
+                <div style="display: flex; align-items: center; gap: 16px; min-width: 0; flex: 1;">
+                    <div style="width: 44px; height: 44px; border-radius: 50%; background: #000623; border: 2px solid #4F48E6; color: #FFFFFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 12px rgba(79, 72, 230, 0.3);">
+                        <svg style="width: 18px; height: 18px; flex-shrink: 0;" viewBox="0 0 74 83" fill="currentColor">
+                            <path d="M73.74 32.4627V59.9427C67.93 59.7673 62.2767 61.8422 57.9596 65.7344C53.6426 69.6267 50.9952 75.0356 50.57 80.8327C50.52 81.3027 50.48 81.8327 50.46 82.2827H23.57C23.57 82.0227 23.48 81.7627 23.43 81.5127C20.73 67.1427 16.41 63.2427 0 59.6527V32.6527C13.34 31.5727 27.12 37.6527 36.92 47.9327C46 38.3527 58.99 31.8927 73.74 32.4627Z"/>
+                            <path d="M37.0001 0.0031237C40.4833 0.0367014 43.8785 1.10075 46.7578 3.06112C49.637 5.02149 51.8715 7.79043 53.1794 11.0188C54.4873 14.2473 54.8101 17.7906 54.1071 21.2023C53.4042 24.6139 51.7069 27.741 49.2293 30.1894C46.7516 32.6378 43.6046 34.2979 40.1849 34.9604C36.7652 35.6228 33.2259 35.258 30.0132 33.9119C26.8005 32.5658 24.0583 30.2987 22.1322 27.3963C20.2061 24.494 19.1824 21.0864 19.1901 17.6031C19.1737 15.2695 19.6247 12.9562 20.5166 10.7997C21.4084 8.64315 22.7231 6.68703 24.383 5.04669C26.0429 3.40635 28.0145 2.11499 30.1814 1.24877C32.3484 0.382549 34.6669 -0.040991 37.0001 0.0031237Z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                            <h2 style="font-size: 16px; font-weight: 800; color: #000623; margin: 0;">Practice with Jenny AI Mock Interviewer</h2>
+                            <span style="background: #EEF2FF; color: #4F48E6; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 99px; border: 1px solid #C7D2FE; text-transform: uppercase;">AI Coach</span>
+                        </div>
+                        <p style="font-size: 13px; color: #64748B; margin: 0;">Practice role-tailored questions with real-time STAR evaluation and sample answers.</p>
+                    </div>
+                </div>
+                <a href="<?= url('/candidate/ai-assistant/interview-prep') ?>" style="display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 8px !important; padding: 10px 20px; background: #4F48E6; color: #FFFFFF; border-radius: 10px; font-size: 13.5px; font-weight: 700; text-decoration: none; white-space: nowrap !important; flex-shrink: 0 !important; box-shadow: 0 2px 8px rgba(79, 72, 230, 0.25);">
+                    <span>Launch AI Mock Interview</span>
+                    <svg style="width: 14px; height: 14px; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                </a>
+            </div>
+
             <!-- 2-Column Main Preparation Grid -->
             <div class="db-prep-grid">
                 

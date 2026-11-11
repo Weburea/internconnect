@@ -165,10 +165,12 @@ class CommunicationService
         try {
             $pdo = Database::getConnection();
             $stmt = $pdo->prepare("
-                INSERT INTO in_app_notifications (user_id, user_role, title, message, type, action_url, is_read)
-                VALUES (?, ?, ?, ?, ?, ?, 0)
+                INSERT INTO in_app_notifications (user_id, user_role, title, message, type, action_url, is_read, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, 0, ?)
             ");
-            $stmt->execute([$userId, $recipientRole, $title, $message, $type, $actionUrl]);
+            // Write the app-timezone timestamp explicitly: SQLite's CURRENT_TIMESTAMP is UTC,
+            // which made fresh notifications read as "1h ago" in presentNotifications().
+            $stmt->execute([$userId, $recipientRole, $title, $message, $type, $actionUrl, $item['created_at']]);
             $item['id'] = (int)$pdo->lastInsertId();
         } catch (Throwable $e) {
             error_log('createNotification error: ' . $e->getMessage());
@@ -232,6 +234,139 @@ class CommunicationService
         } catch (Throwable $e) {
             return true;
         }
+    }
+
+    /**
+     * Delete a single notification owned by the given role/user
+     */
+    public static function deleteNotification(int $id, string $userRole, int $userId = 1): bool
+    {
+        if (session_status() === PHP_SESSION_NONE && !headers_sent()) {
+            @session_start();
+        }
+
+        self::ensureTables();
+
+        $sessionKey = 'notifications_' . $userRole;
+        if (isset($_SESSION[$sessionKey])) {
+            $_SESSION[$sessionKey] = array_values(array_filter(
+                $_SESSION[$sessionKey],
+                static fn ($n) => (int)($n['id'] ?? 0) !== $id
+            ));
+        }
+
+        try {
+            $pdo = Database::getConnection();
+            $stmt = $pdo->prepare("DELETE FROM in_app_notifications WHERE id = ? AND user_role = ? AND user_id = ?");
+            return $stmt->execute([$id, $userRole, $userId]);
+        } catch (Throwable $e) {
+            return true;
+        }
+    }
+
+    /**
+     * Notification categories shown in the Notification Center rail, per role.
+     * Keys are category ids; 'types' lists the raw notification types grouped under it.
+     * See docs/13-notification-system.md (Notification Center UI).
+     */
+    public static function notificationCategories(string $userRole): array
+    {
+        if ($userRole === 'employer') {
+            return [
+                'applications' => ['label' => 'Applications',     'icon' => 'document', 'tone' => 'blue',   'types' => ['application']],
+                'interviews'   => ['label' => 'Interviews',       'icon' => 'calendar', 'tone' => 'indigo', 'types' => ['interview']],
+                'messages'     => ['label' => 'Messages',         'icon' => 'chat',     'tone' => 'sky',    'types' => ['message']],
+                'ai'           => ['label' => 'AI Matches',       'icon' => 'sparkles', 'tone' => 'violet', 'types' => ['ai']],
+                'system'       => ['label' => 'Billing & System', 'icon' => 'shield',   'tone' => 'amber',  'types' => ['system', 'billing', 'payment', 'subscription']],
+            ];
+        }
+
+        return [
+            'interviews'   => ['label' => 'Interviews',       'icon' => 'calendar', 'tone' => 'indigo', 'types' => ['interview']],
+            'offers'       => ['label' => 'Offers',           'icon' => 'badge',    'tone' => 'green',  'types' => ['offer']],
+            'applications' => ['label' => 'Applications',     'icon' => 'document', 'tone' => 'blue',   'types' => ['application']],
+            'messages'     => ['label' => 'Messages',         'icon' => 'chat',     'tone' => 'sky',    'types' => ['message']],
+            'ai'           => ['label' => 'AI & Career',      'icon' => 'sparkles', 'tone' => 'violet', 'types' => ['ai']],
+            'system'       => ['label' => 'Account & System', 'icon' => 'shield',   'tone' => 'amber',  'types' => ['system', 'billing', 'payment', 'subscription']],
+        ];
+    }
+
+    /**
+     * Normalise raw notifications (DB rows or session fallback) into the shape
+     * the shared Notification Center component expects. Newest first.
+     */
+    public static function presentNotifications(array $raw, string $userRole): array
+    {
+        $categories = self::notificationCategories($userRole);
+        $typeToCategory = [];
+        foreach ($categories as $key => $cat) {
+            foreach ($cat['types'] as $t) {
+                $typeToCategory[$t] = $key;
+            }
+        }
+
+        $actionLabels = $userRole === 'employer'
+            ? ['application' => 'Review candidate', 'interview' => 'View interview', 'message' => 'Open conversation', 'ai' => 'View AI matches']
+            : ['application' => 'Track application', 'interview' => 'View interview', 'offer' => 'Review offer', 'message' => 'Open conversation', 'ai' => 'Explore roles'];
+        $fallbackUrl = url($userRole === 'employer' ? '/employer/notifications' : '/candidate/notifications');
+
+        $now = time();
+        $todayStart = strtotime('today', $now);
+        $yesterdayStart = strtotime('yesterday', $now);
+        $weekStart = strtotime('-6 days', $todayStart);
+
+        $items = [];
+        foreach ($raw as $n) {
+            $type = (string)($n['type'] ?? 'system');
+            $ts = !empty($n['created_at']) ? strtotime((string)$n['created_at']) : false;
+            if ($ts === false) {
+                $ts = $now;
+            }
+
+            $diff = max(0, $now - $ts);
+            if ($diff < 60) {
+                $timeLabel = 'Just now';
+            } elseif ($diff < 3600) {
+                $timeLabel = floor($diff / 60) . 'm ago';
+            } elseif ($ts >= $todayStart) {
+                $timeLabel = floor($diff / 3600) . 'h ago';
+            } elseif ($ts >= $yesterdayStart) {
+                $timeLabel = 'Yesterday';
+            } elseif ($ts >= $weekStart) {
+                $timeLabel = date('D', $ts);
+            } else {
+                $timeLabel = date('M j', $ts) . (date('Y', $ts) !== date('Y', $now) ? ', ' . date('Y', $ts) : '');
+            }
+
+            if ($ts >= $todayStart) {
+                $group = 'today';
+            } elseif ($ts >= $yesterdayStart) {
+                $group = 'yesterday';
+            } elseif ($ts >= $weekStart) {
+                $group = 'week';
+            } else {
+                $group = 'earlier';
+            }
+
+            $items[] = [
+                'id'           => (int)($n['id'] ?? 0),
+                'type'         => $type,
+                'category'     => $typeToCategory[$type] ?? 'system',
+                'title'        => (string)($n['title'] ?? 'Platform update'),
+                'body'         => (string)($n['message'] ?? ($n['body'] ?? ($n['desc'] ?? ''))),
+                'timestamp'    => $ts,
+                'time_label'   => $timeLabel,
+                'full_time'    => date('D, M j, Y \a\t g:i A', $ts),
+                'group'        => $group,
+                'is_read'      => !empty($n['is_read']),
+                'action_url'   => !empty($n['action_url']) ? (string)$n['action_url'] : (!empty($n['link']) ? (string)$n['link'] : $fallbackUrl),
+                'action_label' => (string)($n['link_label'] ?? ($actionLabels[$type] ?? 'View details')),
+            ];
+        }
+
+        usort($items, static fn ($a, $b) => [$b['timestamp'], $b['id']] <=> [$a['timestamp'], $a['id']]);
+
+        return $items;
     }
 
     /**
@@ -426,7 +561,7 @@ class CommunicationService
             'company_name'     => $data['company_name'] ?? 'Nexura Technologies',
             'interviewer_name' => $data['interviewer_name'] ?? 'Tunde Bakare',
             'meeting_type'     => $data['meeting_type'] ?? 'virtual',
-            'meeting_link'     => $data['meeting_link'] ?? 'https://meet.google.com/nxt-uxin-2026',
+            'meeting_link'     => $data['meeting_link'] ?? url('/candidate/interview/room/' . (int)($data['candidate_id'] ?? 1)),
             'interview_date'   => $data['date'] ?? '10/26/2026',
             'interview_time'   => $data['time'] ?? '02:30 PM',
             'duration'         => $data['duration'] ?? '45 mins',

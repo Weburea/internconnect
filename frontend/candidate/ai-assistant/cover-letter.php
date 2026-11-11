@@ -433,6 +433,214 @@ $candSkills   = $candidate['skills'] ?? ['Figma', 'UI Design', 'Wireframing', 'U
     background: #FFFFFF;
     box-shadow: 0 0 0 3px rgba(79, 72, 230, 0.1);
 }
+/* Active edit toggle */
+.cl-tool-btn.is-active {
+    background: #EEF2FF;
+    border-color: #C7D2FE;
+    color: #4F48E6;
+}
+
+.cl-tool-btn.is-primary {
+    background: #4F48E6;
+    border-color: #4F48E6;
+    color: #FFFFFF;
+}
+
+.cl-tool-btn.is-primary:hover:not(:disabled) {
+    background: #4338CA;
+    border-color: #4338CA;
+}
+
+.cl-tool-btn:disabled {
+    opacity: 0.7;
+    cursor: progress;
+}
+
+/* Download menu */
+.cl-download {
+    position: relative;
+}
+
+.cl-download-chevron {
+    transition: transform 0.2s ease;
+}
+
+.cl-tool-btn.is-open .cl-download-chevron {
+    transform: rotate(180deg);
+}
+
+.cl-download-menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    width: 264px;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+    padding: 6px;
+    z-index: 30;
+}
+
+.cl-download-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px;
+    border: 0;
+    background: transparent;
+    border-radius: 9px;
+    cursor: pointer;
+    text-align: left;
+    font: inherit;
+}
+
+.cl-download-item:hover {
+    background: #F8FAFC;
+}
+
+.cl-file-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+}
+
+.cl-file-icon.is-pdf {
+    background: #FEF2F2;
+    color: #DC2626;
+}
+
+.cl-file-icon.is-doc {
+    background: #EFF6FF;
+    color: #2563EB;
+}
+
+.cl-download-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.cl-download-text strong {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #0F172A;
+}
+
+.cl-download-text span {
+    font-size: 11.5px;
+    color: #64748B;
+}
+
+/* Header + layout polish */
+.cl-header {
+    align-items: flex-end;
+}
+
+.cl-workspace-grid > .cl-card {
+    position: sticky;
+    top: 84px;
+}
+
+@media (max-width: 1100px) {
+    .cl-workspace-grid > .cl-card {
+        position: static;
+    }
+}
+
+@media (max-width: 1280px) and (min-width: 1101px) {
+    .cl-workspace-grid {
+        grid-template-columns: 360px minmax(0, 1fr);
+    }
+}
+
+.cl-keywords {
+    margin-top: 28px;
+    padding-top: 16px;
+    border-top: 1px solid #F1F5F9;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.cl-keywords-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748B;
+}
+
+.cl-keyword-list {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.cl-keyword {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 6px;
+    background: #EEF2FF;
+    color: #4F48E6;
+    white-space: nowrap;
+}
+
+/* Mobile: tidy toolbar into an even grid */
+@media (max-width: 640px) {
+    .cl-preview-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .cl-actions {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+    }
+
+    .cl-actions .cl-tool-btn {
+        width: 100%;
+        justify-content: center !important;
+        padding: 9px 6px;
+        font-size: 11.5px;
+    }
+
+    .cl-download-chevron {
+        display: none;
+    }
+
+    .cl-download-menu {
+        width: min(264px, calc(100vw - 48px));
+    }
+
+    .cl-keywords {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .cl-textarea-edit {
+        min-height: 320px;
+    }
+}
+
+@media (max-width: 380px) {
+    .cl-actions .cl-tool-btn svg:first-child {
+        display: none;
+    }
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
 
 <script>
@@ -443,7 +651,10 @@ window.__COVER_LETTER_INIT__ = <?= json_encode([
     'activeJobId'  => (int)$targetJobs[0]['id'],
     'letter'       => $initialLetter,
     'editableText' => $initialLetter['full_letter'],
-    'generateUrl'  => url('/candidate/ai-assistant/cover-letter/generate')
+    'generateUrl'  => url('/candidate/ai-assistant/cover-letter/generate'),
+    'candidateName'=> $candName,
+    'jspdfUrl'     => asset('assets/js/jspdf.umd.min.js'),
+    'jszipUrl'     => asset('assets/js/jszip.min.js')
 ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
 
 function coverLetterComponent() {
@@ -490,6 +701,7 @@ function coverLetterComponent() {
                 if (data.success && data.letter) {
                     this.letter = data.letter;
                     this.editableText = data.letter.full_letter;
+                    this.isEditing = false;
                     window.dispatchEvent(new CustomEvent('show-toast', {
                         detail: { text: 'Cover letter updated with ' + this.tone + ' tone!', type: 'success' }
                     }));
@@ -502,7 +714,7 @@ function coverLetterComponent() {
         },
 
         copyToClipboard() {
-            const textToCopy = this.isEditing ? this.editableText : this.letter.full_letter;
+            const textToCopy = this.currentText();
             navigator.clipboard.writeText(textToCopy).then(() => {
                 this.copied = true;
                 setTimeout(() => { this.copied = false; }, 2500);
@@ -512,17 +724,199 @@ function coverLetterComponent() {
             });
         },
 
-        downloadText() {
-            const text = this.isEditing ? this.editableText : this.letter.full_letter;
-            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        downloadOpen: false,
+        exporting: '',
+
+        toggleEditing() {
+            if (this.isEditing) {
+                this.applyEdits();
+            } else {
+                this.editableText = this.letter.full_letter || '';
+            }
+            this.isEditing = !this.isEditing;
+        },
+
+        // Push in-place edits back into the rendered letter so preview, copy and downloads match.
+        applyEdits() {
+            const text = (this.editableText || '').replace(/\r\n/g, '\n').trim();
+            if (!text) return;
+            const blocks = text.split(/\n\s*\n/).map((b) => b.trim()).filter(Boolean);
+            const letter = Object.assign({}, this.letter, { full_letter: text });
+            if (blocks.length >= 3) {
+                letter.salutation = blocks[0];
+                letter.signoff = blocks[blocks.length - 1];
+                letter.paragraphs = blocks.slice(1, -1);
+            } else {
+                letter.salutation = '';
+                letter.signoff = '';
+                letter.paragraphs = blocks;
+            }
+            const words = text.split(/\s+/).filter(Boolean).length;
+            letter.word_count = words;
+            letter.read_time_min = Math.max(1, Math.round(words / 200));
+            this.letter = letter;
+        },
+
+        currentText() {
+            return ((this.isEditing ? this.editableText : this.letter.full_letter) || '').replace(/\r\n/g, '\n').trim();
+        },
+
+        fileBase() {
+            return 'Cover_Letter_' + (this.company || 'Company').replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+        },
+
+        loadScript(src, globalName) {
+            if (window[globalName]) return Promise.resolve();
+            return new Promise((resolve, reject) => {
+                const s = document.createElement('script');
+                s.src = src;
+                s.onload = () => resolve();
+                s.onerror = () => reject(new Error('Could not load ' + src));
+                document.head.appendChild(s);
+            });
+        },
+
+        saveBlob(blob, filename) {
             const u = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = u;
-            a.download = 'Cover_Letter_' + this.company.replace(/[^a-zA-Z0-9]/g, '_') + '.txt';
+            a.download = filename;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            URL.revokeObjectURL(u);
+            setTimeout(() => URL.revokeObjectURL(u), 1000);
+        },
+
+        async download(format) {
+            this.downloadOpen = false;
+            if (this.exporting) return;
+            this.exporting = format;
+            try {
+                if (format === 'pdf') {
+                    await this.downloadPdf();
+                } else {
+                    await this.downloadDocx();
+                }
+                window.dispatchEvent(new CustomEvent('show-toast', {
+                    detail: { text: 'Cover letter downloaded as ' + (format === 'pdf' ? 'PDF' : 'Word document') + '.', type: 'success' }
+                }));
+            } catch (e) {
+                console.error('Cover letter export failed', e);
+                window.dispatchEvent(new CustomEvent('show-toast', {
+                    detail: { text: 'Download failed. Please try again.', type: 'error' }
+                }));
+            } finally {
+                this.exporting = '';
+            }
+        },
+
+        letterBlocks() {
+            return this.currentText().split(/\n\s*\n/).map((b) => b.trim()).filter(Boolean);
+        },
+
+        todayLabel() {
+            return new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+        },
+
+        async downloadPdf() {
+            await this.loadScript(init.jspdfUrl, 'jspdf');
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+            const pageW = doc.internal.pageSize.getWidth();
+            const pageH = doc.internal.pageSize.getHeight();
+            const margin = 64;
+            const maxW = pageW - margin * 2;
+            const lineH = 16.5;
+            let y = margin;
+
+            const ensureSpace = (h) => {
+                if (y + h > pageH - margin) { doc.addPage(); y = margin; }
+            };
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(15);
+            doc.setTextColor(15, 23, 42);
+            doc.text(init.candidateName || '', margin, y);
+            y += 18;
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            doc.setTextColor(100, 116, 139);
+            doc.text(this.todayLabel(), margin, y);
+            y += 14;
+            doc.setDrawColor(226, 232, 240);
+            doc.line(margin, y, pageW - margin, y);
+            y += 28;
+
+            const blocks = this.letterBlocks();
+            doc.setFontSize(11);
+            blocks.forEach((block, i) => {
+                const isEdge = blocks.length >= 3 && (i === 0 || i === blocks.length - 1);
+                doc.setFont('helvetica', isEdge ? 'bold' : 'normal');
+                doc.setTextColor(isEdge ? 15 : 51, isEdge ? 23 : 65, isEdge ? 42 : 85);
+                const lines = [];
+                block.split('\n').forEach((ln) => lines.push(...doc.splitTextToSize(ln, maxW)));
+                lines.forEach((ln) => {
+                    ensureSpace(lineH);
+                    doc.text(ln, margin, y);
+                    y += lineH;
+                });
+                y += i === blocks.length - 2 ? 16 : 10;
+            });
+
+            doc.save(this.fileBase() + '.pdf');
+        },
+
+        async downloadDocx() {
+            await this.loadScript(init.jszipUrl, 'JSZip');
+            const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            const run = (text, bold, color, size) =>
+                '<w:r><w:rPr>' + (bold ? '<w:b/>' : '') + (color ? '<w:color w:val="' + color + '"/>' : '') +
+                (size ? '<w:sz w:val="' + size + '"/><w:szCs w:val="' + size + '"/>' : '') +
+                '</w:rPr><w:t xml:space="preserve">' + esc(text) + '</w:t></w:r>';
+            const para = (block, bold, after, color, size) => {
+                const lines = block.split('\n');
+                const runs = lines.map((ln, i) => (i ? '<w:r><w:br/></w:r>' : '') + run(ln, bold, color, size)).join('');
+                return '<w:p><w:pPr><w:spacing w:after="' + after + '" w:line="300" w:lineRule="auto"/></w:pPr>' + runs + '</w:p>';
+            };
+
+            const blocks = this.letterBlocks();
+            let body = para(init.candidateName || '', true, 40, '0F172A', 30);
+            body += para(this.todayLabel(), false, 360, '64748B', 20);
+            blocks.forEach((block, i) => {
+                const isEdge = blocks.length >= 3 && (i === 0 || i === blocks.length - 1);
+                body += para(block, isEdge, i === blocks.length - 2 ? 320 : 200, isEdge ? '0F172A' : '334155');
+            });
+
+            const documentXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+                '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>' + body +
+                '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1300" w:right="1300" w:bottom="1300" w:left="1300" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr>' +
+                '</w:body></w:document>';
+            const stylesXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+                '<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr>' +
+                '<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:eastAsia="Calibri" w:cs="Calibri"/><w:sz w:val="22"/><w:szCs w:val="22"/><w:lang w:val="en-GB"/>' +
+                '</w:rPr></w:rPrDefault></w:docDefaults></w:styles>';
+
+            const zip = new window.JSZip();
+            zip.file('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+                '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+                '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+                '<Default Extension="xml" ContentType="application/xml"/>' +
+                '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>' +
+                '<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>' +
+                '</Types>');
+            zip.file('_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+                '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+                '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>' +
+                '</Relationships>');
+            zip.file('word/_rels/document.xml.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+                '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+                '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>' +
+                '</Relationships>');
+            zip.file('word/document.xml', documentXml);
+            zip.file('word/styles.xml', stylesXml);
+
+            const blob = await zip.generateAsync({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+            this.saveBlob(blob, this.fileBase() + '.docx');
         }
     };
 }
@@ -670,7 +1064,7 @@ function coverLetterComponent() {
 
                             <div class="cl-actions">
                                 <!-- In-place edit toggle -->
-                                <button type="button" class="cl-tool-btn" @click="isEditing = !isEditing">
+                                <button type="button" class="cl-tool-btn" :class="{ 'is-active': isEditing }" @click="toggleEditing()">
                                     <svg style="width: 13px; height: 13px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                     </svg>
@@ -688,13 +1082,38 @@ function coverLetterComponent() {
                                     <span x-text="copied ? 'Copied!' : 'Copy Letter'"></span>
                                 </button>
 
-                                <!-- Download TXT -->
-                                <button type="button" class="cl-tool-btn" @click="downloadText()">
-                                    <svg style="width: 13px; height: 13px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                                    </svg>
-                                    <span>Download</span>
-                                </button>
+                                <!-- Download menu: PDF or Word -->
+                                <div class="cl-download" @click.outside="downloadOpen = false" @keydown.escape.window="downloadOpen = false">
+                                    <button type="button" class="cl-tool-btn is-primary" :class="{ 'is-open': downloadOpen }" @click="downloadOpen = !downloadOpen" aria-haspopup="menu" :aria-expanded="downloadOpen" :disabled="!!exporting">
+                                        <svg x-show="!exporting" style="width: 13px; height: 13px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                        </svg>
+                                        <svg x-show="exporting" style="display: none; width: 13px; height: 13px; animation: spin 1s linear infinite;" fill="none" viewBox="0 0 24 24">
+                                            <circle style="opacity: 0.25;" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path style="opacity: 0.75;" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                                        </svg>
+                                        <span x-text="exporting ? 'Preparing...' : 'Download'">Download</span>
+                                        <svg class="cl-download-chevron" style="width: 12px; height: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </button>
+                                    <div x-show="downloadOpen" x-transition.opacity.duration.150ms class="cl-download-menu" role="menu" style="display: none;">
+                                        <button type="button" class="cl-download-item" role="menuitem" @click="download('pdf')">
+                                            <span class="cl-file-icon is-pdf">PDF</span>
+                                            <span class="cl-download-text">
+                                                <strong>PDF document</strong>
+                                                <span>Best for uploading and emailing</span>
+                                            </span>
+                                        </button>
+                                        <button type="button" class="cl-download-item" role="menuitem" @click="download('docx')">
+                                            <span class="cl-file-icon is-doc">DOC</span>
+                                            <span class="cl-download-text">
+                                                <strong>Word document (.docx)</strong>
+                                                <span>Editable in Word or Google Docs</span>
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -713,13 +1132,11 @@ function coverLetterComponent() {
                         </div>
 
                         <!-- Highlighted Matched Skills Shelf -->
-                        <div style="margin-top: 28px; padding-top: 16px; border-top: 1px solid #F1F5F9; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-                            <div style="font-size: 12px; font-weight: 700; color: #64748B;">
-                                AI Verified Keywords Integrated:
-                            </div>
-                            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                        <div class="cl-keywords">
+                            <div class="cl-keywords-label">AI Verified Keywords Integrated:</div>
+                            <div class="cl-keyword-list">
                                 <template x-for="(sk, sIdx) in letter.matched_skills" :key="sIdx">
-                                    <span style="font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 6px; background: #EEF2FF; color: #4F48E6; border: 1px solid #C7D2FE;" x-text="sk"></span>
+                                    <span class="cl-keyword" x-text="sk"></span>
                                 </template>
                             </div>
                         </div>

@@ -20,7 +20,40 @@ declare(strict_types=1);
  */
 ?>
 
-<link rel="stylesheet" href="<?= asset('assets/css/employer-candidates.css') ?>">
+<link rel="stylesheet" href="<?= asset('assets/css/employer-candidates.css') ?>?v=<?= time() ?>">
+
+<style>
+    /* Cloudinary Graphic Tinting for AI Suggested Time Box */
+    .emp-ai-suggest-box {
+        background: linear-gradient(135deg, #F8FAFC 55%, #EEF2FF 100%) !important;
+        border-radius: 14px !important;
+        border: 1px solid #E2E8F0 !important;
+        padding: 18px !important;
+        margin-bottom: 14px !important;
+        position: relative !important;
+        overflow: hidden !important;
+    }
+    .emp-ai-suggest-box::after {
+        content: '' !important;
+        position: absolute !important;
+        top: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 52% !important;
+        background-image: url('https://res.cloudinary.com/weburea/image/upload/v1790982394/inter_1_ikbjo1.png') !important;
+        background-repeat: no-repeat !important;
+        background-position: right center !important;
+        background-size: cover !important;
+        opacity: 0.22 !important;
+        mix-blend-mode: multiply !important;
+        pointer-events: none !important;
+        z-index: 1 !important;
+    }
+    .emp-ai-suggest-box > * {
+        position: relative !important;
+        z-index: 2 !important;
+    }
+</style>
 
 <div class="db-shell">
 
@@ -40,6 +73,15 @@ declare(strict_types=1);
         <div class="db-content">
             <div class="emp-cand-page" 
                  x-data="interviewSchedulerManager(<?= htmlspecialchars(json_encode($candidate), ENT_QUOTES, 'UTF-8') ?>)">
+
+                <!-- ── 0. Breadcrumbs ── -->
+                <div class="emp-breadcrumbs" style="font-size: 13.5px; color: #64748B; margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                    <a href="<?= url('/employer/interviews') ?>" style="color: #4F48E6; text-decoration: none; font-weight: 500;">Candidates</a>
+                    <span style="color: #94A3B8;">/</span>
+                    <a :href="'<?= url('/employer/candidate/') ?>' + candidate.id" style="color: #64748B; text-decoration: none; font-weight: 500;">Profile information</a>
+                    <span style="color: #94A3B8;">/</span>
+                    <span style="color: #0F172A; font-weight: 600;">Schedule interview</span>
+                </div>
 
                 <!-- ── 1. Page Header ── -->
                 <div class="emp-sched-header">
@@ -61,8 +103,9 @@ declare(strict_types=1);
                             </div>
                             <div class="emp-sched-cand-role" x-text="candidate.role || 'Frontend Developer'">Frontend Developer</div>
                             <div class="emp-sched-match-tag">
-                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                <svg style="width: 14px; height: 14px; flex-shrink: 0;" viewBox="0 0 74 83" fill="currentColor">
+                                    <path d="M73.74 32.4627V59.9427C67.93 59.7673 62.2767 61.8422 57.9596 65.7344C53.6426 69.6267 50.9952 75.0356 50.57 80.8327C50.52 81.3027 50.48 81.8327 50.46 82.2827H23.57C23.57 82.0227 23.48 81.7627 23.43 81.5127C20.73 67.1427 16.41 63.2427 0 59.6527V32.6527C13.34 31.5727 27.12 37.6527 36.92 47.9327C46 38.3527 58.99 31.8927 73.74 32.4627Z"/>
+                                    <path d="M37.0001 0.0031237C40.4833 0.0367014 43.8785 1.10075 46.7578 3.06112C49.637 5.02149 51.8715 7.79043 53.1794 11.0188C54.4873 14.2473 54.8101 17.7906 54.1071 21.2023C53.4042 24.6139 51.7069 27.741 49.2293 30.1894C46.7516 32.6378 43.6046 34.2979 40.1849 34.9604C36.7652 35.6228 33.2259 35.258 30.0132 33.9119C26.8005 32.5658 24.0583 30.2987 22.1322 27.3963C20.2061 24.494 19.1824 21.0864 19.1901 17.6031C19.1737 15.2695 19.6247 12.9562 20.5166 10.7997C21.4084 8.64315 22.7231 6.68703 24.383 5.04669C26.0429 3.40635 28.0145 2.11499 30.1814 1.24877C32.3484 0.382549 34.6669 -0.040991 37.0001 0.0031237Z"/>
                                 </svg>
                                 <span>Match Score: <strong x-text="candidate.match_score + '%'">92%</strong></span>
                             </div>
@@ -238,12 +281,13 @@ declare(strict_types=1);
                                 </div>
                             </div>
 
-                            <!-- Auto Schedule Button -->
+                            <!-- Auto Schedule Button with Jenny AI Mark -->
                             <button type="button" 
                                     class="emp-ai-auto-btn"
                                     @click="autoSchedule()">
-                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                <svg style="width: 14px; height: 14px; flex-shrink: 0;" viewBox="0 0 74 83" fill="currentColor">
+                                    <path d="M73.74 32.4627V59.9427C67.93 59.7673 62.2767 61.8422 57.9596 65.7344C53.6426 69.6267 50.9952 75.0356 50.57 80.8327C50.52 81.3027 50.48 81.8327 50.46 82.2827H23.57C23.57 82.0227 23.48 81.7627 23.43 81.5127C20.73 67.1427 16.41 63.2427 0 59.6527V32.6527C13.34 31.5727 27.12 37.6527 36.92 47.9327C46 38.3527 58.99 31.8927 73.74 32.4627Z"/>
+                                    <path d="M37.0001 0.0031237C40.4833 0.0367014 43.8785 1.10075 46.7578 3.06112C49.637 5.02149 51.8715 7.79043 53.1794 11.0188C54.4873 14.2473 54.8101 17.7906 54.1071 21.2023C53.4042 24.6139 51.7069 27.741 49.2293 30.1894C46.7516 32.6378 43.6046 34.2979 40.1849 34.9604C36.7652 35.6228 33.2259 35.258 30.0132 33.9119C26.8005 32.5658 24.0583 30.2987 22.1322 27.3963C20.2061 24.494 19.1824 21.0864 19.1901 17.6031C19.1737 15.2695 19.6247 12.9562 20.5166 10.7997C21.4084 8.64315 22.7231 6.68703 24.383 5.04669C26.0429 3.40635 28.0145 2.11499 30.1814 1.24877C32.3484 0.382549 34.6669 -0.040991 37.0001 0.0031237Z"/>
                                 </svg>
                                 <span>AUTO SCHEDULE</span>
                             </button>
@@ -399,6 +443,22 @@ function interviewSchedulerManager(initialCandidate) {
         confirmSchedule() {
             this.showSuccessModal = true;
             this.countdown = 5;
+
+            fetch('<?= url('/employer/interviews/schedule') ?>', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify({
+                    candidate_id: this.candidate.id || 1,
+                    candidate_name: this.candidate.name,
+                    candidate_role: this.candidate.role,
+                    meeting_type: this.meetingType,
+                    meeting_link: this.meetingLink,
+                    date: this.interviewDate,
+                    time: this.interviewTime,
+                    duration: this.duration,
+                    notes: this.notes
+                })
+            }).catch(err => console.error('Failed to schedule interview:', err));
 
             if (this.countdownTimer) {
                 clearInterval(this.countdownTimer);

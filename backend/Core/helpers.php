@@ -40,6 +40,11 @@ if (!function_exists('asset')) {
             if (str_starts_with($cleanPath, 'assets/images/')) {
                 $subPath = substr($cleanPath, strlen('assets/images/'));
 
+                // Local test / dummy documents under dummb/ must never route to Cloudinary
+                if (str_starts_with($subPath, 'dummb/')) {
+                    return url($path);
+                }
+
                 // Specific logo asset mappings per brand guidelines
                 if ($subPath === 'logos/Logo_dark_dx00tg.svg' || $subPath === 'logos/logo_color_name.svg') {
                     return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1785517289/Logo_dark_dx00tg.svg";
@@ -67,6 +72,11 @@ if (!function_exists('asset')) {
                 if ($subPath === 'homepage_icon_margin.png') {
                     return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1785645693/internConnect/images/homepage_icon_margin.png";
                 }
+                // Homepage hero banner illustration
+                if ($subPath === 'internconnect_banner_img.png' || $subPath === 'internconnect_banner_img_ik0cyy.png' || $subPath === 'internconnect_banner_qkshpt.png') {
+                    return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1790719321/internconnect_banner_img_ik0cyy.png";
+                }
+
                 // Homepage hero illustration (Our Mission section)
                 if ($subPath === 'homepage_hero_illustration_bnhu4c.png') {
                     return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1785564352/homepage_hero_illustration_bnhu4c.png";
@@ -106,6 +116,58 @@ if (!function_exists('asset')) {
                 }
                 if ($subPath === 'jenny_ai/Full-body_standing_pose_jenny_ai.png' || $subPath === 'Full-body_standing_pose_jenny_ai.png') {
                     return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1790296516/internConnect/images/jenny_ai/Full-body_standing_pose_jenny_ai.png";
+                }
+
+                // Student portraits & avatars
+                if ($subPath === 'learning_student_beanbag.png' || $subPath === 'company/learning_student_beanbag.png') {
+                    return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1793377311/internConnect/images/company/learning_student_beanbag.png";
+                }
+                if ($subPath === 'ipad_e-learn-removebg-preview_zjxx87.png' || $subPath === 'company/ipad_e-learn-removebg-preview_zjxx87.png') {
+                    return "https://res.cloudinary.com/weburea/image/upload/v1793383654/ipad_e-learn-removebg-preview_zjxx87.png";
+                }
+                if ($subPath === 'ipad_e-learn_aamnea.png' || $subPath === 'company/ipad_e-learn_aamnea.png') {
+                    return "https://res.cloudinary.com/weburea/image/upload/v1793382018/ipad_e-learn_aamnea.png";
+                }
+                if ($subPath === 'welcome_smiling_woman.png') {
+                    return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1785645753/internConnect/images/welcome_smiling_woman.png";
+                }
+                if ($subPath === 'profile.png' || $subPath === 'student_profile_avatar.png') {
+                    return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1793376037/internConnect/images/student_profile_avatar.png";
+                }
+
+                // How-it-Works and Showcase Mockups (Company & Platform Suite)
+                if ($subPath === 'company/holding_phone_jenny_ai.png' || $subPath === 'holding_phone_jenny_ai.png') {
+                    return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1793110800/internConnect/images/company/holding_phone_jenny_ai.png";
+                }
+                if ($subPath === 'company/internconnect_website_browser_mockup.png' || $subPath === 'internconnect_website_browser_mockup.png') {
+                    return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1793110768/internConnect/images/company/internconnect_website_browser_mockup.png";
+                }
+                if ($subPath === 'company/internconnect_multi_device_mockup.png' || $subPath === 'internconnect_multi_device_mockup.png') {
+                    return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1793110727/internConnect/images/company/internconnect_multi_device_mockup.png";
+                }
+                if ($subPath === 'company/internconnect_ipad_on_chair.webp' || $subPath === 'internconnect_ipad_on_chair.webp') {
+                    return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1793110830/internConnect/images/company/internconnect_ipad_on_chair.webp";
+                }
+                if ($subPath === 'company/internconnect_ipad_mockup.png' || $subPath === 'internconnect_ipad_mockup.png') {
+                    return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1793110858/internConnect/images/company/internconnect_ipad_mockup.png";
+                }
+                if ($subPath === 'company/internconnect_laptop_dark_testimonials.webp' || $subPath === 'internconnect_laptop_dark_testimonials.webp') {
+                    return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1793110888/internConnect/images/company/internconnect_laptop_dark_testimonials.webp";
+                }
+                if ($subPath === 'company/ipad_Scheduling_Interview_yfgy0h.png' || $subPath === 'ipad_Scheduling_Interview_yfgy0h.png') {
+                    return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1793420191/ipad_Scheduling_Interview_yfgy0h.png";
+                }
+                if ($subPath === 'company/Corporate_Legitimacy_image_ninwep.png' || $subPath === 'Corporate_Legitimacy_image_ninwep.png') {
+                    return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1793420623/Corporate_Legitimacy_image_ninwep.png";
+                }
+                if ($subPath === 'company/AI_Optimization_Screening_Rules_tn60ad.png' || $subPath === 'AI_Optimization_Screening_Rules_tn60ad.png') {
+                    return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1793421304/AI_Optimization_Screening_Rules_tn60ad.png";
+                }
+                if ($subPath === 'company/Match_Score_brqqxk.png' || $subPath === 'Match_Score_brqqxk.png') {
+                    return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1793421523/Match_Score_brqqxk.png";
+                }
+                if ($subPath === 'company/Schedule_Interviews_cllzqd.png' || $subPath === 'Schedule_Interviews_cllzqd.png') {
+                    return "https://res.cloudinary.com/{$cloudinaryCloudName}/image/upload/v1793421867/Schedule_Interviews_cllzqd.png";
                 }
 
                 // If it starts with logos/, map to logo/ (singular)
@@ -263,4 +325,26 @@ if (!function_exists('render_pagination')) {
         return ob_get_clean() ?: '';
     }
 }
+
+if (!function_exists('seo')) {
+    function seo(): \App\Services\SeoService
+    {
+        return \App\Services\SeoService::getInstance();
+    }
+}
+
+if (!function_exists('seo_render_head')) {
+    function seo_render_head(?string $fallbackTitle = null, ?string $fallbackDesc = null): string
+    {
+        $service = \App\Services\SeoService::getInstance();
+        if ($fallbackTitle !== null) {
+            $service->setTitle($fallbackTitle);
+        }
+        if ($fallbackDesc !== null) {
+            $service->setDescription($fallbackDesc);
+        }
+        return $service->render();
+    }
+}
+
 

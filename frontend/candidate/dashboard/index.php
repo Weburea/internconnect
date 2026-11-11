@@ -69,118 +69,878 @@ $avatar    = $candidate['avatar'] ?? null;
                 <?php endforeach; ?>
             </div>
 
-            <!-- ── Middle Row ── -->
-            <div class="db-mid-row">
+            <!-- ── Middle Row: Your Application Pipeline & Profile / Pro Career Insights ── -->
+            <div class="db-mid-row" x-data="{ 
+                isProfileComplete: <?= ($candidate['profile_pct'] ?? 75) >= 100 ? 'true' : 'false' ?>, 
+                isPro: <?= !empty($candidate['is_pro']) ? 'true' : 'false' ?> 
+            }">
                 <style>
-                .db-chart-col {
+                /* ── Pipeline Card Styling ── */
+                .cand-pipeline-card {
+                    background: linear-gradient(135deg, #3730A3 0%, #4338CA 55%, #4F48E6 100%);
+                    border-radius: 20px;
+                    padding: 28px 30px;
+                    color: #FFFFFF;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    box-shadow: 0 10px 25px -4px rgba(67, 56, 202, 0.28);
+                    position: relative;
+                    overflow: hidden;
+                    min-width: 0;
+                    box-sizing: border-box;
+                }
+                .cand-pipeline-top {
+                    display: flex;
+                    align-items: flex-start;
+                    justify-content: space-between;
+                    gap: 16px;
+                    margin-bottom: 24px;
+                }
+                .cand-pipeline-title {
+                    font-size: 22px;
+                    font-weight: 800;
+                    color: #FFFFFF;
+                    margin: 0 0 6px;
+                    letter-spacing: -0.01em;
+                    line-height: 1.25;
+                }
+                .cand-pipeline-sub {
+                    font-size: 13.5px;
+                    color: rgba(255, 255, 255, 0.88);
+                    margin: 0;
+                    line-height: 1.5;
+                    max-width: 500px;
+                }
+                .cand-pipeline-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    background: rgba(255, 255, 255, 0.16);
+                    border: 1px solid rgba(255, 255, 255, 0.28);
+                    border-radius: 9999px;
+                    padding: 5px 12px;
+                    font-size: 11.5px;
+                    font-weight: 700;
+                    color: #FFFFFF;
+                    white-space: nowrap !important;
+                    flex-shrink: 0 !important;
+                    backdrop-filter: blur(6px);
+                }
+                .cand-pipeline-bars {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 16px;
+                    margin-bottom: 26px;
+                }
+                .cand-pipeline-row {
+                    display: flex;
+                    align-items: center;
+                    gap: 16px;
+                    min-width: 0;
+                }
+                .cand-pipeline-label {
+                    width: 105px;
+                    font-size: 14px;
+                    font-weight: 700;
+                    color: #FFFFFF;
+                    flex-shrink: 0;
+                }
+                .cand-pipeline-bar-col {
+                    flex: 1;
+                    min-width: 0;
+                    display: flex;
+                    flex-direction: column;
+                }
+                .cand-pipeline-track {
+                    width: 100%;
+                    height: 32px;
+                    background: rgba(255, 255, 255, 0.18);
+                    border-radius: 9px;
+                    overflow: hidden;
+                    display: flex;
+                }
+                .cand-pipeline-track.is-full {
+                    background: #FFFFFF;
+                }
+                .cand-pipeline-fill.is-white {
+                    background: #FFFFFF;
+                    height: 100%;
+                    border-radius: 9px;
+                }
+                .cand-pipeline-fill.is-lavender {
+                    background: rgba(255, 255, 255, 0.62);
+                    height: 100%;
+                    border-radius: 9px;
+                    transition: width 0.4s ease;
+                }
+                .cand-pipeline-meta {
+                    font-size: 11px;
+                    color: rgba(255, 255, 255, 0.78);
+                    text-align: right;
+                    margin-top: 4px;
+                    font-weight: 500;
+                }
+                .cand-pipeline-val {
+                    width: 32px;
+                    text-align: right;
+                    font-size: 19px;
+                    font-weight: 800;
+                    color: #FFFFFF;
+                    flex-shrink: 0;
+                }
+                .cand-pipeline-actions {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    flex-wrap: wrap;
+                }
+                .cand-pipeline-btn-primary {
+                    background: #FFFFFF;
+                    color: #4338CA !important;
+                    font-size: 13.5px;
+                    font-weight: 700;
+                    padding: 10px 20px;
+                    border-radius: 12px;
+                    text-decoration: none;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    white-space: nowrap !important;
+                    flex-shrink: 0 !important;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                    transition: transform 0.15s ease, background 0.15s ease;
+                }
+                .cand-pipeline-btn-primary:hover {
+                    background: #F8FAFC;
+                    transform: translateY(-1px);
+                }
+                .cand-pipeline-btn-secondary {
+                    background: rgba(255, 255, 255, 0.12);
+                    color: #FFFFFF !important;
+                    border: 1px solid rgba(255, 255, 255, 0.28);
+                    font-size: 13.5px;
+                    font-weight: 700;
+                    padding: 10px 20px;
+                    border-radius: 12px;
+                    text-decoration: none;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 8px;
+                    white-space: nowrap !important;
+                    flex-shrink: 0 !important;
+                    transition: background 0.15s ease;
+                }
+                .cand-pipeline-btn-secondary:hover {
+                    background: rgba(255, 255, 255, 0.2);
+                }
+
+                /* ── Pro Career Insights Card ── */
+                .db-mid-row {
+                    display: grid !important;
+                    grid-template-columns: minmax(0, 1.45fr) minmax(320px, 1fr) !important;
+                    gap: 20px !important;
+                    align-items: stretch;
+                }
+                .cand-insights-card {
+                    background: #FFFFFF;
+                    border: 1px solid #E2E8F0;
+                    border-radius: 20px;
+                    padding: 22px 20px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+                    position: relative;
+                    min-width: 0;
+                    box-sizing: border-box;
+                    overflow: hidden;
+                }
+                .cand-insights-header {
+                    margin-bottom: 20px;
+                }
+                .cand-insights-top {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 8px;
+                    margin-bottom: 6px;
+                    width: 100%;
+                    box-sizing: border-box;
+                }
+                .cand-insights-title {
+                    font-size: 14.5px !important;
+                    font-weight: 800 !important;
+                    color: #000623 !important;
+                    margin: 0 !important;
+                    letter-spacing: -0.01em !important;
+                    white-space: nowrap !important;
+                    line-height: 1.2 !important;
+                }
+                .cand-insights-sub {
+                    font-size: 12px;
+                    color: #64748B;
+                    line-height: 1.45;
+                    margin: 0;
+                }
+                .cand-pro-pill {
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    gap: 5px !important;
+                    padding: 3px 8px !important;
+                    border-radius: 9999px !important;
+                    font-size: 9.5px !important;
+                    font-weight: 800 !important;
+                    letter-spacing: 0.03em !important;
+                    white-space: nowrap !important;
+                    flex-shrink: 0 !important;
+                    cursor: pointer !important;
+                    transition: all 0.15s ease !important;
+                    border: 1px solid !important;
+                    line-height: 1.1 !important;
+                    text-transform: uppercase !important;
+                    outline: none !important;
+                }
+                .cand-pro-pill.is-pro {
+                    background: #EEF2FF !important;
+                    border-color: #C7D2FE !important;
+                    color: #4F46E5 !important;
+                }
+                .cand-pro-pill.is-pro:hover {
+                    background: #E0E7FF !important;
+                    border-color: #A5B4FC !important;
+                }
+                .cand-pro-pill.is-free {
+                    background: #F8FAFC !important;
+                    border-color: #E2E8F0 !important;
+                    color: #64748B !important;
+                }
+                .cand-pro-pill.is-free:hover {
+                    background: #F1F5F9 !important;
+                    border-color: #CBD5E1 !important;
+                }
+                .cand-pro-dot {
+                    width: 5px;
+                    height: 5px;
+                    border-radius: 50%;
+                    flex-shrink: 0;
+                    display: inline-block;
+                }
+                .cand-pro-pill.is-pro .cand-pro-dot {
+                    background: #4F46E5;
+                }
+                .cand-pro-pill.is-free .cand-pro-dot {
+                    background: #94A3B8;
+                }
+                .cand-metric-item {
+                    margin-bottom: 14px;
+                }
+                .cand-metric-head {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: #1E293B;
+                    margin-bottom: 6px;
+                }
+                .cand-metric-val {
+                    font-size: 13px;
+                    font-weight: 800;
+                }
+                .cand-metric-val.blue   { color: #4338CA; }
+                .cand-metric-val.green  { color: #059669; }
+                .cand-metric-val.orange { color: #EA580C; }
+
+                .cand-metric-track {
+                    width: 100%;
+                    height: 7px;
+                    background: #F1F5F9;
+                    border-radius: 9999px;
+                    overflow: hidden;
+                }
+                .cand-metric-bar {
+                    height: 100%;
+                    border-radius: 9999px;
+                    transition: width 0.6s ease;
+                }
+                .cand-metric-bar.blue   { background: #4338CA; }
+                .cand-metric-bar.green  { background: #10B981; }
+                .cand-metric-bar.orange { background: #F97316; }
+
+                /* Pro Locked Overlay */
+                .cand-pro-gated-wrap {
                     position: relative;
                 }
-                .cand-chart-tooltip {
+                .cand-pro-blurred {
+                    filter: blur(4px);
+                    opacity: 0.55;
+                    pointer-events: none;
+                    user-select: none;
+                }
+                .cand-pro-overlay {
                     position: absolute;
-                    top: -42px;
-                    left: 50%;
-                    transform: translateX(-50%) translateY(4px);
-                    background: #0F172A;
-                    color: #FFFFFF;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 10;
+                    padding: 8px;
+                }
+                .cand-upgrade-btn {
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    gap: 8px !important;
+                    background: #EEF2FF !important;
+                    color: #4338CA !important;
+                    border: 1.5px solid #C7D2FE !important;
+                    border-radius: 12px !important;
+                    padding: 10px 20px !important;
+                    font-size: 13.5px !important;
+                    font-weight: 700 !important;
+                    text-decoration: none !important;
+                    box-shadow: 0 4px 16px rgba(67, 56, 202, 0.12) !important;
+                    white-space: nowrap !important;
+                    flex-shrink: 0 !important;
+                    transition: all 0.2s ease !important;
+                }
+                .cand-upgrade-btn:hover {
+                    background: #E0E7FF !important;
+                    border-color: #A5B4FC !important;
+                    transform: translateY(-1px);
+                }
+
+                .cand-insights-link {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    color: #4338CA;
+                    font-size: 13px;
+                    font-weight: 700;
+                    text-decoration: none;
+                    margin-top: 12px;
+                    transition: color 0.15s ease;
+                }
+                .cand-insights-link:hover {
+                    color: #3730A3;
+                }
+
+                /* ─── AI Match Section Styles (Homepage Featured Opportunities Standard) ─── */
+                .ai-match-section {
+                    margin-top: 36px;
+                    width: 100%;
+                    box-sizing: border-box;
+                }
+                .ai-match-header-wrap {
+                    margin-bottom: 22px;
+                    display: flex;
+                    align-items: flex-end;
+                    justify-content: space-between;
+                    flex-wrap: wrap;
+                    gap: 16px;
+                }
+                .ai-match-eyebrow {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
                     font-size: 11px;
                     font-weight: 700;
-                    padding: 6px 12px;
-                    border-radius: 8px;
-                    white-space: nowrap;
-                    opacity: 0;
-                    visibility: hidden;
-                    transition: all 0.2s ease;
-                    pointer-events: none;
-                    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
-                    z-index: 30;
+                    color: #4F48E6;
+                    background: #EEF2FF;
+                    border: 1px solid #C7D2FE;
+                    border-radius: 9999px;
+                    padding: 3px 10px;
+                    margin-bottom: 6px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                    white-space: nowrap !important;
+                    flex-shrink: 0 !important;
                 }
-                .cand-chart-tooltip::after {
-                    content: '';
-                    position: absolute;
-                    bottom: -4px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    border-width: 5px 5px 0 5px;
-                    border-style: solid;
-                    border-color: #0F172A transparent transparent transparent;
+                .ai-match-title {
+                    font-size: 20px;
+                    font-weight: 800;
+                    color: #000623;
+                    margin: 0;
+                    letter-spacing: -0.01em;
                 }
-                .db-chart-col:hover .cand-chart-tooltip {
-                    opacity: 1;
-                    visibility: visible;
-                    transform: translateX(-50%) translateY(0);
+                .ai-match-view-all {
+                    font-size: 13.5px;
+                    font-weight: 700;
+                    color: #4F48E6;
+                    text-decoration: none;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    white-space: nowrap !important;
+                    flex-shrink: 0 !important;
+                    transition: color 0.15s ease;
+                }
+                .ai-match-view-all:hover {
+                    color: #3730A3;
+                }
+
+                /* 3-Column Responsive Grid */
+                .ai-opps-cards-grid {
+                    display: grid;
+                    grid-template-columns: minmax(0, 1fr) !important;
+                    gap: 24px;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    min-width: 0 !important;
+                    box-sizing: border-box !important;
+                }
+                @media (min-width: 640px) {
+                    .ai-opps-cards-grid {
+                        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                        gap: 20px;
+                    }
+                }
+                @media (min-width: 1100px) {
+                    .ai-opps-cards-grid {
+                        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+                        gap: 24px;
+                    }
+                }
+
+                /* Card Container */
+                .cand-ai-card {
+                    background: #FFFFFF;
+                    border: 1px solid #E2E8F0;
+                    border-radius: 20px;
+                    padding: 24px;
+                    box-shadow: 0 4px 20px -2px rgba(0, 6, 35, 0.05), 0 2px 6px -1px rgba(0, 6, 35, 0.02);
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+                    box-sizing: border-box;
+                    width: 100%;
+                    min-width: 0;
+                }
+                .cand-ai-card:hover {
+                    transform: translateY(-3px);
+                    border-color: #CBD5E1;
+                    box-shadow: 0 16px 36px -4px rgba(0, 6, 35, 0.09), 0 4px 12px -2px rgba(0, 6, 35, 0.03);
+                }
+                .cand-ai-card-top {
+                    display: flex;
+                    align-items: flex-start;
+                    justify-content: space-between;
+                    gap: 12px;
+                }
+                .cand-ai-logo-box {
+                    width: 52px;
+                    height: 52px;
+                    border-radius: 14px;
+                    border: 1px solid #E2E8F0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 9px;
+                    box-sizing: border-box;
+                    box-shadow: 0 2px 8px rgba(0, 6, 35, 0.04);
+                    flex-shrink: 0;
+                    overflow: hidden;
+                    transition: transform 0.2s ease;
+                }
+                .cand-ai-card:hover .cand-ai-logo-box {
+                    transform: scale(1.04);
+                }
+                .cand-ai-logo-img {
+                    width: 32px !important;
+                    height: 32px !important;
+                    max-width: 32px !important;
+                    max-height: 32px !important;
+                    object-fit: contain !important;
+                    display: block !important;
+                    flex-shrink: 0 !important;
+                }
+                .cand-ai-type-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    padding: 4px 12px;
+                    border-radius: 9999px;
+                    font-size: 11.5px;
+                    font-weight: 700;
+                    letter-spacing: 0.02em;
+                    white-space: nowrap !important;
+                    flex-shrink: 0 !important;
+                }
+                .cand-ai-badge-fulltime {
+                    background-color: #ECFDF5;
+                    color: #059669;
+                    border: 1px solid #D1FAE5;
+                }
+                .cand-ai-badge-parttime {
+                    background-color: #EEF2FF;
+                    color: #4F48E6;
+                    border: 1px solid #E0E7FF;
+                }
+                .cand-ai-badge-remote {
+                    background-color: #F5F3FF;
+                    color: #7C3AED;
+                    border: 1px solid #EDE9FE;
+                }
+                .cand-ai-badge-hybrid {
+                    background-color: #EFF6FF;
+                    color: #2563EB;
+                    border: 1px solid #DBEAFE;
+                }
+                .cand-ai-role-title {
+                    font-size: 18.5px;
+                    font-weight: 700;
+                    color: #000623;
+                    line-height: 1.3;
+                    margin: 14px 0 4px 0;
+                    transition: color 0.15s ease;
+                }
+                .cand-ai-card:hover .cand-ai-role-title {
+                    color: #4F48E6;
+                }
+                .cand-ai-role-company {
+                    font-size: 13.5px;
+                    font-weight: 500;
+                    color: #64748B;
+                    margin: 0 0 14px 0;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                }
+                .cand-ai-desc-text {
+                    font-size: 13.5px;
+                    line-height: 1.58;
+                    color: #475569;
+                    margin: 0 0 18px 0;
+                    font-weight: 400;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                }
+                .cand-ai-stats-row {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    background: #F8FAFC;
+                    border: 1px solid #F1F5F9;
+                    border-radius: 12px;
+                    padding: 8px 10px;
+                    margin-bottom: 20px;
+                    gap: 4px;
+                    box-sizing: border-box;
+                    min-width: 0;
+                    overflow: hidden;
+                }
+                .cand-ai-stat-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    font-size: 11px;
+                    font-weight: 500;
+                    color: #475569;
+                    white-space: nowrap !important;
+                    min-width: 0;
+                    flex-shrink: 0 !important;
+                }
+                .cand-ai-stat-item.stat-stipend {
+                    font-weight: 700;
+                    color: #000623;
+                }
+                .cand-ai-stat-icon {
+                    width: 13px !important;
+                    height: 13px !important;
+                    color: #4F48E6;
+                    flex-shrink: 0 !important;
+                }
+                .cand-ai-stat-divider {
+                    width: 1px;
+                    height: 14px;
+                    background: #E2E8F0;
+                    flex-shrink: 0;
+                }
+                .cand-ai-card-btn {
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    gap: 8px !important;
+                    width: 100% !important;
+                    padding: 11px 20px !important;
+                    background-color: #EEF2FF !important;
+                    color: #4F48E6 !important;
+                    border: 1.5px solid #C7D2FE !important;
+                    font-weight: 700 !important;
+                    font-size: 13.5px !important;
+                    border-radius: 12px !important;
+                    text-decoration: none !important;
+                    transition: all 0.2s ease !important;
+                    white-space: nowrap !important;
+                    flex-shrink: 0 !important;
+                    box-shadow: none !important;
+                    box-sizing: border-box !important;
+                }
+                .cand-ai-card-btn:hover {
+                    background-color: #E0E7FF !important;
+                    border-color: #A5B4FC !important;
+                    color: #3730A3 !important;
+                    transform: translateY(-1px);
+                }
+
+                @media (max-width: 1024px) {
+                    .db-mid-row {
+                        grid-template-columns: minmax(0, 1fr) !important;
+                    }
+                }
+                @media (max-width: 640px) {
+                    .cand-pipeline-card {
+                        padding: 22px 18px;
+                    }
+                    .cand-pipeline-top {
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 10px;
+                    }
+                    .cand-pipeline-title {
+                        font-size: 20px;
+                    }
+                    .cand-pipeline-row {
+                        gap: 10px;
+                    }
+                    .cand-pipeline-label {
+                        width: 85px;
+                        font-size: 12.5px;
+                    }
+                    .cand-pipeline-track {
+                        height: 28px;
+                    }
+                    .cand-pipeline-actions {
+                        flex-direction: column;
+                        width: 100%;
+                    }
+                    .cand-pipeline-btn-primary,
+                    .cand-pipeline-btn-secondary {
+                        width: 100%;
+                        justify-content: center;
+                        box-sizing: border-box;
+                    }
                 }
                 </style>
-                <!-- Application Performance Chart -->
-                <div class="db-card" x-data="{ view: 'monthly', charts: {
-                    weekly: [
-                        { label: 'APPLIED', pct: 45, class: 'blue', tooltip: 'Applied: 12 Applications' },
-                        { label: 'REVIEW', pct: 30, class: 'lblue', tooltip: 'In Review: 5 Applications' },
-                        { label: 'INTERVIEW', pct: 15, class: 'blue', tooltip: 'Interviews: 2 Scheduled' },
-                        { label: 'ACCEPT', pct: 10, class: 'green', tooltip: 'Accepted: 1 Offer' },
-                        { label: 'REJECT', pct: 5, class: 'red', tooltip: 'Rejected: 1 Application' }
-                    ],
-                    monthly: [
-                        { label: 'APPLIED', pct: 90, class: 'blue', tooltip: 'Applied: 34 Applications' },
-                        { label: 'REVIEW', pct: 60, class: 'lblue', tooltip: 'In Review: 10 Applications' },
-                        { label: 'INTERVIEW', pct: 40, class: 'blue', tooltip: 'Interviews: 4 Scheduled' },
-                        { label: 'ACCEPT', pct: 25, class: 'green', tooltip: 'Accepted: 2 Offers' },
-                        { label: 'REJECT', pct: 20, class: 'red', tooltip: 'Rejected: 3 Applications' }
-                    ]
-                }}">
-                    <div class="db-card-header">
-                        <h3 class="db-card-title">Application Performance</h3>
-                        <div class="db-toggle-group">
-                            <button class="db-toggle-btn" :class="{ 'active': view === 'weekly' }" @click="view = 'weekly'" type="button">Weekly</button>
-                            <button class="db-toggle-btn" :class="{ 'active': view === 'monthly' }" @click="view = 'monthly'" type="button">Monthly</button>
+
+                <!-- 1. Left Card: Your Application Pipeline -->
+                <div class="cand-pipeline-card">
+                    <div>
+                        <div class="cand-pipeline-top">
+                            <div>
+                                <h2 class="cand-pipeline-title">Your Application Pipeline</h2>
+                                <p class="cand-pipeline-sub">You're making steady progress. Applications are converting to interviews 18% better than last month.</p>
+                            </div>
+                            <span class="cand-pipeline-badge">
+                                <svg style="width: 14px; height: 14px; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+                                </svg>
+                                <span>+18% vs last month</span>
+                            </span>
+                        </div>
+
+                        <!-- Pipeline Progress Bars -->
+                        <div class="cand-pipeline-bars">
+                            <!-- Row 1: Applications -->
+                            <div class="cand-pipeline-row">
+                                <div class="cand-pipeline-label">Applications</div>
+                                <div class="cand-pipeline-bar-col">
+                                    <div class="cand-pipeline-track is-full">
+                                        <div class="cand-pipeline-fill is-white" style="width: 100%;"></div>
+                                    </div>
+                                    <div class="cand-pipeline-meta">100% of pipeline</div>
+                                </div>
+                                <div class="cand-pipeline-val">15</div>
+                            </div>
+
+                            <!-- Row 2: Accepted -->
+                            <div class="cand-pipeline-row">
+                                <div class="cand-pipeline-label">Accepted</div>
+                                <div class="cand-pipeline-bar-col">
+                                    <div class="cand-pipeline-track">
+                                        <div class="cand-pipeline-fill is-lavender" style="width: 53%;"></div>
+                                    </div>
+                                    <div class="cand-pipeline-meta">33% of pipeline</div>
+                                </div>
+                                <div class="cand-pipeline-val">8</div>
+                            </div>
+
+                            <!-- Row 3: Interviews -->
+                            <div class="cand-pipeline-row">
+                                <div class="cand-pipeline-label">Interviews</div>
+                                <div class="cand-pipeline-bar-col">
+                                    <div class="cand-pipeline-track">
+                                        <div class="cand-pipeline-fill is-lavender" style="width: 40%;"></div>
+                                    </div>
+                                    <div class="cand-pipeline-meta">25% of pipeline</div>
+                                </div>
+                                <div class="cand-pipeline-val">6</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="db-chart-area" role="img" aria-label="Bar chart showing application stages">
-                        <template x-for="bar in charts[view]" :key="bar.label">
-                            <div class="db-chart-col">
-                                <div class="cand-chart-tooltip" x-text="bar.tooltip"></div>
-                                <div class="db-chart-bar-wrap">
-                                    <div class="db-chart-bar" :class="bar.class" :style="'height: ' + bar.pct + '%'"></div>
-                                </div>
-                                <span class="db-chart-label" x-text="bar.label"></span>
-                            </div>
-                        </template>
+
+                    <!-- Bottom Action Buttons -->
+                    <div class="cand-pipeline-actions">
+                        <a href="#ai-recommended-roles" class="cand-pipeline-btn-primary">
+                            <span>Explore AI Recommendations</span>
+                            <svg style="width: 14px; height: 14px; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                            </svg>
+                        </a>
+                        <a href="<?= url('/candidate/applications') ?>" class="cand-pipeline-btn-secondary">
+                            <span>View All Applications</span>
+                        </a>
                     </div>
                 </div>
 
-                <!-- Complete Profile -->
-                <div class="db-card db-profile-card">
-                    <div class="db-card-header">
-                        <h3 class="db-card-title">Complete Profile</h3>
-                    </div>
-                    <div class="db-progress-bar-wrap">
-                        <div class="db-progress-label">
-                            <span>Profile Completion</span>
-                            <span class="db-progress-pct"><?= $candidate['profile_pct'] ?? 75 ?>%</span>
+                <!-- 2. Right Card: Conditional Render (Complete Profile vs Your Pro Career Insights) -->
+                <div>
+                    <!-- State A: Complete Profile (Rendered when profile is not completed) -->
+                    <div class="db-card db-profile-card" x-show="!isProfileComplete">
+                        <div class="db-card-header">
+                            <h3 class="db-card-title">Complete Profile</h3>
+                            <button type="button" @click="isProfileComplete = true" title="Preview completed profile with Career Insights" style="background: none; border: none; font-size: 11px; color: #4F48E6; cursor: pointer; text-decoration: underline; padding: 0;">
+                                Test 100%
+                            </button>
                         </div>
-                        <div class="db-progress-track">
-                            <div class="db-progress-fill" style="width: <?= $candidate['profile_pct'] ?? 75 ?>%;"></div>
-                        </div>
-                    </div>
-                    <div class="db-checklist">
-                        <?php foreach (($candidate['checklist'] ?? []) as $item): ?>
-                        <div class="db-check-item">
-                            <div class="db-check-dot <?= $item['done'] ? 'done' : 'undone' ?>">
-                                <?php if ($item['done']): ?>
-                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                                <?php else: ?>
-                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>
-                                <?php endif; ?>
+                        <div class="db-progress-bar-wrap">
+                            <div class="db-progress-label">
+                                <span>Profile Completion</span>
+                                <span class="db-progress-pct">75%</span>
                             </div>
-                            <span><?= htmlspecialchars($item['label']) ?></span>
+                            <div class="db-progress-track">
+                                <div class="db-progress-fill" style="width: 75%;"></div>
+                            </div>
                         </div>
-                        <?php endforeach; ?>
+                        <div class="db-checklist">
+                            <div class="db-check-item">
+                                <div class="db-check-dot done">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                </div>
+                                <span>Upload Resume</span>
+                            </div>
+                            <div class="db-check-item">
+                                <div class="db-check-dot done">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                </div>
+                                <span>Technical Skills</span>
+                            </div>
+                            <div class="db-check-item">
+                                <div class="db-check-dot undone">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>
+                                </div>
+                                <span>Education Details</span>
+                            </div>
+                            <div class="db-check-item">
+                                <div class="db-check-dot done">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                </div>
+                                <span>Experience History</span>
+                            </div>
+                        </div>
+                        <a href="<?= url('/profile') ?>" class="db-update-btn" id="db-update-profile-btn">Update Profile</a>
                     </div>
-                    <a href="<?= url('/profile') ?>" class="db-update-btn" id="db-update-profile-btn">Update Profile</a>
+
+                    <!-- State B: Your Pro Career Insights (Replaces Complete Profile when profile is completed) -->
+                    <div class="cand-insights-card" x-show="isProfileComplete" style="display: none;">
+                        <div>
+                            <div class="cand-insights-header">
+                                <div class="cand-insights-top">
+                                    <h3 class="cand-insights-title">Your Pro Career Insights</h3>
+                                    <button type="button" @click="isPro = !isPro" :title="isPro ? 'Switch to Free Mode preview' : 'Switch to Pro Plan preview'" 
+                                            class="cand-pro-pill" :class="isPro ? 'is-pro' : 'is-free'">
+                                        <span class="cand-pro-dot"></span>
+                                        <span x-text="isPro ? 'PRO UNLOCKED' : 'FREE MODE'"></span>
+                                    </button>
+                                </div>
+                                <p class="cand-insights-sub">See how your profile and applications are performing against peers.</p>
+                            </div>
+
+                            <!-- Metric 1: Profile Strength (Always visible for both Free and Pro) -->
+                            <div class="cand-metric-item">
+                                <div class="cand-metric-head">
+                                    <span>Profile Strength</span>
+                                    <span class="cand-metric-val blue">86%</span>
+                                </div>
+                                <div class="cand-metric-track">
+                                    <div class="cand-metric-bar blue" style="width: 86%;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Gated Section for Metrics 2, 3, 4 and Insights Link -->
+                            <div class="cand-pro-gated-wrap">
+                                <!-- Inner Metrics (Blurred when isPro is false) -->
+                                <div :class="{ 'cand-pro-blurred': !isPro }">
+                                    <!-- Metric 2: Recruiter Visibility -->
+                                    <div class="cand-metric-item">
+                                        <div class="cand-metric-head">
+                                            <span>Recruiter Visibility</span>
+                                            <span class="cand-metric-val blue">82%</span>
+                                        </div>
+                                        <div class="cand-metric-track">
+                                            <div class="cand-metric-bar blue" style="width: 82%;"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Metric 3: Application Strength -->
+                                    <div class="cand-metric-item">
+                                        <div class="cand-metric-head">
+                                            <span>Application Strength</span>
+                                            <span class="cand-metric-val green">91%</span>
+                                        </div>
+                                        <div class="cand-metric-track">
+                                            <div class="cand-metric-bar green" style="width: 91%;"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Metric 4: Interview Readiness -->
+                                    <div class="cand-metric-item">
+                                        <div class="cand-metric-head">
+                                            <span>Interview Readiness</span>
+                                            <span class="cand-metric-val orange">78%</span>
+                                        </div>
+                                        <div class="cand-metric-track">
+                                            <div class="cand-metric-bar orange" style="width: 78%;"></div>
+                                        </div>
+                                    </div>
+
+                                    <!-- View Career Insights Link -->
+                                    <a href="<?= url('/profile') ?>" class="cand-insights-link">
+                                        <span>View Career Insights</span>
+                                        <svg style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                                        </svg>
+                                    </a>
+                                </div>
+
+                                <!-- Overlay Button for Non-Pro Users -->
+                                <div class="cand-pro-overlay" x-show="!isPro">
+                                    <a href="<?= url('/pricing') ?>" class="cand-upgrade-btn">
+                                        <span>Upgrade to Pro Plan</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reset back to Complete Profile preview toggle -->
+                        <div style="margin-top: 14px; border-top: 1px solid #F1F5F9; padding-top: 8px; text-align: right;">
+                            <button type="button" @click="isProfileComplete = false" style="background: none; border: none; font-size: 11px; color: #94A3B8; cursor: pointer; text-decoration: underline; padding: 0;">
+                                View 75% Checklist
+                            </button>
+                        </div>
+                    </div>
                 </div>
+
             </div>
 
-            <!-- ── Recommended For You ── -->
-            <section aria-labelledby="db-recs-heading">
+            <!-- ── Recommended For You (Original Section Restored) ── -->
+            <section aria-labelledby="db-recs-heading" style="margin-top: 36px;">
                 <div class="db-section-header">
                     <h3 class="db-section-title" id="db-recs-heading">Recommended for You</h3>
                     <a href="<?= url('/internships') ?>" class="db-view-all">View All Matches</a>
@@ -246,6 +1006,106 @@ $avatar    = $candidate['avatar'] ?? null;
                             </span>
                             <a href="<?= url('/internship/' . $rec['slug']) ?>" class="db-apply-btn" id="db-apply-btn-<?= htmlspecialchars($rec['slug']) ?>" style="background: #4F47E6; color: #ffffff; font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; white-space: nowrap !important; flex-shrink: 0 !important; transition: all 0.15s ease;">
                                 Apply
+                            </a>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </section>
+
+            <!-- ── Recommended AI Match Internships Section (Directly Beneath Recommended for You) ── -->
+            <section id="ai-recommended-roles" aria-labelledby="db-ai-recs-heading" class="ai-match-section">
+                <div class="ai-match-header-wrap">
+                    <div>
+                        <span class="ai-match-eyebrow">
+                            <span style="width: 16px; height: 16px; border-radius: 50%; background: #000623; border: 1.5px solid #4F48E6; color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg style="width: 9px; height: 10px; flex-shrink: 0;" viewBox="0 0 74 83" fill="currentColor">
+                                    <path d="M73.74 32.4627V59.9427C67.93 59.7673 62.2767 61.8422 57.9596 65.7344C53.6426 69.6267 50.9952 75.0356 50.57 80.8327C50.52 81.3027 50.48 81.8327 50.46 82.2827H23.57C23.57 82.0227 23.48 81.7627 23.43 81.5127C20.73 67.1427 16.41 63.2427 0 59.6527V32.6527C13.34 31.5727 27.12 37.6527 36.92 47.9327C46 38.3527 58.99 31.8927 73.74 32.4627Z"/>
+                                    <path d="M37.0001 0.0031237C40.4833 0.0367014 43.8785 1.10075 46.7578 3.06112C49.637 5.02149 51.8715 7.79043 53.1794 11.0188C54.4873 14.2473 54.8101 17.7906 54.1071 21.2023C53.4042 24.6139 51.7069 27.741 49.2293 30.1894C46.7516 32.6378 43.6046 34.2979 40.1849 34.9604C36.7652 35.6228 33.2259 35.258 30.0132 33.9119C26.8005 32.5658 24.0583 30.2987 22.1322 27.3963C20.2061 24.494 19.1824 21.0864 19.1901 17.6031C19.1737 15.2695 19.6247 12.9562 20.5166 10.7997C21.4084 8.64315 22.7231 6.68703 24.383 5.04669C26.0429 3.40635 28.0145 2.11499 30.1814 1.24877C32.3484 0.382549 34.6669 -0.040991 37.0001 0.0031237Z"/>
+                                </svg>
+                            </span>
+                            AI Match Engine
+                        </span>
+                        <h3 class="ai-match-title" id="db-ai-recs-heading">Recommended AI Match Internships</h3>
+                    </div>
+                    <a href="<?= url('/internships') ?>" class="ai-match-view-all">
+                        <span>View All AI Matches</span>
+                        <svg style="width: 14px; height: 14px; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                        </svg>
+                    </a>
+                </div>
+
+                <!-- 3-Card Grid Matching Homepage Opportunities -->
+                <div class="ai-opps-cards-grid">
+                    <?php foreach (($aiRecommendations ?? []) as $rec): ?>
+                    <div class="cand-ai-card" id="db-ai-card-<?= htmlspecialchars($rec['slug']) ?>">
+                        <div>
+                            <!-- Card Top: Company Logo & Employment Badge -->
+                            <div class="cand-ai-card-top">
+                                <a href="<?= url('/company/' . ($rec['slug'] ?? 'kiro-labs')) ?>" class="cand-ai-logo-box" style="background-color: <?= htmlspecialchars($rec['logo_bg'] ?? '#FFFFFF') ?>; <?= ($rec['logo_bg'] ?? '') === '#000623' ? 'border-color: #1E293B;' : '' ?>" title="View <?= htmlspecialchars($rec['company']) ?> Profile">
+                                    <img src="<?= htmlspecialchars($rec['logo']) ?>" alt="<?= htmlspecialchars($rec['company']) ?>" class="cand-ai-logo-img" loading="lazy">
+                                </a>
+                                <span class="cand-ai-type-badge cand-ai-<?= htmlspecialchars($rec['type_class']) ?>">
+                                    <?= htmlspecialchars($rec['type']) ?>
+                                </span>
+                            </div>
+
+                            <!-- Role Title & Subtitle -->
+                            <h4 class="cand-ai-role-title">
+                                <?= htmlspecialchars($rec['title']) ?>
+                            </h4>
+                            <p class="cand-ai-role-company">
+                                <a href="<?= url('/company/' . ($rec['slug'] ?? 'kiro-labs')) ?>" style="color: inherit; text-decoration: none; font-weight: 600;"><?= htmlspecialchars($rec['company']) ?></a>
+                                <span>&bull;</span>
+                                <span><?= htmlspecialchars($rec['location']) ?></span>
+                            </p>
+
+                            <!-- Description -->
+                            <p class="cand-ai-desc-text">
+                                <?= htmlspecialchars($rec['description']) ?>
+                            </p>
+                        </div>
+
+                        <div>
+                            <!-- Stat Row: Category | Experience | Stipend -->
+                            <div class="cand-ai-stats-row">
+                                <!-- Category -->
+                                <div class="cand-ai-stat-item">
+                                    <svg class="cand-ai-stat-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5a2 2 0 011.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A2 2 0 013 12V5a2 2 0 012-2z"/>
+                                    </svg>
+                                    <span><?= htmlspecialchars($rec['category']) ?></span>
+                                </div>
+
+                                <div class="cand-ai-stat-divider"></div>
+
+                                <!-- Experience Level -->
+                                <div class="cand-ai-stat-item">
+                                    <svg class="cand-ai-stat-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                                    </svg>
+                                    <span><?= htmlspecialchars($rec['experience']) ?></span>
+                                </div>
+
+                                <div class="cand-ai-stat-divider"></div>
+
+                                <!-- Stipend / Pay -->
+                                <div class="cand-ai-stat-item stat-stipend">
+                                    <svg class="cand-ai-stat-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    <span><?= htmlspecialchars($rec['stipend']) ?></span>
+                                </div>
+                            </div>
+
+                            <!-- Full-Width Apply Button -->
+                            <a href="<?= url('/internship/' . $rec['slug']) ?>" class="cand-ai-card-btn">
+                                <span>Apply Now</span>
+                                <svg style="width: 15px; height: 15px; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                                </svg>
                             </a>
                         </div>
                     </div>

@@ -22,9 +22,11 @@ declare(strict_types=1);
 $featuredRoles = [
     [
         'title'       => 'UX/UI Designer',
-        'company'     => 'Creative Minds Agency',
+        'company'     => 'Kiro Labs',
+        'slug'        => 'kiro-labs',
         'location'    => 'Remote / Lagos',
-        'avatar'      => 'https://res.cloudinary.com/weburea/image/upload/v1790818231/01_hpf9or.jpg',
+        'logo'        => 'https://res.cloudinary.com/weburea/image/upload/v1790902254/kiro_uhmovc.svg',
+        'logo_bg'     => '#000623',
         'description' => 'Design beautiful, intuitive user journeys and high-fidelity interactive prototypes for global web applications.',
         'type'        => 'Full-Time',
         'type_class'  => 'badge-fulltime',
@@ -34,9 +36,11 @@ $featuredRoles = [
     ],
     [
         'title'       => 'Digital Marketing Specialist',
-        'company'     => 'GrowthHackers Inc',
+        'company'     => 'Zod Studio',
+        'slug'        => 'zod-studio',
         'location'    => 'Hybrid / Abuja',
-        'avatar'      => 'https://res.cloudinary.com/weburea/image/upload/v1790640489/09_woufvl.jpg',
+        'logo'        => 'https://res.cloudinary.com/weburea/image/upload/v1790902252/zod_fb2rqf.svg',
+        'logo_bg'     => '#FFFFFF',
         'description' => 'Manage multi-channel campaigns, optimize SEO funnels, and scale organic social engagement across tech communities.',
         'type'        => 'Part-Time',
         'type_class'  => 'badge-parttime',
@@ -46,9 +50,11 @@ $featuredRoles = [
     ],
     [
         'title'       => 'Backend Developer',
-        'company'     => 'TechStack Solutions',
+        'company'     => 'Firebase',
+        'slug'        => 'firebase',
         'location'    => 'Remote / Nigeria',
-        'avatar'      => 'https://res.cloudinary.com/weburea/image/upload/v1790640487/08_kd0a4w.jpg',
+        'logo'        => 'https://res.cloudinary.com/weburea/image/upload/v1790902244/firebase-icon_twxbsc.svg',
+        'logo_bg'     => '#FFFFFF',
         'description' => 'Build resilient REST APIs, optimize high-throughput database queries, and streamline core infrastructure microservices.',
         'type'        => 'Remote',
         'type_class'  => 'badge-remote',
@@ -58,9 +64,11 @@ $featuredRoles = [
     ],
     [
         'title'       => 'Mobile App Engineer',
-        'company'     => 'Apex Mobility',
+        'company'     => 'Google',
+        'slug'        => 'google',
         'location'    => 'Remote / Lagos',
-        'avatar'      => 'https://res.cloudinary.com/weburea/image/upload/v1790640486/07_ky0sza.jpg',
+        'logo'        => 'https://res.cloudinary.com/weburea/image/upload/v1790902241/google-icon_nqold7.svg',
+        'logo_bg'     => '#FFFFFF',
         'description' => 'Develop high-performance Flutter & React Native mobile applications with offline sync and crisp native UI components.',
         'type'        => 'Full-Time',
         'type_class'  => 'badge-fulltime',
@@ -70,27 +78,31 @@ $featuredRoles = [
     ],
     [
         'title'       => 'Data Analyst & AI Associate',
-        'company'     => 'MonieAnalytics',
+        'company'     => 'Panda CSS',
+        'slug'        => 'panda-css',
         'location'    => 'Hybrid / Lagos',
-        'avatar'      => 'https://res.cloudinary.com/weburea/image/upload/v1790640485/06_phha53.jpg',
+        'logo'        => 'https://res.cloudinary.com/weburea/image/upload/v1790902235/pandacss-icon_fhb6oc.svg',
+        'logo_bg'     => '#FFFFFF',
         'description' => 'Clean and model complex operational datasets, build automated dashboards, and assist with predictive candidate matching.',
         'type'        => 'Hybrid',
         'type_class'  => 'badge-hybrid',
-        'category'    => 'Data & AI',
-        'experience'  => 'No Experience Req.',
+        'category'    => 'Data Analysis',
+        'experience'  => 'No Experience',
         'stipend'     => '₦160,000/mo',
     ],
     [
         'title'       => 'Product Management Intern',
-        'company'     => 'PayVenture Labs',
+        'company'     => 'Firecrawl',
+        'slug'        => 'firecrawl',
         'location'    => 'Remote / Nigeria',
-        'avatar'      => 'https://res.cloudinary.com/weburea/image/upload/v1790640484/05_fdbsxq.jpg',
+        'logo'        => 'https://res.cloudinary.com/weburea/image/upload/v1790902235/firecrawl-icon_ledn9u.svg',
+        'logo_bg'     => '#FFFFFF',
         'description' => 'Conduct user discovery interviews, define product feature specs, and bridge cross-functional sprint teams toward delivery.',
         'type'        => 'Remote',
         'type_class'  => 'badge-remote',
         'category'    => 'Product',
         'experience'  => 'Internship Role',
-        'stipend'     => 'Performance Stipend',
+        'stipend'     => 'Stipend',
     ],
 ];
 ?>
@@ -541,14 +553,32 @@ $featuredRoles = [
     gap: 12px;
 }
 
-.opportunity-avatar-img {
-    width: 54px;
-    height: 54px;
-    border-radius: 50%;
-    object-fit: cover;
+.opportunity-logo-box {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    border: 1px solid #E2E8F0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 9px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 8px rgba(0, 6, 35, 0.04);
     flex-shrink: 0;
-    border: 2px solid #F8FAFC;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease;
+}
+
+.opportunity-card:hover .opportunity-logo-box {
+    transform: scale(1.04);
+}
+
+.opportunity-logo-img {
+    width: 32px;
+    height: 32px;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
 }
 
 .opportunity-type-badge {
@@ -630,21 +660,24 @@ $featuredRoles = [
     background: #F8FAFC;
     border: 1px solid #F1F5F9;
     border-radius: 12px;
-    padding: 10px 14px;
+    padding: 8px 10px;
     margin-bottom: 20px;
-    gap: 8px;
+    gap: 4px;
     box-sizing: border-box;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .opportunity-stat-item {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 12px;
+    gap: 4px;
+    font-size: 11px;
     font-weight: 500;
     color: #475569;
     white-space: nowrap;
     min-width: 0;
+    flex-shrink: 0;
 }
 
 .opportunity-stat-item.stat-stipend {
@@ -653,15 +686,15 @@ $featuredRoles = [
 }
 
 .opportunity-stat-icon {
-    width: 14px;
-    height: 14px;
+    width: 13px;
+    height: 13px;
     color: #4F48E6;
     flex-shrink: 0;
 }
 
 .opportunity-stat-divider {
     width: 1px;
-    height: 16px;
+    height: 14px;
     background: #E2E8F0;
     flex-shrink: 0;
 }
@@ -940,9 +973,11 @@ $featuredRoles = [
             <?php foreach ($featuredRoles as $role): ?>
                 <div class="opportunity-card" x-show="matchesSearch(<?= htmlspecialchars(json_encode($role), ENT_QUOTES) ?>)">
                     <div>
-                        <!-- Card Top: Avatar & Employment Badge -->
+                        <!-- Card Top: Company Logo & Employment Badge -->
                         <div class="opportunity-card-top">
-                            <img src="<?= htmlspecialchars($role['avatar']) ?>" alt="<?= htmlspecialchars($role['company']) ?>" class="opportunity-avatar-img" loading="lazy">
+                            <a href="<?= url('/company/' . ($role['slug'] ?? 'kiro-labs')) ?>" class="opportunity-logo-box" style="background-color: <?= htmlspecialchars($role['logo_bg'] ?? '#FFFFFF') ?>; <?= ($role['logo_bg'] ?? '') === '#000623' ? 'border-color: #1E293B;' : '' ?>" title="View <?= htmlspecialchars($role['company']) ?> Profile">
+                                <img src="<?= htmlspecialchars($role['logo']) ?>" alt="<?= htmlspecialchars($role['company']) ?>" class="opportunity-logo-img" loading="lazy">
+                            </a>
                             <span class="opportunity-type-badge <?= htmlspecialchars($role['type_class']) ?>">
                                 <?= htmlspecialchars($role['type']) ?>
                             </span>
@@ -953,7 +988,7 @@ $featuredRoles = [
                             <?= htmlspecialchars($role['title']) ?>
                         </h3>
                         <p class="opportunity-role-company">
-                            <span><?= htmlspecialchars($role['company']) ?></span>
+                            <a href="<?= url('/company/' . ($role['slug'] ?? 'kiro-labs')) ?>" style="color: inherit; text-decoration: none; font-weight: 600; transition: color 0.15s ease;" onmouseover="this.style.color='#4F48E6'" onmouseout="this.style.color='inherit'"><?= htmlspecialchars($role['company']) ?></a>
                             <span>•</span>
                             <span><?= htmlspecialchars($role['location']) ?></span>
                         </p>
@@ -1037,7 +1072,7 @@ function opportunitiesFilterComponent() {
             { name: 'UI Designer', count: '14 Roles', color: '#4F48E6', bg: '#EEF2FF', icon: 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01' },
             { name: 'Engineering', count: '28 Roles', color: '#2563EB', bg: '#EFF6FF', icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4' },
             { name: 'Marketing', count: '15 Roles', color: '#D97706', bg: '#FEF3C7', icon: 'M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z' },
-            { name: 'Data', count: '11 Roles', color: '#059669', bg: '#ECFDF5', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
+            { name: 'Data Analysis', count: '11 Roles', color: '#059669', bg: '#ECFDF5', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
             { name: 'Product', count: '8 Roles', color: '#7C3AED', bg: '#F5F3FF', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' },
             { name: 'Remote', count: '24 Roles', color: '#4F48E6', bg: '#EEF2FF', icon: 'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
             { name: 'Full-Time', count: '30 Roles', color: '#059669', bg: '#ECFDF5', icon: 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z' }

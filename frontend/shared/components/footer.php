@@ -24,9 +24,8 @@ declare(strict_types=1);
             <div class="footer-col">
                 <h3 class="footer-heading">Platform</h3>
                 <ul class="footer-list">
-                    <li><a href="<?= url('/about') ?>" class="footer-link">About Us</a></li>
-                    <li><a href="<?= url('/employer') ?>" class="footer-link">Employer Hub</a></li>
-                    <li><a href="<?= url('/internships') ?>" class="footer-link">Applicant Resources</a></li>
+                    <li><a href="<?= url('/elearning') ?>" class="footer-link">E-Learning</a></li>
+                    <li><a href="<?= url('/internships') ?>" class="footer-link">Find Jobs</a></li>
                 </ul>
             </div>
             
@@ -34,19 +33,25 @@ declare(strict_types=1);
             <div class="footer-col">
                 <h3 class="footer-heading">Support</h3>
                 <ul class="footer-list">
-                    <li><a href="<?= url('/contact') ?>" class="footer-link">Contact Support</a></li>
-                    <li><a href="<?= url('/privacy') ?>" class="footer-link">Privacy Policy</a></li>
-                    <li><a href="<?= url('/terms') ?>" class="footer-link">Terms of Service</a></li>
+                    <li><a href="<?= url('/help') ?>" class="footer-link">Help Center</a></li>
+                    <li><a href="<?= url('/refund') ?>" class="footer-link">Refund Policy</a></li>
+                    <li><a href="<?= url('/contact') ?>" class="footer-link">Contact Us</a></li>
+                    <li><a href="<?= url('/cookies') ?>" class="footer-link">Cookie Policy</a></li>
                 </ul>
             </div>
             
-            <!-- Blog Column -->
+            <!-- Company Column -->
             <div class="footer-col">
-                <h3 class="footer-heading">Blog</h3>
+                <h3 class="footer-heading">Company</h3>
                 <ul class="footer-list">
-                    <li><a href="<?= url('/blog') ?>" class="footer-link">Latest Article</a></li>
-                    <li><a href="<?= url('/blog/news') ?>" class="footer-link">News & Updates</a></li>
-                    <li><a href="<?= url('/blog/interview-prep') ?>" class="footer-link">Interview Prep</a></li>
+                    <li><a href="<?= url('/about') ?>" class="footer-link">About Us</a></li>
+                    <li><a href="<?= url('/testimonials') ?>" class="footer-link">Success Stories</a></li>
+                    <li>
+                        <a href="<?= url('/#meet-jenny-block') ?>" class="footer-link footer-link-jenny" @click.prevent="$dispatch('open-jenny')">
+                            <span>Ask Jenny</span>
+                            <span class="footer-jenny-badge">AI</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
             
@@ -87,6 +92,54 @@ declare(strict_types=1);
             <p class="footer-copyright">
                 &copy; <script>document.write(new Date().getFullYear())</script> InternConnect. All rights reserved.
             </p>
+            <p class="footer-legal-notice">
+                Read our <a href="<?= url('/privacy') ?>" class="footer-legal-link">Privacy Policy</a> and <a href="<?= url('/terms') ?>" class="footer-legal-link">Terms &amp; Conditions</a>.
+            </p>
         </div>
     </div>
 </footer>
+
+<style>
+.footer-link-jenny {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.footer-jenny-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1px 6px;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.2;
+    border-radius: 9999px;
+    background: #EEF2FF;
+    color: #4F48E6;
+    border: 1px solid #C7D2FE;
+    letter-spacing: 0.04em;
+    vertical-align: middle;
+}
+.footer-legal-notice {
+    font-size: 13px;
+    color: #64748B;
+    margin: 0;
+}
+.footer-legal-link {
+    color: #4F48E6;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: 500;
+    transition: color 0.15s ease;
+}
+.footer-legal-link:hover {
+    color: #3730A3;
+}
+@media (max-width: 640px) {
+    .footer-bottom-bar {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+}
+</style>

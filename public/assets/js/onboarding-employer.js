@@ -17,13 +17,14 @@ function employerOnboardingWizard() {
         // Step 3 Email Verification
         verification_input: '',
         email_sender: 'internconnect@gmail.com',
-        countdown: 300,
-        resend_cooldown: 51,
+        countdown: 120, // 2 minutes (120 seconds)
+        resend_cooldown: 120,
         countdown_timer_id: null,
         cooldown_timer_id: null,
         show_success_modal: false,
         show_failure_modal: false,
         countdown_progress: 100,
+        success_redirect_timer: null,
 
         // Step 4 Organization Verification
         cac_number: '',
@@ -54,8 +55,10 @@ function employerOnboardingWizard() {
         search_query: '',
         departments: [],
         all_departments: [
-            'Engineering', 'Product Design', 'Marketing', 'Data Science', 'Finance', 'Operations',
-            'Sales', 'HR', 'Customer Success', 'Legal'
+            'Engineering', 'Product Design', 'Marketing', 'Data Science', 'Finance & Accounting', 'Operations',
+            'Sales & Business Dev', 'Human Resources', 'Customer Success', 'Legal & Compliance',
+            'Cybersecurity', 'AI & Machine Learning', 'Content & Copywriting', 'Quality Assurance',
+            'Project Management', 'Public Relations', 'Supply Chain & Logistics', 'IT & Systems Admin'
         ],
         expected_volume: '',
         expected_volume_options: [
@@ -72,6 +75,7 @@ function employerOnboardingWizard() {
         submitting: false,
 
         init() {
+            this.resetModals();
             // Always clear stale localStorage drafts on fresh page load.
             // Draft restoration should only happen via server-side session,
             // not client-side localStorage which retains old test data.
@@ -138,8 +142,20 @@ function employerOnboardingWizard() {
             this.verification_input = this.verification_input.replace(/[^0-9]/g, '').substring(0, 6);
         },
 
+        handlePaste(e) {
+            e.preventDefault();
+            const clipboardData = e.clipboardData || window.clipboardData;
+            const pastedText = clipboardData ? clipboardData.getData('text') : '';
+            const cleanDigits = pastedText.replace(/\D/g, '').substring(0, 6);
+            if (cleanDigits.length > 0) {
+                this.verification_input = cleanDigits;
+            }
+        },
+
         formatCooldown(secs) {
-            return `0:${secs < 10 ? '0' : ''}${secs}`;
+            const m = Math.floor(secs / 60);
+            const s = secs % 60;
+            return `${m}:${s < 10 ? '0' : ''}${s}`;
         },
 
         formatExpiry(secs) {
@@ -151,7 +167,7 @@ function employerOnboardingWizard() {
         startTimers() {
             this.clearTimers();
             
-            // Countdown timer (5 minutes)
+            // Countdown timer (2 minutes)
             this.countdown_timer_id = setInterval(() => {
                 if (this.countdown > 0) {
                     this.countdown--;
@@ -180,11 +196,24 @@ function employerOnboardingWizard() {
                 clearInterval(this.cooldown_timer_id);
                 this.cooldown_timer_id = null;
             }
+            if (this.success_redirect_timer) {
+                clearInterval(this.success_redirect_timer);
+                this.success_redirect_timer = null;
+            }
+        },
+
+        resetModals() {
+            this.show_success_modal = false;
+            this.show_failure_modal = false;
+            if (this.success_redirect_timer) {
+                clearInterval(this.success_redirect_timer);
+                this.success_redirect_timer = null;
+            }
         },
 
         resendCode() {
-            this.resend_cooldown = 51;
-            this.countdown = 300;
+            this.resend_cooldown = 120;
+            this.countdown = 120;
             this.startTimers();
             this.verification_input = '';
             this.$nextTick(() => {
@@ -236,6 +265,8 @@ function employerOnboardingWizard() {
                 this.server_errors = ['Document must be under 10MB.'];
                 return;
             }
+            // Keep the File outside Alpine's reactive state; it is sent with the final step.
+            window.__icEmployerBusinessDoc = file;
             this.business_doc_name = file.name;
             const sizeInMb = (file.size / (1024 * 1024)).toFixed(2);
             this.business_doc_size = sizeInMb + ' MB';
@@ -247,6 +278,7 @@ function employerOnboardingWizard() {
             this.business_doc_name = '';
             this.business_doc_size = '';
             this.business_doc_uploaded = false;
+            window.__icEmployerBusinessDoc = null;
             if (this.$refs.businessDocInput) {
                 this.$refs.businessDocInput.value = '';
             }
@@ -276,6 +308,7 @@ function employerOnboardingWizard() {
                 this.server_errors = ['Logo image must be under 5MB.'];
                 return;
             }
+            window.__icEmployerLogo = file;
             this.logo_name = file.name;
             const sizeInMb = (file.size / (1024 * 1024)).toFixed(2);
             this.logo_size = sizeInMb + ' MB';
@@ -289,6 +322,7 @@ function employerOnboardingWizard() {
             this.logo_size = '';
             this.logo_uploaded = false;
             this.logo_url = '';
+            window.__icEmployerLogo = null;
             if (this.$refs.logoInput) {
                 this.$refs.logoInput.value = '';
             }
@@ -311,6 +345,11 @@ function employerOnboardingWizard() {
 
         clearAllDepartments() {
             this.departments = [];
+        },
+
+        toggleInternshipType(type) {
+            this.internship_type = (this.internship_type === type ? '' : type);
+            this.saveDraftToLocal();
         },
 
         getCompanyInitials() {
@@ -356,23 +395,46 @@ function employerOnboardingWizard() {
             });
         },
 
+        startSuccessModalRedirect() {
+            if (this.success_redirect_timer) {
+                clearInterval(this.success_redirect_timer);
+                this.success_redirect_timer = null;
+            }
+            this.countdown_progress = 100;
+            const duration = 5000; // 5s
+            const interval = 25;
+            let elapsed = 0;
+            this.success_redirect_timer = setInterval(() => {
+                elapsed += interval;
+                this.countdown_progress = Math.max(0, 100 - (elapsed / duration) * 100);
+                if (elapsed >= duration) {
+                    if (this.success_redirect_timer) {
+                        clearInterval(this.success_redirect_timer);
+                        this.success_redirect_timer = null;
+                    }
+                    this.show_success_modal = false;
+                    this.step = 4;
+                    this.clearTimers();
+                    this.saveDraftToLocal();
+                }
+            }, interval);
+        },
+
         submitStep3() {
             this.show_success_modal = true;
             this.startSuccessModalRedirect();
         },
 
         submitStep4() {
+            // Registration Number is required for all organizations
+            if (!this.cac_number.trim()) {
+                this.server_errors = ['Registration Number is required to verify your organization.'];
+                return;
+            }
             // Business Registration Document is mandatory for all organizations
             if (!this.business_doc_uploaded) {
                 this.server_errors = ['Uploading a Business Registration Document is required to verify your organization.'];
                 return;
-            }
-            // CAC Number is mandatory if they register with a personal email domain
-            if (this.isPersonalEmail(this.email)) {
-                if (!this.cac_number.trim()) {
-                    this.server_errors = ['Because you registered with a personal email domain, providing a CAC Number is also required.'];
-                    return;
-                }
             }
             this.server_errors = [];
             this.step = 5;
@@ -389,14 +451,54 @@ function employerOnboardingWizard() {
             this.saveDraftToLocal();
         },
 
-        submitStep7() {
-            localStorage.removeItem('internconnect_employer_onboarding_draft');
+        // Save the organization profile (and uploaded files), then continue to the welcome page.
+        async submitStep7() {
+            if (this.submitting) return;
+            this.submitting = true;
+            this.server_errors = [];
             const welcomeUrl = window.INTERN_WELCOME_EMPLOYER_URL || '/welcome/employer';
-            window.location.href = welcomeUrl + '?name=' + encodeURIComponent(this.company_name);
+            const payload = {
+                company_name: this.company_name,
+                email: this.email,
+                password: this.password,
+                cac_number: this.cac_number,
+                industry: this.industry,
+                company_size: this.company_size,
+                website: this.website,
+                description: this.description,
+                departments: this.departments,
+                expected_volume: this.expected_volume,
+                internship_type: this.internship_type
+            };
+            const form = new FormData();
+            form.append('data', JSON.stringify(payload));
+            if (this.logo_uploaded && window.__icEmployerLogo) form.append('logo', window.__icEmployerLogo);
+            if (this.business_doc_uploaded && window.__icEmployerBusinessDoc) form.append('business_doc', window.__icEmployerBusinessDoc);
+            try {
+                const res = await fetch(window.INTERN_EMPLOYER_COMPLETE_URL || '/register/employer/complete', {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' },
+                    body: form
+                });
+                const json = await res.json().catch(() => ({}));
+                if (!res.ok || !json.success) {
+                    this.server_errors = [json.error || 'We could not save your organization profile. Please try again.'];
+                    this.submitting = false;
+                    return;
+                }
+                localStorage.removeItem('internconnect_employer_onboarding_draft');
+                window.__icEmployerLogo = null;
+                window.__icEmployerBusinessDoc = null;
+                window.location.href = json.redirect || (welcomeUrl + '?name=' + encodeURIComponent(this.company_name));
+            } catch (e) {
+                this.server_errors = ['Network error while saving your organization profile. Please try again.'];
+                this.submitting = false;
+            }
         },
 
         goBackToStep2() {
-            // Reset signup method if we return to Step 2
+            this.resetModals();
+            this.clearTimers();
             this.signup_method = null;
             this.oauth_error = '';
             this.step = 2;

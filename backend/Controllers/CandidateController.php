@@ -8,6 +8,8 @@ use App\Core\Controller;
 use App\Services\HelpService;
 use App\Services\AiService;
 use App\Services\CommunicationService;
+use App\Services\UploadStorage;
+use App\Services\VideoInterviewService;
 
 /**
  * CandidateController
@@ -559,6 +561,11 @@ class CandidateController extends Controller
             // Interests & Preferences
             'interests'             => $_SESSION['profile_interests'] ?? ['UI/UX Design', 'Software Engineering', 'Product Management'],
             'work_arrangements'     => $_SESSION['profile_work_arrangements'] ?? ['Remote', 'Hybrid'],
+            // Location Preferences (onboarding step 7)
+            'location'              => $_SESSION['profile_location'] ?? 'Lagos, Nigeria',
+            'open_to_relocating'    => $_SESSION['profile_open_to_relocating'] ?? 'Yes',
+            'preferred_locations'   => $_SESSION['profile_preferred_locations'] ?? ['Lagos', 'Abuja'],
+            'include_remote'        => $_SESSION['profile_include_remote'] ?? true,
             // Academic Info
             'university'            => $_SESSION['profile_university'] ?? '',
             'graduation_year'       => $_SESSION['profile_graduation_year'] ?? '',
@@ -613,9 +620,15 @@ class CandidateController extends Controller
             'notif_recommendations' => $_SESSION['profile_notif_recommendations'] ?? true,
             'notif_status'          => $_SESSION['profile_notif_status'] ?? true,
             'notif_announcements'   => $_SESSION['profile_notif_announcements'] ?? false,
+            // Resume stored by UploadStorage (null until uploaded during onboarding or here)
+            'resume'                => UploadStorage::describe($_SESSION['profile_resume'] ?? null, url('/candidate/profile/resume')),
+            // New email waiting for its 6-digit confirmation code
+            'pending_email'         => $_SESSION['profile_pending_email']['email'] ?? null,
+            'pending_email_dev_code'=> (($_ENV['APP_ENV'] ?? '') === 'local') ? ($_SESSION['profile_pending_email']['dev_code'] ?? null) : null,
         ];
 
         $this->renderView('candidate/profile', [
+
             'title'      => 'Curate Your Identity — InternConnect',
             'candidate'  => $candidate,
             'success'    => $_SESSION['success_msg'] ?? null,
@@ -648,9 +661,32 @@ class CandidateController extends Controller
                     $_SESSION['error_msg'] = 'New password must be at least 8 characters long.';
                 } elseif ($newPass !== $confirmPass) {
                     $_SESSION['error_msg'] = 'New password and confirmation do not match.';
+                } elseif (!empty($_SESSION['profile_password_hash']) && !password_verify($currentPass, $_SESSION['profile_password_hash'])) {
+                    $_SESSION['error_msg'] = 'Your current password is incorrect.';
+                } elseif (!empty($_SESSION['profile_password_hash']) && password_verify($newPass, $_SESSION['profile_password_hash'])) {
+                    $_SESSION['error_msg'] = 'Your new password must be different from the current one.';
                 } else {
+                    $_SESSION['profile_password_hash'] = password_hash($newPass, PASSWORD_DEFAULT);
                     $_SESSION['success_msg'] = 'Password updated successfully!';
                 }
+            } elseif ($action === 'verify_email') {
+                $pending = $_SESSION['profile_pending_email'] ?? null;
+                $code = preg_replace('/\D+/', '', (string)($_POST['email_code'] ?? ''));
+                if (!$pending) {
+                    $_SESSION['error_msg'] = 'There is no email change waiting for confirmation.';
+                } elseif (time() > (int)$pending['expires']) {
+                    unset($_SESSION['profile_pending_email']);
+                    $_SESSION['error_msg'] = 'That code has expired. Please change your email again to get a new code.';
+                } elseif (strlen($code) !== 6 || !hash_equals((string)$pending['code_hash'], hash('sha256', $code))) {
+                    $_SESSION['error_msg'] = 'That code is not correct. Please check it and try again.';
+                } else {
+                    $_SESSION['profile_email'] = $pending['email'];
+                    unset($_SESSION['profile_pending_email']);
+                    $_SESSION['success_msg'] = 'Email address confirmed and updated.';
+                }
+            } elseif ($action === 'cancel_email') {
+                unset($_SESSION['profile_pending_email']);
+                $_SESSION['success_msg'] = 'Email change cancelled.';
             } else {
                 $firstName = trim(strip_tags($_POST['first_name'] ?? ''));
                 $lastName  = trim(strip_tags($_POST['last_name'] ?? ''));
@@ -665,7 +701,25 @@ class CandidateController extends Controller
                     $_SESSION['profile_last_name']  = $parts[1] ?? '';
                 }
 
-                $_SESSION['profile_email'] = trim(strip_tags($_POST['email'] ?? 'sarah.peters@design-intern.com'));
+                // Email changes are confirmed with a 6-digit code before they take effect
+                $currentEmail = $_SESSION['profile_email'] ?? 'sarah.peters@design-intern.com';
+                $postedEmail = strtolower(trim(strip_tags((string)($_POST['email'] ?? $currentEmail))));
+                $emailNotice = '';
+                if ($postedEmail !== '' && $postedEmail !== strtolower($currentEmail)) {
+                    if (!filter_var($postedEmail, FILTER_VALIDATE_EMAIL)) {
+                        $emailNotice = ' The new email address is not valid, so it was not changed.';
+                    } else {
+                        $code = (string)random_int(100000, 999999);
+                        $_SESSION['profile_pending_email'] = [
+                            'email'     => $postedEmail,
+                            'code_hash' => hash('sha256', $code),
+                            'expires'   => time() + 15 * 60,
+                            'dev_code'  => $code,
+                        ];
+                        // TODO(backend): send $code to $postedEmail via the mailer instead of exposing it locally.
+                        $emailNotice = ' Enter the 6-digit code sent to ' . $postedEmail . ' to confirm your new email.';
+                    }
+                }
                 $_SESSION['profile_role']  = trim(strip_tags($_POST['role'] ?? 'Student Applicant'));
                 $_SESSION['profile_phone'] = trim(strip_tags($_POST['phone'] ?? '+1 (555) 012-3456'));
                 $_SESSION['profile_bio']   = trim(strip_tags($_POST['bio'] ?? ''));
@@ -697,6 +751,28 @@ class CandidateController extends Controller
                     }
                 }
 
+                // Location Preferences
+                if (isset($_POST['location'])) {
+                    $_SESSION['profile_location'] = trim(strip_tags($_POST['location']));
+                }
+                if (isset($_POST['open_to_relocating'])) {
+                    $_SESSION['profile_open_to_relocating'] = $_POST['open_to_relocating'] === 'No' ? 'No' : 'Yes';
+                }
+                if (isset($_POST['preferred_locations'])) {
+                    $decoded = json_decode((string)$_POST['preferred_locations'], true);
+                    $cities = [];
+                    foreach (is_array($decoded) ? $decoded : [] as $city) {
+                        $city = trim(strip_tags((string)$city));
+                        if ($city !== '' && mb_strlen($city) <= 80) {
+                            $cities[] = $city;
+                        }
+                    }
+                    $_SESSION['profile_preferred_locations'] = array_values(array_unique(array_slice($cities, 0, 20)));
+                }
+                if (isset($_POST['include_remote'])) {
+                    $_SESSION['profile_include_remote'] = $_POST['include_remote'] === '1';
+                }
+
                 // Academic Info
                 $_SESSION['profile_university']      = trim(strip_tags($_POST['university'] ?? ''));
                 $_SESSION['profile_graduation_year'] = trim(strip_tags($_POST['graduation_year'] ?? ''));
@@ -713,7 +789,7 @@ class CandidateController extends Controller
                 $_SESSION['profile_notif_status']          = isset($_POST['notif_status']) ? (bool)$_POST['notif_status'] : false;
                 $_SESSION['profile_notif_announcements']   = isset($_POST['notif_announcements']) ? (bool)$_POST['notif_announcements'] : false;
 
-                $_SESSION['success_msg'] = 'Profile settings saved successfully!';
+                $_SESSION['success_msg'] = 'Profile settings saved successfully!' . $emailNotice;
             }
         }
 
@@ -721,6 +797,61 @@ class CandidateController extends Controller
         exit;
     }
 
+    /**
+     * Upload / replace the candidate resume (AJAX, multipart field `resume`)
+     */
+    public function uploadResume(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        header('Content-Type: application/json');
+
+        $result = UploadStorage::store($_FILES['resume'] ?? null, 'resume');
+        if (!$result['ok']) {
+            http_response_code(422);
+            echo json_encode(['success' => false, 'error' => $result['error']]);
+            exit;
+        }
+
+        UploadStorage::delete($_SESSION['profile_resume'] ?? null);
+        $_SESSION['profile_resume'] = $result['meta'];
+
+        echo json_encode([
+            'success' => true,
+            'resume'  => UploadStorage::describe($result['meta'], url('/candidate/profile/resume')),
+        ]);
+        exit;
+    }
+
+    /**
+     * Stream the signed-in candidate's resume (private file, never a public URL)
+     */
+    public function streamResume(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        UploadStorage::stream($_SESSION['profile_resume'] ?? null, isset($_GET['download']));
+    }
+
+    /**
+     * Remove the stored resume (AJAX)
+     */
+    public function deleteResume(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        UploadStorage::delete($_SESSION['profile_resume'] ?? null);
+        unset($_SESSION['profile_resume']);
+
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true]);
+        exit;
+    }
     /**
      * Candidate My Applications
      * Renders the application journey tracking view.
@@ -1173,6 +1304,26 @@ class CandidateController extends Controller
     }
 
     /**
+     * In-Platform Video Interview Room (Powered by Daily.co)
+     * Route: /candidate/interview/room/{id}
+     */
+    public function interviewRoom(array $params = []): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $interviewId = (int)($params['id'] ?? (isset($_GET['id']) ? (int)$_GET['id'] : 1));
+        $room = VideoInterviewService::getRoomDetails($interviewId, 'candidate');
+
+        $this->renderView('candidate/interview/room', [
+            'title'     => 'In-Platform Video Interview — ' . $room['title'] . ' | InternConnect',
+            'room'      => $room,
+            'activeNav' => 'applications',
+        ], 'dashboard');
+    }
+
+    /**
      * Candidate Review Offer View
      * Displays the official offer letter and job description matching design specs.
      *
@@ -1426,33 +1577,17 @@ class CandidateController extends Controller
             'avatar' => $_SESSION['profile_avatar'] ?? asset('assets/images/profile.png'),
         ];
 
-        $rawNotifs = CommunicationService::getNotifications('candidate');
-        $notifications = [];
-        foreach ($rawNotifs as $n) {
-            $type = $n['type'] ?? 'system';
-            $label = 'View Details';
-            if ($type === 'interview') $label = 'View Interview';
-            elseif ($type === 'offer') $label = 'Review Offer';
-            elseif ($type === 'application') $label = 'Track Application';
-            elseif ($type === 'ai') $label = 'Explore Roles';
-
-            $notifications[] = [
-                'id'         => (int)($n['id'] ?? 1),
-                'type'       => $type,
-                'title'      => $n['title'] ?? 'Platform Update',
-                'desc'       => $n['message'] ?? ($n['desc'] ?? ''),
-                'time'       => $n['time_ago'] ?? ($n['time'] ?? 'Just now'),
-                'is_read'    => (bool)($n['is_read'] ?? false),
-                'link'       => !empty($n['action_url']) ? $n['action_url'] : ($n['link'] ?? url('/candidate/notifications')),
-                'link_label' => $n['link_label'] ?? $label,
-            ];
-        }
+        $notifications = CommunicationService::presentNotifications(
+            CommunicationService::getNotifications('candidate'),
+            'candidate'
+        );
 
         $this->renderView('candidate/notifications/index', [
-            'title'         => 'Notifications Center — InternConnect',
-            'activeNav'     => 'notifications',
-            'candidate'     => $candidate,
-            'notifications' => $notifications,
+            'title'          => 'Notifications Center — InternConnect',
+            'activeNav'      => 'notifications',
+            'candidate'      => $candidate,
+            'notifications'  => $notifications,
+            'notifCategories'=> CommunicationService::notificationCategories('candidate'),
         ], 'dashboard');
     }
 
@@ -2250,9 +2385,26 @@ class CandidateController extends Controller
     }
 
     /**
-     * Mark all candidate notifications as read
+     * Delete a single candidate notification (AJAX)
      */
-    public function markAllNotificationsRead(): void
+    public function deleteNotification(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+        $id = (int)($input['id'] ?? 0);
+        $ok = $id > 0 && CommunicationService::deleteNotification($id, 'candidate');
+
+        header('Content-Type: application/json');
+        echo json_encode(['success' => $ok]);
+        exit;
+    }
+
+    /**
+     * Mark all candidate notifications as read (AJAX)
+     */    public function markAllNotificationsRead(): void
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();

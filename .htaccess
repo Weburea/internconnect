@@ -1,6 +1,10 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # Prevent direct browser access to sensitive files
+    RewriteRule ^\.env - [F,L]
+    RewriteRule ^\.git - [F,L]
+
     # If the requested file or directory exists directly, serve it
     RewriteCond %{REQUEST_FILENAME} -f [OR]
     RewriteCond %{REQUEST_FILENAME} -d

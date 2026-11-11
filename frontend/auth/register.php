@@ -10,8 +10,8 @@ declare(strict_types=1);
 <!-- Load Iconify CDN -->
 <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 
-<!-- Register styles -->
-<link rel="stylesheet" href="<?= asset('assets/css/register.css') ?>">
+<!-- Register styles with cache buster -->
+<link rel="stylesheet" href="<?= asset('assets/css/register.css') ?>?v=<?= file_exists(dirname(__DIR__, 2) . '/public/assets/css/register.css') ? filemtime(dirname(__DIR__, 2) . '/public/assets/css/register.css') : time() ?>">
 
 <div x-data="onboardingWizard()" x-init="init()" class="w-full min-h-screen bg-[#F8F9FA] text-[#191C1D] flex flex-col justify-between py-8 select-none" style="font-family: 'Inter', sans-serif;">
     
@@ -38,16 +38,16 @@ declare(strict_types=1);
                         Your next opportunity starts <span class="text-primary">right here.</span>
                     </h2>
                     <p class="text-[16px] leading-[26px] text-secondary-text">
-                        We match ambitious students with top programs. Build your profile once, and let the opportunities come to you.
+                        We match ambitious candidates with top programs. Build your profile once, and let the opportunities come to you.
                     </p>
                     <div class="border-t border-[#E2E8F0] pt-6">
                         <div class="flex items-center gap-3">
                             <div class="flex -space-x-3">
-                                <img class="w-10 h-10 rounded-full border-2 border-[#F8F9FA] object-cover shadow-sm bg-white" src="https://res.cloudinary.com/weburea/image/upload/v1785728653/preson_5_kwlmn2.svg" alt="Student 1">
-                                <img class="w-10 h-10 rounded-full border-2 border-[#F8F9FA] object-cover shadow-sm bg-white" src="https://res.cloudinary.com/weburea/image/upload/v1785728653/preson_4_omuvrk.svg" alt="Student 2">
-                                <img class="w-10 h-10 rounded-full border-2 border-[#F8F9FA] object-cover shadow-sm bg-white" src="https://res.cloudinary.com/weburea/image/upload/v1785728652/preson_6_rqycvb.svg" alt="Student 3">
+                                <img class="w-10 h-10 rounded-full border-2 border-[#F8F9FA] object-cover shadow-sm bg-white" src="https://res.cloudinary.com/weburea/image/upload/v1785728653/preson_5_kwlmn2.svg" alt="Candidate 1">
+                                <img class="w-10 h-10 rounded-full border-2 border-[#F8F9FA] object-cover shadow-sm bg-white" src="https://res.cloudinary.com/weburea/image/upload/v1785728653/preson_4_omuvrk.svg" alt="Candidate 2">
+                                <img class="w-10 h-10 rounded-full border-2 border-[#F8F9FA] object-cover shadow-sm bg-white" src="https://res.cloudinary.com/weburea/image/upload/v1785728652/preson_6_rqycvb.svg" alt="Candidate 3">
                             </div>
-                            <span class="text-[13px] font-semibold text-secondary-text">12,400+ students found their internship this year</span>
+                            <span class="text-[13px] font-semibold text-secondary-text">12,000+ candidates found their internship this year</span>
                         </div>
                     </div>
                     <!-- Benefits (Label only, matching mockup exactly) -->
@@ -62,7 +62,7 @@ declare(strict_types=1);
                             <div class="w-10 h-10 rounded-full bg-primary-light flex items-center justify-center text-primary flex-shrink-0">
                                 <iconify-icon icon="lucide:heart" class="text-lg"></iconify-icon>
                             </div>
-                            <span>Student-First Design</span>
+                            <span>Candidate-First Design</span>
                         </li>
                         <li class="flex items-center gap-3 text-[15px] font-semibold text-[#191C1D] text-left">
                             <div class="w-10 h-10 rounded-full bg-primary-light flex items-center justify-center text-primary flex-shrink-0">
@@ -100,7 +100,7 @@ declare(strict_types=1);
                         <h3 class="text-[24px] font-bold text-[#191C1D] tracking-tight text-left">I am joining as a...</h3>
                         
                         <div class="space-y-4">
-                            <!-- Student Option -->
+                            <!-- Candidate Option -->
                             <div @click="role = 'student'" 
                                  class="flex items-center justify-between p-5 rounded-2xl border-2 cursor-pointer transition-all duration-200"
                                  :class="role === 'student' ? 'border-primary bg-primary/5' : 'border-brandBorder bg-white hover:border-gray-300'">
@@ -109,8 +109,8 @@ declare(strict_types=1);
                                         <iconify-icon icon="lucide:graduation-cap" class="text-2xl"></iconify-icon>
                                     </div>
                                     <div class="text-left">
-                                        <h4 class="font-bold text-[#191C1D] text-[16px]">Student</h4>
-                                        <p class="text-[13px] text-secondary-text">Find internships and build your profile</p>
+                                        <h4 class="font-bold text-[#191C1D] text-[16px]">Candidate</h4>
+                                        <p class="text-[13px] text-secondary-text">Find internships,full-time role and build your profile</p>
                                     </div>
                                 </div>
                                 <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 flex-shrink-0" :class="role === 'student' ? 'border-primary bg-primary' : 'border-gray-300'">
@@ -140,7 +140,7 @@ declare(strict_types=1);
                         <!-- Info Box -->
                         <div class="flex gap-3 bg-primary/5 border border-primary/10 rounded-2xl p-4 text-[13.5px] text-primary">
                             <iconify-icon icon="lucide:info" class="text-lg flex-shrink-0 mt-0.5"></iconify-icon>
-                            <span class="text-left" x-text="role === 'employer' ? 'You are on the employer path—tailored for finding top talent.' : 'You are on the student path—tailored for your career growth.'">You are on the student path—tailored for your career growth.</span>
+                            <span class="text-left" x-text="role === 'employer' ? 'You are on the employer path—tailored for finding top talent.' : 'You are on the candidate path—tailored for your career growth.'">You are on the candidate path—tailored for your career growth.</span>
                         </div>
 
                         <!-- CTA -->
@@ -164,8 +164,8 @@ declare(strict_types=1);
         <footer class="w-full border-t border-[#E2E8F0] pt-6 flex flex-col md:flex-row justify-between items-center text-xs text-secondary-text mt-8 gap-4 py-4">
             <span>© <span id="copyright-year-register">2026</span> INTERNCONNECT. ALL RIGHTS RESERVED.</span>
             <div class="flex gap-6">
-                <a href="#" class="hover:text-primary transition-colors uppercase font-semibold">Privacy Policy</a>
-                <a href="#" class="hover:text-primary transition-colors uppercase font-semibold">Terms of Service</a>
+                <a href="<?= url('/privacy') ?>" class="hover:text-primary transition-colors uppercase font-semibold">Privacy Policy</a>
+                <a href="<?= url('/terms') ?>" class="hover:text-primary transition-colors uppercase font-semibold">Terms of Service</a>
             </div>
         </footer>
 

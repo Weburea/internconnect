@@ -6506,3 +6506,677 @@ span.flatpickr-weekday {
 
 
 
+
+
+/* ══════════════════════════════════════════════════
+   DASHBOARD SIDEBAR V2 (Employer & Candidate)
+   Compact profile, grouped links, scrolling menu, pinned footer
+   ══════════════════════════════════════════════════ */
+.db-sidebar.db-sidebar-v2 {
+    overflow: hidden;
+}
+
+.db-sidebar-v2 .db-sidebar-logo {
+    flex-shrink: 0;
+    padding: 20px 20px 12px;
+}
+
+.db-sidebar-v2 .db-sidebar-logo-img {
+    height: 30px;
+}
+
+.db-sidebar-v2 .db-profile-compact {
+    flex-direction: row;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 12px;
+    margin: 4px 16px 6px;
+    padding: 12px;
+    text-align: left;
+    background: #F8FAFC;
+    border: 1px solid #EEF1F6;
+    border-radius: 12px;
+}
+
+.db-sidebar-v2 .db-avatar-wrap {
+    position: relative;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    margin: 0;
+}
+
+.db-sidebar-v2 .db-avatar,
+.db-sidebar-v2 .db-avatar-initials {
+    width: 44px;
+    height: 44px;
+    font-size: 15px;
+}
+
+.db-sidebar-v2 .db-avatar-edit-btn {
+    position: absolute;
+    right: -3px;
+    bottom: -3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 19px;
+    height: 19px;
+    border: 2px solid #FFFFFF;
+    border-radius: 50%;
+    background: #4F48E6;
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
+.db-sidebar-v2 .db-avatar-edit-btn svg {
+    width: 9px;
+    height: 9px;
+}
+
+.db-sidebar-v2 .db-profile-text {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.db-sidebar-v2 .db-profile-name-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.db-sidebar-v2 .db-profile-name {
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    font-size: 14px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.db-sidebar-v2 .db-profile-role {
+    overflow: hidden;
+    font-size: 12px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.db-sidebar-v2 .db-plan-badge-avatar {
+    flex-shrink: 0;
+    padding: 2px 6px;
+    border-radius: 9999px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.db-sidebar-v2 .db-plan-badge-avatar.is-pro {
+    background: #EEF2FF;
+    color: #4F48E6;
+}
+
+.db-sidebar-v2 .db-plan-badge-avatar.is-premium {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.db-sidebar-v2 .db-sidebar-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    gap: 2px;
+    padding: 8px 16px 12px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #E2E8F0 transparent;
+}
+
+.db-sidebar-v2 .db-nav-heading {
+    padding: 14px 12px 6px;
+    color: #94A3B8;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.db-sidebar-v2 .db-nav-link {
+    min-height: 38px;
+    padding: 8px 12px;
+    font-size: 13.5px;
+    box-sizing: border-box;
+}
+
+.db-sidebar-v2 .db-nav-link svg {
+    width: 18px;
+    height: 18px;
+}
+
+.db-sidebar-v2 .db-nav-label {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.db-sidebar-v2 .db-nav-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    min-width: 20px;
+    height: 20px;
+    margin-left: auto;
+    padding: 0 6px;
+    border-radius: 9999px;
+    background: #4F48E6;
+    color: #FFFFFF;
+    font-size: 10.5px;
+    font-weight: 700;
+    box-sizing: border-box;
+}
+
+.db-sidebar-v2 .db-nav-count.is-soft {
+    background: #EEF2FF;
+    color: #4F48E6;
+}
+
+.db-sidebar-v2 .db-nav-tag {
+    flex-shrink: 0;
+    margin-left: auto;
+    padding: 2px 7px;
+    border-radius: 9999px;
+    background: #EEF2FF;
+    color: #4338CA;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+.db-sidebar-v2 .db-nav-tag.is-premium {
+    background: #FEF3C7;
+    color: #92400E;
+}
+
+.db-sidebar-v2 .db-sidebar-footer {
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    gap: 10px;
+    padding: 10px 16px 16px;
+    border-top: 1px solid #F1F5F9;
+}
+
+.db-sidebar-v2 .db-nav-link-logout {
+    margin-top: 0;
+}
+
+/* Compact closable promo card */
+.db-sidebar.db-sidebar-v2 .db-promo-compact {
+    position: relative;
+    flex-shrink: 0;
+    margin: 0 !important;
+    padding: 14px;
+    border-radius: 12px;
+    background: linear-gradient(155deg, #0A1E3F 0%, #0F2D6B 100%);
+    box-shadow: 0 8px 20px -6px rgba(10, 30, 63, 0.35);
+}
+
+.db-sidebar-v2 .db-promo-compact.is-upgrade {
+    background: linear-gradient(145deg, #1E1B4B 0%, #312E81 100%);
+}
+
+.db-sidebar-v2 .db-promo-compact.is-premium {
+    background: linear-gradient(145deg, #0F172A 0%, #1E293B 100%);
+}
+
+.db-sidebar-v2 .db-promo-compact .db-promo-dark-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 0 4px;
+    padding-right: 24px;
+    color: #60A5FA;
+    font-size: 13.5px;
+    font-weight: 800;
+}
+
+.db-sidebar-v2 .db-promo-compact.is-upgrade .db-promo-dark-title,
+.db-sidebar-v2 .db-promo-compact.is-premium .db-promo-dark-title {
+    color: #FFFFFF;
+}
+
+.db-sidebar-v2 .db-promo-compact .db-promo-dark-desc {
+    margin: 0 0 10px;
+    color: #A5B4CB;
+    font-size: 11.5px;
+    line-height: 1.45;
+}
+
+.db-sidebar-v2 .db-promo-compact.is-premium .db-promo-dark-desc {
+    margin: 0;
+}
+
+.db-sidebar-v2 .db-promo-compact .db-promo-dark-btn {
+    padding: 7px 10px;
+    border-radius: 9px;
+    background: #2563EB;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+.db-sidebar-v2 .db-promo-compact.is-upgrade .db-promo-dark-btn {
+    background: #FFFFFF;
+    color: #4338CA;
+}
+
+.db-sidebar-v2 .db-promo-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border: none;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.75);
+    cursor: pointer;
+}
+
+.db-sidebar-v2 .db-promo-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #FFFFFF;
+}
+
+.db-sidebar-v2 .db-promo-close svg {
+    width: 12px;
+    height: 12px;
+}
+
+.db-sidebar-v2 .db-promo-status-dot {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10B981;
+}
+
+/* Short laptop screens: keep the promo to a single line of content */
+@media (max-height: 760px) {
+    .db-sidebar-v2 .db-promo-compact .db-promo-dark-desc {
+        display: none;
+    }
+
+    .db-sidebar-v2 .db-promo-compact .db-promo-dark-title {
+        margin-bottom: 8px;
+    }
+}
+
+/* ══════════════════════════════════════════════════
+   DASHBOARD TOP BAR (tools only)
+   ══════════════════════════════════════════════════ */
+.db-cand-topnav-inner {
+    gap: 16px;
+}
+
+.db-cand-topnav-left {
+    flex-shrink: 0;
+    min-width: 0;
+}
+
+.db-topbar-heading {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.25;
+}
+
+.db-topbar-eyebrow {
+    color: #94A3B8;
+    font-size: 11.5px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.db-topbar-title {
+    color: #0F172A;
+    font-size: 15px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.db-cand-nav-search.db-topbar-search {
+    flex: 1 1 auto;
+    width: auto;
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 8px 12px;
+    border-radius: 10px;
+    box-sizing: border-box;
+}
+
+.db-topbar-search input::-webkit-search-cancel-button {
+    cursor: pointer;
+}
+
+.db-cand-topnav .db-cand-topnav-right {
+    flex-shrink: 0;
+    gap: 10px;
+    margin-left: 0;
+}
+
+.db-topbar-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    gap: 6px;
+    height: 38px;
+    padding: 0 14px;
+    border-radius: 10px;
+    background: #4F48E6;
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: background 0.15s ease;
+}
+
+.db-topbar-cta:hover {
+    background: #4338CA;
+    color: #FFFFFF;
+}
+
+.db-topbar-cta svg {
+    flex-shrink: 0;
+    width: 15px;
+    height: 15px;
+}
+
+.db-topbar-account {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 3px 10px 3px 3px;
+    border: 1px solid #E2E8F0;
+    border-radius: 9999px;
+    background: #FFFFFF;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.db-topbar-account:hover {
+    border-color: #C7D2FE;
+    background: #F8FAFF;
+}
+
+.db-topbar-account .db-cand-nav-avatar {
+    width: 32px;
+    height: 32px;
+    border: none;
+}
+
+.db-topbar-account-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    text-align: left;
+    line-height: 1.2;
+}
+
+.db-topbar-account-name {
+    max-width: 150px;
+    overflow: hidden;
+    color: #0F172A;
+    font-size: 12.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.db-topbar-account-role {
+    max-width: 150px;
+    overflow: hidden;
+    color: #94A3B8;
+    font-size: 11px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.db-topbar-account-chevron {
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    color: #94A3B8;
+    transition: transform 0.2s ease;
+}
+
+.db-topbar-account-chevron.is-open {
+    transform: rotate(180deg);
+}
+
+/* Top bar dropdown menus */
+.db-dropdown.db-topbar-menu {
+    padding: 8px;
+}
+
+.db-dropdown.db-topbar-notif-menu {
+    width: 320px;
+}
+
+.db-dropdown.db-topbar-account-menu {
+    width: 240px;
+}
+
+.db-topbar-menu-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 8px 10px;
+    color: #0F172A;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.db-topbar-menu-pill {
+    padding: 2px 8px;
+    border-radius: 9999px;
+    background: #FEE2E2;
+    color: #DC2626;
+    font-size: 10.5px;
+    font-weight: 700;
+}
+
+.db-topbar-notif-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 260px;
+    overflow-y: auto;
+}
+
+.db-topbar-notif-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 8px;
+    color: inherit;
+    text-decoration: none;
+    transition: background 0.12s ease;
+}
+
+.db-topbar-notif-item:hover {
+    background: #F8FAFC;
+}
+
+.db-topbar-notif-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
+.db-topbar-notif-icon svg {
+    width: 14px;
+    height: 14px;
+}
+
+.db-topbar-notif-icon.is-indigo { background: #EEF2FF; color: #4F48E6; }
+.db-topbar-notif-icon.is-amber { background: #FEF3C7; color: #D97706; }
+.db-topbar-notif-icon.is-blue { background: #E0F2FE; color: #0284C7; }
+.db-topbar-notif-icon.is-emerald { background: #DCFCE7; color: #16A34A; }
+
+.db-topbar-notif-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.db-topbar-notif-body strong {
+    color: #191C1D;
+    font-size: 12.5px;
+    font-weight: 600;
+}
+
+.db-topbar-notif-body span {
+    color: #64748B;
+    font-size: 11.5px;
+}
+
+.db-topbar-menu-footer {
+    display: block;
+    margin-top: 6px;
+    padding: 9px 8px 4px;
+    border-top: 1px solid #F1F5F9;
+    color: #4F48E6;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+}
+
+.db-topbar-menu-footer:hover {
+    text-decoration: underline;
+}
+
+.db-topbar-menu-identity {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 6px;
+    padding: 6px 10px 10px;
+    border-bottom: 1px solid #F1F5F9;
+}
+
+.db-topbar-menu-identity strong {
+    color: #0F172A;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.db-topbar-menu-identity span {
+    color: #94A3B8;
+    font-size: 11.5px;
+}
+
+.db-topbar-menu-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    color: #475569;
+    font-size: 13px;
+    text-decoration: none;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+
+.db-topbar-menu-link:hover {
+    background: #F1F5F9;
+    color: #0F172A;
+}
+
+.db-topbar-menu-link svg {
+    flex-shrink: 0;
+    width: 15px;
+    height: 15px;
+    color: #64748B;
+}
+
+.db-topbar-menu-link.is-danger,
+.db-topbar-menu-link.is-danger svg {
+    color: #DC2626;
+}
+
+.db-topbar-menu-link.is-danger:hover {
+    background: #FEE2E2;
+}
+
+.db-topbar-menu-divider {
+    margin: 6px 0;
+    border-top: 1px solid #F1F5F9;
+}
+
+/* The top bar logo only shows when the sidebar is collapsed into a drawer */
+@media (min-width: 901px) {
+    .db-cand-topnav .db-cand-nav-brand {
+        display: none !important;
+    }
+}
+
+@media (max-width: 1200px) {
+    .db-topbar-account-text {
+        display: none;
+    }
+
+    .db-topbar-account {
+        padding: 3px 8px 3px 3px;
+    }
+}
+
+@media (max-width: 900px) {
+    .db-topbar-heading {
+        display: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .db-cand-topnav {
+        padding: 10px 14px;
+    }
+
+    .db-topbar-cta {
+        width: 38px;
+        padding: 0;
+    }
+
+    .db-topbar-cta span {
+        display: none;
+    }
+
+    .db-topbar-account-chevron {
+        display: none;
+    }
+
+    .db-topbar-account {
+        padding: 2px;
+    }
+
+    .db-dropdown.db-topbar-notif-menu {
+        position: fixed;
+        top: 64px;
+        right: 12px;
+        left: 12px;
+        width: auto;
+    }
+}

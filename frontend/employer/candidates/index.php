@@ -306,7 +306,7 @@ declare(strict_types=1);
 function candidateApplicationsManager(initialCandidates) {
     return {
         candidates: initialCandidates || [],
-        searchQuery: '',
+        searchQuery: new URLSearchParams(window.location.search).get('search') || '',
         selectedRole: 'all',
         roleLabel: 'All Internship Roles',
         roleDropdownOpen: false,

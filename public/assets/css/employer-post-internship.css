@@ -2147,9 +2147,9 @@ input:checked + .emp-slider:before {
 }
 
 .emp-status-badge.closed {
-    background: #F1F5F9;
-    color: #64748B;
-    border: 1px solid #E2E8F0;
+    background: #FEE2E2 !important;
+    color: #DC2626 !important;
+    border: 1px solid #FECACA !important;
 }
 
 .emp-status-badge.draft {
@@ -2188,17 +2188,19 @@ input:checked + .emp-slider:before {
     margin-top: 8px;
 }
 
-/* Metrics Section (Applicants, Shortlist, Interviews, Hired) */
+/* Metrics Section (Fixed Width & Precise Grid Alignment across all cards) */
 .emp-card-stats {
-    display: flex;
-    align-items: center;
-    gap: 28px;
-    padding: 0 16px;
+    width: 330px;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 12px;
+    padding: 0 12px;
+    flex-shrink: 0 !important;
 }
 
 .emp-stat-col {
     text-align: center;
-    min-width: 48px;
+    min-width: 0;
 }
 
 .emp-stat-number {
@@ -2219,19 +2221,32 @@ input:checked + .emp-slider:before {
 }
 
 .emp-draft-ready-prompt {
+    width: 330px;
+    text-align: right;
     font-size: 13.5px;
     font-weight: 700;
     color: #92400E;
+    padding-right: 16px;
     white-space: nowrap !important;
-    padding-right: 12px;
+    flex-shrink: 0 !important;
 }
 
-/* Card Actions */
+/* Card Actions (Fixed Right Slot Alignment) */
 .emp-card-actions {
+    width: 230px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: flex-end;
+    gap: 8px;
     flex-shrink: 0 !important;
+}
+
+.emp-action-buttons-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
+    width: 100%;
 }
 
 .emp-btn-view-apps {
@@ -2239,7 +2254,7 @@ input:checked + .emp-slider:before {
     color: #4F48E6;
     border: 1px solid #C7D2FE;
     border-radius: 8px;
-    padding: 8px 18px;
+    padding: 8px 16px;
     font-size: 13px;
     font-weight: 700;
     text-decoration: none;
@@ -2259,15 +2274,18 @@ input:checked + .emp-slider:before {
 .emp-btn-archive {
     background: #F1F5F9;
     color: #475569;
-    border: 1px solid #E2E8F0;
+    border: 1px solid #CBD5E1;
     border-radius: 8px;
-    padding: 8px 18px;
+    padding: 8px 16px;
     font-size: 13px;
     font-weight: 700;
-    text-decoration: none;
+    cursor: pointer;
     transition: all 0.15s ease;
     white-space: nowrap !important;
     flex-shrink: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
 }
 
 .emp-btn-archive:hover {
@@ -2280,13 +2298,16 @@ input:checked + .emp-slider:before {
     color: #FFFFFF;
     border: 1px solid #78350F;
     border-radius: 8px;
-    padding: 8px 20px;
+    padding: 8px 16px;
     font-size: 13px;
     font-weight: 700;
     text-decoration: none;
     transition: all 0.15s ease;
     white-space: nowrap !important;
     flex-shrink: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
 }
 
 .emp-btn-finish-post:hover {
@@ -2294,8 +2315,8 @@ input:checked + .emp-slider:before {
 }
 
 .emp-icon-action-btn {
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
     border-radius: 8px;
     background: #F8FAFC;
     border: 1px solid #E2E8F0;
@@ -2315,9 +2336,128 @@ input:checked + .emp-slider:before {
     border-color: #CBD5E1;
 }
 
+.emp-icon-action-btn.is-danger {
+    color: #94A3B8;
+}
+
+.emp-icon-action-btn.is-danger:hover {
+    background: #FEF2F2;
+    color: #DC2626;
+    border-color: #FECACA;
+}
+
 .emp-icon-action-btn svg {
     width: 15px;
     height: 15px;
+    flex-shrink: 0;
+}
+
+/* Dropdown Menu for More Actions */
+.emp-card-menu-wrap {
+    position: relative;
+    display: inline-block;
+}
+
+.emp-card-menu-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    min-width: 170px;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 6, 35, 0.1);
+    padding: 6px;
+    z-index: 100;
+}
+
+.emp-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    white-space: nowrap !important;
+}
+
+.emp-menu-item:hover {
+    background: #F8FAFC;
+    color: #000623;
+}
+
+.emp-menu-item svg {
+    width: 15px;
+    height: 15px;
+    color: #64748B;
+    flex-shrink: 0;
+}
+
+.emp-menu-item:hover svg {
+    color: #4F48E6;
+}
+
+.emp-menu-item.is-danger {
+    color: #DC2626;
+}
+
+.emp-menu-item.is-danger:hover {
+    background: #FEF2F2;
+    color: #B91C1C;
+}
+
+.emp-menu-item.is-danger svg {
+    color: #DC2626;
+}
+
+.emp-menu-divider {
+    height: 1px;
+    background: #F1F5F9;
+    margin: 4px 0;
+}
+
+/* Modal Buttons */
+.emp-btn-cancel-modal {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    color: #475569;
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.emp-btn-cancel-modal:hover {
+    background: #F8FAFC;
+    color: #0F172A;
+}
+
+.emp-btn-confirm-delete {
+    background: #DC2626;
+    border: 1px solid #DC2626;
+    color: #FFFFFF;
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.emp-btn-confirm-delete:hover {
+    background: #B91C1C;
+    border-color: #B91C1C;
 }
 
 /* Responsive Card Breakpoint */
@@ -2325,18 +2465,46 @@ input:checked + .emp-slider:before {
     .emp-internship-card {
         flex-direction: column;
         align-items: stretch;
-        gap: 18px;
-        padding: 20px 18px;
+        gap: 16px;
+        padding: 18px 16px;
+    }
+    .emp-card-left {
+        width: 100%;
+        min-width: 0;
     }
     .emp-card-stats {
-        padding: 14px 0;
+        width: 100%;
+        padding: 12px 0;
         border-top: 1px solid #F1F5F9;
         border-bottom: 1px solid #F1F5F9;
-        justify-content: space-around;
-        gap: 12px;
+        display: grid !important;
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: 6px;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+    }
+    .emp-stat-number {
+        font-size: 18px;
+    }
+    .emp-stat-label {
+        font-size: 9.5px;
+    }
+    .emp-draft-ready-prompt {
+        width: 100%;
+        text-align: left;
+        padding: 8px 0;
     }
     .emp-card-actions {
-        justify-content: flex-end;
+        width: 100%;
+        justify-content: flex-start;
+    }
+    .emp-action-buttons-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .emp-btn-view-apps, .emp-btn-finish-post, .emp-btn-archive {
+        flex: 1;
+        justify-content: center;
     }
 }
 

@@ -13,11 +13,12 @@ declare(strict_types=1);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($title ?? 'InternConnect') ?></title>
+<?= seo_render_head($title ?? null, $metaDescription ?? null) ?>
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="<?= asset('assets/images/logos/Logo_single_dark_dj6vhf.png') ?>">
     <!-- Global CSS -->
     <link rel="stylesheet" href="<?= asset('assets/css/style.css') ?>?v=<?= time() ?>">
+    <link rel="stylesheet" href="<?= asset('assets/css/pages.css') ?>?v=<?= time() ?>">
     <?php if (isset($extraCss)): ?>
         <?php foreach ((array)$extraCss as $cssPath): ?>
             <link rel="stylesheet" href="<?= asset($cssPath) ?>">

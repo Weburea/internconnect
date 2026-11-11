@@ -15,9 +15,13 @@ require_once dirname(__DIR__) . '/backend/Core/helpers.php';
 
 use App\Core\Router;
 
-// Simple environment configuration loader
-if (file_exists(dirname(__DIR__) . '/.env')) {
-    $lines = file(dirname(__DIR__) . '/.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+// Simple environment configuration loader (cPanel & Localhost compatible)
+$envPath = file_exists(dirname(__DIR__) . '/.env') 
+    ? dirname(__DIR__) . '/.env' 
+    : (file_exists(__DIR__ . '/.env') ? __DIR__ . '/.env' : null);
+
+if ($envPath) {
+    $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line) {
         $line = trim($line);
         if ($line === '' || str_starts_with($line, '#')) {

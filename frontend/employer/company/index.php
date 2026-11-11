@@ -886,7 +886,7 @@ $strength    = (int)($employer['profile_strength'] ?? 78);
                                 <?php foreach (($culture['tags'] ?? []) as $tag): ?>
                                     <span class="comp-tag-pill">
                                         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                                         </svg>
                                         <?= htmlspecialchars($tag) ?>
                                     </span>
@@ -1017,8 +1017,8 @@ $strength    = (int)($employer['profile_strength'] ?? 78);
                             </div>
 
                             <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 18px; padding-top: 16px; border-top: 1px solid #F1F5F9;">
-                                <a href="<?= url('/employer/company') ?>" class="comp-btn-primary" style="justify-content: center;">
-                                    <span>Preview Profile →</span>
+                                <a href="<?= url('/company/techflow') ?>" target="_blank" class="comp-btn-primary" style="justify-content: center;">
+                                    <span>Preview Public Profile →</span>
                                 </a>
                                 <a href="<?= url('/employer/profile') ?>" class="comp-btn-outline" style="justify-content: center;">
                                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

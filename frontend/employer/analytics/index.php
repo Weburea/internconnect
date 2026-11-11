@@ -429,6 +429,80 @@ $role        = $employer['role'] ?? 'Talent Acquisition Team';
     flex-shrink: 0;
 }
 
+/* Header actions: period picker and export side by side, right-aligned */
+.analytics-actions {
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    margin-left: auto;
+}
+
+.analytics-actions .db-dropdown-wrap {
+    position: relative;
+    width: auto;
+}
+
+.analytics-actions .db-dropdown-btn {
+    width: auto;
+    min-width: 172px;
+    height: 40px;
+    justify-content: space-between;
+    gap: 10px;
+    box-sizing: border-box;
+}
+
+.analytics-actions .analytics-export-btn {
+    height: 40px;
+    box-sizing: border-box;
+}
+
+/* KPI cards: five across on desktop, 3 + 2 on tablets, stacked on phones */
+.analytics-kpi-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+@media (max-width: 1180px) {
+    .analytics-kpi-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+/* KPI cards: label, value, trend and note sit on the same lines in every card */
+.analytics-kpi-card {
+    padding: 18px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    justify-content: stretch;
+    row-gap: 8px;
+}
+
+.analytics-kpi-top {
+    display: contents;
+}
+
+.analytics-kpi-lbl {
+    grid-row: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.analytics-kpi-val {
+    grid-row: 2;
+    margin-bottom: 0;
+    white-space: nowrap;
+}
+
+.analytics-kpi-badge {
+    grid-row: 3;
+    justify-self: start;
+}
+
+.analytics-kpi-sub {
+    grid-row: 4;
+    line-height: 1.45;
+}
+
 /* Responsive Media Queries */
 @media (max-width: 960px) {
     .analytics-sections-grid {
@@ -450,7 +524,8 @@ $role        = $employer['role'] ?? 'Talent Acquisition Team';
         flex-direction: column !important;
     }
     .analytics-actions .db-dropdown-wrap,
-    .analytics-actions .db-dropdown-btn {
+    .analytics-actions .db-dropdown-btn,
+    .analytics-actions .analytics-export-btn {
         width: 100% !important;
         justify-content: center !important;
     }

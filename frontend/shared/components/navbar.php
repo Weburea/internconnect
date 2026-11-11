@@ -10,9 +10,9 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Default state is TRUE (shows Search input, Notification Bell, and Avatar Dropdown)
+// Default state is TRUE (shows Notification Bell and Avatar Dropdown)
 $isLoggedIn = true;
-if (isset($_GET['logged_out']) || isset($_GET['logout'])) {
+if (isset($_GET['logout']) && ($_GET['logout'] === 'true' || $_GET['logout'] === '1')) {
     $isLoggedIn = false;
 }
 
@@ -40,11 +40,11 @@ if ($currentPath !== '/' && str_ends_with($currentPath, '/')) {
     $currentPath = rtrim($currentPath, '/');
 }
 
-$isInternshipsActive = ($currentPath === '/internships' || str_starts_with($currentPath, '/internship') || str_starts_with($currentPath, '/apply'));
-$isHowItWorksActive  = ($currentPath === '/how-it-works');
-$isElearningActive   = ($currentPath === '/elearning' || $currentPath === '/e-learning');
-$isPaymentsActive    = ($currentPath === '/pricing' || $currentPath === '/payments' || $currentPath === '/pricing/upgrade' || $currentPath === '/checkout');
-$isStoriesActive     = ($currentPath === '/success-stories' || $currentPath === '/testimonials');
+$isJobsActive        = ($currentPath === '/internships' || $currentPath === '/search' || str_starts_with($currentPath, '/internship') || str_starts_with($currentPath, '/apply'));
+$isPricingActive     = ($currentPath === '/pricing' || $currentPath === '/payments' || $currentPath === '/pricing/upgrade' || $currentPath === '/checkout');
+$isElearningActive   = ($currentPath === '/elearning' || str_starts_with($currentPath, '/elearning'));
+$isHowItWorksActive  = ($currentPath === '/how-it-works' || $currentPath === '/#features');
+$isContactActive     = ($currentPath === '/contact');
 
 $userName = $_SESSION['profile_name'] ?? 'Sarah Peters';
 $userEmail = $_SESSION['profile_email'] ?? 'sarah.peters@example.com';
@@ -58,41 +58,79 @@ $userAvatar = $_SESSION['profile_avatar'] ?? asset('assets/images/profile.png');
                 <a href="<?= url('/') ?>" class="header-brand-logo" aria-label="InternConnect Home">
                     <img src="<?= asset('assets/images/logos/Logo_dark_dx00tg.svg') ?>" alt="InternConnect" class="header-logo-img">
                 </a>
-                <!-- Desktop Navigation Links -->
-                <div class="header-desktop-links">
-                    <a href="<?= url('/internships') ?>" class="header-nav-link <?= $isInternshipsActive ? 'active' : '' ?>">Find Internships</a>
-                    <a href="<?= url('/#features') ?>" class="header-nav-link <?= $isHowItWorksActive ? 'active' : '' ?>">How it Works</a>
-                    <a href="<?= url('/#elearning') ?>" class="header-nav-link <?= $isElearningActive ? 'active' : '' ?>">E-Learning</a>
-                    <a href="<?= url('/pricing') ?>" class="header-nav-link <?= $isPaymentsActive ? 'active' : '' ?>">Payments</a>
-                    <a href="<?= url('/#testimonials') ?>" class="header-nav-link <?= $isStoriesActive ? 'active' : '' ?>">Success Stories</a>
-                </div>
+            </div>
+
+            <!-- Desktop Navigation Links (Centered) -->
+            <div class="header-desktop-links">
+                <a href="<?= url('/internships') ?>" class="header-nav-link <?= $isJobsActive ? 'active' : '' ?>">Find Jobs</a>
+                <a href="<?= url('/pricing') ?>" class="header-nav-link <?= $isPricingActive ? 'active' : '' ?>">Pricing</a>
+                <a href="<?= url('/elearning') ?>" class="header-nav-link <?= $isElearningActive ? 'active' : '' ?>">E-Learning</a>
+                <a href="<?= url('/how-it-works') ?>" class="header-nav-link <?= $isHowItWorksActive ? 'active' : '' ?>">How It Works</a>
+                <a href="<?= url('/contact') ?>" class="header-nav-link <?= $isContactActive ? 'active' : '' ?>">Contact Us</a>
             </div>
 
             <!-- Desktop Right Group -->
             <div class="header-right-group">
                 <?php if ($isLoggedIn): ?>
-                    <!-- Search Internships Form with Clickable Button -->
-                    <form action="<?= url('/internships') ?>" method="GET" class="header-search-form">
-                        <div class="header-search-inner">
-                            <svg class="header-search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                            <input type="text" name="search" placeholder="Search Internships" class="header-search-input" aria-label="Search Internships">
-                            <button type="submit" class="header-search-btn" aria-label="Search">
-                                <svg class="header-search-btn-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                            </button>
-                        </div>
-                    </form>
 
-                    <!-- Notification Bell Button -->
-                    <button type="button" class="header-notif-btn" aria-label="View notifications">
-                        <svg class="header-notif-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                        </svg>
-                        <span class="header-notif-dot"></span>
-                    </button>
+                    <!-- Notification Bell Button with Interactive Dropdown -->
+                    <div class="relative" x-data="{ notifOpen: false }" @click.outside="notifOpen = false">
+                        <button @click="notifOpen = !notifOpen" type="button" class="header-notif-btn" aria-label="View notifications" aria-expanded="false">
+                            <svg class="header-notif-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                            </svg>
+                            <span class="header-notif-dot"></span>
+                        </button>
+
+                        <!-- Notification Dropdown Menu -->
+                        <div x-show="notifOpen"
+                             x-transition:enter="transition ease-out duration-150"
+                             x-transition:enter-start="transform opacity-0 scale-95"
+                             x-transition:enter-end="transform opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-100"
+                             x-transition:leave-start="transform opacity-100 scale-100"
+                             x-transition:leave-end="transform opacity-0 scale-95"
+                             class="header-notif-dropdown"
+                             style="display: none; width: 320px; position: absolute; right: 0; top: calc(100% + 10px); background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); padding: 14px; z-index: 60;"
+                             @click.stop>
+                            <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 13px; font-weight: 700; color: #000623;">Notifications</span>
+                                <span style="background: #EEF2FF; color: #4F48E6; font-size: 11px; padding: 2px 8px; border-radius: 99px; font-weight: 700;">3 New</span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto;">
+                                <a href="<?= url('/candidate/dashboard') ?>" style="display: flex; gap: 10px; padding: 8px; border-radius: 8px; text-decoration: none; transition: background .12s;" onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background='transparent'">
+                                    <div style="width: 30px; height: 30px; border-radius: 50%; background: #EFF6FF; display: flex; align-items: center; justify-content: center; color: #3B82F6; flex-shrink: 0;">
+                                        <svg style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 12px; font-weight: 600; color: #191C1D;">Interview Scheduled</div>
+                                        <div style="font-size: 11px; color: #64748B;">Tomorrow at 10:00 AM</div>
+                                    </div>
+                                </a>
+                                <a href="<?= url('/candidate/applications') ?>" style="display: flex; gap: 10px; padding: 8px; border-radius: 8px; text-decoration: none; transition: background .12s;" onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background='transparent'">
+                                    <div style="width: 30px; height: 30px; border-radius: 50%; background: #DCFCE7; display: flex; align-items: center; justify-content: center; color: #16A34A; flex-shrink: 0;">
+                                        <svg style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 12px; font-weight: 600; color: #191C1D;">Application Shortlisted</div>
+                                        <div style="font-size: 11px; color: #64748B;">2 hours ago</div>
+                                    </div>
+                                </a>
+                                <a href="<?= url('/help') ?>" style="display: flex; gap: 10px; padding: 8px; border-radius: 8px; text-decoration: none; transition: background .12s;" onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background='transparent'">
+                                    <div style="width: 30px; height: 30px; border-radius: 50%; background: #F5F3FF; display: flex; align-items: center; justify-content: center; color: #7C3AED; flex-shrink: 0;">
+                                        <svg style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 12px; font-weight: 600; color: #191C1D;">New Message from Recruiter</div>
+                                        <div style="font-size: 11px; color: #64748B;">4 hours ago</div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div style="border-top: 1px solid #F1F5F9; margin-top: 10px; padding-top: 8px;">
+                                <a href="<?= url('/candidate/dashboard') ?>" style="display: block; text-align: center; font-size: 12px; color: #4F48E6; font-weight: 600; text-decoration: none;">View All Notifications</a>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Avatar with Dropdown -->
                     <div class="relative">
@@ -183,34 +221,15 @@ $userAvatar = $_SESSION['profile_avatar'] ?? asset('assets/images/profile.png');
     </nav>
 
     <!-- Mobile Menu Drawer -->
-    <div x-show="open" @click.away="open = false" class="md:hidden" id="mobile-menu" x-transition style="display: none;">
+    <div x-show="open" @click.away="open = false" class="lg:hidden" id="mobile-menu" x-transition style="display: none;">
         <div class="header-mobile-drawer">
-            <?php if ($isLoggedIn): ?>
-                <!-- Mobile Search Bar (100% Full Width) -->
-                <div class="header-mobile-search-wrap">
-                    <form action="<?= url('/internships') ?>" method="GET" class="header-search-form w-full">
-                        <div class="header-search-inner w-full">
-                            <svg class="header-search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                            <input type="text" name="search" placeholder="Search Internships" class="header-search-input w-full" aria-label="Search Internships">
-                            <button type="submit" class="header-search-btn" aria-label="Search">
-                                <svg class="header-search-btn-svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            <?php endif; ?>
-
             <!-- Mobile Navigation Links -->
             <div class="header-mobile-links">
-                <a href="<?= url('/internships') ?>" class="header-mobile-link <?= $isInternshipsActive ? 'active' : '' ?>">Find Internships</a>
-                <a href="<?= url('/#features') ?>" class="header-mobile-link <?= $isHowItWorksActive ? 'active' : '' ?>">How it Works</a>
-                <a href="<?= url('/#elearning') ?>" class="header-mobile-link <?= $isElearningActive ? 'active' : '' ?>">E-Learning</a>
-                <a href="<?= url('/pricing') ?>" class="header-mobile-link <?= $isPaymentsActive ? 'active' : '' ?>">Payments</a>
-                <a href="<?= url('/#testimonials') ?>" class="header-mobile-link <?= $isStoriesActive ? 'active' : '' ?>">Success Stories</a>
+                <a href="<?= url('/internships') ?>" class="header-mobile-link <?= $isJobsActive ? 'active' : '' ?>">Find Jobs</a>
+                <a href="<?= url('/pricing') ?>" class="header-mobile-link <?= $isPricingActive ? 'active' : '' ?>">Pricing</a>
+                <a href="<?= url('/elearning') ?>" class="header-mobile-link <?= $isElearningActive ? 'active' : '' ?>">E-Learning</a>
+                <a href="<?= url('/how-it-works') ?>" class="header-mobile-link <?= $isHowItWorksActive ? 'active' : '' ?>">How It Works</a>
+                <a href="<?= url('/contact') ?>" class="header-mobile-link <?= $isContactActive ? 'active' : '' ?>">Contact Us</a>
             </div>
 
             <?php if ($isLoggedIn): ?>

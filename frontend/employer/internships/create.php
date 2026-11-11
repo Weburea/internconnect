@@ -40,7 +40,7 @@ $draftBenefits              = !empty($draft['benefits']) && is_array($draft['ben
     ? $draft['benefits']
     : [''];
 
-$draftSkills         = $draft['skills'] ?? ['Figma', 'UI/UX Design'];
+$draftSkills         = $draft['skills'] ?? [];
 $rawEdu              = $draft['education_level'] ?? 'Undergraduate';
 $draftEducationLevels = is_array($rawEdu) ? $rawEdu : array_values(array_filter(array_map('trim', explode(',', (string)$rawEdu))));
 if (empty($draftEducationLevels)) {
@@ -50,12 +50,12 @@ $draftEducation      = implode(', ', $draftEducationLevels);
 $draftExperience     = $draft['experience_level'] ?? 'No Experience';
 $draftStartDate      = $draft['start_date'] ?? '2026-06-01';
 $draftDuration       = (!empty($draft['duration']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $draft['duration'])) ? $draft['duration'] : '2026-08-31';
-$draftOpenings       = $draft['openings'] ?? 10;
+$draftOpenings       = $draft['openings'] ?? 1;
 $draftStipend        = $draft['stipend_amount'] ?? '2000';
 $draftIsUnpaid       = !empty($draft['is_unpaid']);
 $draftPerks          = $draft['perks'] ?? ['Certificate', 'Letter of Recommendation', 'Flexible work hours'];
 $draftDeadline       = $draft['deadline'] ?? '2026-05-15';
-$draftNumInterns     = $draft['num_interns'] ?? 10;
+$draftNumInterns     = $draft['num_interns'] ?? 1;
 $draftAllowRemote    = $draft['allow_remote'] ?? true;
 
 $validInterviewTypes = [
@@ -67,22 +67,15 @@ if (!in_array($draftInterviewType, $validInterviewTypes, true)) {
     $draftInterviewType = 'Video Interview (Online Meeting Link)';
 }
 
-// Relevant Experience: configures Step 1 candidate experience questions
+// Relevant Experience: configures Step 1 candidate experience questions (Clean empty default)
 $draftRelevantExperience = !empty($draft['relevant_experience']) && is_array($draft['relevant_experience'])
     ? $draft['relevant_experience']
-    : [
-        ['id' => 1, 'label' => '1. Job Title', 'type' => 'Text Input', 'required' => true],
-        ['id' => 2, 'label' => '2. Company', 'type' => 'Text Input', 'required' => true],
-        ['id' => 3, 'label' => '3. Salary Expectation ($/month)', 'type' => 'Currency / Number', 'required' => true],
-    ];
+    : [];
 
-// Screening Questions: configures Step 3 candidate questions (Matches Screenshot 1)
+// Screening Questions: configures Step 3 candidate questions (Clean empty default)
 $draftQuestions      = !empty($draft['screening_questions']) && is_array($draft['screening_questions'])
     ? $draft['screening_questions']
-    : [
-        ['id' => 1, 'text' => 'Why are you interested in this specific internship role?', 'type' => 'Short Answer'],
-        ['id' => 2, 'text' => 'Share a link to your portfolio or GitHub profile.', 'type' => 'Link / URL'],
-    ];
+    : [];
 ?>
 
 <link rel="stylesheet" href="<?= asset('assets/css/employer-post-internship.css') ?>">
@@ -1354,7 +1347,7 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('postInternshipForm', () => {
         const initialData = window.__postInternshipInitialData || {};
         return {
-            skills: Array.isArray(initialData.skills) && initialData.skills.length > 0 ? initialData.skills : ['Figma', 'UI/UX Design'],
+            skills: Array.isArray(initialData.skills) ? initialData.skills : [],
             category: initialData.category || 'Technology',
             type: initialData.type || 'Remote',
             educationLevels: Array.isArray(initialData.educationLevels) 
@@ -1367,14 +1360,10 @@ document.addEventListener('alpine:init', () => {
             isUnpaid: Boolean(initialData.isUnpaid),
             allowRemote: initialData.allowRemote !== undefined ? Boolean(initialData.allowRemote) : true,
             
-            // Relevant Experience fields (Step 1 Candidate)
-            relevantExperience: Array.isArray(initialData.relevantExperience) ? initialData.relevantExperience : [
-                { id: 1, label: '1. Job Title', type: 'Text Input', required: true },
-                { id: 2, label: '2. Company', type: 'Text Input', required: true },
-                { id: 3, label: '3. Salary Expectation ($/month)', type: 'Currency / Number', required: true }
-            ],
+            // Relevant Experience fields (Step 1 Candidate - Clean empty default)
+            relevantExperience: Array.isArray(initialData.relevantExperience) ? initialData.relevantExperience : [],
             
-            // Screening Questions (Step 3 Candidate)
+            // Screening Questions (Step 3 Candidate - Clean empty default)
             questions: Array.isArray(initialData.questions) ? initialData.questions : [],
             responsibilitiesTitle: initialData.responsibilitiesTitle || 'Key Responsibilities',
             responsibilities: Array.isArray(initialData.responsibilities) && initialData.responsibilities.length > 0 ? initialData.responsibilities : [''],

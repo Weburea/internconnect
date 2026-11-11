@@ -6,7 +6,9 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Services\CommunicationService;
+use App\Services\UploadStorage;
 use App\Services\ExportService;
+use App\Services\VideoInterviewService;
 
 /**
  * EmployerController
@@ -842,17 +844,21 @@ class EmployerController extends Controller
         }
 
         $success = $_SESSION['profile_success'] ?? null;
-        unset($_SESSION['profile_success']);
+        $error = $_SESSION['profile_error'] ?? null;
+        unset($_SESSION['profile_success'], $_SESSION['profile_error']);
 
         $employer = [
             'company_name'          => $_SESSION['employer_company'] ?? 'TechFlow Systems',
             'slogan'                => $_SESSION['employer_slogan'] ?? 'Building innovative digital experiences for the future',
             'cac_number'            => $_SESSION['employer_cac_number'] ?? 'RC-1849204',
-            'business_doc_name'     => $_SESSION['employer_business_doc_name'] ?? '',
-            'business_doc_size'     => $_SESSION['employer_business_doc_size'] ?? '',
-            'business_doc_uploaded' => !empty($_SESSION['employer_business_doc_name']),
-            'business_doc_url'      => $_SESSION['employer_business_doc_url'] ?? asset('dummy.pdf'),
-            'business_doc_verified' => !empty($_SESSION['employer_business_doc_name']),
+            // Business registration document stored privately by UploadStorage
+            'business_doc'          => UploadStorage::describe($_SESSION['employer_business_doc'] ?? null, url('/employer/profile/business-doc')),
+            'business_doc_name'     => $_SESSION['employer_business_doc']['name'] ?? '',
+            'founded_year'          => $_SESSION['employer_founded_year'] ?? '2018',
+            'linkedin'              => $_SESSION['employer_linkedin'] ?? 'linkedin.com/company/techflow',
+            'twitter'               => $_SESSION['employer_twitter'] ?? '@techflow',
+            'pending_email'         => $_SESSION['employer_pending_email']['email'] ?? null,
+            'pending_email_dev_code'=> (($_ENV['APP_ENV'] ?? '') === 'local') ? ($_SESSION['employer_pending_email']['dev_code'] ?? null) : null,
             'industry'              => $_SESSION['employer_industry'] ?? 'Software Development',
             'company_size'          => $_SESSION['employer_company_size'] ?? '201–500 employees',
             'website'               => $_SESSION['employer_website'] ?? 'https://techflow.io',
@@ -861,7 +867,9 @@ class EmployerController extends Controller
             'google_email'          => 'techflow.official@gmail.com',
             'phone'                 => $_SESSION['employer_phone'] ?? '+234 801 234 5678',
             'location'              => $_SESSION['employer_location'] ?? 'Victoria Island, Lagos, Nigeria',
-            'logo'                  => $_SESSION['employer_logo'] ?? 'https://res.cloudinary.com/weburea/image/upload/v1789424092/internConnect/images/hk_logo.jpg',
+            'logo'                  => UploadStorage::path($_SESSION['employer_logo_file'] ?? null) !== null
+                ? UploadStorage::describe($_SESSION['employer_logo_file'], url('/employer/profile/logo'))['url']
+                : ($_SESSION['employer_logo'] ?? 'https://res.cloudinary.com/weburea/image/upload/v1789424092/internConnect/images/hk_logo.jpg'),
             'banner'                => $_SESSION['employer_banner'] ?? 'https://res.cloudinary.com/weburea/image/upload/v1789424121/internConnect/images/hk_banner.png',
             'description'           => $_SESSION['employer_description'] ?? 'TechFlow Systems is a leading provider of enterprise software solutions, specializing in cloud-native applications and AI-driven analytics. We empower businesses to streamline their operations and unlock new growth opportunities through cutting-edge technology.',
             'culture_description'   => $_SESSION['employer_culture_desc'] ?? 'We believe that a supportive and inclusive environment is key to driving innovation. Our core values guide everything we do, from product development to team collaboration.',
@@ -917,6 +925,7 @@ class EmployerController extends Controller
             'title'    => 'Employer Profile & Settings — InternConnect',
             'employer' => $employer,
             'success'  => $success,
+            'error'    => $error,
         ], 'dashboard');
     }
 
@@ -932,7 +941,40 @@ class EmployerController extends Controller
         $action = $_POST['action'] ?? 'update_profile';
 
         if ($action === 'update_password') {
-            $_SESSION['profile_success'] = 'Password updated successfully!';
+            $currentPass = (string)($_POST['current_password'] ?? '');
+            $newPass     = (string)($_POST['new_password'] ?? '');
+            $confirmPass = (string)($_POST['confirm_password'] ?? '');
+            $hash        = $_SESSION['employer_password_hash'] ?? '';
+            if ($currentPass === '' || $newPass === '' || $confirmPass === '') {
+                $_SESSION['profile_error'] = 'Please fill in all password fields.';
+            } elseif (strlen($newPass) < 8) {
+                $_SESSION['profile_error'] = 'New password must be at least 8 characters long.';
+            } elseif ($newPass !== $confirmPass) {
+                $_SESSION['profile_error'] = 'New password and confirmation do not match.';
+            } elseif ($hash !== '' && !password_verify($currentPass, $hash)) {
+                $_SESSION['profile_error'] = 'Your current password is incorrect.';
+            } else {
+                $_SESSION['employer_password_hash'] = password_hash($newPass, PASSWORD_DEFAULT);
+                $_SESSION['profile_success'] = 'Password updated successfully!';
+            }
+        } elseif ($action === 'verify_email') {
+            $pending = $_SESSION['employer_pending_email'] ?? null;
+            $code = preg_replace('/\D+/', '', (string)($_POST['email_code'] ?? ''));
+            if (!$pending) {
+                $_SESSION['profile_error'] = 'There is no email change waiting for confirmation.';
+            } elseif (time() > (int)$pending['expires']) {
+                unset($_SESSION['employer_pending_email']);
+                $_SESSION['profile_error'] = 'That code has expired. Please change your email again to get a new code.';
+            } elseif (strlen($code) !== 6 || !hash_equals((string)$pending['code_hash'], hash('sha256', $code))) {
+                $_SESSION['profile_error'] = 'That code is not correct. Please check it and try again.';
+            } else {
+                $_SESSION['employer_email'] = $pending['email'];
+                unset($_SESSION['employer_pending_email']);
+                $_SESSION['profile_success'] = 'Email address confirmed and updated.';
+            }
+        } elseif ($action === 'cancel_email') {
+            unset($_SESSION['employer_pending_email']);
+            $_SESSION['profile_success'] = 'Email change cancelled.';
         } elseif ($action === 'update_privacy') {
             $_SESSION['employer_privacy_show_email']    = isset($_POST['privacy_show_email']);
             $_SESSION['employer_privacy_show_phone']    = isset($_POST['privacy_show_phone']);
@@ -983,8 +1025,29 @@ class EmployerController extends Controller
             if (!empty($_POST['culture_description'])) {
                 $_SESSION['employer_culture_desc'] = trim($_POST['culture_description']);
             }
-            if (!empty($_POST['email'])) {
-                $_SESSION['employer_email'] = trim($_POST['email']);
+            // Email changes are confirmed with a 6-digit code before they take effect
+            $emailNotice = '';
+            $currentEmail = $_SESSION['employer_email'] ?? 'careers@techflow.io';
+            $postedEmail = strtolower(trim(strip_tags((string)($_POST['email'] ?? ''))));
+            if ($postedEmail !== '' && $postedEmail !== strtolower($currentEmail)) {
+                if (!filter_var($postedEmail, FILTER_VALIDATE_EMAIL)) {
+                    $emailNotice = ' The new email address is not valid, so it was not changed.';
+                } else {
+                    $code = (string)random_int(100000, 999999);
+                    $_SESSION['employer_pending_email'] = [
+                        'email'     => $postedEmail,
+                        'code_hash' => hash('sha256', $code),
+                        'expires'   => time() + 15 * 60,
+                        'dev_code'  => $code,
+                    ];
+                    // TODO(backend): send $code to $postedEmail via the mailer instead of exposing it locally.
+                    $emailNotice = ' Enter the 6-digit code sent to ' . $postedEmail . ' to confirm your new email.';
+                }
+            }
+            foreach (['founded_year' => 4, 'linkedin' => 200, 'twitter' => 60] as $key => $max) {
+                if (isset($_POST[$key])) {
+                    $_SESSION['employer_' . $key] = mb_substr(trim(strip_tags((string)$_POST[$key])), 0, $max);
+                }
             }
             if (!empty($_POST['phone'])) {
                 $_SESSION['employer_phone'] = trim($_POST['phone']);
@@ -1007,12 +1070,76 @@ class EmployerController extends Controller
             if (!empty($_POST['internship_type'])) {
                 $_SESSION['employer_internship_type'] = trim($_POST['internship_type']);
             }
-            $_SESSION['profile_success'] = 'Employer profile settings updated successfully!';
+            $_SESSION['profile_success'] = 'Employer profile settings updated successfully!' . $emailNotice;
         }
 
         $this->redirect('/employer/profile');
     }
 
+    /**
+     * Upload / replace the company logo (AJAX, multipart field `logo`)
+     */
+    public function uploadLogo(): void
+    {
+        $this->storeEmployerUpload('logo', 'employer_logo_file', '/employer/profile/logo');
+    }
+
+    /**
+     * Upload / replace the business registration document (AJAX, multipart field `business_doc`)
+     */
+    public function uploadBusinessDoc(): void
+    {
+        $this->storeEmployerUpload('business_doc', 'employer_business_doc', '/employer/profile/business-doc');
+    }
+
+    public function streamLogo(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        UploadStorage::stream($_SESSION['employer_logo_file'] ?? null);
+    }
+
+    public function streamBusinessDoc(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        UploadStorage::stream($_SESSION['employer_business_doc'] ?? null, isset($_GET['download']));
+    }
+
+    public function deleteBusinessDoc(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        UploadStorage::delete($_SESSION['employer_business_doc'] ?? null);
+        unset($_SESSION['employer_business_doc']);
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true]);
+        exit;
+    }
+
+    private function storeEmployerUpload(string $kind, string $sessionKey, string $viewPath): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        header('Content-Type: application/json');
+
+        $result = UploadStorage::store($_FILES[$kind] ?? null, $kind);
+        if (!$result['ok']) {
+            http_response_code(422);
+            echo json_encode(['success' => false, 'error' => $result['error']]);
+            exit;
+        }
+
+        UploadStorage::delete($_SESSION[$sessionKey] ?? null);
+        $_SESSION[$sessionKey] = $result['meta'];
+
+        echo json_encode(['success' => true, 'file' => UploadStorage::describe($result['meta'], url($viewPath))]);
+        exit;
+    }
     /**
      * Renders the Create New Opportunity form.
      */
@@ -1589,6 +1716,45 @@ class EmployerController extends Controller
             'stats'       => $stats,
             'activeNav'   => 'interviews',
         ], 'dashboard');
+    }
+
+    /**
+     * In-Platform Video Interview Room (Powered by Daily.co)
+     * Route: /employer/interviews/room/{id}
+     */
+    public function interviewRoom(array $params = []): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $interviewId = (int)($params['id'] ?? (isset($_GET['id']) ? (int)$_GET['id'] : 1));
+        $room = VideoInterviewService::getRoomDetails($interviewId, 'employer');
+
+        $this->renderView('employer/interviews/room', [
+            'title'     => 'In-Platform Video Interview — ' . $room['title'] . ' | InternConnect',
+            'room'      => $room,
+            'activeNav' => 'interviews',
+        ], 'dashboard');
+    }
+
+    /**
+     * Save Interview Evaluation Scorecard API
+     * Route: POST /api/interviews/room/score
+     */
+    public function saveInterviewScore(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+        $interviewId = (int)($input['interview_id'] ?? 1);
+        $saved = VideoInterviewService::saveEvaluation($interviewId, $input);
+
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'rubric' => $saved]);
+        exit;
     }
 
     /**
@@ -2238,35 +2404,17 @@ class EmployerController extends Controller
             'avatar'       => $_SESSION['employer_avatar'] ?? null,
         ];
 
-        $rawNotifs = CommunicationService::getNotifications('employer');
-        $notifications = [];
-        foreach ($rawNotifs as $n) {
-            $type = $n['type'] ?? 'system';
-            $category = ($type === 'message') ? 'messages' : (($type === 'interview') ? 'interviews' : (($type === 'system') ? 'system' : 'applications'));
-            $lbl = 'View Details';
-            if ($type === 'interview') $lbl = 'View Interview';
-            elseif ($type === 'message') $lbl = 'Open Conversation';
-            elseif ($type === 'application') $lbl = 'Review Candidate';
-            elseif ($type === 'ai') $lbl = 'View AI Matches';
-
-            $notifications[] = [
-                'id'         => (int)($n['id'] ?? 1),
-                'type'       => $type,
-                'category'   => $category,
-                'title'      => $n['title'] ?? 'Platform Update',
-                'body'       => $n['message'] ?? ($n['body'] ?? ''),
-                'time_ago'   => $n['time_ago'] ?? 'Just now',
-                'is_unread'  => empty($n['is_read']),
-                'action_lbl' => $lbl,
-                'action_url' => !empty($n['action_url']) ? $n['action_url'] : url('/employer/notifications'),
-            ];
-        }
+        $notifications = CommunicationService::presentNotifications(
+            CommunicationService::getNotifications('employer'),
+            'employer'
+        );
 
         $this->renderView('employer/notifications/index', [
-            'title'         => 'Notifications Center — Employer Portal — InternConnect',
-            'activeNav'     => 'notifications',
-            'employer'      => $employer,
-            'notifications' => $notifications,
+            'title'          => 'Notifications Center — Employer Portal — InternConnect',
+            'activeNav'      => 'notifications',
+            'employer'       => $employer,
+            'notifications'  => $notifications,
+            'notifCategories'=> CommunicationService::notificationCategories('employer'),
         ], 'dashboard');
     }
 
@@ -2317,6 +2465,23 @@ class EmployerController extends Controller
         exit;
     }
 
+    /**
+     * Delete a single employer notification (AJAX)
+     */
+    public function deleteNotification(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+        $id = (int)($input['id'] ?? 0);
+        $ok = $id > 0 && CommunicationService::deleteNotification($id, 'employer');
+
+        header('Content-Type: application/json');
+        echo json_encode(['success' => $ok]);
+        exit;
+    }
     /**
      * Mark all employer notifications as read
      */

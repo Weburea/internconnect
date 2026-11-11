@@ -15,6 +15,18 @@ $logoUrl     = $employer['logo'] ?? 'https://res.cloudinary.com/weburea/image/up
 $bannerUrl   = $employer['banner'] ?? 'https://res.cloudinary.com/weburea/image/upload/v1789424121/internConnect/images/hk_banner.png';
 ?>
 <style>
+/* Email change confirmation */
+.emp-email-verify { margin-top: 10px; padding: 12px; border-radius: 10px; background: #EEF2FF; }
+.emp-email-verify-text { margin: 0 0 10px; font-size: 12.5px; color: #3730A3; line-height: 1.5; }
+.emp-dev-code { display: inline-block; margin-left: 4px; padding: 1px 8px; border-radius: 9999px; background: #FFFFFF; color: #4F48E6; font-weight: 700; font-size: 11.5px; }
+.emp-email-verify-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.emp-email-verify-row .db-input { flex: 1 1 140px; min-width: 0; height: 40px; letter-spacing: .2em; }
+.emp-verify-btn, .emp-verify-cancel { height: 40px; padding: 0 14px; border-radius: 9px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+.emp-verify-btn { border: 1px solid #4F48E6; background: #4F48E6; color: #FFFFFF; }
+.emp-verify-btn:hover { background: #4338CA; }
+.emp-verify-cancel { border: 1px solid #C7D2FE; background: #FFFFFF; color: #475569; }
+.db-settings-grid > * { min-width: 0; }
+
 /* ── Guaranteed Single Arrow for All Custom Selects (Eliminates repeated background arrows) ── */
 select.db-select, 
 select.db-select:focus, 
@@ -169,6 +181,7 @@ function employerProfileSettings() {
         confirmNameInput: '',
         companyFullName: <?= json_encode($companyName) ?>,
         successAlert: <?= json_encode($success ?? '') ?>,
+        errorAlert: <?= json_encode($error ?? '') ?>,
         
         // Banner & Logo Upload States
         bannerUrl: <?= json_encode($bannerUrl) ?>,
@@ -177,15 +190,17 @@ function employerProfileSettings() {
         draggingLogo: false,
 
         // Business CAC Document (empty by default on clean onboarding)
-        cacFile: <?= json_encode($employer['business_doc_name'] ?? '') ?>,
-        cacSize: <?= json_encode($employer['business_doc_size'] ?? '') ?>,
-        cacUploaded: <?= json_encode(!empty($employer['business_doc_name']) ? 'Aug 14, 2026' : '') ?>,
-        cacVerified: <?= json_encode(!empty($employer['business_doc_name'])) ?>,
+        cacFile: <?= json_encode($employer['business_doc']['name'] ?? '') ?>,
+        cacSize: <?= json_encode($employer['business_doc']['size_label'] ?? '') ?>,
+        cacUploaded: <?= json_encode($employer['business_doc']['uploaded_on'] ?? '') ?>,
+        cacVerified: <?= json_encode(!empty($employer['business_doc'])) ?>,
+        cacUploading: false,
+        logoUploading: false,
         showPreviewModal: false,
-        uploadedFileName: <?= json_encode($employer['business_doc_name'] ?? 'CAC_Incorporation_Certificate.pdf') ?>,
-        uploadedFileSize: <?= json_encode($employer['business_doc_size'] ?? '1.8 MB') ?>,
-        uploadedFileUrl: <?= json_encode(asset('dummy.pdf')) ?>,
-        uploadedFileExt: 'pdf',
+        uploadedFileName: <?= json_encode($employer['business_doc']['name'] ?? '') ?>,
+        uploadedFileSize: <?= json_encode($employer['business_doc']['size_label'] ?? '') ?>,
+        uploadedFileUrl: <?= json_encode($employer['business_doc']['url'] ?? '') ?>,
+        uploadedFileExt: <?= json_encode($employer['business_doc']['ext'] ?? '') ?>,
         draggingCac: false,
 
         // Password fields
@@ -194,8 +209,17 @@ function employerProfileSettings() {
         showConfirmPass: false,
 
         // Hiring focus departments
-        selectedDepts: <?= json_encode($employer['departments'] ?? ['Engineering', 'Product Design', 'Marketing', 'Data Science']) ?>,
-        allDepts: ['Engineering', 'Product Design', 'Marketing', 'Data Science', 'Finance', 'Operations', 'Sales', 'HR', 'Customer Success', 'Legal'],
+        selectedDepts: <?= json_encode(array_values($employer['departments'] ?? ['Engineering', 'Product Design', 'Marketing', 'Data Science'])) ?>,
+        // Same list as onboarding step 6 (public/assets/js/onboarding-employer.js), plus any custom picks
+        coreDepts: [
+            'Engineering', 'Product Design', 'Marketing', 'Data Science', 'Finance & Accounting', 'Operations',
+            'Sales & Business Dev', 'Human Resources', 'Customer Success', 'Legal & Compliance',
+            'Cybersecurity', 'AI & Machine Learning', 'Content & Copywriting', 'Quality Assurance',
+            'Project Management', 'Public Relations', 'Supply Chain & Logistics', 'IT & Systems Admin'
+        ],
+        get allDepts() {
+            return [...this.coreDepts, ...this.selectedDepts.filter(d => !this.coreDepts.includes(d))];
+        },
 
         init() {
             if (this.successAlert) {
@@ -204,6 +228,21 @@ function employerProfileSettings() {
                     this.successAlert = '';
                 });
             }
+            if (this.errorAlert) {
+                this.$nextTick(() => {
+                    this.$dispatch('show-toast', { text: this.errorAlert, type: 'error' });
+                    this.errorAlert = '';
+                });
+            }
+        },
+
+        async sendUpload(url, field, file) {
+            const form = new FormData();
+            form.append(field, file);
+            const res = await fetch(url, { method: 'POST', headers: { 'Accept': 'application/json' }, body: form });
+            const json = await res.json().catch(() => ({}));
+            if (!res.ok || !json.success) throw new Error(json.error || 'Upload failed. Please try again.');
+            return json.file;
         },
 
         toggleDept(dept) {
@@ -242,14 +281,27 @@ function employerProfileSettings() {
                 this.uploadLogoFile(e.target.files[0]);
             }
         },
-        uploadLogoFile(file) {
-            if (!file) return;
-            if (file.size > 4 * 1024 * 1024) {
-                this.$dispatch('show-toast', { text: 'Logo exceeds 4MB limit.', type: 'warning' });
+        async uploadLogoFile(file) {
+            if (!file || this.logoUploading) return;
+            if (file.size > 5 * 1024 * 1024) {
+                this.$dispatch('show-toast', { text: 'Logo exceeds 5MB limit.', type: 'warning' });
                 return;
             }
-            this.logoUrl = URL.createObjectURL(file);
-            this.$dispatch('show-toast', { text: 'Company logo updated!', type: 'success' });
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (!['png', 'jpg', 'jpeg', 'webp'].includes(ext)) {
+                this.$dispatch('show-toast', { text: 'Please upload a PNG, JPG or WebP logo.', type: 'warning' });
+                return;
+            }
+            this.logoUploading = true;
+            try {
+                const saved = await this.sendUpload(<?= json_encode(url('/employer/profile/logo')) ?>, 'logo', file);
+                this.logoUrl = saved.url;
+                this.$dispatch('show-toast', { text: 'Company logo updated!', type: 'success' });
+            } catch (err) {
+                this.$dispatch('show-toast', { text: err.message, type: 'error' });
+            } finally {
+                this.logoUploading = false;
+            }
         },
 
         // CAC Document handlers
@@ -267,38 +319,48 @@ function employerProfileSettings() {
                 this.uploadCacFile(e.target.files[0]);
             }
         },
-        uploadCacFile(file) {
-            if (!file) return;
+        applyCac(doc) {
+            this.cacFile = doc ? doc.name : '';
+            this.cacSize = doc ? doc.size_label : '';
+            this.cacUploaded = doc ? doc.uploaded_on : '';
+            this.cacVerified = !!doc;
+            this.uploadedFileName = this.cacFile;
+            this.uploadedFileSize = this.cacSize;
+            this.uploadedFileExt = doc ? doc.ext : '';
+            this.uploadedFileUrl = doc ? doc.url : '';
+        },
+        async uploadCacFile(file) {
+            if (!file || this.cacUploading) return;
             if (file.size > 10 * 1024 * 1024) {
                 this.$dispatch('show-toast', { text: 'Document exceeds 10MB limit.', type: 'warning' });
                 return;
             }
             const ext = file.name.split('.').pop().toLowerCase();
-            if (!['pdf', 'docx', 'jpg', 'jpeg', 'png'].includes(ext)) {
-                this.$dispatch('show-toast', { text: 'Please upload a PDF, DOCX, or Image document.', type: 'warning' });
+            if (!['pdf', 'jpg', 'jpeg', 'png'].includes(ext)) {
+                this.$dispatch('show-toast', { text: 'Please upload a PDF, JPG or PNG document.', type: 'warning' });
                 return;
             }
-            this.cacFile = file.name;
-            this.cacSize = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
-            this.cacUploaded = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-            this.uploadedFileName = file.name;
-            this.uploadedFileSize = this.cacSize;
-            this.uploadedFileExt = ext;
-            this.uploadedFileUrl = URL.createObjectURL(file);
-            this.cacVerified = true;
-            this.$dispatch('show-toast', { text: 'Business registration document uploaded successfully!', type: 'success' });
+            this.cacUploading = true;
+            try {
+                this.applyCac(await this.sendUpload(<?= json_encode(url('/employer/profile/business-doc')) ?>, 'business_doc', file));
+                this.$dispatch('show-toast', { text: 'Business registration document uploaded successfully!', type: 'success' });
+            } catch (err) {
+                this.$dispatch('show-toast', { text: err.message, type: 'error' });
+            } finally {
+                this.cacUploading = false;
+            }
         },
-        deleteCacFile() {
-            this.cacFile = '';
-            this.cacSize = '';
-            this.cacUploaded = '';
-            this.uploadedFileName = '';
-            this.uploadedFileSize = '';
-            this.uploadedFileExt = '';
-            this.cacVerified = false;
-            this.$dispatch('show-toast', { text: 'Document removed.', type: 'info' });
-        }
-    };
+        async deleteCacFile() {
+            try {
+                const res = await fetch(<?= json_encode(url('/employer/profile/business-doc/delete')) ?>, { method: 'POST', headers: { 'Accept': 'application/json' } });
+                if (!res.ok) throw new Error('delete failed');
+                this.applyCac(null);
+                this.showPreviewModal = false;
+                this.$dispatch('show-toast', { text: 'Document removed.', type: 'info' });
+            } catch (err) {
+                this.$dispatch('show-toast', { text: 'Could not remove the document. Please try again.', type: 'error' });
+            }
+        }    };
 }
 </script>
 
@@ -353,7 +415,7 @@ function employerProfileSettings() {
 
                             <!-- Hidden file inputs -->
                             <input type="file" x-ref="bannerInput" @change="handleBannerSelect" style="display: none;" accept="image/png,image/jpeg,image/webp">
-                            <input type="file" x-ref="logoInput" @change="handleLogoSelect" style="display: none;" accept="image/png,image/jpeg,image/svg+xml,image/webp">
+                            <input type="file" x-ref="logoInput" @change="handleLogoSelect" style="display: none;" accept="image/png,image/jpeg,image/webp">
 
                             <!-- Interactive Banner & Logo Box -->
                             <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 16px; padding: 16px; margin-bottom: 20px;">
@@ -445,8 +507,8 @@ function employerProfileSettings() {
                                 </div>
                                 <div class="db-form-group">
                                     <label for="input-founded" class="db-label">Registration / Founded Year</label>
-                                    <input type="text" name="founded_year" id="input-founded" class="db-input"
-                                           value="2019" placeholder="e.g. 2019">
+                                    <input type="text" name="founded_year" id="input-founded" class="db-input" inputmode="numeric" maxlength="4"
+                                           value="<?= htmlspecialchars($employer['founded_year'] ?? '') ?>" placeholder="e.g. 2019">
                                 </div>
                             </div>
 
@@ -454,7 +516,7 @@ function employerProfileSettings() {
                             <div style="margin-top: 10px;">
                                 <label class="db-label" style="display: block; margin-bottom: 8px;">Business Registration Certificate (CAC)</label>
                                 
-                                <input type="file" x-ref="cacInput" @change="handleCacSelect" style="display: none;" accept=".pdf,.docx,.jpg,.jpeg,.png">
+                                <input type="file" x-ref="cacInput" @change="handleCacSelect" style="display: none;" accept=".pdf,.jpg,.jpeg,.png">
 
                                 <!-- Drag-and-drop Zone if no file -->
                                 <div x-show="!cacFile" class="db-upload-zone" :class="{ 'dragging': draggingCac }"
@@ -467,7 +529,7 @@ function employerProfileSettings() {
                                     </div>
                                     <h5>Upload Certificate of Incorporation</h5>
                                     <p>Drag and drop or <span style="color: #4F47E6; font-weight: 700; text-decoration: underline;">browse</span> your legal document</p>
-                                    <span>PDF, DOCX, or High-Res Image up to 10MB</span>
+                                    <span>PDF, JPG or PNG up to 10MB</span>
                                 </div>
 
                                 <!-- Uploaded Document Card -->
@@ -551,6 +613,8 @@ function employerProfileSettings() {
                                         'Banking & Financial Services', 'Telecommunications', 'Education Technology'
                                     ];
                                     $currInd = $employer['industry'] ?? 'Software Development';
+                                    // Onboarding lets employers type any industry; keep it selectable here
+                                    if ($currInd !== '' && !in_array($currInd, $industries, true)) { $industries[] = $currInd; }
                                     ?>
                                     <div class="db-dropdown-wrap" x-data="{ open: false, selected: '<?= htmlspecialchars($currInd) ?>', label: '<?= htmlspecialchars($currInd) ?>' }" @click.outside="open = false">
                                         <button type="button" class="db-dropdown-btn" :class="{ 'is-open': open }" @click="open = !open">
@@ -626,19 +690,17 @@ function employerProfileSettings() {
                             <div style="margin-bottom: 20px;">
                                 <label class="db-label" style="display: block; margin-bottom: 8px;">Target Internship Departments</label>
                                 <div class="emp-tags-wrapper">
-                                    <?php 
-                                    $allDeptsList = ['Engineering', 'Product Design', 'Marketing', 'Data Science', 'Finance', 'Operations', 'Sales', 'HR', 'Customer Success', 'Legal'];
-                                    foreach ($allDeptsList as $dept): ?>
-                                        <button type="button" 
+                                    <template x-for="dept in allDepts" :key="dept">
+                                        <button type="button"
                                                 class="emp-tag-pill"
-                                                :class="{ 'is-active': selectedDepts.includes('<?= $dept ?>') }"
-                                                @click="toggleDept('<?= $dept ?>')">
-                                            <span><?= $dept ?></span>
-                                            <svg x-show="selectedDepts.includes('<?= $dept ?>')" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                :class="{ 'is-active': selectedDepts.includes(dept) }"
+                                                @click="toggleDept(dept)">
+                                            <span x-text="dept"></span>
+                                            <svg x-show="selectedDepts.includes(dept)" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                             </svg>
                                         </button>
-                                    <?php endforeach; ?>
+                                    </template>
                                 </div>
                                 <input type="hidden" name="departments" :value="JSON.stringify(selectedDepts)">
                             </div>
@@ -669,8 +731,9 @@ function employerProfileSettings() {
                                 <div class="db-form-group">
                                     <label class="db-label">Program Compensation Type</label>
                                     <?php 
-                                    $types = ['Paid', 'Stipend', 'Academic Credit'];
+                                    $types = ['Paid', 'Stipend', 'Unpaid', 'Academic Credit'];
                                     $currType = $employer['internship_type'] ?? 'Paid';
+                                    if ($currType !== '' && !in_array($currType, $types, true)) { $types[] = $currType; }
                                     ?>
                                     <div class="db-dropdown-wrap" x-data="{ open: false, selected: '<?= htmlspecialchars($currType) ?>', label: '<?= htmlspecialchars($currType) ?>' }" @click.outside="open = false">
                                         <button type="button" class="db-dropdown-btn" :class="{ 'is-open': open }" @click="open = !open">
@@ -708,6 +771,22 @@ function employerProfileSettings() {
                                     <label for="input-email" class="db-label">Careers Email</label>
                                     <input type="email" name="email" id="input-email" class="db-input"
                                            value="<?= htmlspecialchars($employer['email'] ?? 'careers@techflow.io') ?>" required>
+                                    <?php if (!empty($employer['pending_email'])): ?>
+                                    <!-- Pending email change: confirm with the 6-digit code (inputs belong to #email-verify-form) -->
+                                    <div class="emp-email-verify" role="status">
+                                        <p class="emp-email-verify-text">
+                                            Confirm <strong><?= htmlspecialchars($employer['pending_email']) ?></strong> with the 6-digit code we sent.
+                                            <?php if (!empty($employer['pending_email_dev_code'])): ?>
+                                                <span class="emp-dev-code">Local dev code: <?= htmlspecialchars($employer['pending_email_dev_code']) ?></span>
+                                            <?php endif; ?>
+                                        </p>
+                                        <div class="emp-email-verify-row">
+                                            <input type="text" name="email_code" form="email-verify-form" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="\d{6}" placeholder="6-digit code" class="db-input" aria-label="Email confirmation code" required>
+                                            <button type="submit" form="email-verify-form" class="emp-verify-btn">Confirm</button>
+                                            <button type="submit" form="email-cancel-form" class="emp-verify-cancel" formnovalidate>Cancel</button>
+                                        </div>
+                                    </div>
+                                    <?php endif; ?>
                                 </div>
                                 <div class="db-form-group">
                                     <label for="input-phone" class="db-label">Office Phone Number</label>
@@ -741,7 +820,7 @@ function employerProfileSettings() {
                                                 </svg>
                                             </span>
                                             <input type="text" name="linkedin" id="input-linkedin" class="db-input" style="padding-left: 40px;"
-                                                   value="linkedin.com/company/techflow" placeholder="e.g. linkedin.com/company/techflow">
+                                                   value="<?= htmlspecialchars($employer['linkedin'] ?? '') ?>" placeholder="e.g. linkedin.com/company/techflow">
                                         </div>
                                     </div>
                                     <div class="db-form-group">
@@ -753,7 +832,7 @@ function employerProfileSettings() {
                                                 </svg>
                                             </span>
                                             <input type="text" name="twitter" id="input-twitter" class="db-input" style="padding-left: 40px;"
-                                                   value="@TechFlowHQ" placeholder="e.g. @TechFlowHQ">
+                                                   value="<?= htmlspecialchars($employer['twitter'] ?? '') ?>" placeholder="e.g. @TechFlowHQ">
                                         </div>
                                     </div>
                                 </div>
@@ -761,7 +840,7 @@ function employerProfileSettings() {
                         </div>
 
                         <!-- 6. Notification Preferences -->
-                        <div class="db-settings-card">
+                        <div class="db-settings-card" id="notification-preferences" style="scroll-margin-top: 90px;">
                             <div class="db-settings-card-header">
                                 <h3 class="db-settings-card-title">Notification Preferences</h3>
                                 <button type="submit" class="db-btn-save">
@@ -808,6 +887,12 @@ function employerProfileSettings() {
                             </div>
                         </div>
 
+                    </form>
+                    <form action="<?= url('/employer/profile') ?>" method="POST" id="email-verify-form" hidden>
+                        <input type="hidden" name="action" value="verify_email">
+                    </form>
+                    <form action="<?= url('/employer/profile') ?>" method="POST" id="email-cancel-form" hidden>
+                        <input type="hidden" name="action" value="cancel_email">
                     </form>
 
                     <!-- 7. Account Management / Deactivate Card -->
@@ -964,7 +1049,186 @@ function employerProfileSettings() {
                         </form>
                     </div>
 
-                    <!-- 3. Active Devices & Sessions Card -->
+                    <!-- 3. Public Profile Visibility & Privacy Settings Card -->
+                    <div class="db-settings-card">
+                        <div class="db-settings-card-header">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <svg style="width: 18px; height: 18px; color: #4F47E6;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                <h3 class="db-settings-card-title" style="margin: 0;">Public Profile Visibility</h3>
+                            </div>
+                        </div>
+
+                        <p style="font-size: 12.5px; color: #64748B; margin: 0 0 16px; line-height: 1.5;">
+                            Control which contact details and organization metrics are visible to candidates on your public company profile.
+                        </p>
+
+                        <form action="<?= url('/employer/profile') ?>" method="POST">
+                            <input type="hidden" name="action" value="update_privacy">
+
+                            <div class="db-notif-list">
+                                <!-- Careers Email -->
+                                <div class="db-notif-item">
+                                    <div class="db-notif-info">
+                                        <h5>Careers Email Address</h5>
+                                        <p>Display your public careers email in the profile contact card.</p>
+                                    </div>
+                                    <label class="db-switch">
+                                        <input type="checkbox" name="privacy_show_email" value="1" <?= (!empty($employer['privacy_show_email'])) ? 'checked' : '' ?>>
+                                        <span class="db-switch-slider"></span>
+                                    </label>
+                                </div>
+
+                                <!-- Office Phone -->
+                                <div class="db-notif-item">
+                                    <div class="db-notif-info">
+                                        <h5>Office Phone Number</h5>
+                                        <p>Make your verified office telephone number publicly visible.</p>
+                                    </div>
+                                    <label class="db-switch">
+                                        <input type="checkbox" name="privacy_show_phone" value="1" <?= (!empty($employer['privacy_show_phone'])) ? 'checked' : '' ?>>
+                                        <span class="db-switch-slider"></span>
+                                    </label>
+                                </div>
+
+                                <!-- Social Media Links -->
+                                <div class="db-notif-item">
+                                    <div class="db-notif-info">
+                                        <h5>Social Media Profiles</h5>
+                                        <p>Show LinkedIn, Twitter/X, and social links to prospective interns.</p>
+                                    </div>
+                                    <label class="db-switch">
+                                        <input type="checkbox" name="privacy_show_socials" value="1" <?= (!empty($employer['privacy_show_socials'])) ? 'checked' : '' ?>>
+                                        <span class="db-switch-slider"></span>
+                                    </label>
+                                </div>
+
+                                <!-- Company Size -->
+                                <div class="db-notif-item">
+                                    <div class="db-notif-info">
+                                        <h5>Company Size / Headcount</h5>
+                                        <p>Display your organization's employee headcount bracket.</p>
+                                    </div>
+                                    <label class="db-switch">
+                                        <input type="checkbox" name="privacy_show_size" value="1" <?= (!empty($employer['privacy_show_size'])) ? 'checked' : '' ?>>
+                                        <span class="db-switch-slider"></span>
+                                    </label>
+                                </div>
+
+                                <!-- Office Location -->
+                                <div class="db-notif-item">
+                                    <div class="db-notif-info">
+                                        <h5>Headquarters Location</h5>
+                                        <p>Display your physical office city and country on the profile.</p>
+                                    </div>
+                                    <label class="db-switch">
+                                        <input type="checkbox" name="privacy_show_location" value="1" <?= (!empty($employer['privacy_show_location'])) ? 'checked' : '' ?>>
+                                        <span class="db-switch-slider"></span>
+                                    </label>
+                                </div>
+
+                                <!-- Workspace Gallery -->
+                                <div class="db-notif-item">
+                                    <div class="db-notif-info">
+                                        <h5>Workspace & Culture Gallery</h5>
+                                        <p>Showcase office and team culture photos to candidates.</p>
+                                    </div>
+                                    <label class="db-switch">
+                                        <input type="checkbox" name="privacy_show_gallery" value="1" <?= (!empty($employer['privacy_show_gallery'])) ? 'checked' : '' ?>>
+                                        <span class="db-switch-slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid #F1F5F9; display: flex; flex-direction: column; gap: 8px;">
+                                <button type="submit" class="db-btn-primary-form">
+                                    Save Visibility Settings
+                                </button>
+                                <a href="<?= url('/company/techflow') ?>" target="_blank" class="db-btn-primary-form" style="background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; text-decoration: none; text-align: center; justify-content: center;" onmouseover="this.style.background='#E2E8F0'" onmouseout="this.style.background='#F1F5F9'">
+                                    Preview Public Profile ↗
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- 4. Company Workspace Gallery Upload & Management Card -->
+                    <div class="db-settings-card" x-data="{ addPhotoModal: false, photoUrlInput: '' }">
+                        <div class="db-settings-card-header">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <svg style="width: 18px; height: 18px; color: #4F47E6;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                </svg>
+                                <h3 class="db-settings-card-title" style="margin: 0;">Workspace Gallery</h3>
+                            </div>
+                            <button type="button" class="db-btn-save" @click="addPhotoModal = true; photoUrlInput = '';" style="padding: 6px 12px; font-size: 12px;">
+                                <svg style="width: 13px; height: 13px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                                </svg>
+                                <span>Add Photo</span>
+                            </button>
+                        </div>
+
+                        <p style="font-size: 12px; color: #64748B; margin: 0 0 14px; line-height: 1.45;">
+                            Photos displayed on your public profile workspace gallery. Highlight work desks, collaborative lounges, and team events.
+                        </p>
+
+                        <?php $galList = $employer['gallery'] ?? []; ?>
+                        <?php if (!empty($galList)): ?>
+                            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px;">
+                                <?php foreach ($galList as $gIdx => $gUrl): ?>
+                                    <div style="position: relative; height: 90px; border-radius: 10px; overflow: hidden; border: 1px solid #E2E8F0; background: #F1F5F9;">
+                                        <img src="<?= htmlspecialchars($gUrl) ?>" alt="Workspace Photo" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                                        <form action="<?= url('/employer/profile') ?>" method="POST" style="position: absolute; top: 4px; right: 4px; margin: 0;">
+                                            <input type="hidden" name="action" value="delete_gallery_photo">
+                                            <input type="hidden" name="photo_index" value="<?= $gIdx ?>">
+                                            <button type="submit" style="width: 24px; height: 24px; border-radius: 50%; background: rgba(15, 23, 42, 0.75); color: #FFFFFF; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s;" title="Remove Photo" onmouseover="this.style.background='#DC2626'" onmouseout="this.style.background='rgba(15, 23, 42, 0.75)'">
+                                                <svg style="width: 12px; height: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php else: ?>
+                            <div style="text-align: center; padding: 24px 16px; background: #F8FAFC; border: 1px dashed #CBD5E1; border-radius: 10px; margin-bottom: 12px;">
+                                <p style="font-size: 12.5px; color: #64748B; margin: 0 0 8px;">No workspace photos added yet.</p>
+                                <button type="button" class="db-btn-save" @click="addPhotoModal = true; photoUrlInput = '';" style="font-size: 12px; padding: 5px 12px;">
+                                    + Add First Photo
+                                </button>
+                            </div>
+                        <?php endif; ?>
+
+                        <!-- Add Photo Modal for Workspace Gallery -->
+                        <div x-show="addPhotoModal" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center; padding: 16px;" class="flex" @click.self="addPhotoModal = false">
+                            <div style="background: #FFFFFF; max-width: 440px; width: 100%; border-radius: 18px; padding: 24px; border: 1px solid #E2E8F0; box-shadow: 0 20px 40px rgba(0,0,0,0.2);" @click.stop>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                    <h4 style="font-size: 16px; font-weight: 800; color: #0F172A; margin: 0;">Add Workspace Photo</h4>
+                                    <button type="button" @click="addPhotoModal = false" style="background: none; border: none; cursor: pointer; color: #64748B; padding: 4px;">
+                                        <svg style="width: 18px; height: 18px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <form action="<?= url('/employer/profile') ?>" method="POST">
+                                    <input type="hidden" name="action" value="add_gallery_photo">
+                                    <div class="db-form-group" style="margin-bottom: 16px;">
+                                        <label class="db-label">Photo Image URL</label>
+                                        <input type="url" name="photo_url" class="db-input" placeholder="e.g. https://images.unsplash.com/..." required x-model="photoUrlInput">
+                                        <span style="font-size: 11px; color: #64748B; margin-top: 4px; display: block;">Paste an image URL or Cloudinary CDN link of your office space.</span>
+                                    </div>
+                                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                                        <button type="button" class="db-file-action-btn" @click="addPhotoModal = false">Cancel</button>
+                                        <button type="submit" class="db-btn-save" :disabled="!photoUrlInput">Add to Gallery</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 5. Active Devices & Sessions Card -->
                     <div class="db-settings-card">
                         <div class="db-settings-card-header">
                             <div style="display: flex; align-items: center; gap: 8px;">

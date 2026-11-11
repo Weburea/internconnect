@@ -404,8 +404,8 @@ $avatar      = $employer['avatar'] ?? null;
                     <p style="font-size: 14px; color: #475569; margin-top: 8px; font-weight: 500;">Ready to scale your team? You have 12 new applications waiting for review.</p>
                 </div>
                 <a href="<?= url('/employer/internships/create') ?>" style="background: #4F47E6; color: #fff; text-decoration: none; font-size: 13px; font-weight: 700; padding: 12px 24px; border-radius: 12px; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(79, 70, 230, 0.25); transition: transform 0.2s, background 0.2s; flex-shrink: 0;" onmouseover="this.style.background='#4338ca'; this.style.transform='translateY(-1px)';" onmouseout="this.style.background='#4F47E6'; this.style.transform='translateY(0)';">
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                     </svg>
                     <span>Launch New Opening</span>
                 </a>
@@ -491,7 +491,7 @@ $avatar      = $employer['avatar'] ?? null;
                             <span>Review Queue</span>
                         </h3>
                     </div>
-                    <a href="#" style="font-size: 13px; font-weight: 600; color: #4F47E6; text-decoration: none; hover:underline;">View All (12)</a>
+                    <a href="<?= url('/employer/candidates') ?>" style="font-size: 13px; font-weight: 600; color: #4F47E6; text-decoration: none;">View All (12)</a>
                 </div>
 
                 <div class="db-table-responsive" style="overflow-x: auto;">
@@ -519,7 +519,7 @@ $avatar      = $employer['avatar'] ?? null;
                                 </td>
                                 <td class="td-date" style="padding: 16px; font-size: 13px; color: #64748b; font-weight: 500;"><?= htmlspecialchars($applicant['applied_date']) ?></td>
                                 <td class="td-action" style="padding: 16px; text-align: right;">
-                                    <a href="#" class="btn-review" style="background: #4F47E6; color: #fff; text-decoration: none; font-size: 12px; font-weight: 600; padding: 8px 16px; border-radius: 8px; transition: background 0.15s;" onmouseover="this.style.background='#4338ca'" onmouseout="this.style.background='#4F47E6'">Review Now</a>
+                                    <a href="<?= url('/employer/candidates/' . ($applicant['id'] ?? 1)) ?>" class="btn-review" style="background: #4F47E6; color: #fff; text-decoration: none; font-size: 12px; font-weight: 600; padding: 8px 16px; border-radius: 8px; transition: background 0.15s;" onmouseover="this.style.background='#4338ca'" onmouseout="this.style.background='#4F47E6'">Review Now</a>
                                 </td>
                             </tr>
                             <?php endforeach; ?>
@@ -640,7 +640,7 @@ $avatar      = $employer['avatar'] ?? null;
                     <div class="db-card" style="padding: 24px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                             <h3 class="db-card-title" style="margin: 0; font-size: 16px; font-weight: 700; color: #0f172a;">AI Recommended Candidates</h3>
-                            <a href="#" style="font-size: 13px; font-weight: 600; color: #4F47E6; text-decoration: none;">Explore All Talent</a>
+                            <a href="<?= url('/employer/candidates') ?>" style="font-size: 13px; font-weight: 600; color: #4F47E6; text-decoration: none;">Explore All Talent</a>
                         </div>
 
                         <!-- Recommendations list -->
@@ -682,7 +682,7 @@ $avatar      = $employer['avatar'] ?? null;
                                         <span class="status-dot <?= $dotClass ?>"></span>
                                         <?= htmlspecialchars($candidate['status']) ?>
                                     </span>
-                                    <a href="#" style="background: #4F47E6; color: #fff; text-decoration: none; font-size: 11px; font-weight: 600; padding: 8px 16px; border-radius: 8px; transition: background 0.15s;" onmouseover="this.style.background='#4338ca'" onmouseout="this.style.background='#4F47E6'">View Profile</a>
+                                    <a href="<?= url('/employer/candidates/' . ($candidate['id'] ?? 1)) ?>" style="background: #4F47E6; color: #fff; text-decoration: none; font-size: 11px; font-weight: 600; padding: 8px 16px; border-radius: 8px; transition: background 0.15s;" onmouseover="this.style.background='#4338ca'" onmouseout="this.style.background='#4F47E6'">View Profile</a>
                                 </div>
                             </div>
                             <?php endforeach; ?>
@@ -717,7 +717,7 @@ $avatar      = $employer['avatar'] ?? null;
                                     </div>
                                 </div>
                                 <?php if ($interview['live']): ?>
-                                <a href="#" style="background: #4F47E6; color: #fff; text-decoration: none; font-size: 12px; font-weight: 600; padding: 10px; border-radius: 10px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 10px rgba(79, 70, 230, 0.15); transition: background 0.15s;" onmouseover="this.style.background='#4338ca'" onmouseout="this.style.background='#4F47E6'">
+                                <a href="<?= url('/employer/interviews') ?>" style="background: #4F47E6; color: #fff; text-decoration: none; font-size: 12px; font-weight: 600; padding: 10px; border-radius: 10px; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 10px rgba(79, 70, 230, 0.15); transition: background 0.15s;" onmouseover="this.style.background='#4338ca'" onmouseout="this.style.background='#4F47E6'">
                                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                                     <span>Join Interview</span>
                                 </a>
@@ -768,7 +768,7 @@ $avatar      = $employer['avatar'] ?? null;
                             </div>
                         </div>
 
-                        <a href="#" style="display: block; font-size: 12px; font-weight: 700; color: #4F47E6; text-decoration: none; text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #F1F5F9; hover:underline; flex-shrink: 0;">View All Notifications</a>
+                        <a href="<?= url('/employer/notifications') ?>" style="display: block; font-size: 12px; font-weight: 700; color: #4F47E6; text-decoration: none; text-align: center; margin-top: 24px; padding-top: 16px; border-top: 1px solid #F1F5F9; flex-shrink: 0;">View All Notifications</a>
                     </div>
                 </div>
             </div>

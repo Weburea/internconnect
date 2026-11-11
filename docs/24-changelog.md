@@ -23,6 +23,16 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## [Unreleased]
 
+- **Onboarding -> Profile Settings sync (Candidate + Employer)** - 2026-11-11:
+  - Onboarding wizards now POST their answers on the final step (`/register/student/complete`, `/register/employer/complete`, multipart `data` JSON + files) and Profile Settings reads the same session keys, so everything entered at signup is visible and editable.
+  - New `App\Services\UploadStorage` (resume, logo, business_doc): files saved under `storage/uploads/{kind}/` with random names, checked by extension, size, MIME and magic bytes; `storage/.htaccess` denies direct access. Served only via `/candidate/profile/resume`, `/employer/profile/logo`, `/employer/profile/business-doc`.
+  - Email changes on both profiles require a 6-digit code (15-minute expiry; the code is shown on screen only when `APP_ENV=local` until the mailer is wired). Password changes verify the current password against the hash saved at signup.
+  - Candidate profile: Location Preferences card (onboarding step 7), interests from onboarding always visible, resume rules aligned (PDF/DOCX, 10MB). Employer profile: departments, industry and "Unpaid" compensation aligned with onboarding; founded year, LinkedIn and X handle now saved.
+- **Notification Center redesign (Candidate + Employer)** - 2026-11-11:
+  - Replaced the two stacked-card notification pages with one shared inbox component (`frontend/shared/components/notification-center.php`): category rail with unread counts, search, date groups (Today / Yesterday / Earlier this week / Older), compact rows with inline actions, 15-per-page pagination, delete with Undo, `?filter=` deep links. Responsive: rail becomes a chip bar at <= 1024px.
+  - Added `CommunicationService::presentNotifications()` / `notificationCategories()` / `deleteNotification()` and `POST /{candidate|employer}/notifications/delete`.
+  - Fixed every notification showing "Just now" (time was never computed from `created_at`) and the SQLite UTC offset that made new items read "1h ago".
+  - Full spec: `docs/13-notification-system.md` -> "Notification Center UI".
 - **Employer Post Internship & Publishing Journey (`/employer/internships/create`, `/employer/internships/review`, `/employer/internships/success`)**:
   - **Create Opportunity Form (`frontend/employer/internships/create.php`)**: Built modern 2-column opportunity creation interface matching UI designs with zero emojis. Features Basic Information, Custom Alpine Category Dropdown with interactive keyword search and checkbox selection (Image 4 match), Segmented Internship Type control (Remote, Hybrid, On-site), Rich Text Area toolbars for Role Overview ("About the Internship", "What You'll Do", "What We're Looking For"), Interactive Alpine Skills Tag Manager with pill removal and inline addition, Custom Alpine Dropdowns for Education Level and Duration with "Apply" button triggers, Details & Duration controls, and Monthly Stipend / Perks selection.
   - **Jenny AI Mascot Mascot Card Branding**: Replaced generic icon in the "AI Internship Assistant" and "AI Optimization" cards with the high-resolution transparent waving Jenny chatbot mascot (`jenny_ai_hi.png` / Cloudinary `v1790296466`) inside a rounded avatar frame (`.emp-ai-avatar-wrap`).

@@ -10,8 +10,36 @@ class InternshipController extends Controller
 {
     public function index(): void
     {
+        $search = trim($_GET['search'] ?? '');
+        $location = trim($_GET['location'] ?? '');
+        $category = trim($_GET['category'] ?? '');
+
         $this->renderView('landing/internships', [
-            'title' => 'Browse Internships - InternConnect'
+            'title'           => 'Browse Internships — InternConnect',
+            'initialSearch'   => $search,
+            'initialLocation' => $location,
+            'initialCategory' => $category,
+        ]);
+    }
+
+    public function search(): void
+    {
+        $search = trim($_GET['search'] ?? '');
+        $location = trim($_GET['location'] ?? '');
+        $category = trim($_GET['category'] ?? '');
+
+        $pageTitle = 'Search Internships — InternConnect';
+        if (!empty($search) && !empty($location)) {
+            $pageTitle = 'Results for "' . htmlspecialchars($search) . '" in ' . htmlspecialchars($location) . ' — InternConnect';
+        } elseif (!empty($search)) {
+            $pageTitle = 'Results for "' . htmlspecialchars($search) . '" — InternConnect';
+        }
+
+        $this->renderView('landing/search', [
+            'title'           => $pageTitle,
+            'initialSearch'   => $search,
+            'initialLocation' => $location,
+            'initialCategory' => $category,
         ]);
     }
 

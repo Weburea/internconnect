@@ -10,8 +10,239 @@ declare(strict_types=1);
 <!-- Load Iconify CDN -->
 <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 
-<!-- Register styles -->
-<link rel="stylesheet" href="<?= asset('assets/css/register.css') ?>">
+<!-- Register styles with cache buster -->
+<link rel="stylesheet" href="<?= asset('assets/css/register.css') ?>?v=<?= file_exists(dirname(__DIR__, 2) . '/public/assets/css/register.css') ? filemtime(dirname(__DIR__, 2) . '/public/assets/css/register.css') : time() ?>">
+
+<style>
+/* ── InternConnect Bulletproof Form Input System (Prevents Tailwind Preflight Collapses) ── */
+[x-cloak] { display: none !important; }
+
+.emp-field-group {
+    margin-bottom: 16px !important;
+    text-align: left !important;
+}
+.emp-field-group:last-child {
+    margin-bottom: 0 !important;
+}
+.emp-field-label {
+    display: block !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #334155 !important;
+    margin-bottom: 7px !important;
+    text-transform: none !important;
+    letter-spacing: 0.01em !important;
+    text-align: left !important;
+}
+.emp-input-text {
+    width: 100% !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 10px !important;
+    padding: 0 14px !important;
+    font-size: 13.5px !important;
+    color: #0F172A !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+    font-family: inherit !important;
+    line-height: normal !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+.emp-input-text:focus {
+    border-color: #4F48E6 !important;
+    box-shadow: 0 0 0 3px rgba(79, 72, 230, 0.12) !important;
+}
+.emp-input-text::placeholder {
+    color: #94A3B8 !important;
+}
+.emp-input-with-icon {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+}
+.emp-input-icon-slot {
+    position: absolute !important;
+    left: 14px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    color: #94A3B8 !important;
+    pointer-events: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 2 !important;
+}
+.emp-input-icon-slot svg,
+.emp-input-icon-slot iconify-icon {
+    width: 16px !important;
+    height: 16px !important;
+    font-size: 16px !important;
+    flex-shrink: 0 !important;
+}
+.emp-input-with-icon .emp-input-text {
+    padding-left: 40px !important;
+}
+.emp-input-with-right-icon .emp-input-text {
+    padding-right: 44px !important;
+}
+.emp-input-right-slot {
+    position: absolute !important;
+    right: 14px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 2 !important;
+    cursor: pointer !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    color: #94A3B8 !important;
+    transition: color 0.15s ease !important;
+}
+.emp-input-right-slot:hover {
+    color: #475569 !important;
+}
+.emp-input-right-slot svg,
+.emp-input-right-slot iconify-icon {
+    width: 18px !important;
+    height: 18px !important;
+    font-size: 18px !important;
+    flex-shrink: 0 !important;
+}
+.emp-textarea {
+    width: 100% !important;
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 10px !important;
+    padding: 11px 14px !important;
+    font-size: 13.5px !important;
+    color: #0F172A !important;
+    outline: none !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+    font-family: inherit !important;
+    line-height: 1.6 !important;
+    box-sizing: border-box !important;
+    resize: vertical !important;
+}
+.emp-textarea:focus {
+    border-color: #4F48E6 !important;
+    box-shadow: 0 0 0 3px rgba(79, 72, 230, 0.12) !important;
+}
+.emp-textarea::placeholder {
+    color: #94A3B8 !important;
+}
+.emp-segmented-control {
+    display: flex !important;
+    align-items: center !important;
+    background: #F8FAFC !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 10px !important;
+    padding: 3px !important;
+    gap: 3px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+.emp-segment-btn {
+    flex: 1 !important;
+    min-width: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    padding: 8px 10px !important;
+    font-size: 12.5px !important;
+    font-weight: 600 !important;
+    color: #64748B !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    text-align: center !important;
+    transition: all 0.15s ease !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+.emp-segment-btn:hover {
+    color: #0F172A !important;
+}
+.emp-segment-btn.active {
+    background: #FFFFFF !important;
+    color: #4F48E6 !important;
+    border: 1px solid #E2E8F0 !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06) !important;
+    font-weight: 700 !important;
+}
+.db-dropdown-wrap {
+    position: relative !important;
+    width: 100% !important;
+}
+.db-dropdown-btn {
+    width: 100% !important;
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 10px !important;
+    padding: 11px 14px !important;
+    font-size: 13.5px !important;
+    font-weight: 500 !important;
+    color: #0F172A !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    cursor: pointer !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+    font-family: inherit !important;
+    text-align: left !important;
+}
+.db-dropdown-btn:hover {
+    border-color: #CBD5E1 !important;
+}
+.db-dropdown-btn:focus,
+.db-dropdown-btn.active {
+    border-color: #4F48E6 !important;
+    box-shadow: 0 0 0 3px rgba(79, 72, 230, 0.12) !important;
+}
+.emp-input-with-icon .db-dropdown-btn {
+    padding-left: 40px !important;
+}
+.db-dropdown-menu {
+    position: absolute !important;
+    top: calc(100% + 6px) !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: #FFFFFF !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12) !important;
+    z-index: 100 !important;
+    padding: 6px !important;
+    box-sizing: border-box !important;
+}
+.db-dropdown-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 8px 12px !important;
+    font-size: 12.5px !important;
+    font-weight: 500 !important;
+    color: #334155 !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    transition: background 0.15s ease, color 0.15s ease !important;
+}
+.db-dropdown-item:hover {
+    background: #F8FAFC !important;
+    color: #0F172A !important;
+}
+.db-dropdown-item.is-selected {
+    background: #EEF2FF !important;
+    color: #4F48E6 !important;
+    font-weight: 600 !important;
+}
+</style>
 
 <div x-data="studentOnboardingWizard()" x-init="init()" class="w-full min-h-screen bg-[#F8F9FA] text-[#191C1D] flex flex-col justify-between py-8 select-none" style="font-family: 'Inter', sans-serif;">
     
@@ -83,7 +314,7 @@ declare(strict_types=1);
                         We sent you a code, <span class="text-primary">check your inbox.</span>
                     </h2>
                     <p class="text-[16px] leading-[26px] text-secondary-text">
-                        A 6-digit code is on its way to <strong class="text-[#191C1D]" x-text="email || 'your email'"></strong>. It expires in 10 minutes, enter it on the right to confirm your email.
+                        A 6-digit code is on its way to <strong class="text-[#191C1D]" x-text="email || 'your email'"></strong>. It expires in 2 minutes, enter it on the right to confirm your email.
                     </p>
                     <div class="border-t border-[#E2E8F0] pt-6"></div>
                     <ul class="space-y-4">
@@ -101,7 +332,7 @@ declare(strict_types=1);
                                 <iconify-icon icon="lucide:clock" class="text-lg"></iconify-icon>
                             </div>
                             <div>
-                                <strong class="text-[#191C1D] block">Code expires in 5 minutes</strong>
+                                <strong class="text-[#191C1D] block">Code expires in 2 minutes</strong>
                             </div>
                         </li>
                         <li class="flex items-start gap-3 text-[14px] text-secondary-text text-left">
@@ -215,28 +446,31 @@ declare(strict_types=1);
                     </p>
                     <div class="border-t border-[#E2E8F0] pt-6"></div>
                     <ul class="space-y-4">
-                        <li class="flex items-start gap-3 text-[14px] text-secondary-text text-left">
-                            <div class="w-10 h-10 rounded-full bg-primary-light flex items-center justify-center text-primary flex-shrink-0 mt-0.5">
+                        <li class="flex items-center gap-3.5 text-[14px] text-secondary-text text-left">
+                            <div class="w-10 h-10 rounded-full bg-primary-light flex items-center justify-center text-primary flex-shrink-0">
                                 <iconify-icon icon="lucide:sparkles" class="text-lg"></iconify-icon>
                             </div>
                             <div>
                                 <strong class="text-[#191C1D] block">AI Matchmaking</strong>
+                                <span class="text-[13px]">Personalized role recommendations.</span>
                             </div>
                         </li>
-                        <li class="flex items-start gap-3 text-[14px] text-secondary-text text-left">
-                            <div class="w-10 h-10 rounded-full bg-primary-light flex items-center justify-center text-primary flex-shrink-0 mt-0.5">
+                        <li class="flex items-center gap-3.5 text-[14px] text-secondary-text text-left">
+                            <div class="w-10 h-10 rounded-full bg-primary-light flex items-center justify-center text-primary flex-shrink-0">
                                 <iconify-icon icon="lucide:bell" class="text-lg"></iconify-icon>
                             </div>
                             <div>
                                 <strong class="text-[#191C1D] block">Real-time Alerts</strong>
+                                <span class="text-[13px]">Instant updates as matching roles open.</span>
                             </div>
                         </li>
-                        <li class="flex items-start gap-3 text-[14px] text-secondary-text text-left">
-                            <div class="w-10 h-10 rounded-full bg-primary-light flex items-center justify-center text-primary flex-shrink-0 mt-0.5">
+                        <li class="flex items-center gap-3.5 text-[14px] text-secondary-text text-left">
+                            <div class="w-10 h-10 rounded-full bg-primary-light flex items-center justify-center text-primary flex-shrink-0">
                                 <iconify-icon icon="lucide:briefcase" class="text-lg"></iconify-icon>
                             </div>
                             <div>
                                 <strong class="text-[#191C1D] block">New Jobs Daily</strong>
+                                <span class="text-[13px]">Verified employer roles added 24/7.</span>
                             </div>
                         </li>
                     </ul>
@@ -320,7 +554,7 @@ declare(strict_types=1);
 
                         <!-- Google OAuth -->
                         <button @click="continueWithGoogle()" class="w-full flex items-center justify-center gap-3 border border-brandBorder rounded-lg py-2.5 text-[14px] font-semibold text-[#191C1D] hover:bg-gray-50 transition-colors shadow-sm">
-                            <img src="https://api.iconify.design/flat-color-icons:google.svg" class="w-5 h-5" alt="Google">
+                            <svg class="w-5 h-5" style="width:20px;height:20px;flex-shrink:0" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
                             <span>Sign up with Google</span>
                         </button>
 
@@ -333,30 +567,31 @@ declare(strict_types=1);
 
                         <!-- Fields with standard left icons -->
                         <div class="space-y-4 text-left">
-                            <div>
-                                <label for="email" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Email Address</label>
-                                <div class="relative flex items-center">
-                                    <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
-                                        <iconify-icon icon="lucide:mail" class="text-lg"></iconify-icon>
-                                    </div>
+                            <div class="emp-field-group">
+                                <label for="email" class="emp-field-label">Email Address</label>
+                                <div class="emp-input-with-icon">
+                                    <span class="emp-input-icon-slot">
+                                        <iconify-icon icon="lucide:mail"></iconify-icon>
+                                    </span>
                                     <input type="email" id="email" x-model="email" placeholder="e.g. jane@university.edu" 
-                                           class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                           class="emp-input-text"
+                                           style="height: 44px; min-height: 44px; border: 1px solid #E2E8F0 !important; border-radius: 10px !important; background: #FFFFFF !important; padding-left: 40px !important; padding-right: 14px !important; font-size: 13.5px !important; width: 100% !important; box-sizing: border-box !important;">
                                 </div>
                             </div>
 
                             <!-- Password -->
-                            <div>
-                                <label for="reg-password" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Password</label>
-                                <div class="relative flex items-center">
-                                    <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
-                                        <iconify-icon icon="lucide:lock" class="text-lg"></iconify-icon>
-                                    </div>
+                            <div class="emp-field-group">
+                                <label for="reg-password" class="emp-field-label">Password</label>
+                                <div class="emp-input-with-icon emp-input-with-right-icon">
+                                    <span class="emp-input-icon-slot">
+                                        <iconify-icon icon="lucide:lock"></iconify-icon>
+                                    </span>
                                     <input :type="password_visible ? 'text' : 'password'" id="reg-password" x-model="password" placeholder="••••••••" 
-                                           class="w-full pl-10 pr-10 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm tracking-widest text-[#191C1D] placeholder-gray-400">
+                                           class="emp-input-text"
+                                           style="height: 44px; min-height: 44px; border: 1px solid #E2E8F0 !important; border-radius: 10px !important; background: #FFFFFF !important; padding-left: 40px !important; padding-right: 44px !important; font-size: 13.5px !important; width: 100% !important; box-sizing: border-box !important; letter-spacing: 0.15em;">
                                     <button @click="password_visible = !password_visible" type="button" 
-                                            style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); cursor: pointer;"
-                                            class="text-gray-400 hover:text-gray-600 flex items-center border-none bg-transparent outline-none">
-                                        <iconify-icon :icon="password_visible ? 'lucide:eye-off' : 'lucide:eye'" class="text-lg"></iconify-icon>
+                                            class="emp-input-right-slot" :title="password_visible ? 'Hide password' : 'Show password'">
+                                        <iconify-icon :icon="password_visible ? 'lucide:eye-off' : 'lucide:eye'"></iconify-icon>
                                     </button>
                                 </div>
                                 <!-- 5 Stacked Thin Horizontal Lines Strength Indicator -->
@@ -371,18 +606,18 @@ declare(strict_types=1);
                             </div>
 
                             <!-- Confirm Password -->
-                            <div>
-                                <label for="confirm-password" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Confirm Password</label>
-                                <div class="relative flex items-center">
-                                    <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
-                                        <iconify-icon icon="lucide:lock" class="text-lg"></iconify-icon>
-                                    </div>
+                            <div class="emp-field-group">
+                                <label for="confirm-password" class="emp-field-label">Confirm Password</label>
+                                <div class="emp-input-with-icon emp-input-with-right-icon">
+                                    <span class="emp-input-icon-slot">
+                                        <iconify-icon icon="lucide:lock"></iconify-icon>
+                                    </span>
                                     <input :type="confirm_password_visible ? 'text' : 'password'" id="confirm-password" x-model="confirm_password" placeholder="••••••••" 
-                                           class="w-full pl-10 pr-10 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm tracking-widest text-[#191C1D] placeholder-gray-400">
+                                           class="emp-input-text"
+                                           style="height: 44px; min-height: 44px; border: 1px solid #E2E8F0 !important; border-radius: 10px !important; background: #FFFFFF !important; padding-left: 40px !important; padding-right: 44px !important; font-size: 13.5px !important; width: 100% !important; box-sizing: border-box !important; letter-spacing: 0.15em;">
                                     <button @click="confirm_password_visible = !confirm_password_visible" type="button" 
-                                            style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); cursor: pointer;"
-                                            class="text-gray-400 hover:text-gray-600 flex items-center border-none bg-transparent outline-none">
-                                        <iconify-icon :icon="confirm_password_visible ? 'lucide:eye-off' : 'lucide:eye'" class="text-lg"></iconify-icon>
+                                            class="emp-input-right-slot" :title="confirm_password_visible ? 'Hide password' : 'Show password'">
+                                        <iconify-icon :icon="confirm_password_visible ? 'lucide:eye-off' : 'lucide:eye'"></iconify-icon>
                                     </button>
                                 </div>
                                 <!-- 5 Stacked Thin Horizontal Lines Confirm Indicator -->
@@ -400,7 +635,7 @@ declare(strict_types=1);
                             <label class="flex items-start gap-3 cursor-pointer pt-2">
                                 <input type="checkbox" x-model="terms" class="mt-1 rounded text-primary focus:ring-primary border-brandBorder w-4 h-4">
                                 <span class="text-[13px] leading-[18px] text-secondary-text">
-                                    I agree to the <a href="#" class="text-primary font-semibold hover:underline">Terms of Service</a> and <a href="#" class="text-primary font-semibold hover:underline">Privacy Policy</a>.
+                                    I agree to the <a href="<?= url('/terms') ?>" class="text-primary font-semibold hover:underline">Terms of Service</a> and <a href="<?= url('/privacy') ?>" class="text-primary font-semibold hover:underline">Privacy Policy</a>.
                                 </span>
                             </label>
                         </div>
@@ -434,9 +669,10 @@ declare(strict_types=1);
                         <!-- Robust hidden-input sequential verification boxes -->
                         <div class="relative flex justify-between gap-2 max-w-[360px] mx-auto py-2 cursor-pointer" @click="$refs.verificationInput.focus()">
                             
-                            <!-- Hidden actual input to receive text sequentially -->
+                            <!-- Hidden actual input to receive text sequentially & handle paste -->
                             <input type="text" maxlength="6" x-model="verification_input" x-ref="verificationInput"
                                    @input="handleVerificationInput()"
+                                   @paste="handlePaste($event)"
                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
                                    pattern="[0-9]*" inputmode="numeric">
                             
@@ -461,7 +697,7 @@ declare(strict_types=1);
 
                         <!-- CTA Row -->
                         <div class="flex justify-between items-center pt-4 border-t border-brandBorder">
-                            <button @click="step = 2; server_errors = []" class="text-sm font-semibold text-secondary-text hover:text-[#191C1D] transition-colors flex items-center gap-1.5">
+                            <button @click="goBackToStep2()" class="text-sm font-semibold text-secondary-text hover:text-[#191C1D] transition-colors flex items-center gap-1.5">
                                 <iconify-icon icon="lucide:arrow-left"></iconify-icon>
                                 <span>Back</span>
                             </button>
@@ -493,55 +729,84 @@ declare(strict_types=1);
                         <div class="space-y-4 text-left">
                             <!-- Names Row -->
                             <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label for="first-name" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">First Name</label>
-                                    <div class="relative flex items-center">
-                                        <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
-                                            <iconify-icon icon="lucide:user" class="text-lg"></iconify-icon>
-                                        </div>
+                                <div class="emp-field-group">
+                                    <label for="first-name" class="emp-field-label">First Name</label>
+                                    <div class="emp-input-with-icon">
+                                        <span class="emp-input-icon-slot">
+                                            <iconify-icon icon="lucide:user"></iconify-icon>
+                                        </span>
                                         <input type="text" id="first-name" x-model="first_name" placeholder="e.g. Sarah" 
-                                               class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                               class="emp-input-text"
+                                               style="height: 44px; min-height: 44px; border: 1px solid #E2E8F0 !important; border-radius: 10px !important; background: #FFFFFF !important; padding-left: 40px !important; padding-right: 14px !important; font-size: 13.5px !important; width: 100% !important; box-sizing: border-box !important;">
                                     </div>
                                 </div>
-                                <div>
-                                    <label for="last-name" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Last Name</label>
-                                    <div class="relative flex items-center">
-                                        <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
-                                            <iconify-icon icon="lucide:user" class="text-lg"></iconify-icon>
-                                        </div>
+                                <div class="emp-field-group">
+                                    <label for="last-name" class="emp-field-label">Last Name</label>
+                                    <div class="emp-input-with-icon">
+                                        <span class="emp-input-icon-slot">
+                                            <iconify-icon icon="lucide:user"></iconify-icon>
+                                        </span>
                                         <input type="text" id="last-name" x-model="last_name" placeholder="e.g. Peters" 
-                                               class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                               class="emp-input-text"
+                                               style="height: 44px; min-height: 44px; border: 1px solid #E2E8F0 !important; border-radius: 10px !important; background: #FFFFFF !important; padding-left: 40px !important; padding-right: 14px !important; font-size: 13.5px !important; width: 100% !important; box-sizing: border-box !important;">
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- University -->
-                            <div>
-                                <label for="university" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">University</label>
-                                <div class="relative flex items-center">
-                                    <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
-                                        <iconify-icon icon="lucide:building" class="text-lg"></iconify-icon>
-                                    </div>
-                                    <input type="text" id="university" x-model="university" placeholder="e.g. University of Lagos" 
-                                           class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                            <!-- University with Autocomplete Dropdown -->
+                            <div class="emp-field-group relative" @click.outside="show_university_dropdown = false">
+                                <label for="university" class="emp-field-label">University</label>
+                                <div class="emp-input-with-icon">
+                                    <span class="emp-input-icon-slot">
+                                        <iconify-icon icon="lucide:building"></iconify-icon>
+                                    </span>
+                                    <input type="text" id="university" x-model="university" 
+                                           @input="searchUniversities()" 
+                                           @focus="if(university_results.length > 0) show_university_dropdown = true"
+                                           placeholder="e.g. University of Lagos" 
+                                           autocomplete="off"
+                                           class="emp-input-text"
+                                           style="height: 44px; min-height: 44px; border: 1px solid #E2E8F0 !important; border-radius: 10px !important; background: #FFFFFF !important; padding-left: 40px !important; padding-right: 14px !important; font-size: 13.5px !important; width: 100% !important; box-sizing: border-box !important;">
+                                </div>
+
+                                <!-- Autocomplete Results Dropdown -->
+                                <div x-show="show_university_dropdown && university_results.length > 0"
+                                     x-transition:enter="transition ease-out duration-100"
+                                     x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                                     x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                     x-transition:leave="transition ease-in duration-75"
+                                     x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                                     x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                                     class="db-dropdown-menu custom-primary-scrollbar"
+                                     style="display: none; max-height: 240px; overflow-y: auto;">
+                                    <template x-for="item in university_results" :key="item.name + (item.country || '')">
+                                        <div class="db-dropdown-item" @click="selectUniversity(item.name)">
+                                            <div class="flex flex-col text-left truncate mr-2">
+                                                <span class="font-semibold text-gray-900 truncate" x-text="item.name"></span>
+                                                <span class="text-[11px] text-gray-500" x-text="item.country ? (item.country + (item.state ? ' • ' + item.state : '')) : ''"></span>
+                                            </div>
+                                            <span class="text-[10px] text-primary/80 font-mono bg-primary/5 px-2 py-0.5 rounded-full flex-shrink-0" x-show="item.domains && item.domains[0]" x-text="item.domains ? item.domains[0] : ''"></span>
+                                        </div>
+                                    </template>
                                 </div>
                             </div>
 
                             <!-- Degree / Graduation Year Row -->
                             <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Degree Level</label>
-                                    <div class="relative w-full" x-data="{ open: false }" @click.outside="open = false">
-                                        <div class="relative flex items-center">
-                                            <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center z-10">
-                                                <iconify-icon icon="lucide:graduation-cap" class="text-lg"></iconify-icon>
-                                            </div>
+                                <div class="emp-field-group">
+                                    <label class="emp-field-label">Degree Level</label>
+                                    <div class="db-dropdown-wrap" x-data="{ open: false }" @click.outside="open = false">
+                                        <div class="emp-input-with-icon">
+                                            <span class="emp-input-icon-slot">
+                                                <iconify-icon icon="lucide:graduation-cap"></iconify-icon>
+                                            </span>
                                             <button type="button" 
-                                                    class="w-full h-[42px] min-h-[42px] max-h-[42px] flex items-center justify-between pl-10 pr-3.5 py-2 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] bg-white text-left cursor-pointer overflow-hidden"
-                                                    :class="{ 'border-primary ring-2 ring-primary/20': open }"
-                                                    @click="open = !open">
-                                                <span class="truncate whitespace-nowrap min-w-0 mr-1" :class="degree_level ? 'text-[#191C1D]' : 'text-gray-400'" x-text="degree_level || 'Select Degree'"></span>
-                                                <svg class="w-4 h-4 text-gray-500 transition-transform duration-200 flex-shrink-0" :class="{ 'rotate-180 text-primary': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                                                    class="db-dropdown-btn"
+                                                    :class="{ 'active': open }"
+                                                    @click="open = !open"
+                                                    style="height: 44px; min-height: 44px; padding-left: 40px !important; padding-right: 14px !important; width: 100% !important; box-sizing: border-box !important;">
+                                                <span class="truncate whitespace-nowrap min-w-0" :class="degree_level ? 'text-[#0F172A] font-medium' : 'text-gray-400 font-normal'" x-text="degree_level || 'Select Degree'"></span>
+                                                <svg class="db-dropdown-chevron" :style="open ? 'transform: rotate(180deg)' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
                                                 </svg>
                                             </button>
@@ -553,14 +818,14 @@ declare(strict_types=1);
                                              x-transition:leave="transition ease-in duration-75"
                                              x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                                              x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
-                                             class="absolute top-[calc(100%+6px)] left-0 right-0 bg-white border border-brandBorder rounded-xl shadow-lg z-50 p-1.5 custom-primary-scrollbar"
+                                             class="db-dropdown-menu custom-primary-scrollbar"
                                              style="display: none; max-height: 220px; overflow-y: auto;">
                                             <template x-for="dOpt in degree_options" :key="dOpt">
-                                                <div class="flex items-center justify-between px-3 py-2 text-xs font-medium rounded-lg cursor-pointer transition-colors"
-                                                     :class="degree_level === dOpt ? 'bg-indigo-50 text-primary font-semibold' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'"
+                                                <div class="db-dropdown-item"
+                                                     :class="{ 'is-selected': degree_level === dOpt }"
                                                      @click="degree_level = dOpt; open = false">
                                                     <span x-text="dOpt"></span>
-                                                    <svg x-show="degree_level === dOpt" class="w-3.5 h-3.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                    <svg x-show="degree_level === dOpt" class="w-3.5 h-3.5 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                                     </svg>
                                                 </div>
@@ -568,19 +833,21 @@ declare(strict_types=1);
                                         </div>
                                     </div>
                                 </div>
-                                <div>
-                                    <label class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Graduation Year</label>
-                                    <div class="relative w-full" x-data="{ open: false }" @click.outside="open = false">
-                                        <div class="relative flex items-center">
-                                            <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center z-10">
-                                                <iconify-icon icon="lucide:calendar" class="text-lg"></iconify-icon>
-                                            </div>
+
+                                <div class="emp-field-group">
+                                    <label class="emp-field-label">Graduation Year</label>
+                                    <div class="db-dropdown-wrap" x-data="{ open: false }" @click.outside="open = false">
+                                        <div class="emp-input-with-icon">
+                                            <span class="emp-input-icon-slot">
+                                                <iconify-icon icon="lucide:calendar"></iconify-icon>
+                                            </span>
                                             <button type="button" 
-                                                    class="w-full h-[42px] min-h-[42px] max-h-[42px] flex items-center justify-between pl-10 pr-3.5 py-2 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] bg-white text-left cursor-pointer overflow-hidden"
-                                                    :class="{ 'border-primary ring-2 ring-primary/20': open }"
-                                                    @click="open = !open">
-                                                <span class="truncate whitespace-nowrap min-w-0 mr-1" :class="graduation_year ? 'text-[#191C1D]' : 'text-gray-400'" x-text="graduation_year || 'Select Year'"></span>
-                                                <svg class="w-4 h-4 text-gray-500 transition-transform duration-200 flex-shrink-0" :class="{ 'rotate-180 text-primary': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                                                    class="db-dropdown-btn"
+                                                    :class="{ 'active': open }"
+                                                    @click="open = !open"
+                                                    style="height: 44px; min-height: 44px; padding-left: 40px !important; padding-right: 14px !important; width: 100% !important; box-sizing: border-box !important;">
+                                                <span class="truncate whitespace-nowrap min-w-0" :class="graduation_year ? 'text-[#0F172A] font-medium' : 'text-gray-400 font-normal'" x-text="graduation_year || 'Select Year'"></span>
+                                                <svg class="db-dropdown-chevron" :style="open ? 'transform: rotate(180deg)' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
                                                 </svg>
                                             </button>
@@ -592,14 +859,14 @@ declare(strict_types=1);
                                              x-transition:leave="transition ease-in duration-75"
                                              x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                                              x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
-                                             class="absolute top-[calc(100%+6px)] left-0 right-0 bg-white border border-brandBorder rounded-xl shadow-lg z-50 p-1.5 custom-primary-scrollbar"
+                                             class="db-dropdown-menu custom-primary-scrollbar"
                                              style="display: none; max-height: 220px; overflow-y: auto;">
                                             <template x-for="yOpt in graduation_year_options" :key="yOpt">
-                                                <div class="flex items-center justify-between px-3 py-2 text-xs font-medium rounded-lg cursor-pointer transition-colors"
-                                                     :class="graduation_year === yOpt ? 'bg-indigo-50 text-primary font-semibold' : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'"
+                                                <div class="db-dropdown-item"
+                                                     :class="{ 'is-selected': graduation_year === yOpt }"
                                                      @click="graduation_year = yOpt; open = false">
                                                     <span x-text="yOpt"></span>
-                                                    <svg x-show="graduation_year === yOpt" class="w-3.5 h-3.5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                    <svg x-show="graduation_year === yOpt" class="w-3.5 h-3.5 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                                     </svg>
                                                 </div>
@@ -610,33 +877,35 @@ declare(strict_types=1);
                             </div>
 
                             <!-- Field of Study -->
-                            <div>
-                                <label for="field-of-study" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Field of Study</label>
-                                <div class="relative flex items-center">
-                                    <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
-                                        <iconify-icon icon="lucide:book-open" class="text-lg"></iconify-icon>
-                                    </div>
+                            <div class="emp-field-group">
+                                <label for="field-of-study" class="emp-field-label">Field of Study</label>
+                                <div class="emp-input-with-icon">
+                                    <span class="emp-input-icon-slot">
+                                        <iconify-icon icon="lucide:book-open"></iconify-icon>
+                                    </span>
                                     <input type="text" id="field-of-study" x-model="field_of_study" placeholder="e.g. Computer Science" 
-                                           class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                           class="emp-input-text"
+                                           style="height: 44px; min-height: 44px; border: 1px solid #E2E8F0 !important; border-radius: 10px !important; background: #FFFFFF !important; padding-left: 40px !important; padding-right: 14px !important; font-size: 13.5px !important; width: 100% !important; box-sizing: border-box !important;">
                                 </div>
                             </div>
 
                             <!-- GPA (Optional) -->
-                            <div>
-                                <label for="gpa" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">GPA (Optional)</label>
-                                <div class="relative flex items-center">
-                                    <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
-                                        <iconify-icon icon="lucide:award" class="text-lg"></iconify-icon>
-                                    </div>
+                            <div class="emp-field-group">
+                                <label for="gpa" class="emp-field-label">GPA (Optional)</label>
+                                <div class="emp-input-with-icon">
+                                    <span class="emp-input-icon-slot">
+                                        <iconify-icon icon="lucide:award"></iconify-icon>
+                                    </span>
                                     <input type="text" id="gpa" x-model="gpa" placeholder="e.g. 3.8 / 4.0" 
-                                           class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                           class="emp-input-text"
+                                           style="height: 44px; min-height: 44px; border: 1px solid #E2E8F0 !important; border-radius: 10px !important; background: #FFFFFF !important; padding-left: 40px !important; padding-right: 14px !important; font-size: 13.5px !important; width: 100% !important; box-sizing: border-box !important;">
                                 </div>
                             </div>
                         </div>
 
                         <!-- CTA Row -->
                         <div class="flex justify-between items-center pt-4 border-t border-brandBorder">
-                            <button @click="step = 3; server_errors = []" class="text-sm font-semibold text-secondary-text hover:text-[#191C1D] transition-colors flex items-center gap-1.5">
+                            <button @click="step = 3; server_errors = []; resetModals();" class="text-sm font-semibold text-secondary-text hover:text-[#191C1D] transition-colors flex items-center gap-1.5">
                                 <iconify-icon icon="lucide:arrow-left"></iconify-icon>
                                 <span>Back</span>
                             </button>
@@ -691,16 +960,19 @@ declare(strict_types=1);
                                         </div>
                                     </div>
                                     <div class="min-w-0 flex-1 overflow-hidden">
-                                        <p class="text-xs font-bold text-[#191C1D] truncate block" :title="resume_name" x-text="resume_name"></p>
-                                        <p class="text-[11px] text-gray-500 truncate" x-text="resume_size + ' • Ready'"></p>
-                                        <!-- Status badge -->
-                                        <div class="flex items-center gap-1.5 mt-0.5">
-                                            <span class="inline-flex items-center px-1.5 py-0.2 rounded-full text-[9px] font-semibold bg-green-50 text-green-700 border border-green-200">Parsed by AI</span>
+                                        <p class="text-xs font-bold text-[#191C1D] truncate block" style="line-height: 1.35;" x-text="resume_name"></p>
+                                        <!-- Size, status and AI badge on one aligned row -->
+                                        <div class="flex items-center flex-wrap" style="gap: 6px; margin-top: 4px;">
+                                            <span class="text-gray-500 whitespace-nowrap" style="font-size: 11px; line-height: 1.35;" x-text="resume_size + ' • Ready'"></span>
+                                            <span class="inline-flex items-center whitespace-nowrap rounded-full bg-green-50 text-green-700 border border-green-200" style="gap: 4px; padding: 2px 8px; font-size: 10px; font-weight: 600; line-height: 1.4;">
+                                                <svg style="width: 10px; height: 10px; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                                <span>Parsed by AI</span>
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
                                 <!-- Delete button -->
-                                <button type="button" @click="removeSelectedFile()" class="text-red-500 hover:text-red-700 flex items-center flex-shrink-0 p-1.5 rounded-lg hover:bg-red-50 transition-colors" title="Remove Resume">
+                                <button type="button" @click="removeSelectedFile()" class="text-red-500 hover:text-red-700 flex items-center flex-shrink-0 p-1.5 rounded-lg hover:bg-red-50 transition-colors" aria-label="Remove resume">
                                     <iconify-icon icon="lucide:trash-2" class="text-base"></iconify-icon>
                                 </button>
                             </div>
@@ -715,37 +987,40 @@ declare(strict_types=1);
 
                         <!-- Links Fields -->
                         <div class="space-y-4 text-left">
-                            <div>
-                                <label for="portfolio-url" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Portfolio URL (Optional)</label>
-                                <div class="relative flex items-center">
-                                    <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
-                                        <iconify-icon icon="lucide:globe" class="text-lg"></iconify-icon>
-                                    </div>
+                            <div class="emp-field-group">
+                                <label for="portfolio-url" class="emp-field-label">Portfolio URL (Optional)</label>
+                                <div class="emp-input-with-icon">
+                                    <span class="emp-input-icon-slot">
+                                        <iconify-icon icon="lucide:globe"></iconify-icon>
+                                    </span>
                                     <input type="text" id="portfolio-url" x-model="portfolio" placeholder="https://yourportfolio.com" 
-                                           class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                           class="emp-input-text"
+                                           style="height: 44px; min-height: 44px; border: 1px solid #E2E8F0 !important; border-radius: 10px !important; background: #FFFFFF !important; padding-left: 40px !important; padding-right: 14px !important; font-size: 13.5px !important; width: 100% !important; box-sizing: border-box !important;">
                                 </div>
                             </div>
 
                             <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label for="linkedin-url" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">LinkedIn (Optional)</label>
-                                    <div class="relative flex items-center">
-                                        <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
-                                            <iconify-icon icon="lucide:linkedin" class="text-lg"></iconify-icon>
-                                        </div>
+                                <div class="emp-field-group">
+                                    <label for="linkedin-url" class="emp-field-label">LinkedIn (Optional)</label>
+                                    <div class="emp-input-with-icon">
+                                        <span class="emp-input-icon-slot">
+                                            <iconify-icon icon="lucide:linkedin"></iconify-icon>
+                                        </span>
                                         <input type="text" id="linkedin-url" x-model="linkedin" placeholder="linkedin.com/in/username" 
-                                               class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                               class="emp-input-text"
+                                               style="height: 44px; min-height: 44px; border: 1px solid #E2E8F0 !important; border-radius: 10px !important; background: #FFFFFF !important; padding-left: 40px !important; padding-right: 14px !important; font-size: 13.5px !important; width: 100% !important; box-sizing: border-box !important;">
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label for="github-url" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">GitHub (Optional)</label>
-                                    <div class="relative flex items-center">
-                                        <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
-                                            <iconify-icon icon="lucide:github" class="text-lg"></iconify-icon>
-                                        </div>
+                                <div class="emp-field-group">
+                                    <label for="github-url" class="emp-field-label">GitHub (Optional)</label>
+                                    <div class="emp-input-with-icon">
+                                        <span class="emp-input-icon-slot">
+                                            <iconify-icon icon="lucide:github"></iconify-icon>
+                                        </span>
                                         <input type="text" id="github-url" x-model="github" placeholder="github.com/username" 
-                                               class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                                               class="emp-input-text"
+                                               style="height: 44px; min-height: 44px; border: 1px solid #E2E8F0 !important; border-radius: 10px !important; background: #FFFFFF !important; padding-left: 40px !important; padding-right: 14px !important; font-size: 13.5px !important; width: 100% !important; box-sizing: border-box !important;">
                                     </div>
                                 </div>
                             </div>
@@ -754,7 +1029,7 @@ declare(strict_types=1);
                         <!-- CTA Row -->
                         <div class="flex flex-col items-center gap-4 pt-4 border-t border-brandBorder">
                             <div class="w-full flex justify-between items-center">
-                                <button @click="step = 4; server_errors = []" class="text-sm font-semibold text-secondary-text hover:text-[#191C1D] transition-colors flex items-center gap-1.5">
+                                <button @click="step = 4; server_errors = []; resetModals();" class="text-sm font-semibold text-secondary-text hover:text-[#191C1D] transition-colors flex items-center gap-1.5">
                                     <iconify-icon icon="lucide:arrow-left"></iconify-icon>
                                     <span>Back</span>
                                 </button>
@@ -777,31 +1052,126 @@ declare(strict_types=1);
                     <!-- Step 6: Career Interests                        -->
                     <!-- ─────────────────────────────────────────────── -->
                     <div x-show="step === 6" class="space-y-6">
-                        <h3 class="text-[24px] font-bold text-[#191C1D] tracking-tight text-left">Pick your areas of interest</h3>
+                        <!-- Hidden inputs for form POST and database synchronization -->
+                        <input type="hidden" name="interests" :value="JSON.stringify(interests)">
+                        <input type="hidden" name="interest_keywords" :value="JSON.stringify(interest_keywords)">
 
-                        <!-- Filter search -->
-                        <div class="relative flex items-center">
-                            <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
-                                <iconify-icon icon="lucide:search" class="text-lg"></iconify-icon>
-                            </div>
-                            <input type="text" x-model="search_query" placeholder="Search" 
-                                   class="w-full pl-10 pr-4 py-2 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                        <div class="text-left">
+                            <h3 class="text-[24px] font-bold text-[#191C1D] tracking-tight">Pick your areas of interest</h3>
+                            <p class="text-xs text-secondary-text mt-1">Select fields you're passionate about. We'll surface related specializations automatically.</p>
                         </div>
 
-                        <!-- Interest Tags Grid with Primary Scrollbar -->
-                        <div class="flex flex-wrap gap-2 py-2 max-h-[180px] overflow-y-auto pr-1 custom-primary-scrollbar">
-                            <template x-for="item in filteredInterests()" :key="item">
-                                <button type="button" @click="toggleInterest(item)"
-                                        class="px-4 py-2 rounded-full text-xs font-semibold border transition-all duration-200"
-                                        :class="interests.includes(item) ? 'bg-primary text-white border-primary' : 'bg-white text-secondary-text border-[#E2E8F0] hover:border-gray-300'">
-                                    <span x-text="item"></span>
+                        <!-- Selected Interests Container (Matching Step 7 Standard) -->
+                        <div x-show="interests.length > 0" class="space-y-1.5 text-left" style="display: none;">
+                            <div class="flex items-center justify-between">
+                                <label class="emp-field-label">Selected Interests (<span x-text="interests.length"></span>)</label>
+                                <button type="button" @click="clearInterests()" class="text-xs font-semibold text-gray-500 hover:text-red-600 transition-colors cursor-pointer">
+                                    Reset selection
                                 </button>
-                            </template>
+                            </div>
+                            <div class="flex flex-wrap gap-2 p-3 border border-brandBorder rounded-xl min-h-[50px] bg-white items-center">
+                                <template x-for="item in interests" :key="item">
+                                    <div class="inline-flex items-center gap-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold border border-primary/20" style="padding: 6px 14px;">
+                                        <span x-text="item"></span>
+                                        <button type="button" @click="toggleInterest(item)" class="flex items-center text-primary/80 hover:text-primary cursor-pointer">
+                                            <iconify-icon icon="lucide:x" class="text-sm"></iconify-icon>
+                                        </button>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Filter Search with Floating Auto-Suggest Dropdown -->
+                        <div class="emp-field-group relative text-left" @click.outside="show_interest_dropdown = false">
+                            <label class="emp-field-label">Search Disciplines or Specializations</label>
+                            <div class="emp-input-with-icon emp-input-with-right-icon">
+                                <span class="emp-input-icon-slot">
+                                    <iconify-icon icon="lucide:search"></iconify-icon>
+                                </span>
+                                <input type="text" x-model="search_query" 
+                                       @input="show_interest_dropdown = true"
+                                       @focus="if(search_query.trim().length > 0) show_interest_dropdown = true"
+                                       placeholder="Search roles, disciplines, or keywords (e.g. Figma, React, DevOps)..." 
+                                       class="emp-input-text"
+                                       style="height: 44px; min-height: 44px; border: 1px solid #E2E8F0 !important; border-radius: 10px !important; background: #FFFFFF !important; padding-left: 40px !important; padding-right: 40px !important; font-size: 13.5px !important; width: 100% !important; box-sizing: border-box !important;">
+                                <span class="emp-input-right-slot" x-show="search_query" style="display: none;">
+                                    <button type="button" @click="search_query = ''; show_interest_dropdown = false;" class="text-gray-400 hover:text-gray-600 transition-colors flex items-center cursor-pointer">
+                                        <iconify-icon icon="lucide:x" class="text-base"></iconify-icon>
+                                    </button>
+                                </span>
+                            </div>
+
+                            <!-- Floating Auto-Suggest Dropdown attached to Search Bar -->
+                            <div x-show="show_interest_dropdown && search_query.trim().length > 0"
+                                 x-transition:enter="transition ease-out duration-100"
+                                 x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                 x-transition:leave="transition ease-in duration-75"
+                                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                                 x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                                 class="absolute left-0 right-0 mt-1.5 w-full bg-white border border-[#E2E8F0] rounded-xl shadow-xl z-50 p-2"
+                                 style="display: none; max-height: 200px; overflow-y: auto !important; scrollbar-gutter: stable; box-sizing: border-box;">
+                                
+                                <template x-if="searchResults().length > 0">
+                                    <div class="space-y-1">
+                                        <template x-for="item in searchResults()" :key="item">
+                                            <div @click="toggleInterest(item); search_query = ''; show_interest_dropdown = false;"
+                                                 class="flex items-center justify-between px-3.5 py-2 text-xs font-semibold rounded-lg cursor-pointer transition-all duration-150 select-none hover:bg-gray-50"
+                                                 :class="interests.includes(item) ? 'bg-indigo-50/80 text-primary font-bold' : 'text-gray-700'">
+                                                <div class="flex items-center gap-2">
+                                                    <span x-text="item"></span>
+                                                    <span class="text-[10px] text-gray-400 font-normal" x-text="interests_taxonomy[item]?.category ? '(' + interests_taxonomy[item].category + ')' : ''"></span>
+                                                </div>
+                                                <div class="w-4 h-4 rounded-md border flex items-center justify-center transition-all duration-150 flex-shrink-0"
+                                                     :class="interests.includes(item) ? 'bg-primary border-primary text-white' : 'border-gray-300 bg-white'">
+                                                    <svg x-show="interests.includes(item)" class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                                <template x-if="searchResults().length === 0">
+                                    <div class="py-4 text-center text-xs text-gray-400">
+                                        No matching disciplines found for "<span class="font-semibold text-gray-600" x-text="search_query"></span>"
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Foundational Disciplines with generous, explicit padding (6px 14px) and subtle borders -->
+                        <div class="text-left space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="emp-field-label text-xs font-medium text-gray-500 mb-0">Foundational Disciplines</span>
+                                <span x-show="interests.length === 0" class="text-[11px] text-gray-400">Select one or more to begin</span>
+                            </div>
+                            
+                            <div class="flex flex-wrap gap-2.5 py-1">
+                                <template x-for="item in foundationalDisciplines" :key="item">
+                                    <button type="button" @click="toggleInterest(item)"
+                                            class="rounded-full text-xs font-semibold transition-all duration-150 inline-flex items-center gap-1.5 cursor-pointer select-none"
+                                            style="padding: 6px 14px;"
+                                            :class="interests.includes(item) 
+                                                ? 'bg-primary text-white border border-primary shadow-sm' 
+                                                : 'bg-white text-secondary-text border border-[#E2E8F0] hover:border-primary/40 hover:text-[#191C1D]'">
+                                        <span x-text="item"></span>
+                                        <template x-if="interests.includes(item)">
+                                            <svg class="w-3 h-3 text-white flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        </template>
+                                        <template x-if="!interests.includes(item)">
+                                            <iconify-icon icon="lucide:plus" class="text-xs text-gray-400 flex-shrink-0"></iconify-icon>
+                                        </template>
+                                    </button>
+                                </template>
+                            </div>
                         </div>
 
                         <!-- Work Arrangement -->
                         <div class="space-y-2 border-t border-[#E2E8F0] pt-4 text-left">
-                            <span class="text-[12px] font-bold text-secondary-text uppercase tracking-wider block">Work arrangement</span>
+                            <span class="emp-field-label block">Work arrangement</span>
                             
                             <div class="flex gap-6">
                                 <label class="flex items-center gap-2 cursor-pointer text-sm font-semibold text-[#191C1D]">
@@ -821,13 +1191,13 @@ declare(strict_types=1);
 
                         <!-- CTA Row -->
                         <div class="flex justify-between items-center pt-4 border-t border-[#E2E8F0]">
-                            <button @click="step = 5; server_errors = []" class="text-sm font-semibold text-secondary-text hover:text-[#191C1D] transition-colors flex items-center gap-1.5">
+                            <button @click="step = 5; server_errors = []; resetModals();" class="text-sm font-semibold text-secondary-text hover:text-[#191C1D] transition-colors flex items-center gap-1.5">
                                 <iconify-icon icon="lucide:arrow-left"></iconify-icon>
                                 <span>Back</span>
                             </button>
                             
                             <button @click="submitStep6()" 
-                                    :disabled="interests.length === 0 || work_arrangements.length === 0 || submitting"
+                                     :disabled="interests.length === 0 || work_arrangements.length === 0 || submitting"
                                     class="bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm flex items-center gap-1.5">
                                 <span x-text="submitting ? 'Saving...' : 'Continue'"></span>
                                 <iconify-icon icon="lucide:arrow-right" x-show="!submitting"></iconify-icon>
@@ -843,40 +1213,41 @@ declare(strict_types=1);
 
                         <div class="space-y-4 text-left">
                             <!-- Current Location -->
-                            <div>
-                                <label for="current-location" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Current location</label>
-                                <div class="relative flex items-center">
-                                    <div class="absolute left-3 text-gray-400 pointer-events-none flex items-center">
-                                        <iconify-icon icon="lucide:map-pin" class="text-lg"></iconify-icon>
-                                    </div>
-                                    <input type="text" id="current-location" x-model="location" placeholder="Lagos, Nigeria" 
-                                           class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-brandBorder focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-sm text-[#191C1D] placeholder-gray-400">
+                            <div class="emp-field-group">
+                                <label for="current-location" class="emp-field-label">Current location</label>
+                                <div class="emp-input-with-icon">
+                                    <span class="emp-input-icon-slot">
+                                        <iconify-icon icon="lucide:map-pin"></iconify-icon>
+                                    </span>
+                                    <input type="text" id="current-location" x-model="location" placeholder="e.g. Lagos, Nigeria" 
+                                           class="emp-input-text"
+                                           style="height: 44px; min-height: 44px; border: 1px solid #E2E8F0 !important; border-radius: 10px !important; background: #FFFFFF !important; padding-left: 40px !important; padding-right: 14px !important; font-size: 13.5px !important; width: 100% !important; box-sizing: border-box !important;">
                                 </div>
                             </div>
 
                             <!-- Relocating toggle switcher -->
-                            <div>
-                                <label class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Open to relocating?</label>
-                                <div class="flex bg-gray-100 rounded-lg p-1 border border-brandBorder">
+                            <div class="emp-field-group">
+                                <label class="emp-field-label">Open to relocating?</label>
+                                <div class="emp-segmented-control">
                                     <button type="button" @click="open_to_relocating = 'Yes'" 
-                                            class="flex-1 py-2 text-sm font-semibold rounded-lg transition-all"
-                                            :class="open_to_relocating === 'Yes' ? 'bg-white text-primary shadow-sm' : 'text-secondary-text hover:text-[#191C1D]'">
+                                            class="emp-segment-btn"
+                                            :class="open_to_relocating === 'Yes' ? 'active' : ''">
                                         Yes
                                     </button>
                                     <button type="button" @click="open_to_relocating = 'No'" 
-                                            class="flex-1 py-2 text-sm font-semibold rounded-lg transition-all"
-                                            :class="open_to_relocating === 'No' ? 'bg-white text-primary shadow-sm' : 'text-secondary-text hover:text-[#191C1D]'">
+                                            class="emp-segment-btn"
+                                            :class="open_to_relocating === 'No' ? 'active' : ''">
                                         No, stay local
                                     </button>
                                 </div>
                             </div>
 
                             <!-- Where do you want job suggestions from (tag input) -->
-                            <div>
-                                <label class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Where do you want job suggestions from?</label>
+                            <div class="emp-field-group">
+                                <label class="emp-field-label">Where do you want job suggestions from?</label>
                                 
                                 <!-- Suggestions Pills Container -->
-                                <div class="flex flex-wrap gap-2 p-3 border border-brandBorder rounded-lg min-h-[50px] bg-white items-center">
+                                <div class="flex flex-wrap gap-2 p-3 border border-brandBorder rounded-xl min-h-[50px] bg-white items-center">
                                     <template x-for="city in job_suggestions_locations" :key="city">
                                         <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold border border-primary/20">
                                             <span x-text="city"></span>
@@ -909,7 +1280,7 @@ declare(strict_types=1);
 
                         <!-- CTA Row -->
                         <div class="flex justify-between items-center pt-4 border-t border-[#E2E8F0]">
-                            <button @click="step = 6; server_errors = []" class="text-sm font-semibold text-secondary-text hover:text-[#191C1D] transition-colors flex items-center gap-1.5">
+                            <button @click="step = 6; server_errors = []; resetModals();" class="text-sm font-semibold text-secondary-text hover:text-[#191C1D] transition-colors flex items-center gap-1.5">
                                 <iconify-icon icon="lucide:arrow-left"></iconify-icon>
                                 <span>Back</span>
                             </button>
@@ -932,8 +1303,8 @@ declare(strict_types=1);
         <footer class="w-full border-t border-[#E2E8F0] pt-6 flex flex-col md:flex-row justify-between items-center text-xs text-secondary-text mt-8 gap-4 py-4">
             <span>© <span id="copyright-year-register-student">2026</span> INTERNCONNECT. ALL RIGHTS RESERVED.</span>
             <div class="flex gap-6">
-                <a href="#" class="hover:text-primary transition-colors uppercase font-semibold">Privacy Policy</a>
-                <a href="#" class="hover:text-primary transition-colors uppercase font-semibold">Terms of Service</a>
+                <a href="<?= url('/privacy') ?>" class="hover:text-primary transition-colors uppercase font-semibold">Privacy Policy</a>
+                <a href="<?= url('/terms') ?>" class="hover:text-primary transition-colors uppercase font-semibold">Terms of Service</a>
             </div>
         </footer>
 
@@ -945,6 +1316,8 @@ declare(strict_types=1);
     
     <!-- Success Modal -->
     <div x-show="show_success_modal" 
+         x-cloak
+         style="display: none;"
          @click.self="show_success_modal = false; step = 4; clearTimers(); saveDraftToLocal()"
          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm shadow-xl"
          x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
@@ -989,6 +1362,8 @@ declare(strict_types=1);
 
     <!-- Failure Modal -->
     <div x-show="show_failure_modal" 
+         x-cloak
+         style="display: none;"
          @click.self="show_failure_modal = false"
          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm shadow-xl"
          x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
@@ -1028,6 +1403,8 @@ declare(strict_types=1);
 <!-- PHP-rendered URL config — must come BEFORE onboarding-student.js -->
 <script>
     window.INTERN_WELCOME_URL = '<?= url('/welcome') ?>';
+    window.INTERN_ONBOARD_COMPLETE_URL = '<?= url('/register/student/complete') ?>';
+    window.INTERN_UNIVERSITIES_API = '<?= url('/api/universities') ?>';
 </script>
 <script src="<?= asset('assets/js/onboarding-student.js') ?>?v=<?= filemtime(dirname(__DIR__, 2) . '/public/assets/js/onboarding-student.js') ?>"></script>
 <script>

@@ -83,13 +83,51 @@ $interviewerInitials = strtoupper(substr($interviewerWords[0] ?? 'A', 0, 1) . (i
     submitReschedule() {
         this.showRescheduleModal = false;
         this.showSuccessModal = true;
+        fetch('<?= url('/candidate/interview/respond') ?>', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                interview_id: 1,
+                status: 'Reschedule Requested',
+                reason: this.rescheduleReasonLabel,
+                reschedule_date: this.rescheduleDate,
+                reschedule_time: this.rescheduleTime,
+                notes: this.rescheduleMessage
+            })
+        }).catch(err => console.error('Failed to submit reschedule:', err));
     },
 
     sendMessage() {
         this.showMessageModal = false;
+        const body = (this.messageSubject ? this.messageSubject + ': ' : '') + this.messageBody;
+        fetch('<?= url('/candidate/messages/send') ?>', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                thread_id: 1,
+                content: body
+            })
+        }).catch(err => console.error('Failed to send recruiter message:', err));
         if (typeof window.$dispatch === 'function') {
             window.$dispatch('show-toast', { 
                 text: 'Your message has been sent to <?= htmlspecialchars($interview['interviewer_name']) ?>.', 
+                type: 'success' 
+            });
+        }
+    },
+
+    confirmInterview() {
+        fetch('<?= url('/candidate/interview/respond') ?>', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                interview_id: 1,
+                status: 'Confirmed'
+            })
+        }).catch(err => console.error('Failed to confirm interview:', err));
+        if (typeof window.$dispatch === 'function') {
+            window.$dispatch('show-toast', { 
+                text: 'Interview invitation confirmed! Calendar notification dispatched.', 
                 type: 'success' 
             });
         }
@@ -197,11 +235,11 @@ $interviewerInitials = strtoupper(substr($interviewerWords[0] ?? 'A', 0, 1) . (i
                                         </svg>
                                     </button>
                                 </div>
-                                <a href="<?= htmlspecialchars($interview['meet_link']) ?>" target="_blank" rel="noopener noreferrer" class="db-join-meet-btn">
-                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                                <a href="<?= url('/candidate/interview/room') ?>" class="db-join-meet-btn" style="white-space: nowrap !important; flex-shrink: 0 !important;">
+                                    <svg style="width: 15px; height: 15px; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                                     </svg>
-                                    <span>Link to Meeting</span>
+                                    <span>Enter Video Room</span>
                                 </a>
                             </div>
                             <p class="db-join-footnote">Button will be active 10 minutes before the interview start time.</p>

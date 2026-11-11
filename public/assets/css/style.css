@@ -4158,10 +4158,10 @@ img,video {
 .header-desktop-links {
   display: none;
   align-items: center;
-  gap: 28px;
+  gap: 24px;
 }
 
-@media (min-width: 960px) {
+@media (min-width: 1024px) {
   .header-desktop-links {
     display: flex;
     position: absolute;
@@ -4426,9 +4426,9 @@ img,video {
   align-items: center;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .header-mobile-toggle {
-    display: none;
+    display: none !important;
   }
 }
 

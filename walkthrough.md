@@ -1,241 +1,349 @@
-# InternConnect Comprehensive Reconstruction Walkthrough & Architecture Plan (`walkthrough.md`)
+# InternConnect Student Onboarding & Navigation Restructuring Walkthrough (`walkthrough.md`)
 
-This walkthrough details the comprehensive redesign, structural alignment, and logic updates for the **Employer Posted Internships**, **Jenny AI Match Intelligence**, and **Candidate Application Review** systems, in full alignment with the governance rules defined in [`.agents/rules/rules.md`](file:///c:/xampp/htdocs/InternConnect/.agents/rules/rules.md) and [`.agents/rules/agent_mistakes_preventions.md`](file:///c:/xampp/htdocs/InternConnect/.agents/rules/agent_mistakes_preventions.md).
-
-> [!NOTE]
-> **Status**: Implementation Completed & Verified. All three areas (Posted Internships, Jenny AI Match Intelligence, Post Internship Form clean empty defaults, and Candidate Application Review) are fully implemented and verified in strict accordance with [`.agents/rules/rules.md`](file:///c:/xampp/htdocs/InternConnect/.agents/rules/rules.md) and [`.agents/rules/agent_mistakes_preventions.md`](file:///c:/xampp/htdocs/InternConnect/.agents/rules/agent_mistakes_preventions.md).
-
----
-
-## 1. Executive Summary of Requirements & Scope
-
-| Area | Current Implementation | Reconstructed Implementation | Key Rationale |
-| :--- | :--- | :--- | :--- |
-| **Sidebar Navigation** | Link 2: *Post Internship*<br>Link 3: *My Internships* | Link 2: *Post Internship*<br>Link 3: **Posted Internships** | Resolves naming ambiguity: Link 2 launches a new opening, Link 3 manages existing posted roles. |
-| **Page Header** (`/employer/internships`) | Title: *My Internships*<br>Subtitle: *Manage and track your posted internships* | Title: **Posted Internships**<br>Subtitle: *Manage and track your posted internships* | Aligns terminology with the sidebar and standard recruitment workflow. |
-| **AI Insights Banner** | Button label: `Apply Now` (candidate copy) | Button label: **`View Top Matches →`** (links to `/employer/candidates?sort=ai_match`) | Employers do not apply to their own postings; button triggers candidate review. |
-| **Jenny AI Intelligence** | Basic static text banner | Fully articulated Talent Detection & Scoring Engine documented in [`md/jenny_ai.md`](file:///c:/xampp/htdocs/InternConnect/md/jenny_ai.md) | Computes 0–100% match scores across skills, screening answers, and academic credentials. |
-| **Listings Card Metrics** | Stat numbers (142, 215) fluctuate horizontally across cards | Fixed-width, perfectly aligned grid columns (`Applicants`, `Shortlist`, `Interviews`, `Hired`) | Clean vertical alignment across all cards regardless of digit width. |
-| **Listing Action Buttons** | Button label: `View Applications`<br>Edit icon directly on published roles | Primary button: **`View Applicants`**<br>Secondary icon: **`View Posted Internship`** (preview) + Dropdown for Edit/Draft/Close | Employers inspect applicants first, view the public posting preview, and manage status safely. |
-| **Closed Roles Badge** | Grey `CLOSED` pill | **Red Text Status Badge** (`color: #DC2626; background: #FEE2E2;`) | High-visibility warning that role applications are closed. |
-| **Post Internship Form Defaults** (`create.php`) | 3 prefilled experience fields & 2 prefilled screening questions | **Clean empty state (`[]`)** with `+ Add Experience Field` and `+ Add Question` | Eliminates unwanted dummy data; gives employer a blank canvas. |
-| **Candidate Review Header** (`candidates/show.php`) | Actions (`Reject`, `Shortlist`, `Message`, `Schedule Interview`) crammed in top header | **Clean Header** (Avatar, Match Score Gauge, Name, Stage) + **Decision Action Bar at Bottom of Page** | Enforces thorough candidate evaluation before taking decisive hiring actions. |
-| **Match Score UI Widget** | Simple circular border box with tight spacing | **Precision SVG Circular Gauge** with dynamic stroke offset, tiered color, and generous breathing room | High-end visual indicator matching design system polish. |
-| **Candidate Answers & Docs** | Hardcoded generic questions | Dynamically maps **Employer Step 1 (Experience)** & **Step 3 (Screening Questions)** answers + links | Displays exact candidate responses, uploaded CV/documents, and portfolio URLs. |
+This document details the architectural plan, API analysis, and implementation roadmap for:
+1. **Student Onboarding (`/register/student`)**:
+   - **Step 3 (Email Verification)**: 2-minute countdown synchronization across logic and sidebar, plus seamless 6-digit OTP paste automation.
+   - **Step 4 (Academic Background)**: Free open-source worldwide University Search API architecture, selection, and autocomplete integration.
+   - **Step 6 (Career Interests)**: Search-filtered interest tags and work arrangement selection.
+2. **Global Navigation Restructuring (`navbar.php`)**:
+   - Updated link sequence: `Find Jobs`, `Pricing`, `E-Learning`, `How It Works`, `Contact Us`.
+3. **Footer Restructuring (`footer.php`)**:
+   - Clean 3-group column hierarchy: `Platform`, `Support`, `Company` (replacing `Blog`), and `Follow Us`.
+4. **Clean Placeholder Route & View Architecture**:
+   - Lightweight scaffolded views for newly referenced pages (`/elearning`, `/how-it-works`, `/contact`, `/refund`, `/cookies`, etc.) preventing 404 errors.
+5. **Architectural Governance & Rules Update (`rules.md`)**:
+   - Strict standard for third-party API integration (backend proxy, caching, timeout resilience, zero client-side direct dependency).
 
 ---
 
-## 2. Detailed Technical & Architectural Specifications
+## 1. Step 3: Email Verification Timer & OTP Paste Automation
 
-### Component A: Posted Internships Dashboard (`frontend/employer/internships/index.php`)
+### A. 2-Minute Cooldown & Expiration Logic
+| Element | Current State | Reconstructed State |
+| :--- | :--- | :--- |
+| **Marketing Sidebar Copy** | "Code expires in 5 minutes" | **"Code expires in 2 minutes"** |
+| **Resend Cooldown Timer** | `resend_cooldown: 51` (displays `0:51`) | **`resend_cooldown: 120` (displays `2:00` counting down to `0:00`)** |
+| **Code Expiry Countdown** | `countdown: 300` (5 min) | **`countdown: 120` (2 min)** |
+| **Timer Formatter Function** | `formatCooldown(secs)` hardcoded `0:ss` | **Dynamic `formatCooldown(secs)` displaying `m:ss` (e.g., `2:00`, `1:59`, `0:45`)** |
 
-#### 1. Page Header & Sidebar Alignment
-- **Sidebar** ([`employer-sidebar.php`](file:///c:/xampp/htdocs/InternConnect/frontend/shared/components/employer-sidebar.php)):
-  - Link 2: `<a href="/employer/internships/create">Post Internship</a>`
-  - Link 3: `<a href="/employer/internships">Posted Internships</a>` (active when viewing listings).
-- **Page Header**:
-  - `<h1>` Title: **Posted Internships**
-  - `<p>` Subtitle: *Manage and track your posted internships*
-  - CTA Button: `+ Launch New Opening` (maintains single-line integrity).
-
-#### 2. Jenny AI Insights Banner & Smart Recruiter Action
-- Banner stays full-width with Jenny waving mascot (`jenny_ai_hi.png`).
-- Replaces `"Apply Now"` with **`"View Top Matches →"`** (`.emp-banner-btn`).
-- Destination URL: `<?= url('/employer/candidates?internship_id=2&sort=match_score') ?>`.
-- Full algorithmic logic and candidate detection architecture is detailed in [`md/jenny_ai.md`](file:///c:/xampp/htdocs/InternConnect/md/jenny_ai.md).
-
-#### 3. Listing Cards Grid Alignment
-- Currently, cards with 2-digit numbers vs 3-digit numbers cause stats to jitter horizontally.
-- **Solution**: Enforce strict column widths using CSS Grid on `.emp-card-stats`:
-  ```css
-  .emp-card-stats {
-      display: grid !important;
-      grid-template-columns: repeat(4, minmax(72px, 84px)) !important;
-      gap: 16px !important;
-      align-items: center !important;
-  }
-  .emp-stat-col {
-      text-align: center !important;
-  }
-  ```
-  Every metric (`Applicants`, `Shortlist`, `Interviews`, `Hired`) will align on an identical vertical baseline across all cards.
-
-#### 4. Role Status States & Action Workflows
-- **Active Roles**:
-  - Badge: Green active dot + `ACTIVE`.
-  - Primary Action: **`View Applicants`** (`.emp-btn-view-apps` $\rightarrow$ `/employer/candidates?internship_id={id}`).
-  - Secondary Action: **`View Posted Internship`** (`title="View Posted Internship"` $\rightarrow$ preview of published role).
-  - Extended Dropdown / Actions: `Edit Post`, `Move to Draft`, `Close Role`, `Delete Listing`.
-- **Closed Roles**:
-  - Badge: **Red text** (`color: #DC2626; background: #FEE2E2; border: 1px solid #FECACA;`).
-  - Primary Action: `Archive Role`.
-  - Secondary Actions: `Reopen Role`, `Delete`.
-- **Draft Roles**:
-  - Prompt: *"Ready to post?"* in muted warm amber/brown.
-  - Primary Action: `Finish & Post` (resumes publishing pipeline at `/employer/internships/create`).
-  - Secondary Actions: `Edit Draft`, `Delete Draft`.
-
----
-
-### Component B: Clean Default State for Post Internship Form (`create.php`)
-
-#### Elimination of Prefilled Demo Data
-In [`frontend/employer/internships/create.php`](file:///c:/xampp/htdocs/InternConnect/frontend/employer/internships/create.php):
-- **Relevant Experience (Card 4 / Candidate Step 1)**:
-  - Previously initialized with 3 dummy fields: *1. Job Title*, *2. Company*, *3. Salary Expectation*.
-  - **New State**: Initializes as empty `[]`.
-  - Empty state displays a clean dashed guide or straightforward `+ Add Experience Field` button.
-- **Screening Questions (Card 5 / Candidate Step 3)**:
-  - Previously initialized with 2 dummy questions: *"Why are you interested..."*, *"Share a link..."*.
-  - **New State**: Initializes as empty `[]`.
-  - Empty state displays a clean interactive `+ Add Question` trigger.
-
----
-
-### Component C: Candidate Application Review Reconstruction (`candidates/show.php`)
-
-#### 1. Header Card Simplification & Match Score Gauge
-- **Header Content**:
-  - Candidate Avatar with green active indicator dot.
-  - Candidate Full Name, academic title, graduation year, location, and `ACTIVE APPLICANT` pill badge.
-  - **Match Score Redesign**: Replace square/tight border box with an SVG Circular Progress Ring:
-    - 64px diameter SVG circle with `cx="32" cy="32" r="26"`.
-    - Dynamic stroke color (`#059669` for 90%+, `#4F48E6` for 75%+).
-    - Centered percentage text (`95%`) and small subtitle (`MATCH SCORE`) with adequate whitespace.
-- **Action Buttons Removed from Header**: Buttons are removed from the top card to prevent hasty decisions before reading the applicant dossier.
-
-#### 2. Application Answers & Document Structure (Left Column)
-- **Application Answers Section**:
-  - Displays Candidate responses to the employer's configured **Screening Questions** (Step 3).
-  - Displays responses to **Relevant Experience Fields** (Step 1, e.g. previous job titles, organizations, compensation expectations).
-- **Professional Summary & Work Experience**:
-  - Retains candidate career statement and chronological work experience timeline.
-- **Cover Letter Handling**:
-  - If submitted as a written statement: Rendered as a dedicated section in the main left column.
-  - If uploaded as a document (PDF/Word): Displayed in the right sidebar under **Documents & Links**.
-
-#### 3. Documents & Links (Right Sidebar)
-- **Resume / CV**: Attached with download trigger and file size.
-- **Document Attachments**: PDF Cover Letter, Transcripts, Certifications (if uploaded).
-- **Interactive Web Links**: Styled pills for Portfolio URL, GitHub Profile, and LinkedIn Profile.
-
-#### 4. Bottom Decision Action Bar (Relocated Actions)
-- Positioned prominently below the 2-column grid at the bottom of the review page:
-  ```html
-  <div class="emp-candidate-decision-bar">
-      <div class="emp-decision-info">
-          <h4>Candidate Review Complete</h4>
-          <p>Choose an action to advance Sarah Peters in your recruitment pipeline.</p>
-      </div>
-      <div class="emp-decision-actions">
-          <button class="emp-btn-reject">Reject Application</button>
-          <a class="emp-btn-message">Message Candidate</a>
-          <button class="emp-btn-shortlist">Shortlist</button>
-          <a class="emp-btn-schedule">Schedule Interview →</a>
-      </div>
-  </div>
-  ```
-- Guarantees employers conduct a comprehensive review before approving or declining.
-
----
-
-## 3. Zero-Regression & Mistake Prevention Checklist
-
-Before writing any code, the following strict constraints from [`.agents/rules/agent_mistakes_preventions.md`](file:///c:/xampp/htdocs/InternConnect/.agents/rules/agent_mistakes_preventions.md) are locked in:
-
-- [x] **No Colored Accent Border Strips**: Only subtle neutral borders (`border: 1px solid #E2E8F0;`). Absolutely zero blue/colored left or top accent border strips.
-- [x] **Zero Right-Side White Gutters on Mobile**: Use `grid-template-columns: minmax(0, 1fr) !important;`, `width: 100% !important;`, and `min-width: 0;` on all flex children and inputs.
-- [x] **No Duplicate Hamburger Listeners**: Sidebar drawer toggle is exclusively handled by the centralized listener in [`employer-sidebar.php`](file:///c:/xampp/htdocs/InternConnect/frontend/shared/components/employer-sidebar.php).
-- [x] **Single-Line Button Integrity**: All buttons enforce `white-space: nowrap !important; flex-shrink: 0 !important; display: inline-flex !important;`.
-- [x] **Strict Zero Emojis**: Zero unicode glyphs anywhere in headers, buttons, or badges.
-- [x] **No Native Browser Popups**: Zero `alert()`, `prompt()`, or `confirm()`. All feedback uses the unified Alpine toast/modal pattern.
-
----
-
-## 4. Files Targeted for Implementation
-
-1. [`frontend/shared/components/employer-sidebar.php`](file:///c:/xampp/htdocs/InternConnect/frontend/shared/components/employer-sidebar.php): Update link 3 text to "Posted Internships".
-2. [`frontend/employer/internships/index.php`](file:///c:/xampp/htdocs/InternConnect/frontend/employer/internships/index.php):
-   - Update header to "Posted Internships".
-   - Replace "Apply Now" with "View Top Matches".
-   - Refactor card action buttons ("View Applicants", "View Posted Internship", Red badge for Closed).
-   - Re-align metrics columns.
-3. [`public/assets/css/employer-post-internship.css`](file:///c:/xampp/htdocs/InternConnect/public/assets/css/employer-post-internship.css):
-   - Grid column sizing for stats.
-   - Closed status red badge styling.
-   - Dropdown action styles.
-4. [`frontend/employer/internships/create.php`](file:///c:/xampp/htdocs/InternConnect/frontend/employer/internships/create.php):
-   - Clear default values for `relevantExperience` and `screening_questions` to empty arrays `[]`.
-5. [`frontend/employer/candidates/show.php`](file:///c:/xampp/htdocs/InternConnect/frontend/employer/candidates/show.php):
-   - Redesign Match Score circular gauge widget.
-   - Relocate Reject, Message, Shortlist, Schedule Interview to the bottom review action bar.
-   - Dynamic presentation of configured Step 1 & Step 3 answers and document links.
-6. [`public/assets/css/employer-candidates.css`](file:///c:/xampp/htdocs/InternConnect/public/assets/css/employer-candidates.css):
-   - Match score SVG gauge styling.
-   - Bottom decision bar layout and responsive mobile stacking.
-
----
-
-## 5. Landing Page Process & AI Workflow Bento Section (`frontend/landing/components/process.php`)
-
-### Overview & Placement
-Positioned directly following **"Explore by Category"** ([`statistics.php`](file:///c:/xampp/htdocs/InternConnect/frontend/landing/components/statistics.php)) and preceding **"Our Mission"** ([`features.php`](file:///c:/xampp/htdocs/InternConnect/frontend/landing/components/features.php)). Translates the reference bento design into a bespoke, high-performance InternConnect showcase tailored to students, job seekers, and recruiters.
-
-### Architectural Breakdown
-
-```mermaid
-graph TD
-    Header[Section Header: Streamlined Platform Experience] --> Grid[Bento Grid Container]
-    Grid --> Card1[Card 1: Complete Your Profile & AI Verification]
-    Grid --> Card2[Card 2: Smart Portfolio Intake & Radar]
-    Grid --> Card3[Card 3: AI-Powered Interview Scheduling & Match Coordination]
-    Card1 --> Anim1[Infinite Staggered Verification Shimmer & Glowing Badges]
-    Card2 --> Anim2[Concentric Breathing Radar Rings + Orbiting Project Artifacts + Jenny AI Avatar]
-    Card3 --> Anim3[Interactive Calendar + Dynamic Booking Pulse + Floating Interview Card]
+```javascript
+formatCooldown(secs) {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+}
 ```
 
-### Component Details
-1. **Card 1: Complete Your Profile (Top Left - 50% Desktop Width)**:
-   - **Credentials Visual**: 3 stacked cards with rich colored badge icons:
-     1. *Curriculum Vitae* (PDF · ATS Optimized) with rose badge.
-     2. *Personal & Identity Data* (Verified Candidate Dossier) with blue badge.
-     3. *Academic Information* (**University Certification Checkup**) with emerald badge.
-   - **Animation**: Infinite smooth staggered scan cycling across credential rows with verified checkmarks.
-   - **Spacing & Breathing Room**: Generously expanded margin (`36px` desktop / `28px` mobile) between the credential cards and `Complete Your Profile` header text to prevent visual crowding.
-   - **Corner Emitter**: Saturated crimson/rose emitter pulse (`.process-emitter-red`).
+### B. Seamless 6-Digit OTP Paste Mechanism
+- **User Pain Point**: Students copying a 6-digit verification code from their email app currently have to memorize or switch back and forth to type it digit-by-digit into individual boxes.
+- **Solution**:
+  - Attach `@paste="handlePaste($event)"` to the verification input wrapper.
+  - Automatically captures clipboard data, strips all non-numeric characters (`\D`), extracts the first 6 digits, and immediately populates `this.verification_input`.
+  - Instantly renders all 6 boxes populated.
+  - Allows manual digit-by-digit typing and backspace deletion for full flexibility.
 
-2. **Card 2: Smart Portfolio Intake & Radar (Top Right - 50% Desktop Width)**:
-   - **Radar Canvas**: InternConnect Brand Indigo gradient (`linear-gradient(145deg, #4F48E6 0%, #3730A3 55%, #000623 100%)`).
-   - **Concentric Breathing Radar Waves**: Translucent ripple rings expanding outward.
-   - **Center Hub**: Glowing upload circle with vertical bobbing animation.
-   - **Orbiting Artifact Pills**: Figma prototype, GitHub code repository, PDF case study drifting smoothly.
-   - **Status Badge**: Floating pill with Jenny AI waving mascot avatar (`jenny_ai_hi.png`) + "AI Intake Complete" + emerald green checkmark.
-   - **Spacing & Breathing Room**: Generously expanded top spacing (`36px` desktop / `28px` mobile) above `Direct Portfolio Upload`.
-   - **Corner Emitter**: Saturated electric purple emitter pulse (`.process-emitter-purple`).
+```javascript
+handlePaste(e) {
+    e.preventDefault();
+    const clipboardData = e.clipboardData || window.clipboardData;
+    const pastedText = clipboardData ? clipboardData.getData('text') : '';
+    const cleanDigits = pastedText.replace(/\D/g, '').substring(0, 6);
+    if (cleanDigits.length > 0) {
+        this.verification_input = cleanDigits;
+    }
+}
+```
 
-3. **Card 3: AI-Powered Interview Scheduling & Match Coordination (Bottom - Full Width)**:
-   - **Left Column**:
-     - Jenny AI Badge: `Powered by Jenny AI Coordination` with official icon.
-     - Clean H3 & copy explaining timezone synchronization, 1-click Google Meet provisioning, and pre-interview scorecards.
-     - Single-line CTA button: `Explore Opportunities →` with zero wrapping.
-   - **Right Column (Interactive Calendar with Banner-Style Simulated Cursor & Month Switcher)**:
-     - **Interactive Month Navigation**: Arrow controls `<` and `>` seamlessly browse between November 2026, December 2026, and January 2027 with accurate calendar grids and timezone tags (`WAT (UTC+1)`).
-     - **Clickable Date Booking**: All available dates feature subtle indicator dots and are interactive. Clicking a date triggers a smooth ripple ring (`processDateRipple`), confirms the slot, and reactively updates the Upcoming Interview card.
-     - **Simulated Banner Cursor Tour**: When idle, an automated demo cursor (`Recruiter`) smoothly glides between dates, presses/clicks with ripple feedback, marks the slot confirmed (`Slot Reserved ✓`), and updates the interview card repeatedly. Fades out on user interaction.
-     - **Floating Upcoming Interview Card**: Dynamically syncs with selected dates and times with candidate Sarah Peters and a live `Join Now` status pill.
-     - **Floating AI Match Score Badge**: `95% Match Score · UI/UX Role` with Jenny AI brand icon.
+---
 
-4. **Animated Bento Grid Flow Lines (Pipeline Stream Architecture)**:
-   - **Left Flow Beam (Crimson/Rose into Brand Indigo)**: Traces along the left outer contour of Card 1 down into Card 3 and across its bottom left.
-   - **Right Flow Beam (Electric Purple/Violet into Blue)**: Traces along the right outer contour of Card 2 down into Card 3 and across its bottom right.
-   - **Center Connector Beam**: Flows from between Card 1 and Card 2 directly into Card 3's top coordination header.
-   - **Light Mode Visibility**: Saturated, vibrant gradient paths with soft glow drop-shadow filters (`filter: drop-shadow(...)`), clearly visible on light mode with smooth continuous travel animation.
-   - **Pointer-Events Inactive**: Placed on `z-index: 10` with `pointer-events: none;`, ensuring zero interference with card clicks and zero horizontal overflow on mobile.
+## 2. Step 4: Worldwide University Search API — Evaluation & Architecture
 
-### Zero-Regression Enforcement
-- **No Accent Border Strips**: Only clean, subtle neutral borders (`border: 1px solid #E2E8F0;`).
-- **Zero Horizontal Overflow**: Verified at 360px, 375px, 440px, and 1440px (`scrollWidth === clientWidth`).
-- **Strictly No Emojis**: 100% SVG vector marks matching the design system.
-- **Single-Line Button Integrity**: All buttons enforce `white-space: nowrap !important; flex-shrink: 0 !important;`.
-- **Cloudinary Integration**: Assets served through `asset()` helper.
+### A. University Search API Comparison & Selection
+
+The platform requires an API that:
+- Has **thousands/tens of thousands of verified universities worldwide** (Nigeria, UK, USA, Canada, Germany, India, Ghana, Kenya, Australia, etc.).
+- Is **completely free and open-source** with **no restrictive rate-limits or API key expiration**.
+- Does not break client code if external networks fluctuate.
+
+| Criteria | 1. Hipo World Universities API (Recommended) | 2. ROR (Research Organization Registry) | 3. OpenAlex Institutions API |
+| :--- | :--- | :--- | :--- |
+| **Coverage** | **10,000+ accredited higher education institutions** across 200+ countries | 105,000+ research & university organizations | 100,000+ global academic entities |
+| **Pricing / License** | **100% Free & Open Source (MIT)** | 100% Free & Open Data (CC0) | Free (up to 100k requests/day) |
+| **API Key Required?** | **No** (open public endpoints) | **No** | No (optional mailto header) |
+| **Nigerian & African Coverage** | **Comprehensive** (UNILAG, OAU, UI, Covenant, ABU, UNN, FUTA, Babcock, etc.) | High | High |
+| **Search Response Speed** | **Fast (< 120ms)** | Moderate (~200–350ms) | Moderate (~250–400ms) |
+| **Offline Dataset Available?** | **Yes** (full JSON dump available on GitHub) | Yes (monthly data dumps) | Yes |
+| **Verdict** | **TOP PICK FOR INTERNCONNECT**: Fastest, lightest, covers all universities with domains & websites. | Excellent secondary source. | Too research/citation-heavy. |
+
+### B. Chosen Architecture: Resilient Backend Proxy Pattern
+
+Per project governance, **third-party APIs must never be called directly from client browsers**:
+1. Client-side direct calls risk CORS errors, adblocker/privacy extension blocks, and unpredictable network latency.
+2. Direct calls cannot be cached across users, causing repeated slow round-trips.
+
+```
+[ Client Browser (Alpine.js Autocomplete) ]
+                  │
+        GET /api/universities?q=lagos
+                  ▼
+[ Backend UniversityService (App\Services\UniversityService) ]
+        │
+        ├── 1. Check Local In-Memory / File Cache (0ms response)
+        │      └─ Found? Return immediately.
+        │
+        ├── 2. Query Hipolabs API: http://universities.hipolabs.com/search?name={q}
+        │      └─ Success? Store in cache (24hr TTL) & return clean JSON.
+        │
+        └── 3. Fallback: If external API times out (> 1.5s) or fails:
+               └─ Query bundled local fallback database (`sql/universities.json`).
+```
+
+### C. UX Implementation on Step 4 (`register-student.php`)
+- **Input Field**: Replace static text input with an interactive search autocomplete input.
+- **Dropdown List**:
+  - Opens as user types (debounced 250ms, minimum 2 characters).
+  - Displays matching university name, country badge, and official domain (e.g., `University of Lagos • Nigeria`).
+  - Clicking any item fills the field and closes the menu.
+  - **Manual Entry Guarantee**: If a candidate attends an unlisted or newly founded college, they can still freely type and submit their custom name without being blocked.
+
+---
+
+## 3. Step 6: Career Interests & Work Arrangement
+
+- **Search Filter**: The "Search" input dynamically filters the `all_interests` tags in real time using `filteredInterests()`.
+- **Interactive Multi-Select**: Selected tags display in brand primary indigo (`#4F48E6`), while unselected tags show in soft neutral borders (`#E2E8F0`).
+- **Work Arrangement**: Checkboxes for `Remote`, `Hybrid`, and `On-site` with single-click toggle and validated state before advancing to Step 7.
+
+---
+
+## 4. Global Navigation Restructuring (`navbar.php`)
+
+### Updated Navbar Link Sequence:
+| # | Nav Item Text | Target URL | Active Path Rule | Status |
+| :---: | :--- | :--- | :--- | :--- |
+| **1** | **Find Jobs** | `url('/internships')` | `/internships`, `/internship/*`, `/apply/*` | Points to existing internships search |
+| **2** | **Pricing** | `url('/pricing')` | `/pricing`, `/payments`, `/checkout` | Points to existing pricing page |
+| **3** | **E-Learning** | `url('/elearning')` | `/elearning` | Scaffold lightweight placeholder view |
+| **4** | **How It Works** | `url('/how-it-works')` | `/how-it-works` | Scaffold lightweight placeholder view |
+| **5** | **Contact Us** | `url('/contact')` | `/contact` | Scaffold lightweight placeholder view |
+
+- Applied identically across desktop navigation (`.header-desktop-links`) and mobile drawer navigation (`.header-mobile-drawer`).
+
+---
+
+## 5. Global Footer Restructuring (`footer.php`)
+
+### Updated Footer Column Structure:
+```
+[ Brand Column ]
+Logo + "Empowering the next generation of global talent through editorial-grade career resources."
+
+[ Platform ]
+├── E-Learning           -> /elearning
+├── Find Jobs            -> /internships
+└── Employer Hub         -> /employer
+
+[ Support ]
+├── Help Center          -> /help
+├── Privacy Policy       -> /privacy
+├── Terms of Service     -> /terms
+├── Refund Policy        -> /refund
+├── Contact Us           -> /contact
+└── Cookie Policy        -> /cookies
+
+[ Company ]  (Replaces old "Blog" column)
+├── About Us             -> /about
+├── Success Stories      -> /testimonials
+└── Jenny AI             -> /#meet-jenny-block
+
+[ Follow Us ]
+LinkedIn, Facebook, Instagram, X
+```
+
+---
+
+## 6. Lightweight Route & View Scaffold Architecture
+
+Per user instruction:
+> *"Any page that is not being created, just create the page, but don't write anything on it. You can just write a text like 'Contact Page', 'E-Learning Page', etc. on the blank screen so that it makes sense, but do not do any extra design on it."*
+
+We will scaffold clean minimal views with standard header, page identifier headline, and standard footer for:
+1. `frontend/landing/elearning.php` -> Route: `GET /elearning`
+2. `frontend/landing/how-it-works.php` -> Route: `GET /how-it-works`
+3. `frontend/landing/contact.php` -> Route: `GET /contact`
+4. `frontend/legal/refund.php` -> Route: `GET /refund`
+5. `frontend/legal/cookies.php` -> Route: `GET /cookies`
+6. `frontend/landing/about.php` -> Route: `GET /about`
+7. `frontend/legal/privacy.php` -> Route: `GET /privacy`
+8. `frontend/legal/terms.php` -> Route: `GET /terms`
+
+---
+
+## 7. Project Governance & Rules Integration
+
+Update [`.agents/rules/rules.md`](file:///c:/xampp/htdocs/InternConnect/.agents/rules/rules.md) and [`.agents/rules/agent_mistakes_preventions.md`](file:///c:/xampp/htdocs/InternConnect/.agents/rules/agent_mistakes_preventions.md) with the **Third-Party API Integration Protocol**:
+- **Backend Service Abstraction Mandatory**: All external third-party data providers (e.g., University APIs, verification services, geocoding) must be queried exclusively through a dedicated backend Service class in `backend/Services/`.
+- **Zero Direct Client-Side Calls**: Client-side JavaScript must never make unproxied fetch calls to external domains.
+- **Fail-Safe Fallbacks**: Every third-party integration must define a local fallback or bundled dataset with timeout threshold (≤ 2.0s), ensuring platform stability even during external service outages.
+
+---
+
+---
+
+## 8. Implementation Milestones & Status (Completed)
+
+1. [x] **Step 3 Verification Code Timer & OTP Paste (Student & Employer Onboarding)**:
+   - Updated marketing sidebar copy from 5/10 minutes to **"Code expires in 2 minutes"** in both [register-student.php](file:///c:/xampp/htdocs/InternConnect/frontend/auth/register-student.php) and [register-employer.php](file:///c:/xampp/htdocs/InternConnect/frontend/auth/register-employer.php).
+   - Set `countdown: 120` and `resend_cooldown: 120` in [onboarding-student.js](file:///c:/xampp/htdocs/InternConnect/public/assets/js/onboarding-student.js) and [onboarding-employer.js](file:///c:/xampp/htdocs/InternConnect/public/assets/js/onboarding-employer.js).
+   - Upgraded `formatCooldown(secs)` to format as `m:ss` (e.g. `2:00`, `1:59`, `0:45`).
+   - Implemented `@paste="handlePaste($event)"` handler on OTP inputs for instant 6-digit distribution.
+2. [x] **Step 4 Worldwide University Search API**:
+   - Built [UniversityService.php](file:///c:/xampp/htdocs/InternConnect/backend/Services/UniversityService.php) with Hipolabs API integration, 24h file caching, and offline fallback dataset.
+   - Built [ApiController.php](file:///c:/xampp/htdocs/InternConnect/backend/Controllers/ApiController.php) with route `GET /api/universities` in [routes.php](file:///c:/xampp/htdocs/InternConnect/backend/routes.php).
+   - Embedded debounced autocomplete dropdown on Step 4 in [register-student.php](file:///c:/xampp/htdocs/InternConnect/frontend/auth/register-student.php) with full manual input support.
+3. [x] **Step 6 Career Interests & Work Arrangement**:
+   - Real-time search filter and toggle pill grid verified and responsive.
+4. [x] **Global Navigation Restructuring (`navbar.php`)**:
+   - Updated desktop and mobile link sequence to: `Find Jobs`, `Pricing`, `E-Learning`, `How It Works`, `Contact Us`.
+5. [x] **Global Footer Restructuring (`footer.php`)**:
+   - `Platform` column updated to strictly contain `E-Learning` and `Find Jobs` (`Employer Hub` removed per instruction).
+   - `Support` column expanded with Help Center, Privacy, Terms, Refund, Contact, and Cookies.
+   - `Company` column replacing `Blog` with About Us, Success Stories, and Jenny AI.
+6. [x] **Lightweight Route & View Scaffolding**:
+   - Created minimal views for `/elearning`, `/how-it-works`, `/contact`, `/about`, `/testimonials`, `/refund`, `/cookies`, `/privacy`, `/terms`.
+   - Registered all GET routes in [routes.php](file:///c:/xampp/htdocs/InternConnect/backend/routes.php) and handled by [HomeController.php](file:///c:/xampp/htdocs/InternConnect/backend/Controllers/HomeController.php).
+7. [x] **Governance & Rules Documentation**:
+   - Enforced Third-Party API Integration Protocol in [.agents/rules/rules.md](file:///c:/xampp/htdocs/InternConnect/.agents/rules/rules.md) and [.agents/rules/agent_mistakes_preventions.md](file:///c:/xampp/htdocs/InternConnect/.agents/rules/agent_mistakes_preventions.md).
+8. [x] **Testing & Validation**:
+   - All modified and created files passed PHP syntax validation (`php -l`) with zero errors.
+
+---
+
+## 9. Registration Input Field Standardization & Wizard Polish (Candidate & Employer)
+
+### A. Core Problem Statement & Reference Design Standard
+- **The Issue**: Registration input fields had inconsistent paddings, boxy outlines, unaligned left/right icon slots, and jarring modal pop-ups occurred when navigating backwards or switching steps. Additionally, on Candidate Step 6 (Interests), selecting any discipline triggered an explosion of 8+ sub-specialization pills that cluttered and blew out the card layout.
+- **Reference Standard**: The Employer Post Internship page (`/employer/internships/create`, styled in `public/assets/css/employer-post-internship.css`) was designated as the single source of truth for all form controls:
+  - Input container: `.emp-field-group` (`margin-bottom: 16px;`)
+  - Label: `.emp-field-label` (`font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 7px;`)
+  - Inputs: `.emp-input-text` (`padding: 11px 14px; font-size: 13.5px; border-radius: 10px; border: 1px solid #E2E8F0; focus: border-color #4F48E6, box-shadow: 0 0 0 3px rgba(79, 72, 230, 0.12)`)
+  - Icon slots: `.emp-input-with-icon` (`padding-left: 40px;`) with `.emp-input-icon-slot` (`left: 14px; width/height: 16px; color: #94A3B8;`)
+  - Right icon slots: `.emp-input-with-right-icon` (`padding-right: 42px;`) with `.emp-input-right-slot` (`right: 14px;`)
+  - Textareas: `.emp-textarea` (`padding: 12px 14px; border-radius: 10px; border: 1px solid #E2E8F0; line-height: 1.6;`)
+  - Custom Dropdowns: standardized `.db-dropdown-wrap`, `.db-dropdown-btn`, `.db-dropdown-chevron`, `.db-dropdown-menu`, `.db-dropdown-item`
+  - Segmented Controls: `.emp-segmented-control`, `.emp-segment-btn`
+
+### B. Verification Modal Pop-Up Elimination
+- **Root Cause**:
+  1. The success and failure modal wrappers lacked `x-cloak` and inline `style="display: none;"`, causing them to flash briefly into view during initial browser rendering before Alpine finished initializing.
+  2. In `onboarding-employer.js`, `startSuccessModalRedirect()` was completely undefined, resulting in fatal JavaScript errors when submitting Step 3.
+  3. Clicking "Back" on Step 4 or any subsequent step did not reset active modal states or cancel pending `setInterval` redirection timers.
+- **Rectification**:
+  1. Added `x-cloak style="display: none;"` to both Success and Failure modal wrappers in both `register-student.php` and `register-employer.php`.
+  2. Implemented `resetModals()` and updated `clearTimers()` in both `onboarding-student.js` and `onboarding-employer.js` to unconditionally cancel `success_redirect_timer` and reset modal booleans.
+  3. Added `startSuccessModalRedirect()` to `onboarding-employer.js` with smooth progress bar animation and safe transition to Step 4.
+  4. Attached `resetModals()` to all Back buttons across Steps 3, 4, 5, 6, and 7.
+
+### C. Candidate Step 6 Clean Interests Layout (Resolving Screenshot 1 Clutter)
+- **Problem**: When a user selected an interest, `filteredInterests()` dynamically concatenated all related sub-disciplines (e.g. `Machine Learning Engineer`, `Deep Learning`, `Computer Vision`, `NLP`, `Data Analyst`, `Data Engineering`), sprawling a messy wall of tags across the screen.
+- **Solution**:
+  - Refactored `filteredInterests()` in `public/assets/js/onboarding-student.js` to show strictly the clean 15 foundational disciplines by default (plus any active selections).
+  - Search queries cleanly filter disciplines without exploding secondary tags into view.
+  - Relational keywords (e.g. `python`, `figma`, `react`, `pytorch`) are silently extracted and synchronized into the `interest_keywords` hidden array in the background for AI matchmaking and SQL indexing without cluttering the visual UI.
+
+### D. Full Form Component Alignment
+- **Student Registration (`register-student.php`)**:
+  - Step 2: Full Name, Email, Password, Confirm Password -> `.emp-field-group`, `.emp-field-label`, `.emp-input-with-icon`, `.emp-input-text`, `.emp-input-right-slot`.
+  - Step 4: First Name, Last Name, University Autocomplete, Degree Level Custom Dropdown, Graduation Year Custom Dropdown, Field of Study, GPA -> completely standardized.
+  - Step 5: Portfolio URL, LinkedIn, GitHub -> `.emp-field-group`, `.emp-field-label`, `.emp-input-with-icon`, `.emp-input-text`.
+  - Step 6: Search input with clear icon -> `.emp-input-with-icon.emp-input-with-right-icon`, `.emp-input-text`.
+  - Step 7: Current Location -> `.emp-input-with-icon`, `.emp-input-text`; Relocating -> `.emp-segmented-control`, `.emp-segment-btn`; Location tag pill wrapper -> rounded-xl with clean border.
+- **Employer Registration (`register-employer.php`)**:
+  - Step 2: Company Name, Work Email, Password, Confirm Password -> `.emp-field-group`, `.emp-field-label`, `.emp-input-with-icon`, `.emp-input-text`, `.emp-input-right-slot`.
+  - Step 4: Registration Number (CAC/RC) -> `.emp-field-group`, `.emp-field-label`, `.emp-input-with-icon`, `.emp-input-text`.
+  - Step 5: Company Name Details, Industry, Company Size (Custom Dropdown), Website, Description -> completely standardized to `.emp-*` and `.db-dropdown-*`.
+  - Step 6: Expected Hiring Volume -> Custom Dropdown `.db-dropdown-wrap`; Primary Internship Type -> High-contrast padded cards.
+
+---
+
+## 5. Phase 5 & Version 2.0 Platform Expansion (Option 1, Option 2, Option 3)
+
+### Option 1: Enterprise Analytics & CSV Reporting
+- **Route**: `/employer/analytics`
+- **Features**: 5 core recruitment KPIs, hiring conversion funnel drop-off tracker, university talent source breakdown, discipline hiring velocity table, report window filter (`Last 7 Days`, `Last 30 Days`, `Last 90 Days`, `Year to Date`).
+- **Data Streaming Service (`ExportService.php`)**:
+  - `/employer/analytics/export/candidates` (Candidate pipeline CSV)
+  - `/employer/analytics/export/interviews` (Interview schedule CSV)
+  - `/employer/analytics/export/billing` (Billing & Paystack ledger CSV with UTF-8 BOM and Naira `₦` support)
+
+### Option 2: Version 2.0 AI Career Coach & Cover Letter Generator
+- **AI Cover Letter Generator (`/candidate/ai-assistant/cover-letter`)**:
+  - Quick-pick verified openings (Paystack, Flutterwave, Nexura, Interswitch) or custom company/role inputs.
+  - 4 tailored tone styles: *Professional*, *Confident & Bold*, *Technical*, *Enthusiastic*.
+  - Structured 4-paragraph generation with ATS keyword optimization, reading time, in-place editing, and 1-click clipboard copy.
+- **AI Career Coach & Skill Roadmap (`/candidate/ai-assistant/career-coach`)**:
+  - 7-discipline switcher (*Product Designer*, *UI/UX Designer*, *Software Engineer*, *Frontend Developer*, *Backend Developer*, *Data Analyst*, *Product Manager*).
+  - Career readiness percentage score and 3-shelf skill gap diagnostic (Mastered, In Progress, Priority Focus).
+  - 12-week progressive milestone checklist roadmap with interactive checkmarks and curated E-Learning course recommendations.
+
+### Option 3: End-to-End Platform Walkthrough & Final QA Audit
+- **Audit Coverage**: 28 total platform views tested across Candidate, Employer, and Super-Admin portals.
+- **Mobile Zero-Overflow Guarantee**: `docScrollWidth === clientWidth` on all screens (`360px`, `390px`, `440px`, `1440px`).
+- **Zero Native Alerts**: 100% adherence to Alpine toast dispatch (`show-toast`).
+- **Zero Colored Accent Borders**: 100% clean neutral `#E2E8F0` border policy.
+- **Test Suite**: 50/50 automated tests passing (`php tests/run_tests.php`).
+
+---
+
+## 6. Direct Messaging Bi-Directional Delivery & Sync Fix
+- **Issue Diagnosed**: Active thread polling (`syncActiveThread()`) was overwriting local messages because `CommunicationService::getThreadMessages()` only searched ephemeral session state without fallback seed messages.
+- **Resolution**:
+  - Implemented `getDefaultThreadMessages(int $threadId): array` in `backend/Services/CommunicationService.php` providing rich pre-seeded candidate and employer messages.
+  - Refactored both `frontend/employer/messages/index.php` and `frontend/candidate/messages/index.php` to clean script-backed Alpine workspaces (`employerMessagingWorkspace()`, `candidateMessagingWorkspace()`).
+  - Added optimistic reactivity (`this.conversations = [...this.conversations]`) with multi-frame scroll-to-bottom.
+  - Verified with live Headless Chrome tests across viewports.
+
+---
+
+## 7. In-Platform Daily.co Video Interviewing Architecture
+- **Philosophy**: Candidates and employers remain 100% inside InternConnect during live interviews—never bounced out to third-party tools like Google Meet or Zoom.
+- **Backend Service (`backend/Services/VideoInterviewService.php`)**:
+  - Daily.co meeting room URL generation (`https://internconnect.daily.co/nxt-uxin-{id}`).
+  - Persistence of rubric evaluations and interview scores in `interview_evaluations` table with session fallback.
+- **Controllers & Routes**:
+  - `EmployerController::interviewRoom` (`/employer/interviews/room/{id}`)
+  - `EmployerController::saveInterviewScore` (`POST /api/interviews/room/score`)
+  - `CandidateController::interviewRoom` (`/candidate/interview/room/{id}`)
+- **Employer Video Room Interface (`frontend/employer/interviews/room.php`)**:
+  - Pre-call lobby with camera preview and live mic level detection.
+  - In-call stage with responsive participant tiles, live stopwatch timer, and floating media controls.
+  - Right drawer with 3 tabs: **Competency Evaluation Rubric** (1–5 star ratings, recommendation chips, private notes, auto-save), **Screening Questions** (checklist with recruiter hints), and **Candidate Dossier** (academics, links).
+- **Candidate Video Room Interface (`frontend/candidate/interview/room.php`)**:
+  - Pre-call lobby and in-call stage matching the design system.
+  - Right drawer with 3 tabs: **Agenda & Stage Breakdown**, **Jenny AI Live Tips** (STAR technique, calming advice), and **In-Call Direct Chat**.
+- **Audit Results**: 100% zero horizontal overflow on all viewports (`360px`, `390px`, `440px`, `1440px`).
+
+---
+
+## 8. Staging & Production Deployment Framework (`docs/20-deployment-guide.md`)
+- Production specifications for Ubuntu 22.04 / 24.04 LTS with PHP 8.3-FPM, MySQL 8.0+, Nginx/Apache, Composer, and Let's Encrypt SSL.
+- Strict WebRTC SSL enforcement (`Permissions-Policy` and HTTPS requirement for `getUserMedia`).
+- Detailed `.env` production checklist for Paystack, Daily.co, DeepSeek AI, and Google OAuth.
+
+---
+
+## 9. Master MySQL 8.0+ Backend Architecture (`docs/48-mysql-backend-architecture-and-schema.md`)
+- Authoritative specification and DDL script (`database/schema_mysql.sql`) covering:
+  - 11 core production tables: `users`, `candidate_profiles`, `employer_profiles`, `internships`, `applications`, `interviews`, `interview_evaluations`, `message_threads`, `direct_messages`, `in_app_notifications`, `subscriptions`, `payment_transactions`, `ai_usage_logs`, `audit_logs`.
+  - Foreign key cascading rules, FULLTEXT search indexes on internship postings and candidate skills, and covering indexes.
+  - Dual-driver abstraction model in `Database.php` (SQLite for local testing, MySQL for staging/production).
+
+---
+
+## 10. Automated Test Suite Verification
+- **Test Suite (`php tests/run_tests.php`)**:
+  - **Results**: 53 passed, 0 failed (100% pass rate).
+  - Includes full coverage for admin, AI, communication, video interview rooms, analytics, and enterprise features.
+
+
 

@@ -175,8 +175,8 @@ $extraCss = ['assets/css/welcome.css'];
         <div class="wlc-footer-content" style="max-width: 1140px; margin: 0 auto; padding: 18px 0; display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box;">
             <span>© <span id="copyright-year-welcome-employer">2026</span> INTERNCONNECT. ALL RIGHTS RESERVED.</span>
             <div style="display: flex; gap: 24px;">
-                <a href="#" style="text-transform: uppercase; font-weight: 600; color: #9CA3AF; text-decoration: none; transition: color 0.15s; font-size: 13px;" onmouseover="this.style.color='#191C1D'" onmouseout="this.style.color='#9CA3AF'">Privacy Policy</a>
-                <a href="#" style="text-transform: uppercase; font-weight: 600; color: #9CA3AF; text-decoration: none; transition: color 0.15s; font-size: 13px;" onmouseover="this.style.color='#191C1D'" onmouseout="this.style.color='#9CA3AF'">Terms of Service</a>
+                <a href="<?= url('/privacy') ?>" style="text-transform: uppercase; font-weight: 600; color: #9CA3AF; text-decoration: none; transition: color 0.15s; font-size: 13px;" onmouseover="this.style.color='#191C1D'" onmouseout="this.style.color='#9CA3AF'">Privacy Policy</a>
+                <a href="<?= url('/terms') ?>" style="text-transform: uppercase; font-weight: 600; color: #9CA3AF; text-decoration: none; transition: color 0.15s; font-size: 13px;" onmouseover="this.style.color='#191C1D'" onmouseout="this.style.color='#9CA3AF'">Terms of Service</a>
             </div>
         </div>
     </footer>

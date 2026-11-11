@@ -691,12 +691,12 @@ html, body {
 
                     <!-- Integrated Hero Split Search Bar -->
                     <div style="padding-top: 4px; width: 100%;">
-                        <form action="<?= url('/internships') ?>" method="GET" class="hero-search-box">
+                        <form action="<?= url('/search') ?>" method="GET" class="hero-search-box">
                             <div class="hero-search-field">
                                 <svg class="hero-search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
-                                <input type="text" name="search" placeholder="Job Title, skill or keyword" class="hero-search-input" autocomplete="off" aria-label="Job Title or Keyword">
+                                <input type="text" name="search" placeholder="Job Title or keywords" class="hero-search-input" autocomplete="off" aria-label="Job Title or Keyword">
                             </div>
                             <div class="hero-search-divider" aria-hidden="true"></div>
                             <div class="hero-search-field">

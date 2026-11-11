@@ -98,8 +98,8 @@ $extraCss = ['assets/css/welcome.css'];
         <div class="wlc-footer-content" style="max-width: 1140px; margin: 0 auto; padding: 18px 0; display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box; font-size: 12px; color: #464555; font-weight: 500; uppercase; tracking-wider;">
             <span>© <span id="copyright-year-pwd-success">2026</span> InternConnect. All rights reserved.</span>
             <div style="display: flex; gap: 24px;">
-                <a href="#" style="text-transform: uppercase; font-weight: 600; color: #9CA3AF; text-decoration: none; transition: color 0.15s; font-size: 13px;" onmouseover="this.style.color='#191C1D'" onmouseout="this.style.color='#9CA3AF'">Privacy</a>
-                <a href="#" style="text-transform: uppercase; font-weight: 600; color: #9CA3AF; text-decoration: none; transition: color 0.15s; font-size: 13px;" onmouseover="this.style.color='#191C1D'" onmouseout="this.style.color='#9CA3AF'">Terms</a>
+                <a href="<?= url('/privacy') ?>" style="text-transform: uppercase; font-weight: 600; color: #9CA3AF; text-decoration: none; transition: color 0.15s; font-size: 13px;" onmouseover="this.style.color='#191C1D'" onmouseout="this.style.color='#9CA3AF'">Privacy</a>
+                <a href="<?= url('/terms') ?>" style="text-transform: uppercase; font-weight: 600; color: #9CA3AF; text-decoration: none; transition: color 0.15s; font-size: 13px;" onmouseover="this.style.color='#191C1D'" onmouseout="this.style.color='#9CA3AF'">Terms</a>
             </div>
         </div>
     </footer>
