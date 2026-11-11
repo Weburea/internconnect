@@ -104,11 +104,11 @@ class ExportService
                 $i['candidate_role'] ?? 'Intern',
                 $i['company_name'] ?? 'Nexura Technologies',
                 $i['interviewer_name'] ?? 'Tunde Bakare',
-                $i['meeting_type'] ?? 'Virtual (Google Meet)',
+                $i['meeting_type'] ?? 'Virtual (InternConnect video room)',
                 $i['interview_date'] ?? date('Y-m-d'),
                 $i['interview_time'] ?? '10:00 AM',
                 $i['duration'] ?? '45 mins',
-                $i['meeting_link'] ?? 'https://meet.google.com/nxt-uxin-2026',
+                $i['meeting_link'] ?? url('/candidate/interview/room/1'),
                 $i['status'] ?? 'Scheduled',
             ];
         }

@@ -12,12 +12,14 @@ require_once __DIR__ . '/Unit/AdminControllerTest.php';
 require_once __DIR__ . '/Unit/AiFeaturesTest.php';
 require_once __DIR__ . '/Unit/CommunicationFeaturesTest.php';
 require_once __DIR__ . '/Unit/EnterpriseFeaturesTest.php';
+require_once __DIR__ . '/Unit/VideoInterviewTest.php';
 
 $testClasses = [
     \Tests\Unit\AdminControllerTest::class,
     \Tests\Unit\AiFeaturesTest::class,
     \Tests\Unit\CommunicationFeaturesTest::class,
     \Tests\Unit\EnterpriseFeaturesTest::class,
+    \Tests\Unit\VideoInterviewTest::class,
 ];
 
 echo "========================================================\n";

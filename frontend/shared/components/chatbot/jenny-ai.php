@@ -1621,7 +1621,7 @@ $fullBodyImg    = asset('assets/images/jenny_ai/Full-body_standing_pose_jenny_ai
                             <div class="jenny-success-details">
                                 <div class="jenny-success-title">Interview Scheduled</div>
                                 <div class="jenny-success-time">Tue, 18 Nov 2026 at <span x-text="selectedTimeSlot"></span></div>
-                                <div class="jenny-success-note">Google Meet invitation dispatched to Chinonso Eze</div>
+                                <div class="jenny-success-note">Interview invitation sent to Chinonso Eze</div>
                             </div>
                         </div>
                     </template>

@@ -185,7 +185,7 @@ CREATE TABLE IF NOT EXISTS `interviews` (
 CREATE TABLE IF NOT EXISTS `interview_evaluations` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     `interview_id` BIGINT UNSIGNED NOT NULL UNIQUE,
-    `technical_score` TINYINT UNSIGNED NOT NULL DEFAULT 4,
+    `technical_score` TINYINT UNSIGNED NOT NULL DEFAULT 0, -- 0 = not rated, 1-5 stars
     `problem_solving_score` TINYINT UNSIGNED NOT NULL DEFAULT 4,
     `communication_score` TINYINT UNSIGNED NOT NULL DEFAULT 5,
     `culture_score` TINYINT UNSIGNED NOT NULL DEFAULT 5,
@@ -201,6 +201,126 @@ CREATE TABLE IF NOT EXISTS `interview_evaluations` (
     INDEX `idx_eval_recommendation` (`overall_recommendation`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- 7b. VIDEO ROOMS, ROOM ACTIVITY & PLATFORM SETTINGS (docs/47-video-interviews.md)
+CREATE TABLE IF NOT EXISTS `interview_rooms` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `interview_id` BIGINT UNSIGNED NOT NULL UNIQUE,
+    `room_name` VARCHAR(100) NOT NULL UNIQUE,
+    `room_url` VARCHAR(500) NOT NULL,
+    `status` ENUM('open', 'ended') NOT NULL DEFAULT 'open',
+    `ended_by` VARCHAR(20) NULL,
+    `created_at` DATETIME NOT NULL,
+    `ended_at` DATETIME NULL,
+    `started_at` DATETIME NULL COMMENT 'First join of the current session (timer start)',
+    PRIMARY KEY (`id`),
+    INDEX `idx_rooms_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `interview_room_events` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `interview_id` BIGINT UNSIGNED NOT NULL,
+    `role` VARCHAR(20) NOT NULL,
+    `event` VARCHAR(40) NOT NULL,
+    `detail` VARCHAR(255) NULL,
+    `created_at` DATETIME NOT NULL,
+    `ip_masked` VARCHAR(64) NULL COMMENT 'Last octet hidden, never the full IP',
+    `city` VARCHAR(120) NULL,
+    `country` VARCHAR(120) NULL,
+    `country_code` CHAR(2) NULL,
+    `lat` DECIMAL(9, 6) NULL,
+    `lng` DECIMAL(9, 6) NULL,
+    `device` VARCHAR(80) NULL,
+    PRIMARY KEY (`id`),
+    INDEX `idx_room_events_interview` (`interview_id`, `created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `platform_settings` (
+    `setting_key` VARCHAR(100) NOT NULL,
+    `setting_value` TEXT NOT NULL,
+    `updated_at` DATETIME NOT NULL,
+    PRIMARY KEY (`setting_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 7c. INTERVIEW SESSIONS, SCORECARDS, FILES, CHAT, REPORTS & GEO CACHE (docs/47-video-interviews.md)
+-- One row per scheduled interview; its id is the video room id.
+CREATE TABLE IF NOT EXISTS `scheduled_interviews` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `candidate_id` BIGINT UNSIGNED NOT NULL DEFAULT 1,
+    `employer_id` BIGINT UNSIGNED NOT NULL DEFAULT 1,
+    `candidate_name` VARCHAR(150) NOT NULL,
+    `candidate_role` VARCHAR(150) NOT NULL,
+    `company_name` VARCHAR(150) NOT NULL,
+    `interviewer_name` VARCHAR(150) NOT NULL,
+    `meeting_type` VARCHAR(20) NOT NULL DEFAULT 'virtual',
+    `meeting_link` VARCHAR(500) NOT NULL DEFAULT '',
+    `interview_date` VARCHAR(20) NOT NULL,
+    `interview_time` VARCHAR(20) NOT NULL,
+    `duration` VARCHAR(20) NOT NULL DEFAULT '30 mins',
+    `status` VARCHAR(20) NOT NULL DEFAULT 'Scheduled',
+    `notes` TEXT NULL,
+    `scheduled_at` DATETIME NULL,
+    `duration_min` SMALLINT UNSIGNED NULL,
+    `setup_json` TEXT NULL COMMENT 'Employer criteria, questions and decision options',
+    `created_by` VARCHAR(20) NULL COMMENT 'employer | admin (NULL = legacy row, hidden from lists)',
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    INDEX `idx_sched_employer` (`employer_id`, `scheduled_at`),
+    INDEX `idx_sched_candidate` (`candidate_id`, `scheduled_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `interview_scorecards` (
+    `interview_id` BIGINT UNSIGNED NOT NULL,
+    `scores` TEXT NOT NULL COMMENT 'JSON: criterion key -> 0..5',
+    `recommendation` VARCHAR(40) NULL,
+    `notes` TEXT NULL,
+    `asked` TEXT NOT NULL COMMENT 'JSON array of asked question ids',
+    `updated_at` DATETIME NOT NULL,
+    PRIMARY KEY (`interview_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `interview_files` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `interview_id` BIGINT UNSIGNED NOT NULL,
+    `role` VARCHAR(20) NOT NULL,
+    `uploader` VARCHAR(80) NOT NULL,
+    `meta` TEXT NOT NULL COMMENT 'UploadStorage metadata (private file in storage/uploads/interview_file)',
+    `created_at` DATETIME NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `idx_files_interview` (`interview_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `interview_chat` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `interview_id` BIGINT UNSIGNED NOT NULL,
+    `role` VARCHAR(20) NOT NULL,
+    `sender` VARCHAR(80) NOT NULL,
+    `body` TEXT NOT NULL,
+    `file_id` BIGINT UNSIGNED NULL,
+    `created_at` DATETIME NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `idx_chat_interview` (`interview_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `interview_reports` (
+    `interview_id` BIGINT UNSIGNED NOT NULL,
+    `summary` TEXT NOT NULL COMMENT 'JSON: overview, highlights, concerns, suggested rating/decision',
+    `source` VARCHAR(20) NOT NULL COMMENT 'gemini | rules',
+    `updated_at` DATETIME NOT NULL,
+    PRIMARY KEY (`interview_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `geo_cache` (
+    `ip_key` VARCHAR(64) NOT NULL,
+    `data` TEXT NULL,
+    `fetched_at` DATETIME NOT NULL,
+    PRIMARY KEY (`ip_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Upgrading an existing database created before 2026-11-11:
+-- ALTER TABLE `interview_rooms` ADD COLUMN `started_at` DATETIME NULL;
+-- ALTER TABLE `interview_room_events` ADD COLUMN `ip_masked` VARCHAR(64) NULL, ADD COLUMN `city` VARCHAR(120) NULL,
+--   ADD COLUMN `country` VARCHAR(120) NULL, ADD COLUMN `country_code` CHAR(2) NULL, ADD COLUMN `lat` DECIMAL(9,6) NULL,
+--   ADD COLUMN `lng` DECIMAL(9,6) NULL, ADD COLUMN `device` VARCHAR(80) NULL;
 -- 8. MESSAGE THREADS & DIRECT MESSAGES
 CREATE TABLE IF NOT EXISTS `message_threads` (
     `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,

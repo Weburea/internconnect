@@ -1014,7 +1014,7 @@ if (!empty($sessionUser)) {
                     <span class="meet-jenny-card-badge">96% ATS</span>
                 </div>
 
-                <!-- Card 2: Middle-Left (Interview Link Sync — Renamed from Google Meet Sync) -->
+                <!-- Card 2: Middle-Left (Interview Link Sync) -->
                 <div class="meet-jenny-card card-mid-left">
                     <div class="meet-jenny-card-icon meet-jenny-icon-violet">
                         <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

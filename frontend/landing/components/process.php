@@ -1489,7 +1489,7 @@ declare(strict_types=1);
                                     </svg>
                                 </div>
                                 <div class="process-feature-text">
-                                    <strong>Direct Google Meet Provisioning:</strong> Generates secure calendar links delivered to candidate dashboards.
+                                    <strong>In-Platform Video Rooms:</strong> Every interview gets a secure InternConnect video room, delivered to candidate dashboards.
                                 </div>
                             </div>
 

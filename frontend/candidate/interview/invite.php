@@ -20,6 +20,10 @@ $interviewerWords = explode(' ', trim($interviewerName));
 $interviewerInitials = strtoupper(substr($interviewerWords[0] ?? 'A', 0, 1) . (isset($interviewerWords[1]) ? substr($interviewerWords[1], 0, 1) : ''));
 ?>
 
+<style>
+.db-join-meet-btn.is-ready { background: #4F48E6; color: #FFFFFF; box-shadow: 0 4px 12px rgba(79, 72, 230, 0.25); }
+.db-join-meet-btn.is-ready:hover { background: #4338CA; color: #FFFFFF; }
+</style>
 <div class="db-shell" x-data="{
     copiedLink: false,
     showRescheduleModal: false,
@@ -226,7 +230,7 @@ $interviewerInitials = strtoupper(substr($interviewerWords[0] ?? 'A', 0, 1) . (i
                             <div class="db-join-link-row">
                                 <div class="db-join-input-box">
                                     <span class="db-join-url"><?= htmlspecialchars($interview['meet_code']) ?></span>
-                                    <button type="button" class="db-join-copy-btn" @click="copyMeetLink()" title="Copy Meeting Link">
+                                    <button type="button" class="db-join-copy-btn" @click="copyMeetLink()" aria-label="Copy interview room link">
                                         <svg x-show="!copiedLink" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                                         </svg>
@@ -235,14 +239,16 @@ $interviewerInitials = strtoupper(substr($interviewerWords[0] ?? 'A', 0, 1) . (i
                                         </svg>
                                     </button>
                                 </div>
-                                <a href="<?= url('/candidate/interview/room') ?>" class="db-join-meet-btn" style="white-space: nowrap !important; flex-shrink: 0 !important;">
+                                <?php if (($interview['meeting_type'] ?? 'virtual') !== 'physical'): ?>
+                                <a href="<?= htmlspecialchars($interview['meet_link']) ?>" class="db-join-meet-btn is-ready" style="white-space: nowrap !important; flex-shrink: 0 !important;">
                                     <svg style="width: 15px; height: 15px; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                                     </svg>
-                                    <span>Enter Video Room</span>
+                                    <span>Join interview</span>
                                 </a>
+                                <?php endif; ?>
                             </div>
-                            <p class="db-join-footnote">Button will be active 10 minutes before the interview start time.</p>
+                            <p class="db-join-footnote"><?= ($interview['meeting_type'] ?? 'virtual') === 'physical' ? 'This interview takes place in person at the address above.' : 'Your interview runs inside InternConnect. No Google Meet or Zoom needed: check your camera in the lobby, then join.' ?></p>
                         </div>
                     </div>
 
@@ -396,13 +402,7 @@ $interviewerInitials = strtoupper(substr($interviewerWords[0] ?? 'A', 0, 1) . (i
                             <div class="db-meeting-item">
                                 <span class="db-meeting-label">Platform</span>
                                 <span class="db-meeting-val db-val-platform" style="display: inline-flex; align-items: center; gap: 6px;">
-                                    <svg style="width: 17px; height: 17px; flex-shrink: 0;" viewBox="0 0 24 24">
-                                        <rect x="2" y="5" width="13" height="14" rx="2" fill="#00832D"/>
-                                        <polygon points="15,9.5 22,5.5 22,18.5 15,14.5" fill="#0066DA"/>
-                                        <path d="M15 5H4a2 2 0 0 0-2 2v2.5h13V5z" fill="#EA4335"/>
-                                        <path d="M2 9.5h13v5H2z" fill="#FFBA00"/>
-                                        <path d="M15 14.5H2V17a2 2 0 0 0 2 2h11v-4.5z" fill="#00AC47"/>
-                                    </svg>
+                                    <span style="width: 22px; height: 22px; border-radius: 6px; background: #EEF2FF; color: #4F48E6; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg style="width: 13px; height: 13px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg></span>
                                     <span><?= htmlspecialchars($interview['platform']) ?></span>
                                 </span>
                             </div>
@@ -456,6 +456,24 @@ $interviewerInitials = strtoupper(substr($interviewerWords[0] ?? 'A', 0, 1) . (i
                             </button>
                         </div>
                     </div>
+
+                    <!-- Card: Interview history (past in-platform interviews with summaries) -->
+                    <?php if (!empty($history)): ?>
+                    <div class="db-card db-interview-card">
+                        <h3 class="db-sidecard-title" style="margin-bottom: 12px;">Interview history</h3>
+                        <div style="display: flex; flex-direction: column;">
+                            <?php foreach (array_slice($history, 0, 5) as $past): ?>
+                            <a href="<?= url('/candidate/interview/' . (int)$past['id'] . '/report') ?>" style="display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-top: 1px solid #F1F5F9; text-decoration: none; color: #0F172A;">
+                                <span style="min-width: 0;">
+                                    <strong style="display: block; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?= htmlspecialchars($past['company_name']) ?></strong>
+                                    <span style="display: block; font-size: 12px; color: #64748B; white-space: nowrap;"><?= htmlspecialchars($past['when'] . ' · ' . $past['duration_min'] . ' min') ?></span>
+                                </span>
+                                <span style="font-size: 12.5px; font-weight: 700; color: #4F48E6; white-space: nowrap; flex-shrink: 0;">View summary</span>
+                            </a>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
 
                     <!-- Card 4: Quick Tips Card -->
                     <div class="db-card db-tips-card">

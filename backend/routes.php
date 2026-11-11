@@ -11,6 +11,7 @@ use App\Controllers\EmployerController;
 use App\Controllers\PaymentController;
 use App\Controllers\ApiController;
 use App\Controllers\AdminController;
+use App\Controllers\InterviewController;
 
 /** @var Router $router */
 
@@ -249,5 +250,24 @@ $router->get('/admin/api/interviews/presence', [AdminController::class, 'intervi
 $router->get('/admin/document/stream', [AdminController::class, 'streamDocument']);
 $router->get('/admin/api/live-sessions', [AdminController::class, 'liveSessions']);
 
+// ── In-platform video interviews: in-call actions, files, chat, AI and history (docs/47-video-interviews.md) ──
+$router->post('/employer/interviews/suggest-questions', [EmployerController::class, 'suggestSetupQuestions']);
+foreach (['/employer/interviews/room', '/candidate/interview/room'] as $roomBase) {
+    $router->post($roomBase . '/{id}/event', [InterviewController::class, 'roomEvent']);
+    $router->post($roomBase . '/{id}/files', [InterviewController::class, 'uploadFile']);
+    $router->get($roomBase . '/{id}/files/{fileId}', [InterviewController::class, 'downloadFile']);
+    $router->post($roomBase . '/{id}/chat', [InterviewController::class, 'chatMessage']);
+}
+$router->post('/employer/interviews/room/{id}/scorecard', [InterviewController::class, 'saveScorecard']);
+$router->post('/employer/interviews/room/{id}/suggest', [InterviewController::class, 'suggestQuestions']);
+$router->get('/employer/interviews/{id}/report', [InterviewController::class, 'report']);
+$router->post('/employer/interviews/{id}/report/ai', [InterviewController::class, 'generateSummary']);
+$router->get('/candidate/interview/{id}/report', [InterviewController::class, 'report']);
 
-
+// Admin interview operations
+$router->post('/admin/interviews/schedule', [AdminController::class, 'scheduleInterviewAdmin']);
+$router->get('/admin/interviews/{id}', [AdminController::class, 'interviewDetail']);
+$router->get('/admin/interviews/{id}/files/{fileId}', [AdminController::class, 'interviewFile']);
+$router->post('/admin/interviews/{id}/report/ai', [AdminController::class, 'interviewSummary']);
+$router->post('/admin/interviews/{id}/status', [AdminController::class, 'interviewStatus']);
+$router->get('/admin/api/interviews/live-map', [AdminController::class, 'interviewLiveMap']);

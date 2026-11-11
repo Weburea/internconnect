@@ -501,10 +501,137 @@ class AdminController extends Controller
             'activeNav'  => 'interviews',
             'settings'   => \App\Services\VideoInterviewService::settings(),
             'configured' => \App\Services\VideoInterviewService::isConfigured(),
-            'rooms'      => $overview['rooms'],
+            'sessions'   => $overview['sessions'],
             'events'     => $overview['events'],
-            'evaluations'=> $overview['evaluations'],
+            'people'     => $this->schedulablePeople(),
         ], 'admin');
+    }
+
+    /** GET /admin/interviews/{id} — session report (no chat content, only counts). */
+    public function interviewDetail(array $params = []): void
+    {
+        $this->requireAdminAuth();
+        $id = (int)($params['id'] ?? 0);
+        $report = \App\Services\VideoInterviewService::report($id, 'admin');
+        if (!$report) {
+            http_response_code(404);
+        }
+        $this->renderView('admin/interviews/show', [
+            'title'     => 'Interview #' . $id . ' — InternConnect Admin',
+            'staff'     => $this->staffForView(),
+            'activeNav' => 'interviews',
+            'report'    => $report,
+            'fileBase'  => url('/admin/interviews/' . $id . '/files/'),
+            'aiUrl'     => url('/admin/interviews/' . $id . '/report/ai'),
+        ], 'admin');
+    }
+
+    /** GET /admin/interviews/{id}/files/{fileId} */
+    public function interviewFile(array $params = []): void
+    {
+        $this->requireAdminAuth();
+        $meta = \App\Services\VideoInterviewService::fileMeta((int)($params['id'] ?? 0), (int)($params['fileId'] ?? 0));
+        \App\Services\UploadStorage::stream($meta, isset($_GET['download']));
+    }
+
+    /** POST /admin/interviews/{id}/report/ai */
+    public function interviewSummary(array $params = []): void
+    {
+        $this->requireAdminAuth();
+        $summary = \App\Services\VideoInterviewService::generateSummary((int)($params['id'] ?? 0));
+        header('Content-Type: application/json');
+        echo json_encode(['success' => (bool)$summary, 'summary' => $summary]);
+        exit;
+    }
+
+    /** POST /admin/interviews/schedule — admin books an interview between an employer and a candidate. */
+    public function scheduleInterviewAdmin(): void
+    {
+        $this->requireAdminAuth();
+        $in = json_decode((string)file_get_contents('php://input'), true) ?: $_POST;
+        $people = $this->schedulablePeople();
+        $candidate = null;
+        $employer = null;
+        foreach ($people['candidates'] as $p) {
+            if ((int)$p['id'] === (int)($in['candidate_id'] ?? 0)) {
+                $candidate = $p;
+            }
+        }
+        foreach ($people['employers'] as $p) {
+            if ((int)$p['id'] === (int)($in['employer_id'] ?? 0)) {
+                $employer = $p;
+            }
+        }
+        $scheduledAt = \App\Services\VideoInterviewService::parseSchedule((string)($in['date'] ?? ''), (string)($in['time'] ?? ''));
+        if (!$candidate || !$employer || !$scheduledAt) {
+            header('Content-Type: application/json');
+            http_response_code(422);
+            echo json_encode(['success' => false, 'error' => 'Choose a candidate, an employer, a date and a time.']);
+            exit;
+        }
+        $duration = max(15, min(180, (int)($in['duration_min'] ?? \App\Services\VideoInterviewService::settings()['default_duration_min'])));
+        $interview = \App\Services\CommunicationService::scheduleInterview([
+            'candidate_id'     => $candidate['id'],
+            'employer_id'      => $employer['id'],
+            'candidate_name'   => $candidate['name'],
+            'candidate_role'   => $candidate['role'],
+            'company_name'     => $employer['company'],
+            'interviewer_name' => $employer['interviewer'],
+            'meeting_type'     => 'virtual',
+            'meeting_link'     => '',
+            'date'             => date('m/d/Y', $scheduledAt),
+            'time'             => date('h:i A', $scheduledAt),
+            'duration'         => $duration . ' mins',
+            'notes'            => 'Scheduled by the InternConnect team.',
+        ]);
+        $id = (int)$interview['id'];
+        \App\Services\VideoInterviewService::saveInterviewMeta($id, $scheduledAt, $duration, null, 'admin');
+        \App\Core\Database::getConnection()->prepare('UPDATE scheduled_interviews SET meeting_link = ? WHERE id = ?')->execute([url('/candidate/interview/room/' . $id), $id]);
+        \App\Services\VideoInterviewService::logEvent($id, 'admin', 'scheduled', $candidate['name'] . ' with ' . $employer['company']);
+        \App\Services\CommunicationService::createNotification('employer', $employer['id'], 'Interview scheduled by InternConnect',
+            "An interview with {$candidate['name']} is booked for " . date('M j, g:i A', $scheduledAt) . '.', 'interview', url('/employer/interviews?tab=upcoming'));
+
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'id' => $id]);
+        exit;
+    }
+
+    /** POST /admin/interviews/{id}/status  {status: Ready | Cancelled | Scheduled} */
+    public function interviewStatus(array $params = []): void
+    {
+        $this->requireAdminAuth();
+        $in = json_decode((string)file_get_contents('php://input'), true) ?: $_POST;
+        $ok = \App\Services\VideoInterviewService::setStatus((int)($params['id'] ?? 0), (string)($in['status'] ?? ''), 'admin');
+        header('Content-Type: application/json');
+        echo json_encode(['success' => $ok]);
+        exit;
+    }
+
+    /** GET /admin/api/interviews/live-map — live interview locations (map feed). */
+    public function interviewLiveMap(): void
+    {
+        $this->requireAdminAuth();
+        header('Content-Type: application/json');
+        header('Cache-Control: no-store');
+        echo json_encode(\App\Services\VideoInterviewService::liveMapFeed());
+        exit;
+    }
+
+    /** People an admin can book interviews for (demo directory until accounts are database-backed). */
+    private function schedulablePeople(): array
+    {
+        return [
+            'candidates' => [
+                ['id' => 1, 'name' => 'Sarah Peters', 'role' => 'UI/UX Design Intern'],
+                ['id' => 2, 'name' => 'Elena Daniels', 'role' => 'Data Science Intern'],
+                ['id' => 3, 'name' => 'Topper Andrew', 'role' => 'Data Science Intern'],
+            ],
+            'employers' => [
+                ['id' => 1, 'company' => 'Nexura Technologies', 'interviewer' => 'Tunde Bakare'],
+                ['id' => 2, 'company' => 'Paystack', 'interviewer' => 'Amaka Obi'],
+                ['id' => 3, 'company' => 'Flutterwave', 'interviewer' => 'David Mensah'],
+            ],
+        ];
     }
 
     /** POST /admin/interviews/settings */

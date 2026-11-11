@@ -354,9 +354,9 @@ declare(strict_types=1);
 <div class="db-shell">
 
     <!-- ══ EMPLOYER SIDEBAR ══ -->
-    <?php 
+    <?php
     $activeNav = 'interviews';
-    include dirname(__DIR__, 2) . '/shared/components/employer-sidebar.php'; 
+    include dirname(__DIR__, 2) . '/shared/components/employer-sidebar.php';
     ?>
 
     <!-- ══ MAIN CONTENT WRAPPER ══ -->
@@ -367,12 +367,25 @@ declare(strict_types=1);
 
         <!-- ══ PAGE CONTENT ══ -->
         <div class="db-content">
-            <div class="emp-interviews-page" 
+            <div class="emp-interviews-page"
                  x-data="{
-                     activeTab: 'shortlisted',
+                     activeTab: (new URLSearchParams(window.location.search).get('tab') || 'shortlisted'),
+                     sessions: <?= htmlspecialchars(json_encode($sessions ?? [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') ?>,
+                     reportBase: '<?= url('/employer/interviews/') ?>',
+                     employerRoomBase: '<?= url('/employer/interviews/room/') ?>',
+                     candidateRoomBase: '<?= url('/candidate/interview/room/') ?>',
+                     openStatuses: ['Scheduled', 'Confirmed', 'Ready', 'In progress'],
+                     openSession(c) { return this.sessions.find((s) => s.candidate_id === c.id && s.meeting_type === 'virtual' && this.openStatuses.includes(s.status)) || null; },
+                     isScheduled(c) { return !!this.openSession(c); },
+                     get upcoming() { return this.sessions.filter((s) => this.openStatuses.includes(s.status)); },
+                     get history() { return this.sessions.filter((s) => s.status === 'Completed'); },
+                     get cancelled() { return this.sessions.filter((s) => s.status === 'Cancelled'); },
+                     statusClass(s) { return { 'In progress': 'is-live', Completed: 'is-done', Cancelled: 'is-cancelled' }[s] || 'is-upcoming'; },
+                     statusLabel(s) { return s === 'In progress' ? 'Live now' : s; },
+                     copyLink(s) { navigator.clipboard.writeText(new URL(this.candidateRoomBase + s.id, window.location.origin).href).then(() => window.dispatchEvent(new CustomEvent('show-toast', { detail: { text: 'Candidate join link copied.', type: 'success' } }))); },
                      meetingModalOpen: false,
                      currentMeeting: null,
-                     
+
                      allCandidates: [
                          {
                              id: 1,
@@ -384,7 +397,7 @@ declare(strict_types=1);
                              type: 'Virtual',
                              date_time: '27/09/2026 10:00 AM',
                              is_primary: true,
-                             link: 'https://meet.google.com/sarah-peters-ux'
+                             link: ''
                          },
                          {
                              id: 2,
@@ -396,7 +409,7 @@ declare(strict_types=1);
                              type: 'Virtual',
                              date_time: '30/09/2026 03:30 PM',
                              is_primary: false,
-                             link: 'https://meet.google.com/elena-daniels-ds'
+                             link: ''
                          },
                          {
                              id: 3,
@@ -473,29 +486,36 @@ declare(strict_types=1);
 
                 <!-- ── 3. Pill Tabs Row ── -->
                 <div class="emp-int-tabs-row">
-                    <button type="button" 
-                            class="emp-int-tab-btn" 
+                    <button type="button"
+                            class="emp-int-tab-btn"
                             :class="{ 'is-active': activeTab === 'all' }"
                             @click="activeTab = 'all'">
                         All Interviews
                     </button>
 
-                    <button type="button" 
-                            class="emp-int-tab-btn" 
+                    <button type="button"
+                            class="emp-int-tab-btn"
                             :class="{ 'is-active': activeTab === 'shortlisted' }"
                             @click="activeTab = 'shortlisted'">
                         Shortlisted
                     </button>
 
-                    <button type="button" 
-                            class="emp-int-tab-btn" 
+                    <button type="button"
+                            class="emp-int-tab-btn"
                             :class="{ 'is-active': activeTab === 'upcoming' }"
                             @click="activeTab = 'upcoming'">
                         Upcoming
                     </button>
 
-                    <button type="button" 
-                            class="emp-int-tab-btn" 
+                    <button type="button"
+                            class="emp-int-tab-btn"
+                            :class="{ 'is-active': activeTab === 'history' }"
+                            @click="activeTab = 'history'">
+                        History
+                    </button>
+
+                    <button type="button"
+                            class="emp-int-tab-btn"
                             :class="{ 'is-active': activeTab === 'cancelled' }"
                             @click="activeTab = 'cancelled'">
                         Cancelled
@@ -507,7 +527,7 @@ declare(strict_types=1);
                     <h2 class="emp-int-card-title">Interview Schedule</h2>
 
                     <div class="emp-int-table-wrap">
-                        
+
                         <!-- TAB A: Shortlisted Table (Screenshot 3) -->
                         <table class="emp-int-table" x-show="activeTab === 'shortlisted' || activeTab === 'all'">
                             <thead>
@@ -538,168 +558,115 @@ declare(strict_types=1);
 
                                         <!-- Action Link to Schedule Interview -->
                                         <td style="text-align: right;">
-                                            <a :href="'<?= url('/employer/interviews/schedule/') ?>' + c.id" 
-                                               class="emp-btn-schedule-link">
-                                                Schedule Interview
-                                            </a>
+                                            <div style="display: inline-flex; align-items: center; gap: 12px; justify-content: flex-end; flex-wrap: wrap;">
+                                                <a x-show="isScheduled(c)" :href="isScheduled(c) ? employerRoomBase + openSession(c).id : '#'" class="emp-btn-start-primary" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                                                    <svg style="width: 14px; height: 14px; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                                    <span>Join room</span>
+                                                </a>
+                                                <a :href="'<?= url('/employer/interviews/schedule/') ?>' + c.id"
+                                                   class="emp-btn-schedule-link" x-text="isScheduled(c) ? 'Reschedule' : 'Schedule Interview'">
+                                                    Schedule Interview
+                                                </a>
+                                            </div>
                                         </td>
                                     </tr>
                                 </template>
                             </tbody>
                         </table>
 
-                        <!-- TAB B: Upcoming Table (Screenshot 4) -->
-                        <table class="emp-int-table" x-show="activeTab === 'upcoming'">
-                            <thead>
-                                <tr>
-                                    <th style="width: 30%;">Candidates</th>
-                                    <th style="width: 24%;">Internship Role</th>
-                                    <th style="width: 14%;">Type</th>
-                                    <th style="width: 18%;">Date & Time</th>
-                                    <th style="width: 14%; text-align: right;">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <template x-for="c in allCandidates" :key="'up-' + c.id">
-                                    <tr>
-                                        <!-- Candidate Info -->
-                                        <td>
-                                            <div class="emp-int-cand-cell">
-                                                <img :src="c.avatar" :alt="c.name" class="emp-int-cand-avatar">
-                                                <div>
-                                                    <div class="emp-int-cand-name" x-text="c.name"></div>
-                                                    <div class="emp-int-cand-email" x-text="c.email"></div>
+                        <!-- TAB B: Upcoming sessions (each has its own video room) -->
+                        <div x-show="activeTab === 'upcoming'" style="display: none;">
+                            <table class="emp-int-table eis-table" x-show="upcoming.length">
+                                <thead>
+                                    <tr><th>Candidate</th><th>Date &amp; time</th><th>Length</th><th>Status</th><th style="text-align: right;">Action</th></tr>
+                                </thead>
+                                <tbody>
+                                    <template x-for="s in upcoming" :key="'up-' + s.id">
+                                        <tr>
+                                            <td><div class="emp-int-cand-name" x-text="s.candidate_name"></div><div class="emp-int-cand-email" x-text="s.candidate_role"></div></td>
+                                            <td class="eis-nowrap"><span x-text="s.when"></span><span class="eis-sub" x-text="s.when_time"></span></td>
+                                            <td class="eis-nowrap" x-text="s.duration_min + ' min'"></td>
+                                            <td><span class="eis-badge" :class="statusClass(s.status)" x-text="statusLabel(s.status)"></span></td>
+                                            <td style="text-align: right;">
+                                                <div class="eis-actions">
+                                                    <template x-if="s.meeting_type === 'virtual'">
+                                                        <a :href="employerRoomBase + s.id" class="emp-btn-start-primary" style="text-decoration: none;">Join room</a>
+                                                    </template>
+                                                    <template x-if="s.meeting_type === 'virtual'">
+                                                        <button type="button" class="eis-ghost" @click="copyLink(s)">Copy link</button>
+                                                    </template>
+                                                    <span x-show="s.meeting_type !== 'virtual'" class="eis-sub">In person</span>
                                                 </div>
-                                            </div>
-                                        </td>
-
-                                        <!-- Internship Role -->
-                                        <td>
-                                            <span class="emp-int-role-text" x-text="c.role"></span>
-                                        </td>
-
-                                        <!-- Type -->
-                                        <td>
-                                            <span class="emp-int-meta-text" x-text="c.type"></span>
-                                        </td>
-
-                                        <!-- Date & Time -->
-                                        <td>
-                                            <span class="emp-int-meta-text" x-text="c.date_time"></span>
-                                        </td>
-
-                                        <!-- Start Interview Button -->
-                                        <td style="text-align: right;">
-                                            <button type="button" 
-                                                    :class="c.is_primary ? 'emp-btn-start-primary' : 'emp-btn-start-outline'"
-                                                    @click="startInterview(c)">
-                                                Start Interview
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </template>
-                            </tbody>
-                        </table>
-
-                        <!-- TAB C: Cancelled Table -->
-                        <table class="emp-int-table" x-show="activeTab === 'cancelled'">
-                            <thead>
-                                <tr>
-                                    <th style="width: 32%;">Candidates</th>
-                                    <th style="width: 26%;">Internship Role</th>
-                                    <th style="width: 18%;">Status</th>
-                                    <th style="width: 24%; text-align: right;">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <div class="emp-int-cand-cell">
-                                            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=160&h=160&fit=crop&crop=faces" alt="David Adeleke" class="emp-int-cand-avatar">
-                                            <div>
-                                                <div class="emp-int-cand-name">David Adeleke</div>
-                                                <div class="emp-int-cand-email">david.a@intconnect.com</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td><span class="emp-int-role-text">Backend Engineering Intern</span></td>
-                                    <td><span class="emp-status-pill emp-status-rejected">Cancelled</span></td>
-                                    <td style="text-align: right;">
-                                        <a href="<?= url('/employer/interviews/schedule/1') ?>" class="emp-btn-schedule-link">
-                                            Reschedule
-                                        </a>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                    </div>
-                </div>
-
-                <!-- ── 5. Start Interview Dialog Modal ── -->
-                <div class="emp-int-modal-backdrop" 
-                     x-show="meetingModalOpen" 
-                     x-cloak
-                     @click.self="meetingModalOpen = false"
-                     x-transition:enter="transition ease-out duration-150"
-                     x-transition:enter-start="opacity-0"
-                     x-transition:enter-end="opacity-100"
-                     x-transition:leave="transition ease-in duration-100"
-                     x-transition:leave-start="opacity-100"
-                     x-transition:leave-end="opacity-0"
-                     style="display: none;">
-                    
-                    <div class="emp-int-modal-card" 
-                         x-show="meetingModalOpen"
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 transform scale-95"
-                         x-transition:enter-end="opacity-100 transform scale-100">
-                        
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <div style="width: 36px; height: 36px; border-radius: 10px; background: #EEF2FF; color: #4F48E6; display: flex; align-items: center; justify-content: center;">
-                                    <svg style="width: 18px; height: 18px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                                    </svg>
-                                </div>
-                                <div>
-                                    <h3 style="font-size: 16px; font-weight: 800; color: #0F172A; margin: 0;">Start Virtual Interview</h3>
-                                    <p style="font-size: 12px; color: #64748B; margin: 0;">Candidate: <strong x-text="currentMeeting ? currentMeeting.name : ''"></strong></p>
-                                </div>
-                            </div>
-                            <button type="button" @click="meetingModalOpen = false" style="background: transparent; border: none; color: #94A3B8; cursor: pointer; padding: 4px;">
-                                <svg style="width: 18px; height: 18px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-                            </button>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                            <p class="eis-empty" x-show="!upcoming.length">No upcoming interviews. Schedule one from the Shortlisted tab.</p>
                         </div>
 
-                        <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 14px; margin-bottom: 20px;">
-                            <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #64748B; margin-bottom: 6px;">In-Platform Video Room Link</div>
-                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                                <span style="font-size: 13px; font-weight: 600; color: #4F48E6; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" x-text="'<?= url('/employer/interviews/room/') ?>' + (currentMeeting ? currentMeeting.id : 1)"></span>
-                                <button type="button" 
-                                        @click="navigator.clipboard.writeText('<?= url('/candidate/interview/room/') ?>' + (currentMeeting ? currentMeeting.id : 1)); $dispatch('show-toast', { text: 'In-platform meeting link copied to clipboard!', type: 'info' })" 
-                                        style="background: #FFFFFF; border: 1px solid #CBD5E1; color: #334155; padding: 5px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0; white-space: nowrap !important;">
-                                    Copy Link
-                                </button>
-                            </div>
+                        <!-- TAB C: History (completed sessions with reports) -->
+                        <div x-show="activeTab === 'history'" style="display: none;">
+                            <table class="emp-int-table eis-table" x-show="history.length">
+                                <thead>
+                                    <tr><th>Candidate</th><th>Date</th><th>Length</th><th>Result</th><th style="text-align: right;">Report</th></tr>
+                                </thead>
+                                <tbody>
+                                    <template x-for="s in history" :key="'h-' + s.id">
+                                        <tr>
+                                            <td><div class="emp-int-cand-name" x-text="s.candidate_name"></div><div class="emp-int-cand-email" x-text="s.candidate_role"></div></td>
+                                            <td class="eis-nowrap"><span x-text="s.when"></span><span class="eis-sub" x-text="s.when_time"></span></td>
+                                            <td class="eis-nowrap" x-text="s.duration_min + ' min'"></td>
+                                            <td>
+                                                <span class="eis-result" x-show="s.recommendation" x-text="s.recommendation + (s.score_average ? ' · ' + s.score_average + '/5' : '')"></span>
+                                                <span class="eis-sub" x-show="!s.recommendation">Not scored</span>
+                                            </td>
+                                            <td style="text-align: right;"><a :href="reportBase + s.id + '/report'" class="emp-btn-schedule-link">View report</a></td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                            <p class="eis-empty" x-show="!history.length">Finished interviews appear here with their summary, scorecard and shared files.</p>
                         </div>
 
-                        <div style="display: flex; gap: 10px;">
-                            <button type="button" 
-                                    @click="meetingModalOpen = false" 
-                                    style="flex: 1; height: 42px; border: 1px solid #CBD5E1; background: #FFFFFF; color: #475569; font-size: 13px; font-weight: 600; border-radius: 10px; cursor: pointer; white-space: nowrap !important; flex-shrink: 0 !important;">
-                                Close
-                            </button>
-                            <a :href="'<?= url('/employer/interviews/room/') ?>' + (currentMeeting ? currentMeeting.id : 1)" 
-                               style="flex: 2; height: 42px; background: #4F48E6; color: #FFFFFF; font-size: 13px; font-weight: 700; border-radius: 10px; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 2px 8px rgba(79, 72, 230, 0.25); white-space: nowrap !important; flex-shrink: 0 !important;">
-                                <svg style="width: 15px; height: 15px; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                                <span>Enter Video Room</span>
-                            </a>
+                        <!-- TAB D: Cancelled -->
+                        <div x-show="activeTab === 'cancelled'" style="display: none;">
+                            <table class="emp-int-table eis-table" x-show="cancelled.length">
+                                <thead>
+                                    <tr><th>Candidate</th><th>Was scheduled for</th><th>Status</th><th style="text-align: right;">Action</th></tr>
+                                </thead>
+                                <tbody>
+                                    <template x-for="s in cancelled" :key="'c-' + s.id">
+                                        <tr>
+                                            <td><div class="emp-int-cand-name" x-text="s.candidate_name"></div><div class="emp-int-cand-email" x-text="s.candidate_role"></div></td>
+                                            <td class="eis-nowrap"><span x-text="s.when"></span><span class="eis-sub" x-text="s.when_time"></span></td>
+                                            <td><span class="eis-badge is-cancelled">Cancelled</span></td>
+                                            <td style="text-align: right;"><a :href="'<?= url('/employer/interviews/schedule/') ?>' + s.candidate_id" class="emp-btn-schedule-link">Reschedule</a></td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                            <p class="eis-empty" x-show="!cancelled.length">No cancelled interviews.</p>
                         </div>
 
                     </div>
                 </div>
 
+                <style>
+                .eis-table th, .eis-table td { white-space: normal; }
+                .eis-nowrap { white-space: nowrap !important; }
+                .eis-sub { display: block; font-size: 12px; color: #64748B; margin-top: 2px; white-space: nowrap; }
+                .eis-actions { display: inline-flex; align-items: center; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+                .eis-ghost { height: 34px; padding: 0 12px; border: 1px solid #E2E8F0; border-radius: 9px; background: #FFFFFF; color: #334155; font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+                .eis-ghost:hover { background: #F8FAFC; border-color: #CBD5E1; }
+                .eis-badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 9999px; font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+                .eis-badge.is-upcoming { background: #EEF2FF; color: #4F48E6; }
+                .eis-badge.is-live { background: #ECFDF5; color: #047857; }
+                .eis-badge.is-done { background: #F1F5F9; color: #475569; }
+                .eis-badge.is-cancelled { background: #FEF2F2; color: #B91C1C; }
+                .eis-result { font-size: 13px; font-weight: 700; color: #0F172A; white-space: nowrap; }
+                .eis-empty { margin: 0; padding: 32px 12px; text-align: center; font-size: 13px; color: #64748B; }
+                </style>
             </div>
         </div>
 

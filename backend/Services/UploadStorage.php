@@ -26,6 +26,9 @@ class UploadStorage
         'jpg'  => ['mimes' => ['image/jpeg'], 'magic' => ["\xFF\xD8\xFF"], 'content_type' => 'image/jpeg'],
         'jpeg' => ['mimes' => ['image/jpeg'], 'magic' => ["\xFF\xD8\xFF"], 'content_type' => 'image/jpeg'],
         'webp' => ['mimes' => ['image/webp'], 'magic' => ['RIFF'], 'content_type' => 'image/webp'],
+        'doc'  => ['mimes' => ['application/msword', 'application/CDFV2', 'application/x-ole-storage', 'application/octet-stream'], 'magic' => ["\xD0\xCF\x11\xE0"], 'content_type' => 'application/msword'],
+        // Plain text has no signature: checked by MIME type and for binary bytes instead.
+        'txt'  => ['mimes' => ['text/plain', 'text/x-c', 'application/octet-stream'], 'magic' => [''], 'content_type' => 'text/plain; charset=utf-8'],
     ];
 
     /** kind => [allowed extensions, max bytes, label used in messages] */
@@ -33,6 +36,8 @@ class UploadStorage
         'resume'       => ['ext' => ['pdf', 'docx'], 'max' => 10 * self::MB, 'label' => 'Resume file', 'types' => 'a PDF or DOCX file'],
         'business_doc' => ['ext' => ['pdf', 'jpg', 'jpeg', 'png'], 'max' => 10 * self::MB, 'label' => 'Document', 'types' => 'a PDF, JPG or PNG file'],
         'logo'         => ['ext' => ['png', 'jpg', 'jpeg', 'webp'], 'max' => 5 * self::MB, 'label' => 'Logo image', 'types' => 'a PNG, JPG or WebP image'],
+        // Shared during video interviews: documents and images only (no video).
+        'interview_file' => ['ext' => ['pdf', 'docx', 'doc', 'txt', 'png', 'jpg', 'jpeg', 'webp'], 'max' => 10 * self::MB, 'label' => 'File', 'types' => 'a PDF, Word, text or image file'],
     ];
 
     public static function directory(string $kind): string
@@ -89,6 +94,9 @@ class UploadStorage
         if ($ext === 'webp' && substr($head, 8, 4) !== 'WEBP') {
             $magicOk = false;
         }
+        if ($ext === 'txt' && str_contains((string)file_get_contents($tmp, false, null, 0, 4096), "\0")) {
+            $magicOk = false; // binary content renamed to .txt
+        }
         if (!$magicOk || ($mime !== '' && !in_array($mime, $format['mimes'], true))) {
             return ['ok' => false, 'error' => 'That file does not look like a valid ' . strtoupper($ext) . ' file.'];
         }
@@ -115,7 +123,7 @@ class UploadStorage
     {
         $kind = (string)($meta['kind'] ?? 'resume');
         $file = (string)($meta['file'] ?? '');
-        if (!isset(self::KINDS[$kind]) || !preg_match('/^[a-f0-9]{32}\.(pdf|docx|png|jpe?g|webp)$/', $file)) {
+        if (!isset(self::KINDS[$kind]) || !preg_match('/^[a-f0-9]{32}\.(pdf|docx|doc|txt|png|jpe?g|webp)$/', $file)) {
             return null;
         }
         $path = self::directory($kind) . '/' . $file;

@@ -20,6 +20,7 @@ $adminPages = [
     ['title' => 'Employers',        'group' => 'People',         'icon' => 'building', 'keys' => ['employers', 'verification']],
     ['title' => 'Jenny AI',         'group' => 'Platform',       'icon' => 'sparkles', 'keys' => ['ai', 'ai_chat']],
     ['title' => 'E-Learning',       'group' => 'Platform',       'icon' => 'book',     'keys' => ['elearning']],
+    ['title' => 'Video Interviews', 'group' => 'Platform',       'icon' => 'calendar', 'keys' => ['interviews']],
     ['title' => 'Subscriptions',    'group' => 'Platform',       'icon' => 'card',     'keys' => ['subscriptions']],
     ['title' => 'Settings & Team',  'group' => 'Administration', 'icon' => 'cog',      'keys' => ['settings', 'team']],
 ];

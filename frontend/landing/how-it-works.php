@@ -497,7 +497,7 @@ declare(strict_types=1);
                         </div>
                         <h2 class="hiw-chapter-title">Calendar-Synced Interviews &amp; Digital Acceptance Letters</h2>
                         <p class="hiw-chapter-desc">
-                            When an employer wants to interview you, they send an integrated calendar invitation directly through our Interview Scheduler. Pick your preferred time slot, receive Google Meet / Zoom links automatically, and formalize employment with legitimate digital offer documents.
+                            When an employer wants to interview you, they send an integrated calendar invitation directly through our Interview Scheduler. Pick your preferred time slot, join the interview in a private InternConnect video room, and formalize employment with legitimate digital offer documents.
                         </p>
                         <ul class="hiw-points-list">
                             <li class="hiw-point-item">
@@ -720,7 +720,7 @@ declare(strict_types=1);
                         </div>
                         <h2 class="hiw-chapter-title">Schedule Interviews Seamlessly &amp; Issue Official Offers</h2>
                         <p class="hiw-chapter-desc">
-                            Coordinate interviews effortlessly without external calendar tools. Send direct Google Meet or Zoom invites with preset durations. Once you identify your top intern, generate a legally sound digital offer letter right inside your employer dashboard.
+                            Coordinate interviews effortlessly without external calendar tools. Interviews run in private InternConnect video rooms with preset durations, a live scorecard and Jenny AI follow-up questions. Once you identify your top intern, generate a legally sound digital offer letter right inside your employer dashboard.
                         </p>
                         <ul class="hiw-points-list">
                             <li class="hiw-point-item">
@@ -729,7 +729,7 @@ declare(strict_types=1);
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                                     </svg>
                                 </span>
-                                <div><strong>Automated Interview Links:</strong> Generate Google Meet and Zoom interview URLs with calendar invite sync for both parties.</div>
+                                <div><strong>Built-in Video Interviews:</strong> Every interview gets its own secure in-platform video room, with screen sharing, chat and file sharing for both parties.</div>
                             </li>
                             <li class="hiw-point-item">
                                 <span class="hiw-point-icon">

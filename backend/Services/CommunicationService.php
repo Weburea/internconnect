@@ -68,7 +68,7 @@ class CommunicationService
                     company_name TEXT NOT NULL DEFAULT 'Nexura Technologies',
                     interviewer_name TEXT NOT NULL DEFAULT 'Tunde Bakare',
                     meeting_type TEXT NOT NULL DEFAULT 'virtual',
-                    meeting_link TEXT DEFAULT 'https://meet.google.com/nxt-uxin-2026',
+                    meeting_link TEXT DEFAULT '',
                     interview_date TEXT NOT NULL,
                     interview_time TEXT NOT NULL,
                     duration TEXT NOT NULL DEFAULT '45 mins',
@@ -715,7 +715,7 @@ class CommunicationService
                     [
                         'id'       => 4,
                         'sender'   => 'employer',
-                        'text'     => "Wonderful. We just sent an interview invitation for Thursday at 10:00 AM via Google Meet. Looking forward to speaking!",
+                        'text'     => "Wonderful. We just sent an interview invitation for Thursday at 10:00 AM in our InternConnect video room. Looking forward to speaking!",
                         'time'     => '10:35 AM',
                         'status'   => 'read'
                     ],

@@ -609,6 +609,20 @@ function adminOverview() {
                 <!-- Live Visitors Map -->
                 <?php include dirname(__DIR__, 2) . '/shared/components/admin-live-map.php'; ?>
 
+                <!-- Live Interviews Map (same component, interview feed) -->
+                <?php
+                $liveMap = [
+                    'feed'       => url('/admin/api/interviews/live-map'),
+                    'title'      => 'Live interviews',
+                    'subtitle'   => 'Where people in live video interviews are joining from',
+                    'totalLabel' => 'in interviews',
+                    'labelA'     => 'candidates',
+                    'labelB'     => 'employers',
+                    'emptyText'  => 'No interviews are live right now.',
+                ];
+                include dirname(__DIR__, 2) . '/shared/components/admin-live-map.php';
+                ?>
+
                 <!-- Finance, Top Performers & Marketplace -->
                 <div class="admin-grid-insights">
                     <?php if ($canViewFinance): ?>

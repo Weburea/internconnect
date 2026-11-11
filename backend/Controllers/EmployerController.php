@@ -1341,7 +1341,7 @@ class EmployerController extends Controller
                 'deadline'              => trim($_POST['deadline'] ?? '2026-05-15'),
                 'num_interns'           => (int)($_POST['num_interns'] ?? 10),
                 'allow_remote'          => isset($_POST['allow_remote']),
-                'interview_type'        => trim($_POST['interview_type'] ?? 'Video Interview (Google Meet)'),
+                'interview_type'        => trim($_POST['interview_type'] ?? 'Video Interview (InternConnect video room)'),
                 'relevant_experience'   => $relevantExperience,
                 'screening_questions'   => $screeningQuestions,
             ];
@@ -1715,6 +1715,9 @@ class EmployerController extends Controller
             'candidates'  => $candidates,
             'stats'       => $stats,
             'activeNav'   => 'interviews',
+            // Candidates with a scheduled in-platform interview (room id = candidate id)
+            // In-platform interview sessions for this employer (each has its own room)
+            'sessions'    => VideoInterviewService::sessions(['employer_id' => 1, 'limit' => 50]),
         ], 'dashboard');
     }
 
@@ -2228,7 +2231,7 @@ class EmployerController extends Controller
                     [
                         'id'       => 4,
                         'sender'   => 'employer',
-                        'text'     => "Wonderful. We just sent an interview invitation for Thursday at 10:00 AM via Google Meet. Looking forward to speaking!",
+                        'text'     => "Wonderful. We just sent an interview invitation for Thursday at 10:00 AM in our InternConnect video room. Looking forward to speaking!",
                         'time'     => '10:35 AM',
                         'status'   => 'read'
                     ],
@@ -2553,6 +2556,16 @@ class EmployerController extends Controller
         }
 
         $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+        $isVirtual = ($input['meeting_type'] ?? 'virtual') === 'virtual';
+        $scheduledAt = VideoInterviewService::parseSchedule((string)($input['date'] ?? ''), (string)($input['time'] ?? ''));
+        if ($scheduledAt === null) {
+            header('Content-Type: application/json');
+            http_response_code(422);
+            echo json_encode(['success' => false, 'error' => 'Please choose a valid date and time.']);
+            exit;
+        }
+        $durationMin = max(15, min(180, (int)($input['duration_min'] ?? (int)preg_replace('/\D+/', '', (string)($input['duration'] ?? '')) ?: 30)));
+
         $payload = [
             'candidate_id'     => (int)($input['candidate_id'] ?? 1),
             'employer_id'      => 1,
@@ -2560,18 +2573,67 @@ class EmployerController extends Controller
             'candidate_role'   => $input['candidate_role'] ?? 'UI/UX Design Intern',
             'company_name'     => $_SESSION['employer_company'] ?? 'Nexura Technologies',
             'interviewer_name' => $_SESSION['employer_first_name'] ?? 'Tunde Bakare',
-            'meeting_type'     => $input['meeting_type'] ?? 'virtual',
-            'meeting_link'     => $input['meeting_link'] ?? 'https://meet.google.com/nxt-uxin-2026',
-            'date'             => $input['date'] ?? date('m/d/Y', strtotime('+3 days')),
-            'time'             => $input['time'] ?? '10:00 AM',
-            'duration'         => $input['duration'] ?? '45 mins',
+            'meeting_type'     => $isVirtual ? 'virtual' : 'physical',
+            'meeting_link'     => $isVirtual ? '' : trim((string)($input['meeting_link'] ?? '')),
+            'date'             => date('m/d/Y', $scheduledAt),
+            'time'             => date('h:i A', $scheduledAt),
+            'duration'         => $durationMin . ' mins',
             'notes'            => $input['notes'] ?? '',
         ];
 
         $interview = CommunicationService::scheduleInterview($payload);
+        $interviewId = (int)$interview['id'];
+
+        // Each scheduled interview is its own session and room (docs/47-video-interviews.md).
+        VideoInterviewService::saveInterviewMeta($interviewId, $scheduledAt, $durationMin, is_array($input['setup'] ?? null) ? $input['setup'] : null, 'employer');
+        if ($isVirtual) {
+            \App\Core\Database::getConnection()->prepare('UPDATE scheduled_interviews SET meeting_link = ? WHERE id = ?')
+                ->execute([url('/candidate/interview/room/' . $interviewId), $interviewId]);
+            $_SESSION['active_upcoming_interview']['id'] = $interviewId;
+            $_SESSION['active_upcoming_interview']['meeting_link'] = url('/candidate/interview/room/' . $interviewId);
+        }
+        VideoInterviewService::logEvent($interviewId, 'employer', 'scheduled', $payload['candidate_name'] . ' on ' . date('M j, g:i A', $scheduledAt));
 
         header('Content-Type: application/json');
-        echo json_encode(['success' => true, 'interview' => $interview]);
+        echo json_encode([
+            'success'        => true,
+            'interview'      => $interview,
+            'interview_id'   => $interviewId,
+            'employer_room'  => url('/employer/interviews/room/' . $interviewId),
+            'candidate_room' => url('/candidate/interview/room/' . $interviewId),
+        ]);
+        exit;
+    }
+
+    /**
+     * Jenny AI question suggestions while preparing an interview (before an interview id exists).
+     * Route: POST /employer/interviews/suggest-questions  {role, criteria: [labels]}
+     */
+    public function suggestSetupQuestions(): void
+    {
+        $in = json_decode((string)file_get_contents('php://input'), true) ?: [];
+        $role = mb_substr(trim((string)($in['role'] ?? 'intern')), 0, 80);
+        $criteria = array_slice(array_map(static fn ($c) => mb_substr(trim((string)$c), 0, 60), (array)($in['criteria'] ?? [])), 0, 8);
+        $ai = \App\Services\GeminiClient::json(
+            "Write 4 concise interview questions for a {$role} internship. Cover these criteria: " . (implode(', ', $criteria) ?: 'skills, motivation, teamwork')
+            . '. For each give a short hint of what a good answer shows. Respond as JSON: {"questions":[{"question":"...","hint":"..."}]}',
+            8
+        );
+        $questions = [];
+        foreach ((array)($ai['questions'] ?? []) as $q) {
+            if (trim((string)($q['question'] ?? '')) !== '') {
+                $questions[] = ['question' => mb_substr(trim((string)$q['question']), 0, 300), 'hint' => mb_substr(trim((string)($q['hint'] ?? '')), 0, 200)];
+            }
+        }
+        $source = 'gemini';
+        if (!$questions) {
+            $source = 'rules';
+            foreach ($criteria ?: ['Skills', 'Motivation', 'Teamwork'] as $label) {
+                $questions[] = ['question' => 'Tell us about a time you showed strong ' . strtolower($label) . ' in a project.', 'hint' => 'Look for a concrete example and the outcome.'];
+            }
+        }
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'source' => $source, 'questions' => array_slice($questions, 0, 6)]);
         exit;
     }
 
@@ -2728,11 +2790,11 @@ class EmployerController extends Controller
                 'candidate_role'   => 'UI/UX Design Intern',
                 'company_name'     => 'Nexura Technologies',
                 'interviewer_name' => 'Tunde Bakare',
-                'meeting_type'     => 'Virtual (Google Meet)',
+                'meeting_type'     => 'Virtual (InternConnect video room)',
                 'interview_date'   => '2026-10-26',
                 'interview_time'   => '10:00 AM',
                 'duration'         => '45 mins',
-                'meeting_link'     => 'https://meet.google.com/nxt-uxin-2026',
+                'meeting_link'     => url('/candidate/interview/room/1'),
                 'status'           => 'Confirmed',
             ],
             [
@@ -2741,11 +2803,11 @@ class EmployerController extends Controller
                 'candidate_role'   => 'Software Engineer Intern (Backend)',
                 'company_name'     => 'Nexura Technologies',
                 'interviewer_name' => 'Tunde Bakare',
-                'meeting_type'     => 'Virtual (Google Meet)',
+                'meeting_type'     => 'Virtual (InternConnect video room)',
                 'interview_date'   => '2026-10-27',
                 'interview_time'   => '02:00 PM',
                 'duration'         => '60 mins',
-                'meeting_link'     => 'https://meet.google.com/nxt-be-2026',
+                'meeting_link'     => url('/candidate/interview/room/2'),
                 'status'           => 'Scheduled',
             ]
         ];

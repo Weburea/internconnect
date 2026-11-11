@@ -261,18 +261,35 @@ class CommunicationFeaturesTest extends TestCase
 
     public function testVideoInterviewServiceOperations(): void
     {
+        // Rooms are per scheduled interview, so the test books its own session first.
+        $scheduled = \App\Services\CommunicationService::scheduleInterview([
+            'candidate_id'     => 1,
+            'candidate_name'   => 'Sarah Peters',
+            'candidate_role'   => 'UI/UX Design Intern',
+            'company_name'     => 'Nexura Technologies',
+            'interviewer_name' => 'Tunde Bakare',
+            'meeting_type'     => 'virtual',
+            'date'             => '10/28/2026',
+            'time'             => '03:00 PM',
+            'duration'         => '30 mins',
+        ]);
+        $interviewId = (int)$scheduled['id'];
+
         // 1. Get room details for employer
-        $employerRoom = \App\Services\VideoInterviewService::getRoomDetails(1, 'employer');
+        $employerRoom = \App\Services\VideoInterviewService::getRoomDetails($interviewId, 'employer');
         $this->assertIsArray($employerRoom, 'getRoomDetails must return an array');
+        $this->assertTrue($employerRoom['exists'], 'Room details must load the scheduled interview');
         $this->assertEquals('Nexura Technologies', $employerRoom['company_name']);
         $this->assertEquals('Sarah Peters', $employerRoom['candidate_name']);
-        $this->assertStringContains('https://internconnect.daily.co/', $employerRoom['daily_room_url']);
+        $this->assertEquals(30, $employerRoom['duration_minutes']);
+        $this->assertStringContains('.daily.co/', $employerRoom['daily_room_url']);
         $this->assertArrayHasKey('rubric', $employerRoom);
+        $this->assertArrayHasKey('setup', $employerRoom);
         $this->assertArrayHasKey('portfolio_links', $employerRoom);
         $this->assertArrayHasKey('screening_questions', $employerRoom);
 
         // 2. Get room details for candidate
-        $candidateRoom = \App\Services\VideoInterviewService::getRoomDetails(1, 'candidate');
+        $candidateRoom = \App\Services\VideoInterviewService::getRoomDetails($interviewId, 'candidate');
         $this->assertIsArray($candidateRoom, 'getRoomDetails for candidate must return an array');
         $this->assertArrayHasKey('jenny_ai_tips', $candidateRoom);
 

@@ -867,6 +867,8 @@ function coverLetterComponent() {
         },
 
         async downloadDocx() {
+            // Built from parts: a literal XML declaration would be read as a PHP open tag.
+            const XML_HEAD = '<' + '?xml version="1.0" encoding="UTF-8" standalone="yes"?' + '>';
             await this.loadScript(init.jszipUrl, 'JSZip');
             const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
             const run = (text, bold, color, size) =>
@@ -887,28 +889,28 @@ function coverLetterComponent() {
                 body += para(block, isEdge, i === blocks.length - 2 ? 320 : 200, isEdge ? '0F172A' : '334155');
             });
 
-            const documentXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+            const documentXml = XML_HEAD +
                 '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>' + body +
                 '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1300" w:right="1300" w:bottom="1300" w:left="1300" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr>' +
                 '</w:body></w:document>';
-            const stylesXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+            const stylesXml = XML_HEAD +
                 '<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr>' +
                 '<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:eastAsia="Calibri" w:cs="Calibri"/><w:sz w:val="22"/><w:szCs w:val="22"/><w:lang w:val="en-GB"/>' +
                 '</w:rPr></w:rPrDefault></w:docDefaults></w:styles>';
 
             const zip = new window.JSZip();
-            zip.file('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+            zip.file('[Content_Types].xml', XML_HEAD +
                 '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
                 '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
                 '<Default Extension="xml" ContentType="application/xml"/>' +
                 '<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>' +
                 '<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>' +
                 '</Types>');
-            zip.file('_rels/.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+            zip.file('_rels/.rels', XML_HEAD +
                 '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
                 '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>' +
                 '</Relationships>');
-            zip.file('word/_rels/document.xml.rels', '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+            zip.file('word/_rels/document.xml.rels', XML_HEAD +
                 '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
                 '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>' +
                 '</Relationships>');

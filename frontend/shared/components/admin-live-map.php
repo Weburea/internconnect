@@ -3,13 +3,30 @@ declare(strict_types=1);
 /**
  * Admin Live Visitors Map Component
  * Zoomable world map of current sessions with country and session breakdowns.
- * Reads every location from the /admin/api/live-sessions feed.
+ * Reads every location from a JSON feed (default /admin/api/live-sessions).
+ * Reusable: set $liveMap before including, e.g. for live interviews:
+ *   $liveMap = ['feed' => url('/admin/api/interviews/live-map'), 'title' => 'Live interviews', ...]
+ *
+ * @var array $liveMap  feed, title, subtitle, totalLabel, labelA, labelB, emptyText
  */
+$lm = array_merge([
+    'feed'       => url('/admin/api/live-sessions'),
+    'title'      => 'Live visitors',
+    'subtitle'   => 'Where people are using InternConnect right now',
+    'totalLabel' => 'online now',
+    'labelA'     => 'students',
+    'labelB'     => 'employers',
+    'emptyText'  => 'Nobody is online right now.',
+], $liveMap ?? []);
+$lmLabels = ['a' => $lm['labelA'], 'b' => $lm['labelB'], 'total' => $lm['totalLabel']];
+unset($liveMap);
 ?>
+<?php if (empty($GLOBALS['__adminLiveMapAssets'])): $GLOBALS['__adminLiveMapAssets'] = true; ?>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css">
 <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script>
-function adminLiveMap(feedUrl) {
+function adminLiveMap(feedUrl, labels) {
+    labels = labels || { a: 'students', b: 'employers', total: 'online' };
     // MapLibre objects stay outside Alpine state because reactive proxies break them
     let map = null;
     let popup = null;
@@ -43,14 +60,14 @@ function adminLiveMap(feedUrl) {
         root.appendChild(title);
 
         const detail = document.createElement('span');
-        detail.textContent = place.online.toLocaleString() + ' online · ' + place.students.toLocaleString() + ' students · ' + place.employers.toLocaleString() + ' employers';
+        detail.textContent = place.online.toLocaleString() + ' ' + labels.total + ' · ' + place.students.toLocaleString() + ' ' + labels.a + ' · ' + place.employers.toLocaleString() + ' ' + labels.b;
         root.appendChild(detail);
 
         return root;
     };
 
     return {
-        isSample: true,
+        isSample: false,
         total: 0,
         students: 0,
         employers: 0,
@@ -228,12 +245,13 @@ function adminLiveMap(feedUrl) {
     };
 }
 </script>
+<?php endif; ?>
 
-<section class="admin-card admin-live-card admin-fade-in admin-fade-in-3" x-data="adminLiveMap('<?= url('/admin/api/live-sessions') ?>')" aria-label="Live visitors map">
+<section class="admin-card admin-live-card admin-fade-in admin-fade-in-3" x-data="adminLiveMap(<?= htmlspecialchars(json_encode($lm['feed']), ENT_QUOTES, 'UTF-8') ?>, <?= htmlspecialchars(json_encode($lmLabels), ENT_QUOTES, 'UTF-8') ?>)" aria-label="<?= htmlspecialchars($lm['title']) ?> map">
     <div class="admin-card-header flex-wrap">
         <div class="admin-live-heading">
-            <h2 class="admin-card-title">Live visitors</h2>
-            <p class="admin-card-subtitle">Where people are using InternConnect right now</p>
+            <h2 class="admin-card-title"><?= htmlspecialchars($lm['title']) ?></h2>
+            <p class="admin-card-subtitle"><?= htmlspecialchars($lm['subtitle']) ?></p>
         </div>
         <span class="admin-live-source" x-show="isSample">Sample data</span>
     </div>
@@ -258,11 +276,11 @@ function adminLiveMap(feedUrl) {
                 <div class="admin-live-total-main">
                     <span class="admin-live-beacon"></span>
                     <span class="admin-live-total-value" x-text="total.toLocaleString()">0</span>
-                    <span class="admin-live-total-label">online now</span>
+                    <span class="admin-live-total-label"><?= htmlspecialchars($lm['totalLabel']) ?></span>
                 </div>
                 <div class="admin-live-total-split">
-                    <span><strong x-text="students.toLocaleString()">0</strong> students</span>
-                    <span><strong x-text="employers.toLocaleString()">0</strong> employers</span>
+                    <span><strong x-text="students.toLocaleString()">0</strong> <?= htmlspecialchars($lm['labelA']) ?></span>
+                    <span><strong x-text="employers.toLocaleString()">0</strong> <?= htmlspecialchars($lm['labelB']) ?></span>
                 </div>
             </div>
 
@@ -271,6 +289,7 @@ function adminLiveMap(feedUrl) {
                 <button type="button" class="admin-segmented-btn" :class="{ 'is-active': panelTab === 'sessions' }" @click="panelTab = 'sessions'">Sessions</button>
             </div>
 
+            <p class="admin-live-row-meta" x-show="total === 0" style="padding: 12px 4px; margin: 0;"><?= htmlspecialchars($lm['emptyText']) ?></p>
             <div class="admin-live-list" x-show="panelTab === 'countries'">
                 <template x-for="country in countries" :key="country.code">
                     <button type="button" class="admin-live-row" @click="focusCountry(country.code)">

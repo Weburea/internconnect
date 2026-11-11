@@ -23,6 +23,26 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## [Unreleased]
 
+- **Video room: shared screen controls, full screen, lobby selects; admin activity pagination** - 2026-11-11:
+  - Shared screen toolbar for both people: Hide people, Minimize (floating window / presenter pill), Expand, Full screen; presenter can preview their own screen; double-click toggles full screen.
+  - Full screen for the whole room from the control bar (native, with a fixed-overlay fallback); hides the side panel while active and restores it after.
+  - Lobby camera/microphone selects redesigned (device icon, inset chevron, hover/focus states).
+  - Admin Recent activity: filter chips (All, Joins, Screens & files, Room & admin) and 6 rows per page instead of one long list.
+
+- **Video interviews v2: sessions, timing, setup, files, Jenny AI, history, admin console** - 2026-11-11:
+  - Every scheduled interview is its own session and room (room id = `scheduled_interviews.id`); legacy demo rows are hidden, not deleted.
+  - Timing: room opens 10 min early, 30 min default length, warnings at 5 and 1 minute, a 1-minute wrap-up with a red countdown, then the call closes for both (also enforced by Daily room expiry).
+  - Employer interview setup on the schedule page (criteria, decision preset, questions, "Suggest with Jenny") drives the in-call scorecard; Jenny AI follow-up questions during the call; AI summary with suggested rating/decision after it (Gemini with rule-based fallback).
+  - Presenter view (no mirrored screen), file sharing in chat (PDF/Word/text/images, private storage), chat saved to history.
+  - History/report pages for employer, candidate and admin with audience rules; employer Interviews page gets Upcoming/History/Cancelled from real sessions.
+  - Admin: sessions table with filters and actions (view, mark ready, end, reopen, cancel), admin scheduling, live interview map (also on the overview), activity log with coloured badges, masked IP, city and device (MaxMind).
+  - Fixes: cover-letter.php `<?xml` inside PHP (breaks with short_open_tag), Gemini retired fallback model, leftover Google Meet copy.
+  - Spec: `docs/47-video-interviews.md`. Tests: `tests/Unit/VideoInterviewTest.php`.
+- **Video interviews: real Daily.co calls + admin controls** - 2026-11-11:
+  - The employer and candidate rooms were static mockups (stock photos, no Daily library, fake "60 FPS"). Replaced with one shared component (`frontend/shared/components/video-room.php`) using the Daily call object: real lobby (camera preview, mic meter, device pickers), video tiles, mute/camera/screen share, chat between both participants over Daily app-messages, network quality, leave / end for everyone, ended screens.
+  - `VideoInterviewService` now creates private rooms and per-person meeting tokens via the Daily REST API (employer = owner); the API key stays on the server. Scorecard upsert works on MySQL as well as SQLite.
+  - New admin console `/admin/interviews`: live presence, end/reopen rooms, platform video settings (enable, screen share, chat, max length), activity log.
+  - Spec and setup: `docs/47-video-interviews.md`. New tables in `database/schema_mysql.sql` (7b).
 - **Onboarding -> Profile Settings sync (Candidate + Employer)** - 2026-11-11:
   - Onboarding wizards now POST their answers on the final step (`/register/student/complete`, `/register/employer/complete`, multipart `data` JSON + files) and Profile Settings reads the same session keys, so everything entered at signup is visible and editable.
   - New `App\Services\UploadStorage` (resume, logo, business_doc): files saved under `storage/uploads/{kind}/` with random names, checked by extension, size, MIME and magic bytes; `storage/.htaccess` denies direct access. Served only via `/candidate/profile/resume`, `/employer/profile/logo`, `/employer/profile/business-doc`.

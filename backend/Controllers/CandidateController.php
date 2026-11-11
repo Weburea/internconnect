@@ -1208,14 +1208,16 @@ class CandidateController extends Controller
             'days_remaining'    => 3,
             'hours_remaining'   => 4,
             'minutes_remaining' => 15,
-            'meet_link'         => 'https://meet.google.com/abc-defg-hij',
-            'meet_code'         => 'meet.google.com/abc-defg-hij',
+            'id'                => 1,
+            'meet_link'         => url('/candidate/interview/room/1'),
+            'meet_code'         => 'InternConnect video room #1',
+            'meeting_type'      => 'virtual',
             'interviewer_name'  => 'Alex Chen',
             'interviewer_role'  => 'Senior Product Designer',
             'format_title'      => 'Portfolio Walkthrough (30m) + Q&A (15m)',
             'date'              => 'Oct 24, 2026',
             'time'              => '11:00 AM - 12:00 PM',
-            'platform'          => 'Google Meet',
+            'platform'          => 'InternConnect Video',
             'timezone'          => 'GMT+1 (West Africa Standard Time)',
 
             // What you submitted section (inspired by /apply/senior-product-design-intern)
@@ -1248,32 +1250,44 @@ class CandidateController extends Controller
             ]
         ];
 
-        // Merge active scheduled interview if set by employer
-        if (!empty($_SESSION['active_upcoming_interview'])) {
-            $sessInt = $_SESSION['active_upcoming_interview'];
-            if (!empty($sessInt['company_name'])) {
-                $interview['company'] = $sessInt['company_name'];
-            }
-            if (!empty($sessInt['candidate_role'])) {
-                $interview['role'] = $sessInt['candidate_role'];
-            }
-            if (!empty($sessInt['status'])) {
-                $interview['status'] = $sessInt['status'];
-            }
-            if (!empty($sessInt['interview_date'])) {
-                $interview['date'] = $sessInt['interview_date'];
-            }
-            if (!empty($sessInt['interview_time'])) {
-                $interview['time'] = $sessInt['interview_time'];
-            }
-            if (!empty($sessInt['meeting_link'])) {
-                $interview['meet_link'] = $sessInt['meeting_link'];
-                $interview['meet_code'] = str_replace(['https://', 'http://'], '', $sessInt['meeting_link']);
+        // Latest in-platform interview session for this candidate (each session has its own room).
+        $history = VideoInterviewService::sessions(['candidate_id' => 1, 'limit' => 20]);
+        $current = null;
+        foreach ($history as $sessionRow) {
+            if (!in_array($sessionRow['status'], ['Completed', 'Cancelled'], true)) {
+                $current = $sessionRow;
+                break;
             }
         }
-
+        if ($current) {
+            $detail = VideoInterviewService::getInterview((int)$current['id']);
+            $interview['company'] = $current['company_name'];
+            $interview['role'] = $current['candidate_role'];
+            $interview['status'] = $current['status'] === 'In progress' ? 'Live now' : 'Confirmed';
+            $interview['letter'] = strtoupper(substr($current['company_name'], 0, 1));
+            $interview['interviewer_name'] = $current['interviewer_name'];
+            $interview['date'] = $current['when'];
+            $interview['time'] = $current['when_time'] . ($detail && $detail['scheduled_at'] ? ' - ' . date('g:i A', $detail['scheduled_at'] + $detail['duration_min'] * 60) : '');
+            $interview['format_title'] = $current['duration_min'] . '-minute video interview';
+            if ($current['meeting_type'] === 'physical') {
+                $interview['meeting_type'] = 'physical';
+                $interview['meet_code'] = 'Office location shared by the employer';
+                $interview['platform'] = 'In person';
+            } else {
+                $interview['id'] = (int)$current['id'];
+                $interview['meet_link'] = url('/candidate/interview/room/' . (int)$current['id']);
+                $interview['meet_code'] = 'InternConnect video room #' . (int)$current['id'];
+            }
+            if ($detail && $detail['scheduled_at']) {
+                $left = max(0, $detail['scheduled_at'] - time());
+                $interview['days_remaining'] = intdiv($left, 86400);
+                $interview['hours_remaining'] = intdiv($left % 86400, 3600);
+                $interview['minutes_remaining'] = intdiv($left % 3600, 60);
+            }
+        }
         $this->renderView('candidate/interview/invite', [
-            'title'     => 'Upcoming Interview — Vanguard Design — InternConnect',
+            'title'     => 'Upcoming Interview — ' . $interview['company'] . ' — InternConnect',
+            'history'   => array_values(array_filter($history, static fn ($h) => in_array($h['status'], ['Completed', 'In progress'], true))),
             'candidate' => $candidate,
             'interview' => $interview,
         ], 'dashboard');
@@ -2242,7 +2256,7 @@ class CandidateController extends Controller
                     [
                         'id'     => 104,
                         'sender' => 'recruiter',
-                        'text'   => 'Wonderful. We just sent an interview invitation for Thursday at 10:00 AM via Google Meet. Looking forward to speaking!',
+                        'text'   => 'Wonderful. We just sent an interview invitation for Thursday at 10:00 AM in our InternConnect video room. Looking forward to speaking!',
                         'time'   => 'Yesterday, 10:35 AM',
                         'status' => 'read',
                     ],
