@@ -1739,6 +1739,51 @@ class EmployerController extends Controller
     }
 
     /**
+     * Join an in-platform interview room (AJAX). Returns Daily room URL + owner token.
+     * Route: POST /employer/interviews/room/{id}/join
+     */
+    public function joinInterviewRoom(array $params = []): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $interviewId = (int)($params['id'] ?? 0);
+        $room = VideoInterviewService::getRoomDetails($interviewId, 'employer');
+        $info = VideoInterviewService::joinInfo($interviewId, 'employer', $room['interviewer_name'] . ' (' . $room['company_name'] . ')');
+
+        header('Content-Type: application/json');
+        header('Cache-Control: no-store');
+        echo json_encode($info);
+        exit;
+    }
+
+    /**
+     * Log that the employer left the room (sendBeacon on page leave).
+     * Route: POST /employer/interviews/room/{id}/left
+     */
+    public function leftInterviewRoom(array $params = []): void
+    {
+        VideoInterviewService::logEvent((int)($params['id'] ?? 0), 'employer', 'left');
+        http_response_code(204);
+        exit;
+    }
+
+    /**
+     * End the interview for everyone (closes the Daily room).
+     * Route: POST /employer/interviews/room/{id}/end
+     */
+    public function endInterviewRoom(array $params = []): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $ok = VideoInterviewService::endRoom((int)($params['id'] ?? 0), 'employer');
+        header('Content-Type: application/json');
+        echo json_encode(['success' => $ok]);
+        exit;
+    }
+
+    /**
      * Save Interview Evaluation Scorecard API
      * Route: POST /api/interviews/room/score
      */

@@ -470,3 +470,4 @@ DB_PASSWORD=StrongProductionPassword123!
 ```
 
 The singleton connection manager in [`backend/Core/Database.php`](file:///c:/xampp/htdocs/InternConnect/backend/Core/Database.php) automatically initializes the requested driver with persistent connection options, error exception mode (`PDO::ERRMODE_EXCEPTION`), and default associative fetch modes.
+

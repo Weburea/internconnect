@@ -92,6 +92,8 @@ $router->get('/candidate/interview', [CandidateController::class, 'viewInterview
 $router->get('/candidate/interview/invite', [CandidateController::class, 'viewInterviewInvite']);
 $router->get('/candidate/interview/room', [CandidateController::class, 'interviewRoom']);
 $router->get('/candidate/interview/room/{id}', [CandidateController::class, 'interviewRoom']);
+$router->post('/candidate/interview/room/{id}/join', [CandidateController::class, 'joinInterviewRoom']);
+$router->post('/candidate/interview/room/{id}/left', [CandidateController::class, 'leftInterviewRoom']);
 $router->get('/candidate/interview/guide', [CandidateController::class, 'interviewGuide']);
 $router->get('/candidate/interview-guide', [CandidateController::class, 'interviewGuide']);
 $router->get('/candidate/interview/{slug}', [CandidateController::class, 'viewInterviewInvite']);
@@ -183,6 +185,9 @@ $router->post('/employer/interviews/schedule', [EmployerController::class, 'proc
 $router->get('/employer/interviews/room', [EmployerController::class, 'interviewRoom']);
 $router->get('/employer/interviews/room/{id}', [EmployerController::class, 'interviewRoom']);
 $router->post('/api/interviews/room/score', [EmployerController::class, 'saveInterviewScore']);
+$router->post('/employer/interviews/room/{id}/join', [EmployerController::class, 'joinInterviewRoom']);
+$router->post('/employer/interviews/room/{id}/left', [EmployerController::class, 'leftInterviewRoom']);
+$router->post('/employer/interviews/room/{id}/end', [EmployerController::class, 'endInterviewRoom']);
 
 // Employer 1-on-1 Messages
 $router->get('/employer/messages', [EmployerController::class, 'messages']);
@@ -236,6 +241,11 @@ $router->get('/admin/elearning', [AdminController::class, 'elearning']);
 $router->get('/admin/subscriptions', [AdminController::class, 'subscriptions']);
 $router->get('/admin/settings', [AdminController::class, 'settings']);
 $router->get('/admin/settings/team', [AdminController::class, 'settingsTeam']);
+$router->get('/admin/interviews', [AdminController::class, 'interviews']);
+$router->post('/admin/interviews/settings', [AdminController::class, 'saveInterviewSettings']);
+$router->post('/admin/interviews/{id}/end', [AdminController::class, 'endInterviewRoom']);
+$router->post('/admin/interviews/{id}/reopen', [AdminController::class, 'reopenInterviewRoom']);
+$router->get('/admin/api/interviews/presence', [AdminController::class, 'interviewPresence']);
 $router->get('/admin/document/stream', [AdminController::class, 'streamDocument']);
 $router->get('/admin/api/live-sessions', [AdminController::class, 'liveSessions']);
 

@@ -1324,6 +1324,35 @@ class CandidateController extends Controller
     }
 
     /**
+     * Join an in-platform interview room (AJAX). Returns Daily room URL + guest token.
+     * Route: POST /candidate/interview/room/{id}/join
+     */
+    public function joinInterviewRoom(array $params = []): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $interviewId = (int)($params['id'] ?? 0);
+        $name = $_SESSION['profile_name'] ?? VideoInterviewService::getRoomDetails($interviewId, 'candidate')['candidate_name'];
+        $info = VideoInterviewService::joinInfo($interviewId, 'candidate', $name . ' (Candidate)');
+
+        header('Content-Type: application/json');
+        header('Cache-Control: no-store');
+        echo json_encode($info);
+        exit;
+    }
+
+    /**
+     * Route: POST /candidate/interview/room/{id}/left
+     */
+    public function leftInterviewRoom(array $params = []): void
+    {
+        VideoInterviewService::logEvent((int)($params['id'] ?? 0), 'candidate', 'left');
+        http_response_code(204);
+        exit;
+    }
+
+    /**
      * Candidate Review Offer View
      * Displays the official offer letter and job description matching design specs.
      *

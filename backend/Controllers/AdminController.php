@@ -486,6 +486,80 @@ class AdminController extends Controller
     /**
      * Send visitors without an authenticated staff session to the sign-in screen.
      */
+    /**
+     * Video Interviews console: live rooms, platform video settings, end/reopen rooms.
+     * Route: GET /admin/interviews
+     */
+    public function interviews(): void
+    {
+        $this->requireAdminAuth();
+
+        $overview = \App\Services\VideoInterviewService::adminOverview();
+        $this->renderView('admin/interviews/index', [
+            'title'      => 'Video Interviews — InternConnect Admin',
+            'staff'      => $this->staffForView(),
+            'activeNav'  => 'interviews',
+            'settings'   => \App\Services\VideoInterviewService::settings(),
+            'configured' => \App\Services\VideoInterviewService::isConfigured(),
+            'rooms'      => $overview['rooms'],
+            'events'     => $overview['events'],
+            'evaluations'=> $overview['evaluations'],
+        ], 'admin');
+    }
+
+    /** POST /admin/interviews/settings */
+    public function saveInterviewSettings(): void
+    {
+        $this->requireAdminAuth();
+        $input = json_decode((string)file_get_contents('php://input'), true) ?: $_POST;
+        $saved = \App\Services\VideoInterviewService::saveSettings($input);
+        \App\Services\VideoInterviewService::logEvent(0, 'admin', 'settings_updated', json_encode($saved));
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'settings' => $saved]);
+        exit;
+    }
+
+    /** POST /admin/interviews/{id}/end */
+    public function endInterviewRoom(array $params = []): void
+    {
+        $this->requireAdminAuth();
+        $ok = \App\Services\VideoInterviewService::endRoom((int)($params['id'] ?? 0), 'admin');
+        header('Content-Type: application/json');
+        echo json_encode(['success' => $ok]);
+        exit;
+    }
+
+    /** POST /admin/interviews/{id}/reopen */
+    public function reopenInterviewRoom(array $params = []): void
+    {
+        $this->requireAdminAuth();
+        $ok = \App\Services\VideoInterviewService::reopenRoom((int)($params['id'] ?? 0));
+        header('Content-Type: application/json');
+        echo json_encode(['success' => $ok]);
+        exit;
+    }
+
+    /** GET /admin/api/interviews/presence — who is in which room right now */
+    public function interviewPresence(): void
+    {
+        $this->requireAdminAuth();
+        header('Content-Type: application/json');
+        header('Cache-Control: no-store');
+        echo json_encode(['success' => true, 'presence' => \App\Services\VideoInterviewService::presence(), 'at' => date('c')]);
+        exit;
+    }
+
+    /** Signed-in staff card used by admin layouts. */
+    private function staffForView(): array
+    {
+        return [
+            'name'                => $_SESSION['admin_name'] ?? 'Jayden Okafor',
+            'role'                => $_SESSION['admin_role'] ?? 'Platform Admin',
+            'initials'            => $_SESSION['admin_initials'] ?? 'JO',
+            'email'               => $_SESSION['admin_email'] ?? 'jayden.okafor@internconnect.ng',
+            'notifications_count' => 3,
+        ];
+    }
     protected function requireAdminAuth(): void
     {
         if (session_status() === PHP_SESSION_NONE) {
