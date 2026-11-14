@@ -1061,7 +1061,7 @@ function candidateProfileSettings() {
                                 </div>
                                 <div class="db-auth-details">
                                     <span class="db-auth-label">Primary Login Email</span>
-                                    <span class="db-auth-val" title="<?= htmlspecialchars($candidate['email'] ?? 'sarah.peters@design-intern.com') ?>">
+                                    <span class="db-auth-val" aria-label="<?= htmlspecialchars($candidate['email'] ?? 'sarah.peters@design-intern.com') ?>">
                                         <?= htmlspecialchars($candidate['email'] ?? 'sarah.peters@design-intern.com') ?>
                                     </span>
                                 </div>
@@ -1087,7 +1087,7 @@ function candidateProfileSettings() {
                                 </div>
                                 <div class="db-auth-details">
                                     <span class="db-auth-label">Google Authentication</span>
-                                    <span class="db-auth-val" title="<?= htmlspecialchars($candidate['google_email'] ?? 'sarah.peters@gmail.com') ?>">
+                                    <span class="db-auth-val" aria-label="<?= htmlspecialchars($candidate['google_email'] ?? 'sarah.peters@gmail.com') ?>">
                                         <?= htmlspecialchars($candidate['google_email'] ?? 'sarah.peters@gmail.com') ?>
                                     </span>
                                 </div>

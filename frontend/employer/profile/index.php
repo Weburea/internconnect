@@ -561,7 +561,7 @@ function employerProfileSettings() {
                                             </svg>
                                             <span>View Doc</span>
                                         </button>
-                                        <button type="button" @click="triggerCacInput" class="db-file-action-btn" title="Replace document">
+                                        <button type="button" @click="triggerCacInput" class="db-file-action-btn" aria-label="Replace document">
                                             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                             </svg>
@@ -936,7 +936,7 @@ function employerProfileSettings() {
                                 </div>
                                 <div class="db-auth-details">
                                     <span class="db-auth-label">Primary Login Email</span>
-                                    <span class="db-auth-val" title="<?= htmlspecialchars($employer['email'] ?? 'careers@techflow.io') ?>">
+                                    <span class="db-auth-val" aria-label="<?= htmlspecialchars($employer['email'] ?? 'careers@techflow.io') ?>">
                                         <?= htmlspecialchars($employer['email'] ?? 'careers@techflow.io') ?>
                                     </span>
                                 </div>
@@ -962,7 +962,7 @@ function employerProfileSettings() {
                                 </div>
                                 <div class="db-auth-details">
                                     <span class="db-auth-label">Google Workspace OAuth</span>
-                                    <span class="db-auth-val" title="<?= htmlspecialchars($employer['google_email'] ?? 'techflow.official@gmail.com') ?>">
+                                    <span class="db-auth-val" aria-label="<?= htmlspecialchars($employer['google_email'] ?? 'techflow.official@gmail.com') ?>">
                                         <?= htmlspecialchars($employer['google_email'] ?? 'techflow.official@gmail.com') ?>
                                     </span>
                                 </div>
@@ -1183,7 +1183,7 @@ function employerProfileSettings() {
                                         <form action="<?= url('/employer/profile') ?>" method="POST" style="position: absolute; top: 4px; right: 4px; margin: 0;">
                                             <input type="hidden" name="action" value="delete_gallery_photo">
                                             <input type="hidden" name="photo_index" value="<?= $gIdx ?>">
-                                            <button type="submit" style="width: 24px; height: 24px; border-radius: 50%; background: rgba(15, 23, 42, 0.75); color: #FFFFFF; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s;" title="Remove Photo" onmouseover="this.style.background='#DC2626'" onmouseout="this.style.background='rgba(15, 23, 42, 0.75)'">
+                                            <button type="submit" style="width: 24px; height: 24px; border-radius: 50%; background: rgba(15, 23, 42, 0.75); color: #FFFFFF; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s;" aria-label="Remove Photo" onmouseover="this.style.background='#DC2626'" onmouseout="this.style.background='rgba(15, 23, 42, 0.75)'">
                                                 <svg style="width: 12px; height: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                                 </svg>

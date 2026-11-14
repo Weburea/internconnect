@@ -1,5 +1,8 @@
 # Phase Planning: Testing Architecture, REST API Design, Swagger & Security Audit
 
+> **Status 2026-11-12**: sections 1-4 are implemented. See `docs/51-api-and-security.md` for what was built (PHPUnit 11 + route crawler, `/api/v1` with JWT, Swagger UI at `/admin/api-docs`, security controls) and what is planned for the MySQL phase. Section 5 (Daily.co) is live per docs/47; section 6 (Gemini) per docs/09 and docs/49.
+
+
 **InternConnect Engineering Specification**  
 **Document ID:** `docs/45-testing-api-architecture-and-audit-plan.md`  
 **Status:** Architecture Blueprint (Ready for Inspection & Implementation)  

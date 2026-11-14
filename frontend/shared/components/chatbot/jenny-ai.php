@@ -21,6 +21,11 @@ declare(strict_types=1);
  * - Modes: 'ai' (Default platform-wide) and 'support' (Help Center)
  */
 
+// The AI Assistant chat page is itself a full Jenny workspace: no floating widget on top of it.
+if (str_contains((string)parse_url((string)($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH), '/candidate/ai-assistant/chat')) {
+    return;
+}
+
 $userRole = $_SESSION['user_role'] ?? 'candidate';
 $sessionName = $_SESSION['profile_name'] ?? ($candidate['name'] ?? 'Sarah Peters');
 $candFirstName = explode(' ', trim($sessionName))[0];
@@ -39,300 +44,243 @@ $wavingImg      = asset('assets/images/jenny_ai/jenny_ai_hi.png');
 $thinkingImg    = asset('assets/images/jenny_ai/Thinking_jenny_ai.png');
 $pointingImg    = asset('assets/images/jenny_ai/Pointing_jenny_ai.png');
 $fullBodyImg    = asset('assets/images/jenny_ai/Full-body_standing_pose_jenny_ai.png');
+
+// Widget settings for icJennyWidget() (docs/55-jenny-ai-chat.md).
+$jennyCfg = [
+    'endpoint'    => url('/jenny/chat'),
+    'signedIn'    => !empty($_SESSION['is_logged_in']),
+    'persona'     => $initialPersona,
+    'mode'        => $isHelpRoute ? 'support' : 'ai',
+    'firstName'   => $candFirstName,
+    'loginUrl'    => url('/login'),
+    'registerUrl' => url('/register/student'),
+    'pricingUrl'  => url('/pricing'),
+    'coinImg'     => url('assets/images/jenny-coin.svg'),
+    'coins'       => (static function () {
+        $w = \App\Services\JennyService::wallet(\App\Services\JennyService::actor('widget'));
+        return $w ? \App\Services\JennyService::coinState(\App\Services\PlanService::coins($w[0], $w[1])) : null;
+    })(),
+];
 ?>
 
-<div id="ic-jenny-ai-widget" 
-     x-data="{
+<script>
+/**
+ * Jenny chat widget logic (docs/55-jenny-ai-chat.md). Talks to POST /jenny/chat (Google Gemini,
+ * rule-based fallback). Keeps the conversation for this browser tab in sessionStorage.
+ * Voice input: Web Speech API (speech-to-text) where the browser supports it.
+ */
+window.icJennyWidget = window.icJennyWidget || function (cfg) {
+    const STORE = 'icJennyChat:v1';
+    const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const now = () => new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    return {
         isOpen: false,
         isMinimized: false,
-        unreadCount: 3,
-        mode: '<?= $isHelpRoute ? 'support' : 'ai' ?>',
-        persona: '<?= $initialPersona ?>',
+        unreadCount: 0,
+        mode: cfg.mode,
+        persona: cfg.persona,
         screen: 'welcome',
         inputText: '',
         isTyping: false,
         messages: [],
-        
-        // CV Flow States (Job Seeker)
-        uploadProgress: 0,
-        uploadDone: false,
-        cvAccepted: false,
-        appliedSuggestions: [],
-
-        // Recruiter Flow States
-        selectedTimeSlot: '10:30 AM',
-        interviewConfirmed: false,
+        conversation: null,
+        file: null,
+        signedIn: cfg.signedIn,
+        listening: false,
+        voiceSupported: !!Recognition,
+        recognizer: null,
+        coins: cfg.coins,
+        cfg: cfg,
+        // Kept for the older scripted cards in the template (no longer triggered).
+        uploadProgress: 0, uploadDone: false, cvAccepted: false, appliedSuggestions: [], selectedTimeSlot: '10:30 AM', interviewConfirmed: false,
 
         init() {
-            if (this.mode === 'support') {
-                this.messages = [
-                    {
-                        id: 1,
-                        sender: 'bot',
-                        pose: 'waving',
-                        text: 'Hi <?= htmlspecialchars($candFirstName) ?>! I\'m Jenny from Student Support. How can I help with your account or applications today?',
-                        time: '10:24 AM'
-                    }
-                ];
+            try {
+                const saved = JSON.parse(sessionStorage.getItem(STORE) || 'null');
+                if (saved && saved.messages && saved.messages.length) {
+                    this.messages = saved.messages.slice(-30);
+                    this.conversation = saved.conversation || null;
+                    this.persona = saved.persona || this.persona;
+                    this.screen = 'chat';
+                }
+            } catch (e) {}
+            if (!this.messages.length && this.mode === 'support') {
+                this.messages = [{ id: 1, sender: 'bot', text: 'Hi ' + cfg.firstName + '! I am Jenny from InternConnect Support. How can I help with your account or applications today?', time: now() }];
             }
         },
-
-        openChat() {
+        save() {
+            try { sessionStorage.setItem(STORE, JSON.stringify({ conversation: this.conversation, persona: this.persona, messages: this.messages.slice(-30) })); } catch (e) {}
+        },
+        openChat(prompt) {
             this.isOpen = true;
             this.isMinimized = false;
             this.unreadCount = 0;
             this.scrollToBottom();
+            if (prompt && typeof prompt === 'string') { this.ask(prompt); }
+            this.$nextTick(() => { const i = this.$refs.jennyInput; if (i && window.innerWidth > 640) i.focus(); });
         },
-
-        closeChat() {
-            this.isOpen = false;
+        closeChat() { this.isOpen = false; this.stopVoice(); },
+        minimizeChat() { this.isMinimized = !this.isMinimized; },
+        setPersona(p) {
+            if (p === this.persona) return;
+            this.persona = p;
+            this.newChat();
         },
-
-        minimizeChat() {
-            this.isMinimized = !this.isMinimized;
-        },
-
-        togglePersona() {
-            this.persona = (this.persona === 'jobseeker' ? 'recruiter' : 'jobseeker');
-            this.screen = 'welcome';
+        togglePersona() { this.setPersona(this.persona === 'jobseeker' ? 'recruiter' : 'jobseeker'); },
+        newChat() {
             this.messages = [];
-            this.appliedSuggestions = [];
-            this.cvAccepted = false;
-            this.interviewConfirmed = false;
-            this.scrollToBottom();
+            this.conversation = null;
+            this.screen = 'welcome';
+            this.file = null;
+            this.save();
         },
-
-        triggerAction(actionKey) {
+        triggerAction(key) {
+            const prompts = {
+                update_cv: 'Help me improve my CV for internship applications.',
+                find_internships: 'Find internship opportunities that suit me.',
+                interview_prep: 'Help me prepare for an internship interview.',
+                track_applications: 'How do I track my applications on InternConnect?',
+                shortlist_candidates: 'How do I shortlist the best candidates for my internship?',
+                schedule_interview: 'How do I schedule a video interview with a candidate?',
+                draft_job_post: 'Help me write a good internship job post.',
+                compare_applicants: 'How can I compare applicants for the same role?'
+            };
+            this.ask(prompts[key] || key);
+        },
+        pickFile(ev) {
+            const f = ev.target.files && ev.target.files[0];
+            ev.target.value = '';
+            if (!f) return;
+            if (!this.signedIn) { this.botSays('Sign in to share files with me. I can then read your CV or documents and give feedback.', [{ label: 'Sign in', url: cfg.loginUrl }]); return; }
+            if (f.size > 8 * 1024 * 1024) { this.botSays('That file is larger than 8 MB. Please choose a smaller PDF, Word, text or image file.'); return; }
+            this.file = f;
+        },
+        coinText() {
+            const c = this.coins;
+            if (!c) return '';
+            if (c.unlimited) return 'Unlimited';
+            return c.balance + '/' + c.allowance;
+        },
+        coinHint() {
+            const c = this.coins;
+            if (!c || c.unlimited) return 'Jenny Coins: unlimited on your plan';
+            const wait = c.refills_in ? ' Refills in ' + this.dur(c.refills_in) + '.' : ' Refills ' + c.refill_hours + 'h after you start using them.';
+            return c.balance + ' of ' + c.allowance + ' Jenny Coins left.' + wait + ' 1 coin per answer, 2 with a file.';
+        },
+        dur(sec) { const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60); return (h ? h + 'h ' : '') + (m || !h ? m + 'm' : ''); },
+        fileSize(n) { return n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB'; },
+        sendMessage() { this.ask(this.inputText); },
+        botSays(text, links) {
             this.screen = 'chat';
-            if (actionKey === 'update_cv') {
-                this.messages.push({
-                    id: Date.now(),
-                    sender: 'user',
-                    text: 'Update my CV',
-                    time: '10:25 AM'
-                });
-                this.isTyping = true;
-                this.scrollToBottom();
-
-                setTimeout(() => {
-                    this.isTyping = false;
-                    this.messages.push({
-                        id: Date.now() + 1,
-                        sender: 'bot',
-                        pose: 'pointing',
-                        text: 'Great! Please upload your CV or paste your details, and I\'ll help you optimize it.',
-                        time: '10:26 AM',
-                        specialType: 'upload_card'
-                    });
-                    this.simulateUpload();
-                    this.scrollToBottom();
-                }, 800);
-            } else if (actionKey === 'find_internships') {
-                this.messages.push({
-                    id: Date.now(),
-                    sender: 'user',
-                    text: 'I want to find internship opportunities in tech.',
-                    time: '10:26 AM'
-                });
-                this.isTyping = true;
-                this.scrollToBottom();
-
-                setTimeout(() => {
-                    this.isTyping = false;
-                    this.messages.push({
-                        id: Date.now() + 1,
-                        sender: 'bot',
-                        pose: 'waving',
-                        text: 'Great! Here are some top internship opportunities in tech right now. Would you like me to show you the latest openings or help you filter by location or skills?',
-                        time: '10:27 AM',
-                        specialType: 'internship_suggestions'
-                    });
-                    this.scrollToBottom();
-                }, 900);
-            } else if (actionKey === 'shortlist_candidates') {
-                this.messages.push({
-                    id: Date.now(),
-                    sender: 'user',
-                    text: 'Shortlist top candidates for Product Design',
-                    time: '10:16 AM'
-                });
-                this.isTyping = true;
-                this.scrollToBottom();
-
-                setTimeout(() => {
-                    this.isTyping = false;
-                    this.messages.push({
-                        id: Date.now() + 1,
-                        sender: 'bot',
-                        pose: 'pointing',
-                        text: 'Here are 3 top candidates based on your criteria:',
-                        time: '10:17 AM',
-                        specialType: 'candidate_shortlist'
-                    });
-                    this.scrollToBottom();
-                }, 1000);
-            } else if (actionKey === 'schedule_interview') {
-                this.messages.push({
-                    id: Date.now(),
-                    sender: 'user',
-                    text: 'Schedule interview with Chinonso Eze',
-                    time: '10:19 AM'
-                });
-                this.isTyping = true;
-                this.scrollToBottom();
-
-                setTimeout(() => {
-                    this.isTyping = false;
-                    this.messages.push({
-                        id: Date.now() + 1,
-                        sender: 'bot',
-                        pose: 'pointing',
-                        text: 'Here are available time slots for an online interview with Chinonso:',
-                        time: '10:20 AM',
-                        specialType: 'schedule_card'
-                    });
-                    this.scrollToBottom();
-                }, 800);
-            }
-        },
-
-        simulateUpload() {
-            this.uploadProgress = 15;
-            this.uploadDone = false;
-            const timer = setInterval(() => {
-                if (this.uploadProgress < 75) {
-                    this.uploadProgress += 30;
-                } else if (this.uploadProgress < 100) {
-                    this.uploadProgress = 100;
-                    this.uploadDone = true;
-                    clearInterval(timer);
-                    this.showCvReviewCard();
-                }
-            }, 600);
-        },
-
-        showCvReviewCard() {
-            setTimeout(() => {
-                this.messages.push({
-                    id: Date.now(),
-                    sender: 'bot',
-                    pose: 'pointing',
-                    text: 'I have analyzed your resume against current high-demand internship criteria:',
-                    time: '10:28 AM',
-                    specialType: 'cv_review_card'
-                });
-                this.scrollToBottom();
-            }, 800);
-        },
-
-        applySuggestion(idx) {
-            if (!this.appliedSuggestions.includes(idx)) {
-                this.appliedSuggestions.push(idx);
-            }
-            if (this.appliedSuggestions.length >= 2 && !this.messages.some(m => m.specialType === 'before_after_card')) {
-                setTimeout(() => {
-                    this.messages.push({
-                        id: Date.now(),
-                        sender: 'bot',
-                        pose: 'pointing',
-                        text: 'Here is your improved experience section preview:',
-                        time: '10:30 AM',
-                        specialType: 'before_after_card'
-                    });
-                    this.scrollToBottom();
-                }, 700);
-            }
-        },
-
-        acceptImprovedCv() {
-            this.cvAccepted = true;
-            this.messages.push({
-                id: Date.now(),
-                sender: 'user',
-                text: 'Accept Changes',
-                time: '10:31 AM'
-            });
-            this.isTyping = true;
-            this.scrollToBottom();
-
-            setTimeout(() => {
-                this.isTyping = false;
-                this.messages.push({
-                    id: Date.now() + 1,
-                    sender: 'bot',
-                    pose: 'waving',
-                    text: 'Your CV is updated. Want me to match you with top internship openings now?',
-                    time: '10:31 AM',
-                    specialType: 'cv_success_card'
-                });
-                this.scrollToBottom();
-            }, 900);
-        },
-
-        confirmInterview() {
-            this.interviewConfirmed = true;
-            this.messages.push({
-                id: Date.now(),
-                sender: 'bot',
-                pose: 'waving',
-                text: 'Interview confirmed for Tuesday, 18 Nov at ' + this.selectedTimeSlot + '. Calendar invites sent to both parties!',
-                time: '10:21 AM'
-            });
+            this.messages.push({ id: Date.now() + Math.random(), sender: 'bot', text: text, links: links || [], listings: [], time: now() });
+            this.save();
             this.scrollToBottom();
         },
-
-        sendMessage() {
-            const text = this.inputText.trim();
-            if (!text) return;
-
+        async ask(raw) {
+            const text = String(raw || '').trim();
+            if ((!text && !this.file) || this.isTyping) return;
             this.screen = 'chat';
-            this.messages.push({
-                id: Date.now(),
-                sender: 'user',
-                text: text,
-                time: 'Just now'
-            });
+            const file = this.file;
+            this.messages.push({ id: Date.now(), sender: 'user', text: text || 'Please review the attached file.', file: file ? { name: file.name, size: file.size } : null, time: now() });
             this.inputText = '';
+            this.file = null;
             this.isTyping = true;
             this.scrollToBottom();
-
-            setTimeout(() => {
-                this.isTyping = false;
-                let reply = 'I\'m processing that for you right now. You can also explore our quick career shortcuts.';
-                let pose = 'waving';
-                const lower = text.toLowerCase();
-
-                if (lower.includes('cv') || lower.includes('resume')) {
-                    reply = 'I can optimize your CV to boost recruiter visibility by up to 60%. Click \'Update my CV\' to begin!';
-                    pose = 'pointing';
-                } else if (lower.includes('interview')) {
-                    reply = 'Need interview prep? I can run mock behavioral and technical questions tailored to your field.';
-                    pose = 'pointing';
-                } else if (lower.includes('intern') || lower.includes('job')) {
-                    reply = 'We currently have 450+ verified internship opportunities open across Nigeria. Would you like to view tech or finance roles?';
-                    pose = 'waving';
+            let body, headers = { 'Accept': 'application/json' };
+            if (file) {
+                body = new FormData();
+                body.append('message', text);
+                body.append('persona', this.persona);
+                body.append('page', location.pathname);
+                if (this.conversation) body.append('conversation', this.conversation);
+                body.append('file', file);
+            } else {
+                headers['Content-Type'] = 'application/json';
+                body = JSON.stringify({ message: text, persona: this.persona, page: location.pathname, conversation: this.conversation });
+            }
+            try {
+                const res = await fetch(cfg.endpoint, { method: 'POST', headers: headers, body: body, credentials: 'same-origin' });
+                const data = await res.json().catch(() => ({}));
+                if (data.coins) this.coins = data.coins;
+                if (data.success) {
+                    this.conversation = data.conversation;
+                    this.messages.push({ id: Date.now() + 1, sender: 'bot', text: data.reply, links: data.links || [], listings: data.listings || [], time: now() });
+                    if (!this.isOpen) this.unreadCount++;
+                } else {
+                    if (data.code === 'chat_full') this.conversation = null;
+                    const links = data.upgrade ? [{ label: 'See plans', url: data.upgrade_url || cfg.pricingUrl }] : (data.code === 'visitor_limit' ? [{ label: 'Create a free account', url: cfg.registerUrl }] : []);
+                    this.messages.push({ id: Date.now() + 1, sender: 'bot', text: data.error || 'Sorry, I could not answer that just now. Please try again.', links: links, listings: [], time: now(), isError: true });
                 }
-
-                this.messages.push({
-                    id: Date.now() + 1,
-                    sender: 'bot',
-                    pose: pose,
-                    text: reply,
-                    time: 'Just now'
-                });
-                this.scrollToBottom();
-            }, 1100);
+            } catch (e) {
+                this.messages.push({ id: Date.now() + 1, sender: 'bot', text: 'I could not reach the server. Check your connection and try again.', links: [], listings: [], time: now(), isError: true });
+            }
+            this.isTyping = false;
+            this.save();
+            this.scrollToBottom();
         },
-
+        // Safe formatting for Jenny's replies: escape first, then **bold**, bullets and line breaks.
+        format(text) {
+            const lines = esc(text || '').split(/\n/);
+            let html = '', inList = false;
+            lines.forEach((line) => {
+                const t = line.trim();
+                const bullet = /^[-*]\s+/.test(t) || /^\d+[.)]\s+/.test(t);
+                if (bullet) {
+                    if (!inList) { html += '<ul class=\'jenny-md-list\'>'; inList = true; }
+                    html += '<li>' + t.replace(/^([-*]|\d+[.)])\s+/, '') + '</li>';
+                } else {
+                    if (inList) { html += '</ul>'; inList = false; }
+                    html += t === '' ? '<span class=\'jenny-md-gap\'></span>' : t + '<br>';
+                }
+            });
+            if (inList) html += '</ul>';
+            return html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/(<br>)+$/, '');
+        },
+        startVoice() {
+            if (!Recognition) return;
+            if (this.listening) { this.stopVoice(); return; }
+            const r = new Recognition();
+            r.lang = 'en-NG';
+            r.interimResults = true;
+            r.maxAlternatives = 1;
+            this.recognizer = r;
+            this.listening = true;
+            let finalText = '';
+            r.onresult = (e) => {
+                let interim = '';
+                for (let i = e.resultIndex; i < e.results.length; i++) {
+                    if (e.results[i].isFinal) finalText += e.results[i][0].transcript; else interim += e.results[i][0].transcript;
+                }
+                this.inputText = (finalText + interim).trim();
+            };
+            r.onerror = (e) => {
+                this.listening = false;
+                if (e.error === 'not-allowed' || e.error === 'service-not-allowed') this.botSays('Microphone access is blocked. Allow the microphone for this site in your browser settings to talk to me.');
+            };
+            r.onend = () => {
+                this.listening = false;
+                if (finalText.trim()) this.ask(finalText.trim());
+            };
+            try { r.start(); } catch (e) { this.listening = false; }
+        },
+        stopVoice() { if (this.recognizer) { try { this.recognizer.stop(); } catch (e) {} } this.listening = false; },
+        applySuggestion() {}, acceptImprovedCv() {}, confirmInterview() { this.interviewConfirmed = true; }, simulateUpload() {}, showCvReviewCard() {},
         scrollToBottom() {
             this.$nextTick(() => {
                 const el = this.$refs.chatScroll;
                 if (el) el.scrollTop = el.scrollHeight;
             });
         }
-     }"
-     @open-jenny-ai.window="openChat();"
-     @open-support-chat.window="mode = 'support'; openChat();"
+    };
+};
+</script>
+
+<div id="ic-jenny-ai-widget"
+     x-data="icJennyWidget(<?= htmlspecialchars(json_encode($jennyCfg, JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8') ?>)"
+     @open-jenny-ai.window="openChat($event.detail && $event.detail.prompt)"
+     @open-jenny-chat.window="openChat($event.detail && $event.detail.prompt)"
+     @open-support-chat.window="mode = 'support'; openChat($event.detail && $event.detail.prompt)"
      class="jenny-ai-root">
 
     <style>
@@ -1242,6 +1190,44 @@ $fullBodyImg    = asset('assets/images/jenny_ai/Full-body_standing_pose_jenny_ai
     .jenny-powered-tag svg {
         flex-shrink: 0;
     }
+    /* ─── Jenny on Gemini (2026-11-12): persona toggle, formatted replies, links, files, voice ─── */
+    .jenny-persona-seg { display: inline-flex; background: #E2E8F0; border-radius: 999px; padding: 3px; gap: 2px; }
+    .jenny-persona-seg button { display: inline-flex; align-items: center; gap: 5px; border: 0; background: transparent; color: #475569; font-family: inherit; font-size: 12px; font-weight: 600; line-height: 1; padding: 6px 11px; border-radius: 999px; cursor: pointer; white-space: nowrap; }
+    .jenny-persona-seg button.is-active { background: #FFFFFF; color: #000623; box-shadow: 0 1px 3px rgba(15, 23, 42, .12); }
+    .jenny-persona-seg button svg { flex-shrink: 0; }
+    .jenny-newchat-btn { display: inline-flex; align-items: center; gap: 4px; border: 0; background: transparent; color: #4F48E6; font-family: inherit; font-size: 12px; font-weight: 700; line-height: 1; cursor: pointer; padding: 6px 4px; white-space: nowrap; flex-shrink: 0; }
+    .jenny-md strong { font-weight: 700; }
+    .jenny-md-list { margin: 4px 0 4px; padding-left: 18px; list-style: disc; }
+    .jenny-md-list li { margin: 2px 0; }
+    .jenny-md-gap { display: block; height: 6px; }
+    .jenny-bubble.is-error { background: #FEF2F2 !important; color: #991B1B !important; }
+    .jenny-extras { margin: 6px 0 4px 36px; display: flex; flex-direction: column; gap: 6px; max-width: calc(100% - 36px); }
+    .jenny-listing-card { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border: 1px solid #E2E8F0; border-radius: 12px; background: #FFFFFF; text-decoration: none; transition: border-color .15s ease; }
+    .jenny-listing-card:hover { border-color: #4F48E6; }
+    .jenny-listing-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .jenny-listing-top strong { font-size: 13px; color: #000623; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .jenny-premium-tag { flex-shrink: 0; font-size: 9.5px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; color: #FFFFFF; background: #000623; padding: 2px 7px; border-radius: 999px; }
+    .jenny-listing-meta { font-size: 11.5px; color: #64748B; }
+    .jenny-listing-pay { font-size: 12px; font-weight: 700; color: #4F48E6; }
+    .jenny-link-row { display: flex; flex-wrap: wrap; gap: 6px; }
+    .jenny-link-chip { display: inline-flex; align-items: center; padding: 6px 11px; border-radius: 999px; background: #EEF0FF; color: #4F48E6; font-size: 12px; font-weight: 700; text-decoration: none; }
+    .jenny-link-chip:hover { background: #E0E3FF; }
+    .jenny-file-chip { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; padding: 7px 10px; background: #EEF0FF; color: #312E81; border-radius: 10px; font-size: 12px; min-width: 0; }
+    .jenny-file-chip .jenny-file-name { font-weight: 700; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+    .jenny-file-chip .jenny-file-size { color: #6366F1; flex-shrink: 0; }
+    .jenny-file-chip button { border: 0; background: transparent; color: #4F48E6; cursor: pointer; display: flex; padding: 2px; }
+    .jenny-file-chip.in-bubble { margin: 6px 0 0; background: rgba(255, 255, 255, .18); color: inherit; }
+    .jenny-mic-btn { width: 32px; height: 32px; border-radius: 50%; border: 0; background: transparent; color: #64748B; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+    .jenny-mic-btn:hover { color: #4F48E6; }
+    .jenny-mic-btn.is-listening { background: #4F48E6; color: #FFFFFF; animation: jennyPulse 1.2s ease-in-out infinite; }
+    .jenny-input-form.is-listening { border-color: #4F48E6; }
+    .jenny-coin-chip { position: relative; display: inline-flex; align-items: center; gap: 5px; margin-left: auto; padding: 3px 9px 3px 4px; border-radius: 999px; background: #FFFBEB; border: 1px solid #FDE68A; font-size: 12px; font-weight: 800; color: #92400E; white-space: nowrap; cursor: default; }
+    .jenny-coin-chip img { width: 18px; height: 18px; display: block; }
+    .jenny-coin-tip { display: none; position: absolute; right: 0; top: calc(100% + 6px); width: 220px; white-space: normal; background: #000623; color: #FFFFFF; font-size: 11.5px; font-weight: 500; line-height: 1.45; padding: 8px 10px; border-radius: 10px; z-index: 5; box-shadow: 0 10px 25px -10px rgba(0, 6, 35, .5); }
+    .jenny-coin-chip:hover .jenny-coin-tip, .jenny-coin-chip:focus-within .jenny-coin-tip { display: block; }
+    .jenny-control-btn.is-on { background: #4F48E6; }
+    @keyframes jennyPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(79, 72, 230, .45); } 50% { box-shadow: 0 0 0 6px rgba(79, 72, 230, 0); } }
+    @media (prefers-reduced-motion: reduce) { .jenny-mic-btn.is-listening { animation: none; } }
     </style>
 
     <!-- ════ 1. FLOATING LAUNCHER BUTTON ════ -->
@@ -1265,7 +1251,7 @@ $fullBodyImg    = asset('assets/images/jenny_ai/Full-body_standing_pose_jenny_ai
             <div class="jenny-header-left">
                 <div class="jenny-avatar-wrap">
                     <img src="<?= $iconBadgeImg ?>" alt="Jenny AI">
-                    <span class="jenny-online-dot" title="Online"></span>
+                    <span class="jenny-online-dot" aria-hidden="true"></span>
                 </div>
                 <div class="jenny-header-text">
                     <div class="jenny-header-title-row">
@@ -1290,26 +1276,24 @@ $fullBodyImg    = asset('assets/images/jenny_ai/Full-body_standing_pose_jenny_ai
 
         <!-- Role / Persona Banner & Switcher (Job Seeker vs Recruiter - No Emojis, Clean SVGs) -->
         <div class="jenny-role-pill-bar" x-show="!isMinimized">
-            <div class="jenny-role-tag">
-                <template x-if="persona === 'jobseeker'">
-                    <span style="display: inline-flex; align-items: center; gap: 6px;">
-                        <svg class="jenny-role-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                        <span>Job Seeker (<?= htmlspecialchars($jobSeekerName) ?>)</span>
-                    </span>
-                </template>
-                <template x-if="persona === 'recruiter'">
-                    <span style="display: inline-flex; align-items: center; gap: 6px;">
-                        <svg class="jenny-role-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                        <span>Recruiter (<?= htmlspecialchars($recruiterName) ?>)</span>
-                    </span>
-                </template>
+            <div class="jenny-persona-seg" role="tablist" aria-label="I am a">
+                <button type="button" role="tab" :aria-selected="persona === 'jobseeker'" :class="{ 'is-active': persona === 'jobseeker' }" @click="setPersona('jobseeker')">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span>Job seeker</span>
+                </button>
+                <button type="button" role="tab" :aria-selected="persona === 'recruiter'" :class="{ 'is-active': persona === 'recruiter' }" @click="setPersona('recruiter')">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                    <span>Employer</span>
+                </button>
             </div>
-            <button type="button" 
-                    @click="togglePersona()"
-                    class="jenny-role-switch-btn"
-                    aria-label="Switch Persona">
-                <span>Switch to <span x-text="persona === 'jobseeker' ? 'Recruiter' : 'Job Seeker'"></span></span>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4m0 0L3 8m4-4l4 4m6 4v12m0 0l4-4m-4 4l-4-4"/></svg>
+            <span class="jenny-coin-chip" x-show="coins" :aria-label="coinHint()" role="status">
+                <img :src="cfg.coinImg" src="<?= htmlspecialchars($jennyCfg['coinImg']) ?>" width="18" height="18" alt="">
+                <span x-text="coinText()"></span>
+                <span class="jenny-coin-tip" x-text="coinHint()"></span>
+            </span>
+            <button type="button" class="jenny-newchat-btn" @click="newChat()" x-show="messages.length > 0" aria-label="Start a new chat">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                <span>New chat</span>
             </button>
         </div>
 
@@ -1335,11 +1319,11 @@ $fullBodyImg    = asset('assets/images/jenny_ai/Full-body_standing_pose_jenny_ai
                             <svg class="jenny-action-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                             <span>Find internships</span>
                         </button>
-                        <button type="button" @click="triggerAction('find_internships')" class="jenny-action-card">
+                        <button type="button" @click="triggerAction('interview_prep')" class="jenny-action-card">
                             <svg class="jenny-action-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                             <span>Prepare for interview</span>
                         </button>
-                        <button type="button" @click="triggerAction('find_internships')" class="jenny-action-card">
+                        <button type="button" @click="triggerAction('track_applications')" class="jenny-action-card">
                             <svg class="jenny-action-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                             <span>Track applications</span>
                         </button>
@@ -1357,11 +1341,11 @@ $fullBodyImg    = asset('assets/images/jenny_ai/Full-body_standing_pose_jenny_ai
                             <svg class="jenny-action-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                             <span>Schedule interviews</span>
                         </button>
-                        <button type="button" @click="triggerAction('find_internships')" class="jenny-action-card">
+                        <button type="button" @click="triggerAction('draft_job_post')" class="jenny-action-card">
                             <svg class="jenny-action-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                             <span>Draft a job post</span>
                         </button>
-                        <button type="button" @click="triggerAction('shortlist_candidates')" class="jenny-action-card">
+                        <button type="button" @click="triggerAction('compare_applicants')" class="jenny-action-card">
                             <svg class="jenny-action-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                             <span>Compare applicants</span>
                         </button>
@@ -1375,14 +1359,44 @@ $fullBodyImg    = asset('assets/images/jenny_ai/Full-body_standing_pose_jenny_ai
                     <div class="jenny-msg-row" :class="item.sender">
                         <!-- Mini bot avatar -->
                         <template x-if="item.sender === 'bot'">
-                            <div class="jenny-bot-avatar-mini" title="Jenny">
+                            <div class="jenny-bot-avatar-mini" aria-hidden="true">
                                 <img src="<?= $iconBadgeImg ?>" alt="Jenny">
                             </div>
                         </template>
 
                         <!-- Bubble -->
-                        <div class="jenny-bubble" x-text="item.text"></div>
+                        <div class="jenny-bubble" :class="{ 'is-error': item.isError }">
+                            <template x-if="item.sender === 'bot'"><div class="jenny-md" x-html="format(item.text)"></div></template>
+                            <template x-if="item.sender !== 'bot'"><div x-text="item.text"></div></template>
+                            <template x-if="item.file">
+                                <div class="jenny-file-chip in-bubble">
+                                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                                    <span x-text="item.file.name"></span>
+                                </div>
+                            </template>
+                        </div>
                     </div>
+
+                    <!-- Jenny's suggested internships and page links -->
+                    <template x-if="item.sender === 'bot' && ((item.listings && item.listings.length) || (item.links && item.links.length))">
+                        <div class="jenny-extras">
+                            <template x-for="l in (item.listings || [])" :key="l.id">
+                                <a class="jenny-listing-card" :href="l.url">
+                                    <span class="jenny-listing-top">
+                                        <strong x-text="l.title"></strong>
+                                        <span x-show="l.premium" class="jenny-premium-tag">Premium</span>
+                                    </span>
+                                    <span class="jenny-listing-meta" x-text="l.company + ' \u00B7 ' + l.location + ' \u00B7 ' + l.mode"></span>
+                                    <span class="jenny-listing-pay" x-text="l.locked ? 'Pay shown on Premium' : l.pay"></span>
+                                </a>
+                            </template>
+                            <div class="jenny-link-row" x-show="item.links && item.links.length">
+                                <template x-for="lk in (item.links || [])" :key="lk.url + lk.label">
+                                    <a class="jenny-link-chip" :href="lk.url" x-text="lk.label"></a>
+                                </template>
+                            </div>
+                        </div>
+                    </template>
 
                     <!-- 1. Special: Upload File Progress Card -->
                     <template x-if="item.specialType === 'upload_card'">
@@ -1642,24 +1656,40 @@ $fullBodyImg    = asset('assets/images/jenny_ai/Full-body_standing_pose_jenny_ai
 
         <!-- Footer Input (White #FFFFFF, Light Grey #F2F2F2) -->
         <div class="jenny-footer" x-show="!isMinimized">
-            <form @submit.prevent="sendMessage()" class="jenny-input-form">
-                <!-- Attachment Icon (Clip) -->
-                <label class="jenny-attach-icon" title="Upload Document / Image">
-                    <input type="file" @change="triggerAction('update_cv')" style="display: none;">
+            <!-- Attached file waiting to be sent -->
+            <div class="jenny-file-chip" x-show="file" x-cloak>
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span class="jenny-file-name" x-text="file ? file.name : ''"></span>
+                <span class="jenny-file-size" x-text="file ? fileSize(file.size) : ''"></span>
+                <button type="button" @click="file = null" aria-label="Remove attachment">
+                    <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <form @submit.prevent="sendMessage()" class="jenny-input-form" :class="{ 'is-listening': listening }">
+                <!-- Attach a document or image (signed-in users; read by Jenny) -->
+                <label class="jenny-attach-icon" aria-label="Attach a file">
+                    <input type="file" accept=".pdf,.docx,.txt,.png,.jpg,.jpeg,.webp" @change="pickFile($event)" style="display: none;">
                     <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
                     </svg>
                 </label>
 
                 <!-- Input Text -->
-                <input type="text" 
-                       x-model="inputText" 
-                       placeholder="Ask Jenny anything..." 
-                       class="jenny-input-field" 
+                <input type="text"
+                       x-ref="jennyInput"
+                       x-model="inputText"
+                       :placeholder="listening ? 'Listening...' : 'Ask Jenny anything...'"
+                       maxlength="4000"
+                       class="jenny-input-field"
                        aria-label="Ask Jenny anything">
 
+                <!-- Voice input (Web Speech API) -->
+                <button type="button" x-show="voiceSupported" @click="startVoice()" class="jenny-mic-btn" :class="{ 'is-listening': listening }" :aria-label="listening ? 'Stop listening' : 'Speak to Jenny'">
+                    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3zM19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>
+                </button>
+
                 <!-- Send Button -->
-                <button type="submit" class="jenny-send-btn" aria-label="Send">
+                <button type="submit" class="jenny-send-btn" aria-label="Send" :disabled="isTyping" :style="isTyping ? 'opacity: .55;' : ''">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                     </svg>

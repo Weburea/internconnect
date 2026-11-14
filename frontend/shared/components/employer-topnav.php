@@ -26,6 +26,7 @@ $employerPages = [
     ['title' => 'AI Assistant',        'group' => 'Communication', 'icon' => 'sparkles',  'keys' => ['ai_assistant', 'ai-assistant']],
     ['title' => 'Notifications',       'group' => 'Communication', 'icon' => 'bell',      'keys' => ['notifications', 'notification']],
     ['title' => 'Profile Settings',    'group' => 'Account',       'icon' => 'user',      'keys' => ['profile', 'settings', 'profile_settings']],
+    ['title' => 'Billings & Subscription', 'group' => 'Account', 'icon' => 'card',  'keys' => ['billings', 'billing', 'subscription']],
 ];
 $pageHeading = ['workspace' => 'Employer', 'group' => 'Overview', 'title' => 'Dashboard', 'icon' => 'dashboard'];
 foreach ($employerPages as $page) {

@@ -9,7 +9,7 @@ declare(strict_types=1);
  */
 
 $isError = ($_GET['error'] ?? '') === 'invalid';
-$email = $_GET['email'] ?? 'fluxtech.io';
+$email = (string)($_SESSION['reset_email'] ?? ($_GET['email'] ?? ''));
 ?>
 <!-- Load Iconify CDN -->
 <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
@@ -344,6 +344,9 @@ $email = $_GET['email'] ?? 'fluxtech.io';
             },
 
             resend() {
+                const fd = new FormData();
+                fd.append('email', <?= json_encode((string)($_SESSION['reset_email'] ?? '')) ?>);
+                fetch(<?= json_encode(url('/forgot-password')) ?>, { method: 'POST', body: fd, redirect: 'manual' }).catch(() => {});
                 this.resend_cooldown = 55;
                 this.verification_input = '';
                 this.server_errors = [];
@@ -353,15 +356,24 @@ $email = $_GET['email'] ?? 'fluxtech.io';
                 });
             },
 
-            submitCode() {
+            async submitCode() {
+                if (this.submitting) return;
                 this.submitting = true;
                 this.server_errors = [];
-                setTimeout(() => {
-                    this.submitting = false;
-                    // Any entered code proceeds successfully for UI prototype demonstration
+                const fd = new FormData();
+                fd.append('code', this.verification_input);
+                try {
+                    const r = await fetch(<?= json_encode(url('/verify-code')) ?>, { method: 'POST', headers: { 'Accept': 'application/json' }, body: fd });
+                    const d = await r.json();
+                    if (!d.success) throw new Error(d.error || 'That code is not right. Check the e-mail and try again.');
                     this.show_success_modal = true;
                     this.startSuccessModalRedirect();
-                }, 600);
+                } catch (e) {
+                    this.server_errors = [e.message];
+                    this.verification_input = '';
+                    document.getElementById('verification-code').value = '';
+                }
+                this.submitting = false;
             },
 
             startSuccessModalRedirect() {

@@ -24,3 +24,5 @@ yarn-error.log
 /public/assets/images
 /.agents
 
+/storage/cache
+/storage/testing

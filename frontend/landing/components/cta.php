@@ -622,16 +622,30 @@ declare(strict_types=1);
 
                 <!-- Subscription Form Stage -->
                 <div class="cta-form-stage">
-                    <form class="cta-form" onsubmit="event.preventDefault(); this.querySelector('button').textContent = 'Subscribed';">
+                    <!-- Real double opt-in subscription (POST /newsletter/subscribe, docs/54-email-newsletter-contact.md) -->
+                    <form class="cta-form" x-data="{ email: '', website: '', busy: false, done: false, msg: '', err: false,
+                            async send() {
+                                if (this.busy) return;
+                                this.busy = true; this.msg = ''; this.err = false;
+                                try {
+                                    const r = await fetch('<?= url('/newsletter/subscribe') ?>', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify({ email: this.email, website: this.website, source: 'home' }) });
+                                    const d = await r.json();
+                                    this.err = !d.success; this.msg = d.success ? d.message : (d.error || 'Something went wrong. Please try again.');
+                                    this.done = !!d.success;
+                                } catch (e) { this.err = true; this.msg = 'Network error. Please try again.'; }
+                                this.busy = false;
+                            } }" @submit.prevent="send()">
                         <div class="cta-input-row">
-                            <input type="email" placeholder="you@internconnect.com" required class="cta-input-field" />
-                            <button type="submit" class="cta-subscribe-btn">
+                            <input type="email" placeholder="you@internconnect.com" required class="cta-input-field" x-model="email" :disabled="done" aria-label="Your e-mail address" />
+                            <input type="text" name="website" x-model="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0;" />
+                            <button type="submit" class="cta-subscribe-btn" :disabled="busy || done" x-text="done ? 'Check your inbox' : (busy ? 'Subscribing...' : 'Subscribe')">
                                 Subscribe
                             </button>
                         </div>
-                        
-                        <!-- Anti-spam disclaimer -->
-                        <p class="cta-disclaimer">
+
+                        <!-- Result / anti-spam disclaimer -->
+                        <p class="cta-disclaimer" x-show="msg" x-text="msg" role="status" :style="err ? 'color: #FCA5A5;' : 'color: #86EFAC;'" style="display: none;"></p>
+                        <p class="cta-disclaimer" x-show="!msg">
                             No spam. Only high end career opportunities. Unsubscribe anytime.
                         </p>
                     </form>

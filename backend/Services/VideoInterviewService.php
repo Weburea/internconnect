@@ -14,7 +14,7 @@ use Throwable;
  * Every scheduled interview (scheduled_interviews.id) is its own session:
  * - one private Daily room per interview (interview_rooms), short-lived tokens per participant
  *   (employer = owner, candidate = guest), the API key never leaves the server;
- * - timing: join opens `join_early_min` before the start, the call lasts the interview duration
+ * - timing: candidates can join `join_early_min` before the start (employer/admin any time), the call lasts the interview duration
  *   plus `grace_min`, then the Daily room expires (everyone is disconnected);
  * - employer setup (criteria, questions, recommendation options) drives the in-call scorecard;
  * - files, chat, scorecards, room activity (with approximate location) and an AI report are
@@ -36,7 +36,7 @@ class VideoInterviewService
         'allow_files'          => true,
         'default_duration_min' => 30,
         'grace_min'            => 1,
-        'join_early_min'       => 10,
+        'join_early_min'       => 5,
     ];
 
     public const DEFAULT_CRITERIA = [
@@ -169,7 +169,7 @@ class VideoInterviewService
             'allow_files'          => !empty($input['allow_files']),
             'default_duration_min' => max(15, min(180, (int)($input['default_duration_min'] ?? 30))),
             'grace_min'            => max(0, min(10, (int)($input['grace_min'] ?? 1))),
-            'join_early_min'       => max(0, min(60, (int)($input['join_early_min'] ?? 10))),
+            'join_early_min'       => max(0, min(60, (int)($input['join_early_min'] ?? 5))),
         ];
 
         $pdo = self::pdo();
@@ -321,6 +321,24 @@ class VideoInterviewService
         ];
     }
 
+    /**
+     * Ownership: may the signed-in account of $role open interview $id? Admins always; candidates and
+     * employers only their own (session candidate_id / employer_id; demo accounts are #1).
+     */
+    public static function accessibleBy(int $interviewId, string $role): bool
+    {
+        if ($role === 'admin') {
+            return true;
+        }
+        $interview = self::getInterview($interviewId);
+        if (!$interview) {
+            return false;
+        }
+        return $role === 'employer'
+            ? (int)$interview['employer_id'] === (int)($_SESSION['employer_id'] ?? 1)
+            : (int)$interview['candidate_id'] === (int)($_SESSION['candidate_id'] ?? 1);
+    }
+
     /** Store schedule extras on an interview created by CommunicationService::scheduleInterview(). */
     public static function saveInterviewMeta(int $id, ?int $scheduledAt, int $durationMin, ?array $setup, string $createdBy): void
     {
@@ -353,7 +371,7 @@ class VideoInterviewService
 
     /**
      * Join window and call timing (unix seconds).
-     * opens_at: scheduled start minus join_early_min (null = no schedule, join any time).
+     * opens_at: scheduled start minus join_early_min (null = no schedule, join any time). Applies to candidates only.
      * started_at: first join of the current session; ends_at = started + duration; hard_end = + grace.
      */
     public static function timing(array $interview, ?array $room = null, ?array $settings = null): array
@@ -502,30 +520,36 @@ class VideoInterviewService
         $room = self::getRoomRecord($interviewId);
 
         // The host can start a new session in a room they ended themselves; admin-closed rooms stay closed.
-        if ($role === 'employer' && $room && $room['status'] === 'ended' && ($room['ended_by'] ?? '') !== 'admin') {
-            self::reopenRoom($interviewId, 'employer');
+        // Admins can start any room, including one that was closed.
+        if ($room && $room['status'] === 'ended'
+            && ($role === 'admin' || ($role === 'employer' && ($room['ended_by'] ?? '') !== 'admin'))) {
+            self::reopenRoom($interviewId, $role);
             $room = self::getRoomRecord($interviewId);
         }
 
         $timing = self::timing($interview, $room, $settings);
-        if ($timing['opens_at'] && $now < $timing['opens_at']) {
+        // Only the candidate waits for the join window; the employer and admin can open the room any time to prepare.
+        if ($role === 'candidate' && $timing['opens_at'] && $now < $timing['opens_at']) {
             return $base + ['ok' => false, 'code' => 'too_early', 'opens_at' => $timing['opens_at'] * 1000,
                 'error' => 'The room opens ' . (int)$settings['join_early_min'] . ' minutes before the interview starts.'];
         }
 
         $sessionOver = $timing['hard_end'] && $now >= $timing['hard_end'];
-        if ($sessionOver && $role !== 'employer') {
+        if ($sessionOver && $role === 'candidate') {
             return $base + ['ok' => false, 'code' => 'finished', 'error' => 'This interview has finished.'];
         }
         $startsNow = !$timing['started_at'] || $sessionOver;
-        $projectedEnd = $startsNow ? $now + ($interview['duration_min'] + $timing['grace_min']) * 60 : $timing['hard_end'];
+        // Hosts may open the room early to prepare; the interview clock still starts at the scheduled time.
+        $scheduled = (int)($interview['scheduled_at'] ?? 0);
+        $startAt = ($startsNow && !$sessionOver && $scheduled > $now) ? $scheduled : $now;
+        $projectedEnd = $startsNow ? $startAt + ($interview['duration_min'] + $timing['grace_min']) * 60 : $timing['hard_end'];
 
         $ensured = self::ensureRoom($interviewId, $projectedEnd + 60);
         if (!$ensured['ok']) {
             return $base + ['ok' => false, 'code' => 'room_error', 'error' => $ensured['error']];
         }
         if ($startsNow) {
-            self::pdo()->prepare('UPDATE interview_rooms SET started_at = ? WHERE interview_id = ?')->execute([date('Y-m-d H:i:s', $now), $interviewId]);
+            self::pdo()->prepare('UPDATE interview_rooms SET started_at = ? WHERE interview_id = ?')->execute([date('Y-m-d H:i:s', $startAt), $interviewId]);
             $room = self::getRoomRecord($interviewId);
             $timing = self::timing($interview, $room, $settings);
         }
@@ -534,7 +558,7 @@ class VideoInterviewService
             'room_name'          => $ensured['room']['room_name'],
             'user_name'          => mb_substr($displayName, 0, 60),
             'user_id'            => $role . '-' . $interviewId,
-            'is_owner'           => $role === 'employer',
+            'is_owner'           => $role !== 'candidate',
             'exp'                => (int)$timing['hard_end'] + 120,
             'enable_screenshare' => (bool)$settings['allow_screenshare'],
             'start_video_off'    => false,
@@ -555,7 +579,7 @@ class VideoInterviewService
             'ok'        => true,
             'url'       => $ensured['room']['room_url'],
             'token'     => $tokenRes['body']['token'],
-            'owner'     => $role === 'employer',
+            'owner'     => $role !== 'candidate',
             'serverNow' => $now * 1000,
             'endsAt'    => $timing['ends_at'] * 1000,
             'hardEnd'   => $timing['hard_end'] * 1000,
@@ -1121,7 +1145,7 @@ class VideoInterviewService
         }
         $chatLines = array_map(static fn ($m) => $m['role'] . ': ' . $m['body'], array_slice($chat, -30));
 
-        $prompt = "Summarise a {$interview['duration_min']}-minute internship interview for the hiring team. Be factual and neutral; do not invent details.\n"
+        $prompt = "Summarise a {$interview['duration_min']}-minute internship interview for the hiring team. Be factual and neutral; do not invent details. Refer to the candidate by name or as \"they\"; never assume gender.\n"
             . "Role: {$interview['candidate_role']}. Candidate: {$interview['candidate_name']}. Company: {$interview['company_name']}.\n"
             . 'Minutes present: employer ' . $attendance['employer'] . ', candidate ' . $attendance['candidate'] . "\n"
             . 'Questions asked (' . count($asked) . ' of ' . count($setup['questions']) . '): ' . (implode(' | ', array_column($asked, 'question')) ?: 'none recorded') . "\n"
@@ -1322,7 +1346,7 @@ class VideoInterviewService
             $interviewId = $rooms[$roomName];
             foreach ($people as $p) {
                 $role = $p['role'];
-                $role === 'employer' ? $employers++ : $candidates++;
+                $role === 'candidate' ? $candidates++ : $employers++; // admins count with the hosting side
                 $stmt = self::pdo()->prepare("SELECT * FROM interview_room_events WHERE interview_id = ? AND role = ? AND event = 'joined' ORDER BY id DESC LIMIT 1");
                 $stmt->execute([$interviewId, $role]);
                 $e = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
@@ -1344,7 +1368,7 @@ class VideoInterviewService
                     $k = $city . '|' . $code;
                     $places[$k] = $places[$k] ?? ['city' => $city, 'country' => $country, 'code' => $code, 'lat' => (float)$e['lat'], 'lng' => (float)$e['lng'], 'online' => 0, 'students' => 0, 'employers' => 0];
                     $places[$k]['online']++;
-                    $role === 'employer' ? $places[$k]['employers']++ : $places[$k]['students']++;
+                    $role === 'candidate' ? $places[$k]['students']++ : $places[$k]['employers']++;
                 }
                 $countries[$code] = $countries[$code] ?? ['code' => $code, 'name' => $country, 'online' => 0];
                 $countries[$code]['online']++;

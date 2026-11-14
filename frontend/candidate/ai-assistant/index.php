@@ -537,13 +537,16 @@ $candPlan      = $candPlan ?? ($candidate['plan'] ?? 'pro');
                     <h1 class="ai-hub-title">AI Career Assistant</h1>
                     <p class="ai-hub-sub">Your AI-powered career companion for getting your next internship.</p>
                 </div>
-                <img src="https://res.cloudinary.com/weburea/image/upload/v1793434500/jenny_ai_hi_chat_mafe7r.png" alt="Jenny AI Companion" class="ai-hub-mascot-img" loading="eager">
+                <div style="display: flex; align-items: center; gap: 14px; flex-shrink: 0;">
+                    <?php $coinType = 'candidate'; $coinId = (int)($_SESSION['candidate_id'] ?? 1); include dirname(__DIR__, 2) . '/shared/components/jenny-coin-pill.php'; ?>
+                    <img src="https://res.cloudinary.com/weburea/image/upload/v1793434500/jenny_ai_hi_chat_mafe7r.png" alt="Jenny AI Companion" class="ai-hub-mascot-img" loading="eager">
+                </div>
             </div>
 
             <!-- ── Hero Action Card (Screenshot 1) ── -->
             <div class="ai-hero-card">
                 <div class="ai-hero-top">
-                    <div class="ai-hero-icon-badge" title="Jenny AI Career Assistant">
+                    <div class="ai-hero-icon-badge" aria-label="Jenny AI Career Assistant">
                         <!-- Official Jenny AI Vector Mark inside Circle Badge -->
                         <svg style="width: 22px; height: 22px; flex-shrink: 0;" viewBox="0 0 74 83" fill="currentColor">
                             <path d="M73.74 32.4627V59.9427C67.93 59.7673 62.2767 61.8422 57.9596 65.7344C53.6426 69.6267 50.9952 75.0356 50.57 80.8327C50.52 81.3027 50.48 81.8327 50.46 82.2827H23.57C23.57 82.0227 23.48 81.7627 23.43 81.5127C20.73 67.1427 16.41 63.2427 0 59.6527V32.6527C13.34 31.5727 27.12 37.6527 36.92 47.9327C46 38.3527 58.99 31.8927 73.74 32.4627Z"/>
@@ -640,9 +643,10 @@ $candPlan      = $candPlan ?? ($candidate['plan'] ?? 'pro');
                 </div>
 
                 <!-- Chat Prompt Input Bar with Jenny AI Action Button -->
-                <div class="ai-prompt-box">
-                    <input type="text" class="ai-prompt-input" placeholder="Ask your career assistant anything..." aria-label="Ask your career assistant anything">
-                    <button type="button" class="ai-prompt-btn" aria-label="Send prompt to Jenny AI">
+                <!-- Opens the Jenny chat workspace with the question (docs/55-jenny-ai-chat.md) -->
+                <form class="ai-prompt-box" method="GET" action="<?= url('/candidate/ai-assistant/chat') ?>">
+                    <input type="text" name="q" maxlength="500" class="ai-prompt-input" placeholder="Ask your career assistant anything..." aria-label="Ask your career assistant anything">
+                    <button type="submit" class="ai-prompt-btn" aria-label="Send prompt to Jenny AI">
                         <!-- Jenny AI Mark inside Button -->
                         <svg style="width: 14px; height: 14px; flex-shrink: 0;" viewBox="0 0 74 83" fill="currentColor">
                             <path d="M73.74 32.4627V59.9427C67.93 59.7673 62.2767 61.8422 57.9596 65.7344C53.6426 69.6267 50.9952 75.0356 50.57 80.8327C50.52 81.3027 50.48 81.8327 50.46 82.2827H23.57C23.57 82.0227 23.48 81.7627 23.43 81.5127C20.73 67.1427 16.41 63.2427 0 59.6527V32.6527C13.34 31.5727 27.12 37.6527 36.92 47.9327C46 38.3527 58.99 31.8927 73.74 32.4627Z"/>
@@ -652,7 +656,7 @@ $candPlan      = $candPlan ?? ($candidate['plan'] ?? 'pro');
                             <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
                         </svg>
                     </button>
-                </div>
+                </form>
             </div>
 
             <!-- ── AI-Matched Internships Section (Screenshot 1) ── -->

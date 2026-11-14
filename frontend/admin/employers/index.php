@@ -15,7 +15,7 @@ declare(strict_types=1);
 window.__adminEmployersData = <?= json_encode($employers, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>;
 function adminEmployers() {
     return {
-        activeTab: 'all',
+        activeTab: <?= json_encode(($segment ?? '') ?: 'all') ?>,
         searchQuery: '',
         filterIndustry: '',
         selectedCompany: null,
@@ -268,8 +268,8 @@ function adminEmployers() {
             <!-- 1. Header Row -->
             <div class="admin-page-header">
                 <div>
-                    <h1 class="admin-page-title">Employers</h1>
-                    <p class="admin-page-subtitle">Review employer accounts, track company registrations, and verify CAC documents</p>
+                    <h1 class="admin-page-title"><?= htmlspecialchars($segmentInfo[0] ?? 'Employers', ENT_QUOTES, 'UTF-8') ?></h1>
+                    <p class="admin-page-subtitle"><?= htmlspecialchars($segmentInfo[1] ?? 'Review employer accounts, track company registrations, and verify CAC documents', ENT_QUOTES, 'UTF-8') ?></p>
                 </div>
                 <div>
                     <button type="button" class="admin-date-pill cursor-pointer" id="employers-datepicker" aria-label="Select date range">
@@ -514,7 +514,7 @@ function adminEmployers() {
                                 <div class="space-y-3 text-xs">
                                     <div>
                                         <label class="block font-semibold text-slate-700 mb-1 text-[11.5px]">Industry</label>
-                                        <select class="w-full h-8 px-2.5 rounded-lg border border-slate-200 text-xs text-slate-800 bg-white outline-none focus:border-indigo-600"
+                                        <select data-ic-select class="w-full h-8 px-2.5 rounded-lg border border-slate-200 text-xs text-slate-800 bg-white outline-none focus:border-indigo-600"
                                                 x-model="filterIndustry"
                                                 @change="showFilterPopover = false;">
                                             <option value="">All Industries</option>
@@ -594,7 +594,7 @@ function adminEmployers() {
                                                     <span class="admin-user-name" x-text="emp.name"></span>
                                                     <!-- Verified Badge (Strict Rule: Invisible when unverified!) -->
                                                     <template x-if="emp.is_verified">
-                                                        <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" title="Verified Employer">
+                                                        <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-label="Verified Employer">
                                                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                                         </svg>
                                                     </template>
@@ -828,7 +828,7 @@ function adminEmployers() {
                                 <a :href="selectedCompany?.doc_url || '<?= url('assets/images/dummb/testing.pdf.pdf') ?>'" 
                                    :download="selectedCompany?.doc_name || 'Verification_Document.pdf'" 
                                    class="p-2 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer" 
-                                   title="Download Document"
+                                  
                                    aria-label="Download Document"
                                    @click="downloadDoc(selectedCompany)">
                                     <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

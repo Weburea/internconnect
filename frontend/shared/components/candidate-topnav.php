@@ -13,7 +13,7 @@ $candName      = $candidate['name'] ?? ($_SESSION['profile_name'] ?? 'Sarah Pete
 $candFirstName = explode(' ', trim($candName))[0];
 $candRole      = $candidate['role'] ?? ($_SESSION['profile_role'] ?? 'Student Applicant');
 $candAvatar    = $candidate['avatar'] ?? ($_SESSION['profile_avatar'] ?? asset('assets/images/profile.png'));
-$candPlan      = $_SESSION['candidate_plan'] ?? ($candidate['plan'] ?? 'pro');
+$candPlan      = \App\Services\PlanService::candidatePlan();
 $activeNav     = $activeNav ?? '';
 
 // Page heading: title, sidebar group and icon for each candidate area

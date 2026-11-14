@@ -38,6 +38,10 @@ declare(strict_types=1);
                 <div class="flex-grow border-t border-brandBorder"></div>
             </div>
 
+            <?php $authError = $_SESSION['auth_error'] ?? ''; unset($_SESSION['auth_error']); ?>
+            <?php if ($authError !== ''): ?>
+            <p role="alert" style="margin: 0 0 14px; padding: 10px 12px; border-radius: 10px; background: #FEF2F2; color: #B91C1C; font-size: 13px; font-weight: 600;"><?= htmlspecialchars($authError) ?></p>
+            <?php endif; ?>
             <form action="<?= url('/login') ?>" method="POST" class="space-y-4">
                 <div>
                     <label for="email" class="block text-[12px] font-bold text-[#191C1D] uppercase tracking-wider mb-1.5">Email Address</label>

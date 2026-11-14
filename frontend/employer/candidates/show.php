@@ -17,7 +17,62 @@ declare(strict_types=1);
  */
 ?>
 
-<link rel="stylesheet" href="<?= asset('assets/css/employer-candidates.css') ?>">
+<script src="<?= asset('assets/js/jszip.min.js') ?>"></script>
+<script src="<?= asset('assets/js/docx-preview.min.js') ?>"></script>
+<script src="<?= asset('assets/js/ic-docx-preview.js') ?>?v=<?= @filemtime(dirname(__DIR__, 3) . '/public/assets/js/ic-docx-preview.js') ?: 1 ?>"></script>
+<link rel="stylesheet" href="<?= asset('assets/css/employer-candidates.css') ?>?v=<?= @filemtime(dirname(__DIR__, 3) . '/public/assets/css/employer-candidates.css') ?: 1 ?>">
+<style>
+/* Submission states (inline so a cached stylesheet can never leave them unstyled) */
+.emp-cover-letter-body { border-left: 0 !important; border: 1px solid #EEF0F4; background: #F8FAFC; border-radius: 12px; padding: 18px 20px; font-size: 14px; line-height: 1.75; color: #334155; white-space: pre-line; }
+.emp-card-head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.emp-card-head-row .emp-card-header { margin: 0; }
+.emp-state-pill { display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0; height: 24px; padding: 0 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; line-height: 1; white-space: nowrap; }
+.emp-state-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.emp-state-pill.is-yes { background: #ECFDF5; color: #047857; }
+.emp-state-pill.is-no { background: #F1F5F9; color: #64748B; }
+.emp-state-pill.is-ai { background: #EEF2FF; color: #4F48E6; }
+.emp-state-pill svg { width: 12px; height: 12px; flex-shrink: 0; }
+.emp-muted-line { font-size: 12.5px; color: #64748B; line-height: 1.55; margin: 0; }
+.emp-muted-line a { color: #4F48E6; font-weight: 700; text-decoration: none; }
+a.emp-doc-name { color: #0F172A; text-decoration: none; }
+a.emp-doc-name:hover { color: #4F48E6; }
+a.emp-doc-dl-btn { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+.emp-doc-item { gap: 6px; }
+.emp-doc-item .emp-doc-left { flex: 1; min-width: 0; }
+.emp-doc-item .emp-doc-name { font-size: 13px !important; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+button.emp-doc-open { border: 0; background: none; padding: 0; font-family: inherit; text-align: left; cursor: pointer; color: #0F172A; }
+.emp-doc-view { border: 0; cursor: pointer; }
+.emp-doc-item .emp-doc-dl-btn svg { width: 15px; height: 15px; }
+button.emp-doc-open:hover { color: #4F48E6; text-decoration: underline; }
+.emp-inline-doc { border: 1px solid #EEF0F4; border-radius: 12px; overflow: hidden; background: #F1F5F9; height: 460px; }
+.emp-inline-doc iframe { width: 100%; height: 100%; border: 0; display: block; background: #FFFFFF; }
+.emp-inline-doc img { width: 100%; height: 100%; object-fit: contain; display: block; background: #FFFFFF; }
+.emp-docx-host { height: 100%; overflow: auto; padding: 12px; }
+.emp-docx-host .docx-wrapper, .emp-docmodal-body .docx-wrapper { background: transparent !important; padding: 0 !important; }
+.emp-docx-host section.docx, .emp-docmodal-body section.docx { box-shadow: 0 1px 4px rgba(15, 23, 42, .12); margin: 0 auto 12px !important; }
+.emp-inline-doc-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.emp-mini-btn { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px; border: 1px solid #E2E8F0; background: #FFFFFF; font-size: 12.5px; font-weight: 700; color: #334155; text-decoration: none; cursor: pointer; white-space: nowrap; }
+.emp-mini-btn:hover { background: #F8FAFC; color: #0F172A; }
+.emp-mini-btn.is-primary { background: #4F48E6; border-color: #4F48E6; color: #FFFFFF; }
+.emp-mini-btn.is-primary:hover { background: #4338CA; color: #FFFFFF; }
+.emp-cl-file { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid #EEF0F4; border-radius: 12px; background: #F8FAFC; flex-wrap: wrap; }
+.emp-cl-file-icon { width: 38px; height: 44px; border-radius: 8px; background: #FFFFFF; border: 1px solid #E2E8F0; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px; font-size: 9px; font-weight: 800; color: #4F48E6; flex-shrink: 0; }
+.emp-cl-file-text { flex: 1; min-width: 160px; display: flex; flex-direction: column; gap: 2px; }
+.emp-cl-file-text strong { font-size: 13px; color: #0F172A; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.emp-cl-file-text span { font-size: 12px; color: #64748B; }
+.emp-cl-file-actions { display: flex; gap: 8px; }
+.emp-docmodal { position: fixed; inset: 0; z-index: 3000; background: rgba(0, 6, 35, .6); display: flex; align-items: center; justify-content: center; padding: 20px; }
+.emp-docmodal-card { width: 100%; max-width: 920px; height: min(88vh, 900px); background: #FFFFFF; border-radius: 18px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 24px 60px rgba(0, 0, 0, .3); }
+.emp-docmodal-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; border-bottom: 1px solid #F1F5F9; }
+.emp-docmodal-head strong { display: block; font-size: 14.5px; color: #0F172A; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.emp-docmodal-head span { font-size: 12px; color: #64748B; }
+.emp-docmodal-body { flex: 1; min-height: 0; background: #F1F5F9; overflow: auto; position: relative; }
+.emp-docmodal-body iframe { width: 100%; height: 100%; border: 0; display: block; background: #FFFFFF; }
+.emp-docmodal-body img { max-width: 100%; max-height: 100%; display: block; margin: 0 auto; object-fit: contain; }
+.emp-docmodal-close { width: 34px; height: 34px; border-radius: 9px; border: 0; background: #F1F5F9; color: #475569; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+.emp-docmodal-close:hover { background: #E2E8F0; }
+@media (max-width: 640px) { .emp-docmodal { padding: 0; } .emp-docmodal-card { height: 100vh; border-radius: 0; } .emp-inline-doc { height: 380px; } }
+</style>
 
 <div class="db-shell">
 
@@ -36,18 +91,47 @@ declare(strict_types=1);
         <!-- ══ PAGE CONTENT ══ -->
         <div class="db-content">
             <div class="emp-cand-page" 
-                 x-data="{ 
+                 x-data="{
                      currentStage: '<?= htmlspecialchars($candidate['pipeline_stage'] ?? 'Under Review') ?>',
                      isShortlisted: <?= ($candidate['status_type'] ?? '') === 'shortlisted' ? 'true' : 'false' ?>,
                      isRejected: <?= ($candidate['status_type'] ?? '') === 'rejected' ? 'true' : 'false' ?>,
+                     hasApp: <?= !empty($candidate['has_submission']) ? 'true' : 'false' ?>,
+                     stageUrl: '<?= htmlspecialchars(url('/employer/candidates/' . (int)($candidate['id'] ?? 1) . '/stage'), ENT_QUOTES) ?>',
+                     savingStage: false,
+                     viewDoc: null,
                      toastMessage: '',
                      showToast: false,
                      triggerToast(msg) {
                          this.toastMessage = msg;
                          this.showToast = true;
                          setTimeout(() => { this.showToast = false; }, 3000);
-                     }
-                 }">
+                     },
+                     /* Pipeline stage is saved on the application and the candidate is notified. */
+                     async setStage(stage) {
+                         if (this.savingStage) return;
+                         const apply = () => { this.currentStage = stage; this.isShortlisted = stage === 'Shortlisted'; this.isRejected = stage === 'Rejected'; };
+                         if (!this.hasApp) { apply(); this.triggerToast('Sample profile: stage changes are not saved.'); return; }
+                         this.savingStage = true;
+                         try {
+                             const res = await fetch(this.stageUrl, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify({ stage }) });
+                             const json = await res.json().catch(() => ({}));
+                             if (!res.ok || !json.success) throw new Error(json.error || 'Could not update the stage.');
+                             apply();
+                             this.triggerToast(stage === 'Rejected' ? 'Application marked as rejected' : 'Moved to ' + stage + '. The candidate has been notified.');
+                         } catch (e) {
+                             this.triggerToast(e.message);
+                         } finally {
+                             this.savingStage = false;
+                         }
+                     },
+                     /* Document viewer: PDF, Word (docx-preview) and images open in the page. */
+                     openDoc(name, url, ext) {
+                         this.viewDoc = { name, url, ext: String(ext || '').toLowerCase() };
+                         if (this.viewDoc.ext === 'docx') this.$nextTick(() => window.icRenderDocx && window.icRenderDocx(url, this.$refs.docModalHost, name));
+                     },
+                     closeDoc() { this.viewDoc = null; }
+                 }"
+                 @keydown.escape.window="closeDoc()">
 
                 <!-- ── Back Link ── -->
                 <div class="emp-profile-back-bar">
@@ -66,7 +150,7 @@ declare(strict_types=1);
                         <div class="emp-profile-avatar-box">
                             <img src="<?= htmlspecialchars($candidate['avatar'] ?? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&h=160&fit=crop&crop=faces') ?>" 
                                  alt="<?= htmlspecialchars($candidate['name'] ?? 'Sarah Peters') ?>">
-                            <div class="emp-online-status-dot" title="Active Candidate"></div>
+                            <div class="emp-online-status-dot" aria-hidden="true"></div>
                         </div>
 
                         <!-- Name & Academic Subtitle -->
@@ -74,6 +158,13 @@ declare(strict_types=1);
                             <h1 class="emp-profile-cand-name"><?= htmlspecialchars($candidate['name'] ?? 'Sarah Peters') ?></h1>
                             <p class="emp-profile-cand-sub"><?= htmlspecialchars($candidate['student_title'] ?? 'UI/UX Design Student • Class of 2026 • Lagos, NG') ?></p>
                             <span class="emp-pill-active-applicant">ACTIVE APPLICANT</span>
+                            <?php // "Certified by" badges from training partners (docs/57-training-partners.md)
+                            foreach (\App\Services\PartnerService::certifications((int)($candidate['id'] ?? 0)) as $cert): ?>
+                                <span style="display: inline-flex; align-items: center; gap: 5px; margin: 6px 6px 0 0; padding: 3px 10px; border-radius: 999px; background: #000623; color: #FFFFFF; font-size: 11px; font-weight: 700; white-space: nowrap;">
+                                    <svg width="12" height="12" style="width: 12px; height: 12px; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                    Certified by <?= htmlspecialchars($cert['partner_name']) ?><?= $cert['course'] ? ' · ' . htmlspecialchars($cert['course']) : '' ?>
+                                </span>
+                            <?php endforeach; ?>
                         </div>
                     </div>
 
@@ -85,7 +176,7 @@ declare(strict_types=1);
                         $dashOffset = $circ - ($circ * $score / 100);
                         $strokeColor = $score >= 90 ? '#059669' : ($score >= 75 ? '#4F48E6' : '#D97706');
                     ?>
-                    <div class="emp-score-gauge-wrap" title="Candidate match score: <?= $score ?>%">
+                    <div class="emp-score-gauge-wrap" role="img" aria-label="Candidate match score: <?= $score ?>%">
                         <div class="emp-score-gauge-circle">
                             <svg viewBox="0 0 76 76" class="emp-score-gauge-svg">
                                 <circle class="emp-score-gauge-bg" cx="38" cy="38" r="<?= $radius ?>" stroke-width="5" fill="none" />
@@ -176,27 +267,52 @@ declare(strict_types=1);
                         </div>
                         <?php endif; ?>
 
-                        <!-- Card 3: Cover Letter (Written Statement) -->
-                        <?php if (!empty($candidate['cover_letter'])): ?>
+                        <!-- Card 3: Cover Letter (Written Statement) — always shown with its submission state -->
+                        <?php $hasCoverText = trim((string)($candidate['cover_letter'] ?? '')) !== ''; $hasCoverFile = !empty($candidate['documents']['cover_letter_url']); ?>
                         <div class="emp-card">
-                            <div class="emp-card-header">
-                                <svg class="emp-card-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                                </svg>
-                                <div>
-                                    <h2 class="emp-card-title" style="margin: 0;">Candidate Statement / Cover Letter</h2>
-                                    <p style="font-size: 11.5px; color: #64748B; margin: 2px 0 0 0;">Written candidate introduction and motivation</p>
+                            <div class="emp-card-head-row">
+                                <div class="emp-card-header">
+                                    <svg class="emp-card-icon" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                    </svg>
+                                    <div>
+                                        <h2 class="emp-card-title" style="margin: 0;">Candidate Statement / Cover Letter</h2>
+                                        <p style="font-size: 11.5px; color: #64748B; margin: 2px 0 0 0;">Written candidate introduction and motivation</p>
+                                    </div>
+                                </div>
+                                <span class="emp-state-pill <?= $hasCoverText || $hasCoverFile ? 'is-yes' : 'is-no' ?>"><span class="dot"></span><?= $hasCoverText || $hasCoverFile ? 'Submitted' : 'Not submitted' ?></span>
+                            </div>
+                            <?php if ($hasCoverText): ?>
+                            <!-- pre-line keeps the candidate's line breaks; no nl2br (it would double them) -->
+                            <div class="emp-cover-letter-body"><?= htmlspecialchars(trim((string)$candidate['cover_letter'])) ?></div>
+                            <?php elseif ($hasCoverFile): $clExt = $candidate['documents']['cover_letter_ext'] ?? ''; $clUrl = $candidate['documents']['cover_letter_url']; ?>
+                            <div class="emp-cl-file">
+                                <span class="emp-cl-file-icon" aria-hidden="true"><?= htmlspecialchars(strtoupper($clExt ?: 'FILE')) ?></span>
+                                <div class="emp-cl-file-text">
+                                    <strong><?= htmlspecialchars($candidate['documents']['cover_letter_name']) ?></strong>
+                                    <span>Submitted as a file instead of a typed letter</span>
+                                </div>
+                                <div class="emp-cl-file-actions">
+                                    <button type="button" class="emp-mini-btn is-primary" @click="openDoc(<?= htmlspecialchars(json_encode($candidate['documents']['cover_letter_name']), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($clUrl), ENT_QUOTES) ?>, '<?= htmlspecialchars($clExt, ENT_QUOTES) ?>')">View cover letter</button>
+                                    <a class="emp-mini-btn" href="<?= htmlspecialchars($clUrl) ?>?download=1">Download</a>
                                 </div>
                             </div>
-                            <div class="emp-cover-letter-body">
-                                <?= nl2br(htmlspecialchars($candidate['cover_letter'])) ?>
-                            </div>
+<?php else: ?>
+                            <p class="emp-muted-line">No cover letter was included with this application.</p>
+                            <?php endif; ?>
                         </div>
-                        <?php endif; ?>
 
                         <!-- Card 4: Professional Summary -->
                         <div class="emp-card">
-                            <h2 class="emp-card-title" style="margin-bottom: 12px;">Professional Summary</h2>
+                            <div class="emp-card-head-row" style="margin-bottom: 12px; align-items: center;">
+                                <h2 class="emp-card-title" style="margin: 0;">Professional Summary</h2>
+                                <?php if (($candidate['summary_source'] ?? '') === 'ai'): ?>
+                                <span class="emp-state-pill is-ai">
+                                    <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                                    Jenny AI summary
+                                </span>
+                                <?php endif; ?>
+                            </div>
                             <p class="emp-summary-text">
                                 <?= htmlspecialchars($candidate['summary'] ?? "Passionate designer focused on creating intuitive digital experiences. Currently exploring the intersection of accessibility and high-end visual design. Strong foundation in design systems and user-centric research methodologies.") ?>
                             </p>
@@ -228,10 +344,21 @@ declare(strict_types=1);
                                     <div class="emp-timeline-dot"></div>
                                     <div class="emp-exp-head">
                                         <span class="emp-exp-title"><?= htmlspecialchars($exp['title']) ?></span>
+                                        <?php if (($exp['period'] ?? '') !== ''): ?>
                                         <span class="emp-exp-badge"><?= htmlspecialchars($exp['period']) ?></span>
+                                        <?php endif; ?>
                                     </div>
+                                    <?php if (($exp['company'] ?? '') !== ''): ?>
                                     <div class="emp-exp-company"><?= htmlspecialchars($exp['company']) ?></div>
-                                    <p class="emp-exp-desc"><?= htmlspecialchars($exp['desc']) ?></p>
+                                    <?php endif; ?>
+                                    <?php
+                                    // CV highlights read as the original description paragraph.
+                                    $expDesc = ($exp['desc'] ?? '') !== '' ? $exp['desc']
+                                        : implode(' ', array_map(static fn ($h) => rtrim(trim($h), '.') . '.', $exp['highlights'] ?? []));
+                                    ?>
+                                    <?php if ($expDesc !== ''): ?>
+                                    <p class="emp-exp-desc"><?= htmlspecialchars($expDesc) ?></p>
+                                    <?php endif; ?>
                                 </div>
                                 <?php endforeach; ?>
                             </div>
@@ -241,6 +368,20 @@ declare(strict_types=1);
                         <div class="emp-card">
                             <h2 class="emp-card-title" style="margin-bottom: 16px;">Application Details</h2>
                             <div class="emp-app-details-grid">
+                                <?php if (!empty($candidate['application'])): ?>
+                                <div class="emp-app-detail-col">
+                                    <span class="emp-detail-lbl">APPLIED FOR</span>
+                                    <span class="emp-detail-val"><?= htmlspecialchars($candidate['application']['applied_for']) ?></span>
+                                </div>
+                                <div class="emp-app-detail-col">
+                                    <span class="emp-detail-lbl">SUBMITTED</span>
+                                    <span class="emp-detail-val"><?= htmlspecialchars($candidate['application']['submitted']) ?></span>
+                                </div>
+                                <div class="emp-app-detail-col">
+                                    <span class="emp-detail-lbl">APPLICATION</span>
+                                    <span class="emp-detail-val">#<?= (int)$candidate['application']['id'] ?> &middot; <?= htmlspecialchars($candidate['application']['status']) ?></span>
+                                </div>
+                                <?php endif; ?>
                                 <div class="emp-app-detail-col">
                                     <span class="emp-detail-lbl">AVAILABILITY</span>
                                     <span class="emp-detail-val"><?= htmlspecialchars($candidate['availability'] ?? 'Immediate Start') ?></span>
@@ -274,7 +415,7 @@ declare(strict_types=1);
                                 <button type="button" 
                                         class="emp-pipeline-btn" 
                                         :class="{ 'is-active': currentStage === '<?= $stage ?>' }"
-                                        @click="currentStage = '<?= $stage ?>'; triggerToast('Stage moved to <?= $stage ?>')">
+                                        @click="setStage('<?= $stage ?>')" :disabled="savingStage">
                                     <div class="emp-pipeline-radio">
                                         <div class="emp-pipeline-radio-inner"></div>
                                     </div>
@@ -294,13 +435,26 @@ declare(strict_types=1);
                                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                     </svg>
+                                    <?php if (!empty($candidate['documents']['resume_url'])): ?>
+                                    <button type="button" class="emp-doc-name emp-doc-open" @click="openDoc(<?= htmlspecialchars(json_encode($candidate['documents']['resume_name']), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($candidate['documents']['resume_url']), ENT_QUOTES) ?>, '<?= htmlspecialchars($candidate['documents']['resume_ext'] ?? '', ENT_QUOTES) ?>')"><?= htmlspecialchars($candidate['documents']['resume_name']) ?></button>
+                                    <?php else: ?>
                                     <span class="emp-doc-name"><?= htmlspecialchars($candidate['documents']['resume_name'] ?? 'Sarah_Peters_Resume.pdf') ?></span>
+                                    <?php endif; ?>
                                 </div>
-                                <button type="button" class="emp-doc-dl-btn" title="Download Resume" @click="triggerToast('Downloading Resume...')">
+                                <?php if (!empty($candidate['documents']['resume_url'])): ?>
+                                <button type="button" class="emp-doc-dl-btn emp-doc-view" aria-label="View resume" @click="openDoc(<?= htmlspecialchars(json_encode($candidate['documents']['resume_name']), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($candidate['documents']['resume_url']), ENT_QUOTES) ?>, '<?= htmlspecialchars($candidate['documents']['resume_ext'] ?? '', ENT_QUOTES) ?>')"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
+                                <a class="emp-doc-dl-btn" href="<?= htmlspecialchars($candidate['documents']['resume_url']) ?>?download=1" aria-label="Download resume">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                    </svg>
+                                </a>
+                                <?php else: ?>
+                                <button type="button" class="emp-doc-dl-btn" aria-label="Download resume" @click="triggerToast('Sample profile: no resume file on record yet.')">
                                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                     </svg>
                                 </button>
+                                <?php endif; ?>
                             </div>
 
                             <!-- Cover Letter Document Item (if attached as file) -->
@@ -310,13 +464,37 @@ declare(strict_types=1);
                                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                                     </svg>
+                                    <?php if (!empty($candidate['documents']['cover_letter_url'])): ?>
+                                    <button type="button" class="emp-doc-name emp-doc-open" @click="openDoc(<?= htmlspecialchars(json_encode($candidate['documents']['cover_letter_name']), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($candidate['documents']['cover_letter_url']), ENT_QUOTES) ?>, '<?= htmlspecialchars($candidate['documents']['cover_letter_ext'] ?? '', ENT_QUOTES) ?>')"><?= htmlspecialchars($candidate['documents']['cover_letter_name']) ?></button>
+                                    <?php else: ?>
                                     <span class="emp-doc-name"><?= htmlspecialchars($candidate['documents']['cover_letter_name']) ?></span>
+                                    <?php endif; ?>
                                 </div>
-                                <button type="button" class="emp-doc-dl-btn" title="Download Cover Letter" @click="triggerToast('Downloading Cover Letter...')">
+                                <?php if (!empty($candidate['documents']['cover_letter_url'])): ?>
+                                <button type="button" class="emp-doc-dl-btn emp-doc-view" aria-label="View cover letter" @click="openDoc(<?= htmlspecialchars(json_encode($candidate['documents']['cover_letter_name']), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($candidate['documents']['cover_letter_url']), ENT_QUOTES) ?>, '<?= htmlspecialchars($candidate['documents']['cover_letter_ext'] ?? '', ENT_QUOTES) ?>')"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
+                                <a class="emp-doc-dl-btn" href="<?= htmlspecialchars($candidate['documents']['cover_letter_url']) ?>?download=1" aria-label="Download cover letter">
                                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                     </svg>
-                                </button>
+                                </a>
+                                <?php endif; ?>
+                            </div>
+                            <?php endif; ?>
+
+                            <?php if (!empty($candidate['documents']['portfolio_file_url'])): ?>
+                            <div class="emp-doc-item" style="margin-top: 10px;">
+                                <div class="emp-doc-left">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                    </svg>
+                                    <button type="button" class="emp-doc-name emp-doc-open" @click="openDoc(<?= htmlspecialchars(json_encode($candidate['documents']['portfolio_name']), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($candidate['documents']['portfolio_file_url']), ENT_QUOTES) ?>, '<?= htmlspecialchars($candidate['documents']['portfolio_ext'] ?? '', ENT_QUOTES) ?>')"><?= htmlspecialchars($candidate['documents']['portfolio_name']) ?></button>
+                                </div>
+                                <button type="button" class="emp-doc-dl-btn emp-doc-view" aria-label="View attachment" @click="openDoc(<?= htmlspecialchars(json_encode($candidate['documents']['portfolio_name']), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($candidate['documents']['portfolio_file_url']), ENT_QUOTES) ?>, '<?= htmlspecialchars($candidate['documents']['portfolio_ext'] ?? '', ENT_QUOTES) ?>')"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg></button>
+                                <a class="emp-doc-dl-btn" href="<?= htmlspecialchars($candidate['documents']['portfolio_file_url']) ?>?download=1" aria-label="Download attachment">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                    </svg>
+                                </a>
                             </div>
                             <?php endif; ?>
 
@@ -331,6 +509,15 @@ declare(strict_types=1);
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                                     </svg>
                                     <span>Portfolio</span>
+                                </a>
+                                <?php endif; ?>
+
+                                <?php if (!empty($candidate['documents']['figma_url'])): ?>
+                                <a href="<?= htmlspecialchars($candidate['documents']['figma_url']) ?>" target="_blank" rel="noopener noreferrer" class="emp-link-pill">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                    </svg>
+                                    <span>Figma</span>
                                 </a>
                                 <?php endif; ?>
 
@@ -403,12 +590,17 @@ declare(strict_types=1);
                             <h3 class="emp-edu-title"><?= htmlspecialchars($candidate['education']['degree'] ?? 'BFA in Interaction Design') ?></h3>
                             <div class="emp-edu-school"><?= htmlspecialchars($candidate['education']['school'] ?? 'California College of the Arts') ?></div>
 
+                            <?php $eduGrade = $candidate['education']['grade'] ?? 'FIRST CLASS'; $eduGpa = $candidate['education']['gpa'] ?? 'GPA 3.8/4.0'; $eduGrad = $candidate['education']['graduation'] ?? 'Expected Graduation: May 2027'; ?>
+                            <?php if ($eduGrade !== '' || $eduGpa !== ''): ?>
                             <div class="emp-edu-badges">
-                                <span class="emp-badge-grade"><?= htmlspecialchars($candidate['education']['grade'] ?? 'FIRST CLASS') ?></span>
-                                <span class="emp-edu-gpa"><?= htmlspecialchars($candidate['education']['gpa'] ?? 'GPA 3.8/4.0') ?></span>
+                                <?php if ($eduGrade !== ''): ?><span class="emp-badge-grade"><?= htmlspecialchars($eduGrade) ?></span><?php endif; ?>
+                                <?php if ($eduGpa !== ''): ?><span class="emp-edu-gpa"><?= htmlspecialchars($eduGpa) ?></span><?php endif; ?>
                             </div>
+                            <?php endif; ?>
 
-                            <p class="emp-edu-sub"><?= htmlspecialchars($candidate['education']['graduation'] ?? 'Expected Graduation: May 2027') ?></p>
+                            <?php if ($eduGrad !== ''): ?>
+                            <p class="emp-edu-sub"><?= htmlspecialchars($eduGrad) ?></p>
+                            <?php endif; ?>
                         </div>
 
                         <!-- Card 5: Skills & Interests -->
@@ -452,7 +644,7 @@ declare(strict_types=1);
                         <!-- Reject Button -->
                         <button type="button" 
                                 class="emp-btn-decision-reject"
-                                @click="isRejected = !isRejected; triggerToast(isRejected ? 'Application Marked as Rejected' : 'Rejection reverted')">
+                                @click="setStage(isRejected ? 'Under Review' : 'Rejected')" :disabled="savingStage">
                             <svg style="width: 15px; height: 15px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>
@@ -471,7 +663,7 @@ declare(strict_types=1);
                         <button type="button" 
                                 class="emp-btn-decision-shortlist"
                                 :class="{ 'is-active': isShortlisted }"
-                                @click="isShortlisted = !isShortlisted; triggerToast(isShortlisted ? 'Candidate Shortlisted!' : 'Shortlist removed')">
+                                @click="setStage(isShortlisted ? 'Under Review' : 'Shortlisted')" :disabled="savingStage">
                             <svg style="width: 15px; height: 15px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                             </svg>
@@ -488,6 +680,36 @@ declare(strict_types=1);
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                             </svg>
                         </a>
+                    </div>
+                </div>
+
+                <!-- Document viewer: PDF, Word and images -->
+                <div class="emp-docmodal" x-show="viewDoc" x-cloak style="display: none;" @click.self="closeDoc()" role="dialog" aria-modal="true" aria-label="Document preview">
+                    <div class="emp-docmodal-card">
+                        <div class="emp-docmodal-head">
+                            <div style="min-width: 0;">
+                                <strong x-text="viewDoc ? viewDoc.name : ''"></strong>
+                                <span x-text="viewDoc ? (viewDoc.ext.toUpperCase() + ' document') : ''"></span>
+                            </div>
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <a class="emp-mini-btn" :href="viewDoc ? viewDoc.url + '?download=1' : '#'">Download</a>
+                                <button type="button" class="emp-docmodal-close" @click="closeDoc()" aria-label="Close preview">
+                                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="emp-docmodal-body">
+                            <template x-if="viewDoc && viewDoc.ext === 'pdf'">
+                                <iframe :src="viewDoc.url + '#toolbar=0&navpanes=0'" title="Document preview"></iframe>
+                            </template>
+                            <template x-if="viewDoc && ['png', 'jpg', 'jpeg', 'webp'].includes(viewDoc.ext)">
+                                <img :src="viewDoc.url" :alt="viewDoc.name">
+                            </template>
+                            <div x-show="viewDoc && viewDoc.ext === 'docx'" x-ref="docModalHost" style="padding: 12px;"></div>
+                            <template x-if="viewDoc && !['pdf', 'docx', 'png', 'jpg', 'jpeg', 'webp'].includes(viewDoc.ext)">
+                                <p class="emp-muted-line" style="padding: 40px 20px; text-align: center;">This file type cannot be previewed in the browser. Use Download to open it.</p>
+                            </template>
+                        </div>
                     </div>
                 </div>
 

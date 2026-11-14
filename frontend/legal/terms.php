@@ -61,7 +61,7 @@ declare(strict_types=1);
                         <svg style="width: 15px; height: 15px; color: var(--ic-text-subtle); flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        <span>Effective Date: <strong>October 20, 2026</strong></span>
+                        <span>Effective Date: <strong>November 12, 2026</strong></span>
                     </div>
                     <div class="legal-meta-item">
                         <svg style="width: 15px; height: 15px; color: var(--ic-text-subtle); flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -159,11 +159,13 @@ declare(strict_types=1);
                     </h2>
                     <div class="legal-section-body">
                         <p>
-                            Paid services—such as Candidate Pro Upgrades and Employer Tiered Hiring Plans (Starter, Growth, Enterprise)—are billed in Nigerian Naira (NGN) and processed securely through Paystack.
+                            Paid services, such as the candidate Pro and Premium plans and employer hiring plans, are billed in Nigerian Naira (NGN) and processed securely through Paystack. What each plan includes, and its daily or monthly limits, is shown on the <a href="<?= url('/pricing') ?>" class="text-primary font-semibold hover:underline">Pricing page</a>.
                         </p>
                         <ul>
-                            <li><strong>Recurring Billing:</strong> Monthly and annual subscriptions automatically renew unless canceled prior to the next billing date via your Account Settings.</li>
-                            <li><strong>Price Modifications:</strong> We reserve the right to revise pricing with 30 days prior notice to existing active subscribers.</li>
+                            <li><strong>No automatic renewal:</strong> a plan runs for the period you paid for (one month or one year). We remind you by e-mail before it ends; you choose whether to pay again.</li>
+                            <li><strong>Plans earned through training partners:</strong> a partner course result can unlock Pro or Premium for a set time at no cost. These grants never replace or shorten a plan you paid for, and they end on the date shown in your account.</li>
+                            <li><strong>Fair use of AI features:</strong> Jenny AI limits per day or month depend on your plan and protect the service for everyone.</li>
+                            <li><strong>Price and plan changes:</strong> we give at least 30 days' notice before changing prices or reducing what a plan includes. Changes never affect a period you have already paid for.</li>
                             <li><strong>Refunds:</strong> All purchases are governed by our <a href="<?= url('/refund') ?>" class="text-primary font-semibold hover:underline">Refund Policy</a>.</li>
                         </ul>
                     </div>
@@ -214,13 +216,13 @@ declare(strict_types=1);
                     </h2>
                     <div class="legal-section-body">
                         <p>
-                            InternConnect acts as an introductory technology platform and does not guarantee that a candidate will receive an offer, nor do we guarantee an employer will find a suitable intern. These terms are governed exclusively by the laws of the Federal Republic of Nigeria, and any disputes shall be resolved in arbitration in Lagos State, Nigeria.
+                            InternConnect acts as an introductory technology platform and does not guarantee that a candidate will receive an offer, nor do we guarantee an employer will find a suitable intern. Jenny AI suggestions (CV feedback, cover letters, match scores, interview tips) are aids, may contain mistakes, and should be checked before you rely on them. Training partners are independent organisations responsible for their own courses and certificates. These terms are governed exclusively by the laws of the Federal Republic of Nigeria, and any disputes shall be resolved in arbitration in Lagos State, Nigeria.
                         </p>
                         <div class="legal-highlight-box" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
                             <div>
                                 <div style="font-weight: 700; color: #000623; font-size: 14.5px;">Have questions about these terms?</div>
                                 <div style="font-size: 13px; color: #64748B;">Our legal operations team is available Monday through Friday.</div>
-                                <div style="font-size: 13px; color: #4F48E6; font-weight: 600; margin-top: 4px;">legal@internconnect.ng</div>
+                                <div style="font-size: 13px; color: #4F48E6; font-weight: 600; margin-top: 4px; overflow-wrap: anywhere;"><?= htmlspecialchars(\App\Core\Env::get('MAIL_ADMIN_ADDRESS', 'internconnect@weburea.com'), ENT_QUOTES) ?></div>
                             </div>
                             <a href="<?= url('/contact') ?>" class="ic-btn ic-btn-primary">
                                 <span>Contact Legal Team</span>

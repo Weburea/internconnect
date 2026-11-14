@@ -528,13 +528,13 @@ $draftQuestions      = !empty($draft['screening_questions']) && is_array($draft[
                                     <label class="emp-field-label">About the Internship</label>
                                     <div class="emp-richtext-wrap">
                                         <div class="emp-richtext-toolbar">
-                                            <button type="button" class="emp-toolbar-btn" title="Bold (Ctrl+B)" @mousedown.prevent="formatDoc('bold')">
+                                            <button type="button" class="emp-toolbar-btn" aria-label="Bold (Ctrl+B)" @mousedown.prevent="formatDoc('bold')">
                                                 <span style="font-weight: 800; font-size: 13px;">B</span>
                                             </button>
-                                            <button type="button" class="emp-toolbar-btn" title="Italic (Ctrl+I)" @mousedown.prevent="formatDoc('italic')">
+                                            <button type="button" class="emp-toolbar-btn" aria-label="Italic (Ctrl+I)" @mousedown.prevent="formatDoc('italic')">
                                                 <span style="font-style: italic; font-weight: 700; font-size: 13px; font-family: serif;">I</span>
                                             </button>
-                                            <button type="button" class="emp-toolbar-btn" title="Format Paragraph" @mousedown.prevent="formatParagraph()">
+                                            <button type="button" class="emp-toolbar-btn" aria-label="Format Paragraph" @mousedown.prevent="formatParagraph()">
                                                 <svg style="width: 14px; height: 14px; flex-shrink: 0 !important;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h10" />
                                                 </svg>
@@ -568,7 +568,7 @@ $draftQuestions      = !empty($draft['screening_questions']) && is_array($draft[
                                                        class="emp-section-title-input" 
                                                        x-model="responsibilitiesTitle" 
                                                        placeholder="Key Responsibilities">
-                                                <span class="emp-title-edit-hint" title="Click to rename this section">
+                                                <span class="emp-title-edit-hint" aria-label="Click to rename this section">
                                                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                                     </svg>
@@ -606,7 +606,7 @@ $draftQuestions      = !empty($draft['screening_questions']) && is_array($draft[
                                                 <button type="button" 
                                                         class="emp-dyn-delete-btn" 
                                                         @click="removeResponsibility(idx)" 
-                                                        title="Remove responsibility">
+                                                        aria-label="Remove responsibility">
                                                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                     </svg>
@@ -639,7 +639,7 @@ $draftQuestions      = !empty($draft['screening_questions']) && is_array($draft[
                                                        class="emp-section-title-input" 
                                                        x-model="lookingForTitle" 
                                                        placeholder="What We're Looking For">
-                                                <span class="emp-title-edit-hint" title="Click to rename this section">
+                                                <span class="emp-title-edit-hint" aria-label="Click to rename this section">
                                                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                                     </svg>
@@ -783,7 +783,7 @@ $draftQuestions      = !empty($draft['screening_questions']) && is_array($draft[
                                                 <button type="button" 
                                                         class="emp-dyn-delete-btn" 
                                                         @click="removeLookingCard(idx)" 
-                                                        title="Remove card">
+                                                        aria-label="Remove card">
                                                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                     </svg>
@@ -816,7 +816,7 @@ $draftQuestions      = !empty($draft['screening_questions']) && is_array($draft[
                                                        class="emp-section-title-input" 
                                                        x-model="benefitsTitle" 
                                                        placeholder="Program Benefits">
-                                                <span class="emp-title-edit-hint" title="Click to rename this section">
+                                                <span class="emp-title-edit-hint" aria-label="Click to rename this section">
                                                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                                     </svg>
@@ -854,7 +854,7 @@ $draftQuestions      = !empty($draft['screening_questions']) && is_array($draft[
                                                 <button type="button" 
                                                         class="emp-dyn-delete-btn" 
                                                         @click="removeBenefit(idx)" 
-                                                        title="Remove benefit">
+                                                        aria-label="Remove benefit">
                                                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                     </svg>
@@ -1068,12 +1068,12 @@ $draftQuestions      = !empty($draft['screening_questions']) && is_array($draft[
                                                 </div>
                                             </div>
                                             <div class="emp-question-actions">
-                                                <button type="button" class="emp-question-edit" @click="editExperienceField(idx)" title="Edit field">
+                                                <button type="button" class="emp-question-edit" @click="editExperienceField(idx)" aria-label="Edit field">
                                                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                                     </svg>
                                                 </button>
-                                                <button type="button" class="emp-question-delete" @click="removeExperienceField(idx)" title="Remove field">
+                                                <button type="button" class="emp-question-delete" @click="removeExperienceField(idx)" aria-label="Remove field">
                                                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                     </svg>
@@ -1115,12 +1115,12 @@ $draftQuestions      = !empty($draft['screening_questions']) && is_array($draft[
                                                 <div class="emp-question-type" x-text="q.type"></div>
                                             </div>
                                             <div class="emp-question-actions">
-                                                <button type="button" class="emp-question-edit" @click="editQuestion(idx)" title="Edit question">
+                                                <button type="button" class="emp-question-edit" @click="editQuestion(idx)" aria-label="Edit question">
                                                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                                     </svg>
                                                 </button>
-                                                <button type="button" class="emp-question-delete" @click="removeQuestion(idx)" title="Remove question">
+                                                <button type="button" class="emp-question-delete" @click="removeQuestion(idx)" aria-label="Remove question">
                                                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                     </svg>

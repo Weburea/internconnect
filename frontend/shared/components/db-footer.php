@@ -11,6 +11,6 @@ declare(strict_types=1);
     <div class="flex items-center gap-6">
         <a href="<?= url('/privacy') ?>" class="hover:text-gray-900 transition-colors">Privacy Policy</a>
         <a href="<?= url('/terms') ?>" class="hover:text-gray-900 transition-colors">Terms of Service</a>
-        <a href="<?= url('/support') ?>" class="hover:text-gray-900 transition-colors">Support</a>
+        <a href="<?= url('/help') ?>" class="hover:text-gray-900 transition-colors">Support</a>
     </div>
 </footer>

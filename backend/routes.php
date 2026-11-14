@@ -9,17 +9,49 @@ use App\Controllers\InternshipController;
 use App\Controllers\CandidateController;
 use App\Controllers\EmployerController;
 use App\Controllers\PaymentController;
+use App\Controllers\BillingController;
 use App\Controllers\ApiController;
 use App\Controllers\AdminController;
 use App\Controllers\InterviewController;
+use App\Controllers\NewsletterController;
+use App\Controllers\AdminCommunicationsController;
+use App\Controllers\JennyController;
+use App\Controllers\VisitController;
+use App\Controllers\AdminPartnersController;
+use App\Controllers\TrainingController;
+use App\Controllers\AdminTestimonialsController;
 
 /** @var Router $router */
 
 $router->get('/', [HomeController::class, 'index']);
 $router->get('/pricing', [HomeController::class, 'pricing']);
 $router->get('/elearning', [HomeController::class, 'elearning']);
+$router->get('/elearning/go/{id}', [HomeController::class, 'elearningGo']);
+$router->get('/elearning/logo/{id}', [HomeController::class, 'elearningLogo']);
+$router->post('/training/start/{id}', [TrainingController::class, 'start']);
 $router->get('/how-it-works', [HomeController::class, 'howItWorks']);
 $router->get('/contact', [HomeController::class, 'contact']);
+$router->post('/contact', [NewsletterController::class, 'contact']);
+// Newsletter + e-mail tracking (docs/54-email-newsletter-contact.md)
+$router->post('/newsletter/subscribe', [NewsletterController::class, 'subscribe']);
+$router->get('/newsletter/confirm/{token}', [NewsletterController::class, 'confirm']);
+$router->get('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribePage']);
+$router->post('/newsletter/unsubscribe/{token}', [NewsletterController::class, 'unsubscribe']);
+$router->post('/newsletter/one-click/{token}', [NewsletterController::class, 'oneClick']);
+$router->get('/m/o/{token}.gif', [NewsletterController::class, 'pixel']);
+// Jenny AI on Gemini (docs/55-jenny-ai-chat.md)
+// Visits for the live map and Near me (docs/56-location-and-visits.md)
+$router->post('/t/visit', [VisitController::class, 'beacon']);
+$router->get('/geo/me', [VisitController::class, 'me']);
+$router->post('/jenny/chat', [JennyController::class, 'chat']);
+$router->post('/jenny/search', [JennyController::class, 'search']);
+$router->get('/jenny/files/{conversation}/{message}', [JennyController::class, 'file']);
+$router->post('/candidate/ai-assistant/chat', [JennyController::class, 'assistantChat']);
+$router->get('/candidate/ai-assistant/chats/{id}', [JennyController::class, 'assistantConversation']);
+$router->post('/candidate/ai-assistant/chats/{id}/pin', [JennyController::class, 'assistantPin']);
+$router->post('/candidate/ai-assistant/chats/{id}/delete', [JennyController::class, 'assistantDelete']);
+$router->post('/admin/ai/chat/send', [JennyController::class, 'adminSend']);
+$router->get('/admin/ai/chat/sessions/{id}', [JennyController::class, 'adminSession']);
 $router->get('/about', [HomeController::class, 'about']);
 $router->get('/testimonials', [HomeController::class, 'testimonials']);
 $router->get('/success-stories', [HomeController::class, 'testimonials']);
@@ -41,6 +73,12 @@ $router->get('/payment/success', [PaymentController::class, 'success']);
 $router->get('/payment/declined', [PaymentController::class, 'declined']);
 $router->get('/payment/cancelled', [PaymentController::class, 'cancelled']);
 $router->post('/payment/webhook', [PaymentController::class, 'webhook']);
+
+// Billing & Subscription (candidate + employer, docs/08-payment-system.md)
+$router->get('/candidate/billing', [BillingController::class, 'index']);
+$router->get('/candidate/billing/receipt/{id}', [BillingController::class, 'receipt']);
+$router->get('/employer/billing', [BillingController::class, 'index']);
+$router->get('/employer/billing/receipt/{id}', [BillingController::class, 'receipt']);
 $router->get('/login', [AuthController::class, 'login']);
 $router->post('/login', [AuthController::class, 'loginPost']);
 $router->get('/logout', [AuthController::class, 'logout']);
@@ -48,6 +86,7 @@ $router->get('/register', [AuthController::class, 'register']);
 $router->post('/register', [AuthController::class, 'registerPost']);
 $router->get('/register/student', [AuthController::class, 'registerStudent']);
 $router->post('/register/student/complete', [AuthController::class, 'registerStudentComplete']);
+$router->post('/register/student/parse-resume', [AuthController::class, 'parseSignupResume']);
 $router->get('/register/employer', [AuthController::class, 'registerEmployer']);
 $router->post('/register/employer/complete', [AuthController::class, 'registerEmployerComplete']);
 $router->get('/forgot-password', [AuthController::class, 'forgotPassword']);
@@ -128,6 +167,7 @@ $router->post('/candidate/interview/respond', [CandidateController::class, 'resp
 
 // Candidate AI Career Assistant routes (Pro & Premium)
 $router->get('/candidate/ai-assistant', [CandidateController::class, 'aiAssistant']);
+$router->get('/candidate/ai-assistant/chat', [CandidateController::class, 'aiAssistantChat']);
 $router->get('/candidate/ai-assistant/cv-analyze', [CandidateController::class, 'aiCvAnalyze']);
 $router->post('/candidate/ai-assistant/cv-analyze', [CandidateController::class, 'processAiCvAnalyze']);
 $router->get('/candidate/ai-assistant/cv-results', [CandidateController::class, 'aiCvResults']);
@@ -176,6 +216,8 @@ $router->get('/employer/post-internship/success', [EmployerController::class, 'i
 $router->get('/employer/candidates', [EmployerController::class, 'candidates']);
 $router->get('/employer/applications', [EmployerController::class, 'candidates']);
 $router->get('/employer/candidates/{id}', [EmployerController::class, 'candidateProfile']);
+$router->get('/employer/candidates/{id}/files/{kind}', [EmployerController::class, 'candidateFile']);
+$router->post('/employer/candidates/{id}/stage', [EmployerController::class, 'candidateStage']);
 $router->get('/employer/candidate/{id}', [EmployerController::class, 'candidateProfile']);
 
 // Employer Interview Scheduler
@@ -217,6 +259,7 @@ $router->get('/search', [InternshipController::class, 'search']);
 $router->get('/internship/{slug}', [InternshipController::class, 'show']);
 $router->get('/apply/{slug}', [InternshipController::class, 'apply']);
 $router->post('/apply/{slug}', [CandidateController::class, 'submitApplication']);
+$router->post('/apply/{slug}/parse-resume', [CandidateController::class, 'parseApplicationResume']);
 
 // ==============================================================================
 // ADMIN MISSION CONTROL ROUTES & ACCESS CONTROL SUITE
@@ -236,10 +279,51 @@ $router->get('/admin/overview', [AdminController::class, 'overview']);
 $router->get('/admin/dashboard', [AdminController::class, 'overview']);
 $router->get('/admin/interns', [AdminController::class, 'interns']);
 $router->get('/admin/employers', [AdminController::class, 'employers']);
+$router->get('/admin/interns/{segment}', [AdminController::class, 'interns']);
+$router->get('/admin/employers/{segment}', [AdminController::class, 'employers']);
 $router->get('/admin/ai', [AdminController::class, 'ai']);
 $router->get('/admin/ai/chat', [AdminController::class, 'aiChat']);
 $router->get('/admin/elearning', [AdminController::class, 'elearning']);
+$router->post('/admin/elearning/partners/{id}', [AdminController::class, 'updateElearningPartner']);
+// Testimonials (docs/61-testimonials.md)
+$router->get('/admin/testimonials', [AdminTestimonialsController::class, 'index']);
+$router->post('/admin/testimonials', [AdminTestimonialsController::class, 'save']);
+$router->post('/admin/testimonials/upload', [AdminTestimonialsController::class, 'upload']);
+$router->post('/admin/testimonials/{id}', [AdminTestimonialsController::class, 'save']);
+$router->post('/admin/testimonials/{id}/toggle', [AdminTestimonialsController::class, 'toggle']);
+$router->post('/admin/testimonials/{id}/delete', [AdminTestimonialsController::class, 'delete']);
+// Training partners (docs/57-training-partners.md)
+$router->get('/admin/elearning/partners', [AdminPartnersController::class, 'index']);
+$router->post('/admin/elearning/training-partners', [AdminPartnersController::class, 'savePartner']);
+$router->post('/admin/elearning/training-partners/{id}', [AdminPartnersController::class, 'savePartner']);
+$router->post('/admin/elearning/training-partners/{id}/keys', [AdminPartnersController::class, 'rotateKeys']);
+$router->post('/admin/elearning/tier-rules', [AdminPartnersController::class, 'saveRules']);
+$router->post('/admin/elearning/training-results', [AdminPartnersController::class, 'addResult']);
+$router->post('/admin/elearning/training-results/{id}/revoke', [AdminPartnersController::class, 'revokeResult']);
 $router->get('/admin/subscriptions', [AdminController::class, 'subscriptions']);
+$router->get('/admin/subscriptions/plans', [AdminController::class, 'plans']);
+// Communications: newsletter, contact inbox, mail log (docs/54-email-newsletter-contact.md)
+$router->get('/admin/communications', [AdminCommunicationsController::class, 'index']);
+$router->post('/admin/communications/campaigns', [AdminCommunicationsController::class, 'saveCampaign']);
+$router->post('/admin/communications/campaigns/{id}', [AdminCommunicationsController::class, 'saveCampaign']);
+$router->get('/admin/communications/campaigns/{id}/preview', [AdminCommunicationsController::class, 'preview']);
+$router->post('/admin/communications/campaigns/{id}/test', [AdminCommunicationsController::class, 'sendTest']);
+$router->post('/admin/communications/campaigns/{id}/send', [AdminCommunicationsController::class, 'send']);
+$router->post('/admin/communications/queue', [AdminCommunicationsController::class, 'processQueue']);
+$router->post('/admin/communications/test-mail', [AdminCommunicationsController::class, 'testMail']);
+$router->post('/admin/communications/images', [AdminCommunicationsController::class, 'uploadImage']);
+$router->post('/admin/communications/preview-draft', [AdminCommunicationsController::class, 'previewDraft']);
+$router->post('/admin/communications/jenny-draft', [AdminCommunicationsController::class, 'jennyDraft']);
+$router->post('/admin/communications/subscribers/{id}/audience', [AdminCommunicationsController::class, 'setAudience']);
+$router->get('/admin/communications/subscribers/export', [AdminCommunicationsController::class, 'exportSubscribers']);
+$router->post('/admin/communications/subscribers/{id}/unsubscribe', [AdminCommunicationsController::class, 'unsubscribe']);
+$router->post('/admin/communications/inbox/{id}/reply', [AdminCommunicationsController::class, 'reply']);
+$router->post('/admin/communications/inbox/{id}/status', [AdminCommunicationsController::class, 'setStatus']);
+$router->post('/admin/subscriptions/plans', [AdminController::class, 'savePlans']);
+$router->post('/admin/subscriptions/plans/grant', [AdminController::class, 'grantPlan']);
+$router->post('/admin/subscriptions/plans/grants/{id}/revoke', [AdminController::class, 'revokePlanGrant']);
+$router->post('/admin/subscriptions/plans/grants/{id}/reactivate', [AdminController::class, 'reactivatePlanGrant']);
+$router->get('/admin/subscriptions/plans/accounts', [AdminController::class, 'searchAccounts']);
 $router->get('/admin/settings', [AdminController::class, 'settings']);
 $router->get('/admin/settings/team', [AdminController::class, 'settingsTeam']);
 $router->get('/admin/interviews', [AdminController::class, 'interviews']);
@@ -271,3 +355,44 @@ $router->get('/admin/interviews/{id}/files/{fileId}', [AdminController::class, '
 $router->post('/admin/interviews/{id}/report/ai', [AdminController::class, 'interviewSummary']);
 $router->post('/admin/interviews/{id}/status', [AdminController::class, 'interviewStatus']);
 $router->get('/admin/api/interviews/live-map', [AdminController::class, 'interviewLiveMap']);
+// Admin can open/join any interview room at any time (moderation, setup, support)
+$router->get('/admin/interviews/{id}/room', [AdminController::class, 'interviewRoom']);
+$router->post('/admin/interviews/{id}/room/join', [AdminController::class, 'joinInterviewRoom']);
+$router->post('/admin/interviews/{id}/room/left', [AdminController::class, 'leftInterviewRoom']);
+$router->post('/admin/interviews/{id}/room/event', [InterviewController::class, 'roomEvent']);
+$router->post('/admin/interviews/{id}/room/files', [InterviewController::class, 'uploadFile']);
+$router->post('/admin/interviews/{id}/room/chat', [InterviewController::class, 'chatMessage']);
+// ══════════════════════════════════════════════════════════════════════════════
+// REST API v1 (/api/v1) — JSON envelope, Bearer JWT, rate limited. docs/51-api-and-security.md
+// OpenAPI spec: /admin/api-docs (Swagger UI) and /admin/api-docs/openapi.json (admin only).
+// ══════════════════════════════════════════════════════════════════════════════
+$router->get('/api/v1/health', [\App\Controllers\Api\V1\CatalogApiController::class, 'health']);
+$router->post('/api/v1/auth/login', [\App\Controllers\Api\V1\AuthApiController::class, 'login']);
+$router->post('/api/v1/auth/refresh-token', [\App\Controllers\Api\V1\AuthApiController::class, 'refresh']);
+$router->post('/api/v1/auth/logout', [\App\Controllers\Api\V1\AuthApiController::class, 'logout']);
+$router->get('/api/v1/auth/me', [\App\Controllers\Api\V1\AuthApiController::class, 'me']);
+$router->get('/api/v1/internships', [\App\Controllers\Api\V1\CatalogApiController::class, 'internships']);
+$router->get('/api/v1/internships/{id}', [\App\Controllers\Api\V1\CatalogApiController::class, 'internship']);
+$router->get('/api/v1/elearning/programs', [\App\Controllers\Api\V1\CatalogApiController::class, 'elearningPrograms']);
+$router->get('/api/v1/candidate/profile', [\App\Controllers\Api\V1\AccountApiController::class, 'candidateProfile']);
+$router->get('/api/v1/candidate/applications', [\App\Controllers\Api\V1\AccountApiController::class, 'candidateApplications']);
+$router->get('/api/v1/candidate/applications/{id}', [\App\Controllers\Api\V1\AccountApiController::class, 'candidateApplication']);
+$router->get('/api/v1/billing', [\App\Controllers\Api\V1\AccountApiController::class, 'billing']);
+$router->get('/api/v1/notifications', [\App\Controllers\Api\V1\AccountApiController::class, 'notifications']);
+$router->get('/api/v1/employer/candidates/{id}/application', [\App\Controllers\Api\V1\AccountApiController::class, 'employerCandidateApplication']);
+$router->post('/api/v1/employer/candidates/{id}/stage', [\App\Controllers\Api\V1\AccountApiController::class, 'employerSetStage']);
+$router->get('/api/v1/interviews', [\App\Controllers\Api\V1\InterviewApiController::class, 'index']);
+$router->get('/api/v1/interviews/{id}/status', [\App\Controllers\Api\V1\InterviewApiController::class, 'status']);
+$router->post('/api/v1/interviews/{id}/token', [\App\Controllers\Api\V1\InterviewApiController::class, 'token']);
+$router->post('/api/v1/ai/cv/parse', [\App\Controllers\Api\V1\AiApiController::class, 'parseCv']);
+$router->post('/api/v1/ai/cover-letter', [\App\Controllers\Api\V1\AiApiController::class, 'coverLetter']);
+$router->post('/api/v1/ai/interview-prep/questions', [\App\Controllers\Api\V1\AiApiController::class, 'interviewQuestions']);
+// Training partners (Jigide and others): API key + HMAC signature, docs/58-partner-api.md
+$router->post('/api/v1/partners/results', [\App\Controllers\Api\V1\PartnerApiController::class, 'results']);
+$router->post('/api/v1/partners/applications/status', [\App\Controllers\Api\V1\PartnerApiController::class, 'applicationStatus']);
+$router->get('/api/v1/partners/students/{reference}', [\App\Controllers\Api\V1\PartnerApiController::class, 'student']);
+$router->get('/api/v1/partners/students', [\App\Controllers\Api\V1\PartnerApiController::class, 'students']);
+$router->get('/api/v1/partners/stats', [\App\Controllers\Api\V1\PartnerApiController::class, 'stats']);
+// Swagger UI + spec (admin only)
+$router->get('/admin/api-docs', [AdminController::class, 'apiDocs']);
+$router->get('/admin/api-docs/openapi.json', [AdminController::class, 'apiDocsSpec']);

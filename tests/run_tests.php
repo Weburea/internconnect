@@ -13,6 +13,7 @@ require_once __DIR__ . '/Unit/AiFeaturesTest.php';
 require_once __DIR__ . '/Unit/CommunicationFeaturesTest.php';
 require_once __DIR__ . '/Unit/EnterpriseFeaturesTest.php';
 require_once __DIR__ . '/Unit/VideoInterviewTest.php';
+require_once __DIR__ . '/Unit/BillingAndApplicationsTest.php';
 
 $testClasses = [
     \Tests\Unit\AdminControllerTest::class,
@@ -20,6 +21,7 @@ $testClasses = [
     \Tests\Unit\CommunicationFeaturesTest::class,
     \Tests\Unit\EnterpriseFeaturesTest::class,
     \Tests\Unit\VideoInterviewTest::class,
+    \Tests\Unit\BillingAndApplicationsTest::class,
 ];
 
 echo "========================================================\n";

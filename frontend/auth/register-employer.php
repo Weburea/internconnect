@@ -264,6 +264,7 @@ declare(strict_types=1);
                     <div class="inline-flex items-center gap-2 border border-primary/20 rounded-full px-4 py-1.5 bg-primary/5">
                         <span class="text-[12px] font-bold tracking-wider text-primary uppercase">Security</span>
                     </div>
+                    <h1 class="sr-only">Create your InternConnect employer account</h1>
                     <h2 class="text-[40px] lg:text-[48px] leading-[44px] lg:leading-[50px] font-bold tracking-tight text-[#191C1D]">
                         Find your next great <span class="text-primary">intern, faster.</span>
                     </h2>
@@ -746,11 +747,11 @@ declare(strict_types=1);
                                                 </div>
                                             </div>
                                             <div class="min-w-0 flex-1 overflow-hidden">
-                                                <p class="text-xs font-bold text-[#191C1D] truncate block" :title="business_doc_name" x-text="business_doc_name"></p>
+                                                <p class="text-xs font-bold text-[#191C1D] truncate block" :aria-label="business_doc_name" x-text="business_doc_name"></p>
                                                 <p class="text-[11px] text-gray-500 truncate" x-text="business_doc_size"></p>
                                             </div>
                                         </div>
-                                        <button type="button" @click="removeBusinessDoc()" class="text-red-500 hover:text-red-700 flex-shrink-0 p-1.5 rounded-lg hover:bg-red-50 transition-colors" title="Delete document">
+                                        <button type="button" @click="removeBusinessDoc()" class="text-red-500 hover:text-red-700 flex-shrink-0 p-1.5 rounded-lg hover:bg-red-50 transition-colors" aria-label="Delete document">
                                             <iconify-icon icon="lucide:trash-2" class="text-base"></iconify-icon>
                                         </button>
                                     </div>
@@ -793,7 +794,7 @@ declare(strict_types=1);
                                 <div @click="$refs.logoInput.click()" 
                                      class="rounded-2xl border border-brandBorder bg-indigo-50/50 flex items-center justify-center cursor-pointer hover:opacity-95 flex-shrink-0 relative overflow-hidden transition-all shadow-sm group"
                                      style="width: 56px; height: 56px; min-width: 56px;"
-                                     title="Click to upload or change company logo">
+                                     aria-label="Click to upload or change company logo">
                                     <template x-if="logo_uploaded && logo_url">
                                         <div class="relative w-full h-full">
                                             <img :src="logo_url" @error="logo_uploaded = false; logo_url = ''" class="w-full h-full object-cover">

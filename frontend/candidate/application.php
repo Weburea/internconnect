@@ -1,6 +1,14 @@
 <?php
 $extraCss = ['assets/css/application.css'];
 $oldInput = $oldInput ?? [];
+// Account details + the candidate's parsed CV (CvService::prefill); old input wins after a failed submit.
+$prefill = $prefill ?? ['full_name' => '', 'email' => '', 'phone' => '', 'job_title' => '', 'company' => '', 'from_cv' => false];
+$savedCv = $savedCv ?? null;
+$parseUrl = url('/apply/' . rawurlencode((string)($internship['id'] ?? $slug ?? 'software-engineer-intern')) . '/parse-resume');
+// Resume already saved on the profile + latest dashboard cover letter (InternshipController::apply).
+$savedResume = $savedResume ?? null;
+$savedLetter = $savedLetter ?? null;
+$letterUrl = url('/candidate/ai-assistant/cover-letter/generate');
 
 $screeningQuestions = !empty($internship['screening_questions']) && is_array($internship['screening_questions'])
     ? $internship['screening_questions']
@@ -16,18 +24,33 @@ document.addEventListener('alpine:init', () => {
     Alpine.data('applicationForm', () => ({
         step: <?= !empty($errors) ? 3 : 1 ?>, 
         coverLetter: <?= json_encode($oldInput['cover_letter'] ?? '') ?>, 
-        fileUploaded: false, 
-        uploadedFileName: '', 
-        uploadedFileSize: '', 
-        uploadedFileUrl: '', 
-        uploadedFileExt: '', 
-        dragOver: false, 
+        fileUploaded: <?= !empty($savedResume) ? 'true' : 'false' ?>,
+        uploadedFileName: <?= json_encode($savedResume['name'] ?? '') ?>,
+        uploadedFileSize: <?= json_encode($savedResume['size_label'] ?? '') ?>,
+        uploadedFileUrl: <?= json_encode($savedResume['url'] ?? '') ?>,
+        uploadedFileExt: <?= json_encode(strtolower((string)($savedResume['ext'] ?? ''))) ?>,
+        // Saved profile resume in use (sent as use_saved_resume; replaced by any new upload).
+        usingSavedResume: <?= !empty($savedResume) ? 'true' : 'false' ?>,
+        // Jenny AI cover letter: '' | loading | done | error
+        aiTone: 'professional',
+        aiLetterState: '',
+        aiLetterError: '',
+        previousLetter: null,
+        dragOver: false,         dragOver: false, 
         clDragOver: false,
         showPreviewModal: false, 
-        phone: <?= json_encode($oldInput['phone'] ?? '+234 806 071 8932') ?>,
-        parsedSkills: ['PHP', 'JavaScript', 'Tailwind CSS', 'SQL', 'Alpine.js'],
-        jobTitle: <?= json_encode($oldInput['job_title'] ?? '') ?>,
-        company: <?= json_encode($oldInput['experience_company'] ?? '') ?>,
+        fullName: <?= json_encode($oldInput['full_name'] ?? $prefill['full_name']) ?>,
+        email: <?= json_encode($oldInput['email'] ?? $prefill['email']) ?>,
+        phone: <?= json_encode($oldInput['phone'] ?? $prefill['phone']) ?>,
+        parsedSkills: [],
+        jobTitle: <?= json_encode($oldInput['job_title'] ?? $prefill['job_title']) ?>,
+        company: <?= json_encode($oldInput['experience_company'] ?? $prefill['company']) ?>,
+        // CV autofill: '' | reading | filled | failed (docs/49-cv-autofill-and-applications.md)
+        cvStatus: <?= json_encode($prefill['from_cv'] ? 'filled' : '') ?>,
+        cvSource: <?= json_encode($savedCv ? 'saved' : '') ?>,
+        cvFileName: <?= json_encode($savedCv['name'] ?? '') ?>,
+        cvFilled: [],
+        cvInitial: null,
         salary: <?= json_encode($oldInput['salary_expectation'] ?? '') ?>,
         coverLetterFile: false,
         coverLetterFileName: '',
@@ -86,9 +109,9 @@ document.addEventListener('alpine:init', () => {
                 return;
             }
             const ext = file.name.split('.').pop().toLowerCase();
-            if (!['pdf', 'docx', 'rtf'].includes(ext)) {
-                this.resumeError = 'Unsupported file type. Please upload a PDF, DOCX, or RTF.';
-                this.showAlert('Invalid File Format', 'Unsupported file type. Please upload a PDF, DOCX, or RTF document.');
+            if (!['pdf', 'docx'].includes(ext)) {
+                this.resumeError = 'Unsupported file type. Please upload a PDF or DOCX.';
+                this.showAlert('Invalid File Format', 'Unsupported file type. Please upload a PDF or DOCX document.');
                 return;
             }
             this.resumeError = '';
@@ -101,8 +124,45 @@ document.addEventListener('alpine:init', () => {
             this.uploadedFileExt = ext;
             this.uploadedFileUrl = URL.createObjectURL(file);
             this.fileUploaded = true;
+            this.usingSavedResume = false;
+            window.__icResumeFile = file;
+            this.readCv(file);
+            this.$nextTick(() => this.renderDocxPreviews());
+        },
+        // Read the CV with Jenny AI and fill in contact details and the latest job.
+        // Fields the candidate already changed are kept; experience details stay manual.
+        async readCv(file) {
+            if (!this.cvInitial) {
+                this.cvInitial = { fullName: this.fullName, email: this.email, phone: this.phone, jobTitle: this.jobTitle, company: this.company };
+            }
+            this.cvStatus = 'reading';
+            this.cvFileName = file.name;
+            try {
+                const form = new FormData();
+                form.append('resume', file);
+                const res = await fetch(<?= json_encode($parseUrl) ?>, { method: 'POST', headers: { 'Accept': 'application/json' }, body: form });
+                const json = await res.json().catch(() => ({}));
+                if (!res.ok || !json.success) throw new Error(json.error || 'We could not read this CV.');
+                const map = { fullName: 'full_name', email: 'email', phone: 'phone', jobTitle: 'job_title', company: 'company' };
+                const labels = { fullName: 'name', email: 'email', phone: 'phone', jobTitle: 'job title', company: 'company' };
+                const filled = [];
+                for (const [key, field] of Object.entries(map)) {
+                    const value = String((json.fields || {})[field] || '').trim();
+                    const untouched = !String(this[key] || '').trim() || this[key] === this.cvInitial[key];
+                    if (value && untouched) { this[key] = value; filled.push(labels[key]); }
+                }
+                this.parsedSkills = Array.isArray(json.fields.skills) ? json.fields.skills : [];
+                this.cvFilled = filled;
+                this.cvSource = 'upload';
+                this.cvStatus = filled.length ? 'filled' : 'failed';
+                if (filled.length) this.$dispatch('toast', { message: 'We filled in your ' + filled.join(', ') + ' from your CV.', type: 'success' });
+            } catch (e) {
+                this.cvStatus = 'failed';
+            }
         },
         removeResume() {
+            this.usingSavedResume = false;
+            window.__icResumeFile = null;
             if (this.uploadedFileUrl) {
                 URL.revokeObjectURL(this.uploadedFileUrl);
             }
@@ -134,9 +194,9 @@ document.addEventListener('alpine:init', () => {
         },
         processCoverLetterFile(file) {
             const ext = file.name.split('.').pop().toLowerCase();
-            if (!['pdf','docx','rtf'].includes(ext)) {
-                this.coverLetterError = 'Unsupported type. Please upload a PDF, DOCX, or RTF.';
-                this.showAlert('Invalid File Format', 'Unsupported file type. Please upload a PDF, DOCX, or RTF document.');
+            if (!['pdf', 'docx'].includes(ext)) {
+                this.coverLetterError = 'Unsupported type. Please upload a PDF or DOCX.';
+                this.showAlert('Invalid File Format', 'Unsupported file type. Please upload a PDF or DOCX document.');
                 return;
             }
             if (file.size > 5 * 1024 * 1024) {
@@ -244,7 +304,57 @@ document.addEventListener('alpine:init', () => {
                 this.$refs.portfolioFileInput.value = '';
             }
         },
+        // Word (DOCX) preview with docx-preview, same method as the admin document viewer.
+        renderDocxPreviews() {
+            if (this.uploadedFileExt !== 'docx' || typeof window.icRenderDocx !== 'function') return;
+            const source = window.__icResumeFile || this.uploadedFileUrl;
+            ['docxInline', 'docxModal'].forEach((ref) => { if (this.$refs[ref]) window.icRenderDocx(source, this.$refs[ref], this.uploadedFileName); });
+        },
+        openResumePreview() {
+            this.showPreviewModal = true;
+            this.$nextTick(() => this.renderDocxPreviews());
+        },
+        // Jenny AI writes a letter for this internship from the candidate's CV (same engine as the dashboard tool).
+        async generateLetter() {
+            if (this.aiLetterState === 'loading') return;
+            this.aiLetterState = 'loading';
+            this.aiLetterError = '';
+            try {
+                const res = await fetch(<?= json_encode($letterUrl) ?>, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({
+                        company: <?= json_encode((string)($internship['company'] ?? '')) ?>,
+                        role: <?= json_encode((string)($internship['title'] ?? '')) ?>,
+                        tone: this.aiTone,
+                        max_chars: 1900,
+                    }),
+                });
+                const json = await res.json().catch(() => ({}));
+                const text = json && json.letter ? String(json.letter.full_letter || '') : '';
+                if (!res.ok || !text) throw new Error('empty');
+                this.useLetter(text);
+                this.aiLetterState = 'done';
+            } catch (e) {
+                this.aiLetterState = 'error';
+                this.aiLetterError = 'Jenny AI could not write a letter right now. Please try again in a moment.';
+            }
+        },
+        useLetter(text) {
+            this.previousLetter = this.coverLetter;
+            this.coverLetter = String(text || '').trim().slice(0, 2000);
+        },
+        undoLetter() {
+            if (this.previousLetter === null) return;
+            this.coverLetter = this.previousLetter;
+            this.previousLetter = null;
+            this.aiLetterState = '';
+        },
         init() {
+            if (this.usingSavedResume && this.uploadedFileExt === 'docx') {
+                this.$watch('step', (value) => { if (value === 2) this.$nextTick(() => this.renderDocxPreviews()); });
+                this.$nextTick(() => this.renderDocxPreviews());
+            }
             this.$watch('salary', (value) => {
                 if (!value) return;
                 let clean = value.replace(/[^\d]/g, '');
@@ -261,7 +371,9 @@ document.addEventListener('alpine:init', () => {
         canAccessStep(targetStep) {
             if (targetStep === 1) return true;
             
-            const isStep1Valid = this.phone && this.phone.trim() !== '' &&
+            const isStep1Valid = this.fullName && this.fullName.trim() !== '' &&
+                                 this.email && this.email.trim() !== '' &&
+                                 this.phone && this.phone.trim() !== '' &&
                                  this.jobTitle && this.jobTitle.trim() !== '' &&
                                  this.company && this.company.trim() !== '' &&
                                  this.salary && this.salary.trim() !== '';
@@ -290,6 +402,43 @@ document.addEventListener('alpine:init', () => {
 });
 </script>
 
+<style>
+/* Jenny AI letter bar + Word preview (inline so a cached stylesheet can never leave them unstyled) */
+.ic-ai-letter { border: 1px solid #E0E7FF; background: linear-gradient(135deg, #F5F7FF 0%, #FFFFFF 70%); border-radius: 16px; padding: 16px 18px; margin-bottom: 22px; display: flex; flex-direction: column; gap: 12px; }
+.ic-ai-letter-head { display: flex; gap: 12px; align-items: flex-start; }
+.ic-ai-letter-icon { width: 36px; height: 36px; border-radius: 10px; background: #4F48E6; color: #FFFFFF; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 6px 16px -6px rgba(79, 72, 230, .6); }
+.ic-ai-letter-copy { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ic-ai-letter-copy strong { font-size: 14px; font-weight: 700; color: #0F172A; }
+.ic-ai-letter-copy span { font-size: 12.5px; color: #64748B; line-height: 1.5; }
+.ic-ai-letter-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.ic-ai-tone { position: relative; display: inline-flex; align-items: center; }
+.ic-ai-tone .ic-sel { width: auto; }
+.ic-ai-tone-select { appearance: none; -webkit-appearance: none; height: 38px; min-width: 156px; padding: 0 12px; border-radius: 10px; border: 1px solid #E2E8F0; background: #FFFFFF; font-size: 13px; font-weight: 600; color: #334155; cursor: pointer; }
+.ic-ai-tone-select:hover { border-color: #CBD5E1; }
+.ic-ai-tone-select:focus, .ic-sel.is-open .ic-ai-tone-select { outline: none; border-color: #4F48E6; box-shadow: 0 0 0 3px rgba(79, 72, 230, .12); }
+.ic-ai-btn { display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 14px; border-radius: 10px; border: 1px solid #E2E8F0; background: #FFFFFF; color: #334155; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: background .15s ease, border-color .15s ease; }
+.ic-ai-btn:hover:not(:disabled) { background: #F8FAFC; border-color: #CBD5E1; }
+.ic-ai-btn.is-primary { background: #4F48E6; border-color: #4F48E6; color: #FFFFFF; }
+.ic-ai-btn.is-primary:hover:not(:disabled) { background: #4338CA; }
+.ic-ai-btn:disabled { opacity: .7; cursor: wait; }
+.ic-ai-spin { animation: icAiSpin 1s linear infinite; }
+@keyframes icAiSpin { to { transform: rotate(360deg); } }
+.ic-ai-note { margin: 0; font-size: 12px; color: #64748B; line-height: 1.5; }
+.ic-ai-note.is-ok { color: #4F48E6; font-weight: 600; }
+.ic-ai-note.is-ok button { margin-left: 6px; border: 0; background: none; padding: 0; color: #334155; font-weight: 700; text-decoration: underline; cursor: pointer; font-size: 12px; }
+.ic-ai-note.is-error { color: #B91C1C; font-weight: 600; }
+.sr-only-ic { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.ic-docx-host { padding: 12px; }
+.ic-docx-host .docx-wrapper { background: transparent !important; padding: 0 !important; }
+.ic-docx-host section.docx { box-shadow: 0 1px 4px rgba(15, 23, 42, .12); margin: 0 auto 12px !important; }
+.ic-docx-msg { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 40px 16px; text-align: center; font-size: 13px; color: #64748B; }
+.ic-docx-msg strong { color: #0F172A; font-size: 14px; }
+@media (max-width: 520px) { .ic-ai-letter-actions > * { flex: 1 1 auto; justify-content: center; } }
+</style>
+<script src="<?= asset('assets/js/jszip.min.js') ?>"></script>
+<script src="<?= asset('assets/js/docx-preview.min.js') ?>"></script>
+<script src="<?= asset('assets/js/ic-docx-preview.js') ?>?v=<?= @filemtime(dirname(__DIR__, 2) . '/public/assets/js/ic-docx-preview.js') ?: 1 ?>"></script>
+
 <div x-data="applicationForm" class="min-h-screen bg-[#F8FAFC] flex flex-col font-sans">
     
     <div class="flex-grow pt-16 pb-16">
@@ -314,8 +463,8 @@ document.addEventListener('alpine:init', () => {
                             </p>
                             <!-- Status row -->
                             <div class="flex items-center gap-2 mt-4 pt-4 border-t border-gray-100">
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse inline-block"></span>
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold" style="background: #EEF2FF; color: #4F48E6; border: 1px solid #C7D2FE;">
+                                    <span class="h-1.5 w-1.5 rounded-full animate-pulse inline-block" style="background: #4F48E6;"></span>
                                     Applications Open
                                 </span>
                                 <span class="text-[10px] text-gray-400">· Reviewed on a rolling basis</span>
@@ -350,7 +499,7 @@ document.addEventListener('alpine:init', () => {
                                 <div>
                                     <p class="text-[10px] font-bold uppercase tracking-wider mb-0.5"
                                        :class="step === 1 ? 'text-primary' : 'text-gray-400'">Contact Details</p>
-                                    <h3 class="font-bold text-sm transition-colors" :class="step === 1 ? 'text-primary-text' : 'text-gray-500'">Sarah Peters</h3>
+                                    <h3 class="font-bold text-sm transition-colors" :class="step === 1 ? 'text-primary-text' : 'text-gray-500'" x-text="fullName || 'Your details'"></h3>
                                 </div>
                             </div>
                             
@@ -482,17 +631,28 @@ document.addEventListener('alpine:init', () => {
                                 
                                 <h2 class="text-3xl font-bold text-primary-text mb-2">Personal Details</h2>
                                 <p class="text-gray-500 mb-10 text-base">Please review your contact information below.</p>
+
+                                <!-- CV autofill status: one quiet line in the existing layout (styles inline, never cache-dependent) -->
+                                <p class="app-cv-note" role="status" aria-live="polite" style="margin: -28px 0 28px; font-size: 13px; line-height: 1.55; color: #64748B;">
+                                    <span x-show="cvStatus === 'reading'" style="display: none;">Reading your CV to fill in your details...</span>
+                                    <span x-show="cvStatus === 'filled'" style="display: none;">Filled in from your CV<span x-show="cvFileName" x-text="' (' + cvFileName + ')'"></span>. Please check the details below.</span>
+                                    <span x-show="cvStatus === 'failed'" style="display: none;">We could not read details from this CV. Please fill in the fields below.</span>
+                                    <span x-show="!cvStatus">Have a CV? We can fill these in for you.</span>
+                                    <button type="button" x-show="cvStatus !== 'reading'" @click="$refs.fileInput.click()"
+                                            style="margin-left: 6px; padding: 0; border: 0; background: none; color: #4F48E6; font-weight: 700; font-size: 13px; cursor: pointer;"
+                                            x-text="cvStatus === 'filled' ? 'Upload a different CV' : 'Upload CV'"></button>
+                                </p>
                                 
                                 <div class="space-y-6">
                                     <div>
                                         <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Full Name</label>
-                                        <input type="text" name="full_name" class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-colors font-medium text-primary-text" value="Sarah Peters" readonly>
+                                        <input type="text" name="full_name" x-model="fullName" autocomplete="name" placeholder="Your full name" class="w-full px-5 py-4 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors font-medium text-primary-text">
                                     </div>
                                     
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
                                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Email Address</label>
-                                            <input type="email" name="email" class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-colors font-medium text-primary-text" value="sarahpeters@internconnect.com" readonly>
+                                            <input type="email" name="email" x-model="email" autocomplete="email" placeholder="you@example.com" class="w-full px-5 py-4 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors font-medium text-primary-text">
                                         </div>
                                         <div>
                                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Phone Number</label>
@@ -572,7 +732,7 @@ document.addEventListener('alpine:init', () => {
                                  class="w-full pb-4">
                                 
                                 <h2 class="text-3xl font-bold text-primary-text mb-2">Upload your Resume</h2>
-                                <p class="text-gray-500 mb-10 text-base">We accept PDF, DOCX, or RTF files. Ensure your file size is under 5MB.</p>
+                                <p class="text-gray-500 mb-10 text-base">We accept PDF or DOCX files under 5MB. Jenny AI reads your CV to fill in your details.</p>
                                 
                                 <!-- Hidden File Input -->
                                 <input type="file" 
@@ -580,10 +740,11 @@ document.addEventListener('alpine:init', () => {
                                        x-ref="fileInput" 
                                        @change="handleFileChange($event)" 
                                        class="hidden" 
-                                       accept=".pdf,.docx,.rtf">
+                                       accept=".pdf,.docx">
+                                <input type="hidden" name="use_saved_resume" :value="usingSavedResume ? '1' : ''">
 
-                                <!-- Drag & Drop Box -->
-                                <div @click="$refs.fileInput.click()"
+                                <!-- Drag & Drop Box (hidden while a resume is attached; remove it to upload another) -->
+                                <div x-show="!fileUploaded" @click="$refs.fileInput.click()"
                                      @dragover.prevent="dragOver = true"
                                      @dragleave.prevent="dragOver = false"
                                      @drop.prevent="handleFileDrop($event)"
@@ -612,7 +773,7 @@ document.addEventListener('alpine:init', () => {
 
                                 <!-- Uploaded Files Box -->
                                 <div x-show="fileUploaded" class="mb-6">
-                                    <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Uploaded File</p>
+                                    <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3" x-text="usingSavedResume ? 'Your saved resume' : 'Uploaded File'">Uploaded File</p>
                                     <div class="border border-gray-200 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row gap-4 sm:gap-5 items-start sm:items-center justify-between bg-[#F8FAFC] shadow-sm w-full box-border overflow-hidden">
                                         <div class="flex items-center gap-3 sm:gap-4 min-w-0 flex-1 overflow-hidden">
                                             <!-- Visual file icon -->
@@ -626,8 +787,8 @@ document.addEventListener('alpine:init', () => {
                                                 <div class="h-[1.5px] bg-primary w-1/2 rounded"></div>
                                             </div>
                                             <div class="min-w-0 flex-1 overflow-hidden">
-                                                <p class="text-sm sm:text-base font-bold text-primary-text mb-0.5 truncate" :title="uploadedFileName" x-text="uploadedFileName"></p>
-                                                <p class="text-xs sm:text-sm text-gray-500" x-text="uploadedFileSize + ' • Uploaded just now'"></p>
+                                                <p class="text-sm sm:text-base font-bold text-primary-text mb-0.5 truncate" :aria-label="uploadedFileName" x-text="uploadedFileName"></p>
+                                                <p class="text-xs sm:text-sm text-gray-500" x-text="uploadedFileSize + (usingSavedResume ? ' • Saved on your profile' : ' • Uploaded just now')"></p>
                                                 <!-- Status badges -->
                                                 <div class="flex flex-wrap items-center gap-2 mt-1.5">
                                                     <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200" style="white-space: nowrap !important; flex-shrink: 0 !important;">Ready for review</span>
@@ -643,7 +804,7 @@ document.addEventListener('alpine:init', () => {
                                         
                                         <!-- Actions -->
                                         <div class="flex items-center gap-3 w-full sm:w-auto justify-end flex-shrink-0 mt-3 sm:mt-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-gray-200">
-                                            <button type="button" @click="showPreviewModal = true"
+                                            <button type="button" @click="openResumePreview()"
                                                     class="flex-1 sm:flex-initial border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 text-xs font-semibold py-2.5 px-4 sm:px-4.5 rounded-lg transition active:scale-95 inline-flex items-center justify-center gap-2 shadow-sm"
                                                     style="white-space: nowrap !important; flex-shrink: 0 !important;">
                                                 <svg class="h-4 w-4 flex-shrink-0 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -657,7 +818,7 @@ document.addEventListener('alpine:init', () => {
                                                 <svg class="h-4 w-4 flex-shrink-0 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                                 </svg>
-                                                <span>Delete</span>
+                                                <span x-text="usingSavedResume ? 'Remove' : 'Delete'">Delete</span>
                                             </button>
                                         </div>
                                     </div>
@@ -685,8 +846,13 @@ document.addEventListener('alpine:init', () => {
                                         ></iframe>
                                     </div>
 
-                                    <!-- DOCX / RTF: styled placeholder -->
-                                    <div x-show="uploadedFileExt !== 'pdf'"
+                                    <!-- DOCX: rendered in the page (docx-preview) -->
+                                    <div x-show="uploadedFileExt === 'docx'" class="rounded-xl shadow-inner" style="height: clamp(260px, 50vh, 520px); overflow: auto; background: #F1F5F9;">
+                                        <div x-ref="docxInline" class="ic-docx-host"></div>
+                                    </div>
+
+                                    <!-- Other formats: styled placeholder -->
+                                    <div x-show="uploadedFileExt !== 'pdf' && uploadedFileExt !== 'docx'"
                                          class="rounded-xl border border-gray-100 bg-gray-50/60 shadow-inner flex flex-col items-center justify-center gap-4 px-4 py-8 sm:py-0"
                                          style="min-height: 220px;">
                                         <div class="flex items-center justify-center h-14 w-14 rounded-2xl bg-indigo-50 border border-indigo-100">
@@ -778,6 +944,49 @@ document.addEventListener('alpine:init', () => {
 
                                         <!-- Type mode -->
                                         <div x-show="clMode === 'type'" x-transition style="margin-top: 24px;">
+                                            <!-- Jenny AI: write a letter for this internship or reuse the dashboard letter -->
+                                            <div class="ic-ai-letter" role="group" aria-label="Write with Jenny AI">
+                                                <div class="ic-ai-letter-head">
+                                                    <span class="ic-ai-letter-icon" aria-hidden="true">
+                                                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                                                    </span>
+                                                    <div class="ic-ai-letter-copy">
+                                                        <strong>Write it with Jenny AI</strong>
+                                                        <span>A tailored letter for <?= htmlspecialchars((string)($internship['title'] ?? 'this role')) ?> at <?= htmlspecialchars((string)($internship['company'] ?? 'this company')) ?>, built from your CV. You can edit it before you submit.</span>
+                                                    </div>
+                                                </div>
+                                                <div class="ic-ai-letter-actions">
+                                                    <label class="ic-ai-tone">
+                                                        <span class="sr-only-ic">Tone</span>
+                                                        <select data-ic-select class="ic-ai-tone-select" x-model="aiTone" aria-label="Letter tone">
+                                                            <option value="professional">Professional</option>
+                                                            <option value="confident">Confident</option>
+                                                            <option value="enthusiastic">Enthusiastic</option>
+                                                            <option value="technical">Technical</option>
+                                                        </select>
+                                                    </label>
+                                                    <button type="button" class="ic-ai-btn is-primary" @click="generateLetter()" :disabled="aiLetterState === 'loading'">
+                                                        <svg x-show="aiLetterState !== 'loading'" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                                                        <svg x-show="aiLetterState === 'loading'" class="ic-ai-spin" style="display: none;" width="15" height="15" fill="none" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity=".25"/><path fill="currentColor" d="M4 12a8 8 0 018-8v3a5 5 0 00-5 5H4z"/></svg>
+                                                        <span x-text="aiLetterState === 'loading' ? 'Writing your letter...' : (coverLetter.trim() ? 'Rewrite with AI' : 'Generate with AI')"></span>
+                                                    </button>
+                                                    <?php if (!empty($savedLetter['text'])): ?>
+                                                    <button type="button" class="ic-ai-btn" @click="useLetter(<?= htmlspecialchars(json_encode((string)$savedLetter['text']), ENT_QUOTES, 'UTF-8') ?>); aiLetterState = 'done'">
+                                                        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                                        <span>Use my saved letter</span>
+                                                    </button>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <?php if (!empty($savedLetter['text'])): ?>
+                                                <p class="ic-ai-note">Saved letter: <?= htmlspecialchars((string)$savedLetter['role']) ?> at <?= htmlspecialchars((string)$savedLetter['company']) ?> · <?= htmlspecialchars((string)$savedLetter['created_at']) ?> (from AI Cover Letter on your dashboard)</p>
+                                                <?php endif; ?>
+                                                <p class="ic-ai-note is-ok" x-show="aiLetterState === 'done' && previousLetter !== null" style="display: none;">
+                                                    Letter added below. Review and personalise it before you continue.
+                                                    <button type="button" @click="undoLetter()" x-show="previousLetter">Undo</button>
+                                                </p>
+                                                <p class="ic-ai-note is-error" x-show="aiLetterState === 'error'" x-text="aiLetterError" style="display: none;"></p>
+                                            </div>
+
                                             <label class="block text-xs font-bold text-gray-900 uppercase tracking-wider mb-3">Statement of Intent</label>
                                             <textarea name="cover_letter" x-model="coverLetter" rows="12"
                                                       class="w-full px-6 py-5 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white focus:border-transparent transition-colors resize-none text-gray-700 placeholder-gray-400 text-base leading-relaxed shadow-sm"
@@ -798,7 +1007,7 @@ document.addEventListener('alpine:init', () => {
                                         <div x-show="clMode === 'upload'" x-transition style="display:none; margin-top: 24px;">
                                             <input type="file" name="cover_letter_file" x-ref="clFileInput"
                                                    @change="handleCoverLetterFile($event)"
-                                                   class="hidden" accept=".pdf,.docx,.rtf">
+                                                   class="hidden" accept=".pdf,.docx">
 
                                             <!-- Drop zone (hidden once file uploaded) -->
                                             <div x-show="!coverLetterFile"
@@ -812,7 +1021,7 @@ document.addEventListener('alpine:init', () => {
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
                                                 </div>
                                                 <p class="font-bold text-primary-text mb-1">Upload your cover letter</p>
-                                                <p class="text-sm text-gray-500">PDF, DOCX or RTF · Max 5MB</p>
+                                                <p class="text-sm text-gray-500">PDF or DOCX · Max 5MB</p>
                                             </div>
 
                                             <!-- Inline Cover Letter Error Message -->
@@ -1073,7 +1282,7 @@ document.addEventListener('alpine:init', () => {
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-y-4 gap-x-8">
                                             <div>
                                                 <span class="block text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Full Name</span>
-                                                <span class="text-sm font-semibold text-primary-text">Sarah Peters</span>
+                                                <span class="text-sm font-semibold text-primary-text" x-text="fullName || 'Not provided'"></span>
                                             </div>
                                             <div>
                                                 <span class="block text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">Phone Number</span>
@@ -1338,8 +1547,13 @@ document.addEventListener('alpine:init', () => {
                         ></iframe>
                     </div>
 
-                    <!-- DOCX / RTF: centered placeholder -->
-                    <div x-show="uploadedFileExt !== 'pdf'" class="absolute inset-0 flex flex-col items-center justify-center gap-6 p-8">
+                    <!-- DOCX: rendered in the modal (docx-preview) -->
+                    <div x-show="uploadedFileExt === 'docx'" class="absolute inset-0" style="overflow: auto; background: #F1F5F9;">
+                        <div x-ref="docxModal" class="ic-docx-host"></div>
+                    </div>
+
+                    <!-- Other formats: centered placeholder -->
+                    <div x-show="uploadedFileExt !== 'pdf' && uploadedFileExt !== 'docx'" class="absolute inset-0 flex flex-col items-center justify-center gap-6 p-8">
                         <div class="flex items-center justify-center h-20 w-20 rounded-3xl bg-indigo-50 border border-indigo-100 shadow-sm">
                             <svg class="h-10 w-10 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
@@ -1361,7 +1575,7 @@ document.addEventListener('alpine:init', () => {
 
                 <!-- Modal Footer -->
                 <div class="px-5 sm:px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-white flex-shrink-0">
-                    <span class="text-xs text-gray-400" x-text="uploadedFileExt === 'pdf' ? 'Scroll to navigate pages' : 'Download the file to view it in full'"></span>
+                    <span class="text-xs text-gray-400" x-text="['pdf', 'docx'].includes(uploadedFileExt) ? 'Scroll to navigate pages' : 'Download the file to view it in full'"></span>
                     <button type="button" @click="showPreviewModal = false" class="bg-primary hover:bg-primary-hover text-white text-sm font-semibold py-2.5 px-5 rounded-xl transition active:scale-95 shadow-sm">
                         Close Preview
                     </button>

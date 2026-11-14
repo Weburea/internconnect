@@ -313,6 +313,8 @@ function careerCoachComponent() {
                     window.dispatchEvent(new CustomEvent('show-toast', {
                         detail: { text: 'Career Roadmap customized for ' + role, type: 'info' }
                     }));
+                } else if (data.error) {
+                    window.dispatchEvent(new CustomEvent('show-toast', { detail: { text: data.error, type: 'error' } }));
                 }
             } catch (e) {
                 console.error('Error switching roadmap role', e);

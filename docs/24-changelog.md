@@ -23,6 +23,48 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## [Unreleased]
 
+- **Front-end readiness audit** - 2026-11-13: every page checked in a browser (no JS errors, no failed assets, no horizontal overflow at 390px). SEO: global titles and descriptions (no longer "in Nigeria"), candidate and employer dashboards marked noindex, auth pages get the full SEO head (only sign-in and sign-up indexable), help centre indexable with canonical and Open Graph, hidden h1 on the sign-up wizards, CSS cache-busting by file time instead of every request, Alpine pinned to 3.17.5. 89 native title tooltips replaced with aria-labels. Partner API: `GET /partners/students` and `GET /partners/stats`. Email: designed headers, footer styles and button colours; real reset codes. Grants: account search and reactivate.
+
+- **Jenny Coins, testimonials admin, campaign layouts** - 2026-11-13 (docs/53, 54, 55, 61):
+  - Jenny Coins replace daily message limits: Free 5, Pro 20, Premium 60 coins, refilled 24, 12 or 5 hours after the first spend (editable). 1 coin per answer, 2 with a file, 1 per career roadmap. Animated coin, dashboard card, widget chip and AI Assistant coin row.
+  - Jenny is framed as a global platform (founded in Lagos, for everyone). The read-aloud button is removed; voice input is kept.
+  - Admin > Testimonials: quotes and video stories with social platform, rating, home and page visibility, order, and Cloudinary photo and video uploads. The home section reads from the database. `/testimonials` is redesigned with a floating card wall, filters and video stories.
+  - Newsletter campaigns: five layouts (general, marketing, event, interns, employers), audiences, header and body image uploads, Write with Jenny drafts and tips, live preview. The Subscribers tab is rebuilt with groups.
+  - Find Jobs Jenny search bar redesigned. MySQL migration `2026_11_13_000004`.
+
+- **Plans, e-mail, newsletter, Jenny on Gemini, location, training partners, MySQL** - 2026-11-12 (docs/53-59):
+  - Plan engine: Free, Pro and Premium limits live in the database and are editable by admin. The `?plan=premium` loophole is closed. Limits are enforced on applications, AI documents, mock interviews and Jenny. Premium listings (₦300k+, hybrid or remote) are locked with their pay removed server-side. The Pricing compare table and cards are built from the real limits. Admin can grant and revoke plans; demo candidate #1 has a Premium testing grant until 10 Feb 2027. Plan expiry reminder e-mails.
+  - E-mail: PHPMailer over the cPanel mailbox (mail.weburea.com:465 SSL), a queue with retries, open tracking and branded Cloudinary templates. `MAIL_PASSWORD` must be added to `.env`.
+  - Newsletter with double opt-in, one-click unsubscribe (RFC 8058), and admin compose, preview, test, batch send, stats and CSV export. Contact form stored and e-mailed, with an admin inbox and replies. New admin **Communications** page.
+  - Rewritten privacy and cookie policies (Gemini, real providers, NDPA 2023, retention), terms and refund updates, a consent banner with real choices, and footer fixes.
+  - Ticket-style payment receipt for every payment state: Code128 barcode, card box, vector PDF and PNG downloads. Real A4 offer letter PDF.
+  - Jenny on Gemini everywhere: the widget (real answers, listing cards, attachments, voice in and out, Job seeker/Employer toggle), a new AI Assistant chat workspace (Pro 5 / Premium 15 chats a day), the admin console with history and read-only user chats, and Find Jobs search assist (Pro and Premium).
+  - Visitor tracking (beacon, MaxMind city, masked IPs), so the admin live map shows real visitors. Near me on Find Jobs.
+  - Training partners (Jigide first): hand-off with a signed reference; partner API with key, HMAC signature, timestamp window, idempotency, audit log and rate limit; admin-editable pass marks and tier rules; corrections and revokes; Customer Care read-only; dashboard card; "Certified by" badges and filter for employers. Partner developer guide in docs/58.
+  - MySQL `internconnect_db`: migration runner `bin/migrate.php` using the existing `migrations` table; 43 tables added, nothing changed or removed. All services verified on MySQL (24 checks).
+  - Fixes: Jenny events that opened nothing, the dashboard footer `/support` link, demo sign-in not marking users as signed in, geolocation blocked by our own Permissions-Policy, and the contact page toast.
+  - Tests: 121 PHPUnit tests (563 assertions) pass; no overflow at 360/390/440 on 33 pages.
+
+- **PHPUnit, REST API v1, Swagger, security hardening** - 2026-11-12 (docs/51):
+  - Security fix: the SQLite database, docs, tests and source files were downloadable from the web root; `.htaccess` now serves only `index.php` and `public/assets`.
+  - PHPUnit 11.5 (`composer test`): original 80 tests bridged, new API/auth/spec unit tests, HTTP feature tests (route crawler over 181 GET routes, security, API); tests run on a throwaway database copy.
+  - `/api/v1`: 21 endpoints, JSON envelope, JWT access tokens with rotating single-use refresh tokens, revocation, rate limits, CORS allowlist, ownership checks.
+  - Swagger UI at `/admin/api-docs` (admin only), spec contract-tested against the routes.
+  - CSRF on every web POST (automatic client token), hardened session cookie, security headers, login rate limits, session regeneration, admin trusted-device cookie now HMAC-signed, localhost admin auto sign-in only in APP_ENV=local, interview ownership checks.
+
+- **Public page motion, e-learning partners, dropdowns** - 2026-11-11:
+  - Scroll-reveal animations on public pages (home, find jobs, pricing, e-learning, how it works, about); dashboards unchanged (`ic-reveal.js`).
+  - E-learning partners and programs moved to the database (`ElearningService`) with official logos, services offered, a richer details modal, referral tracking through `/elearning/go/{id}`, and an admin Learning Partners card (logo upload, details, services, visibility, referral counts). docs/50.
+  - MySQL schema: sections 12-14 (CV profiles, application submissions, billing, e-learning).
+
+- **CV autofill, applications, billing, admin interview tools, Gemini everywhere** - 2026-11-11:
+  - Join window: candidates can enter 5 minutes before the start; employers and admins can open the room any time, and the interview clock still starts at the scheduled time. Admins can join any room as a host (`/admin/interviews/{id}/room`).
+  - Admin: "Recent interview sessions" (latest 5) on the overview; sessions table paginated (10 per page) with a Join action.
+  - CV autofill (docs/49): Gemini reads the CV at signup, profile upload and application; the application's Personal Details fill in name, email, phone, latest job title and company. Signup's "Parsed by AI" badge now reflects a real parse.
+  - Applications are stored (`application_submissions`) with private resume, cover letter and attachments; the employer candidate page shows CV work experience, a Jenny AI profile summary, the cover letter with Submitted state, application details and working downloads.
+  - Billing & Subscription pages for candidates and employers (docs/08): current plan, renewal, payment method, history with receipts; Paystack callback + webhook recorded once per reference with amount checks; employer CSV export uses the real ledger.
+  - Gemini (Jenny AI) is now first choice for CV analysis (reads the PDF), mock-interview feedback, cover letters and career roadmaps, with the rule-based engines as fallback; failing models are skipped for a few minutes. AI text never assumes gender.
+  - Notification unread dot moved onto the category icon.
 - **Video room: shared screen controls, full screen, lobby selects; admin activity pagination** - 2026-11-11:
   - Shared screen toolbar for both people: Hide people, Minimize (floating window / presenter pill), Expand, Full screen; presenter can preview their own screen; double-click toggles full screen.
   - Full screen for the whole room from the control bar (native, with a fixed-overlay fallback); hides the side panel while active and restores it after.

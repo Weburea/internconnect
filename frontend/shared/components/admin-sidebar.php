@@ -12,7 +12,7 @@ $staffName = $staff['name'] ?? 'Jayden Okafor';
 $staffRole = $staff['role'] ?? 'Platform Admin';
 $staffInitials = $staff['initials'] ?? 'JO';
 $activeNav = $activeNav ?? 'overview';
-$currentTab = $_GET['tab'] ?? '';
+$currentTab = (string)($segment ?? ($_GET['tab'] ?? ''));
 $onAiChat = str_contains($_SERVER['REQUEST_URI'] ?? '', '/admin/ai/chat');
 
 $isInterns = in_array($activeNav, ['interns', 'candidates'], true);
@@ -72,9 +72,9 @@ $chevron = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-wi
                 </div>
                 <div class="admin-submenu" x-show="openInterns" x-transition.opacity.duration.150ms style="display: none;">
                     <a href="<?= url('/admin/interns') ?>" class="admin-subnav-link <?= ($activeNav === 'interns' && $currentTab === '') ? 'is-active' : '' ?>"><span>All Interns</span></a>
-                    <a href="<?= url('/admin/interns?tab=active') ?>" class="admin-subnav-link <?= ($activeNav === 'interns' && $currentTab === 'active') ? 'is-active' : '' ?>"><span>Active Candidates</span></a>
-                    <a href="<?= url('/admin/interns?tab=placed') ?>" class="admin-subnav-link <?= ($activeNav === 'interns' && $currentTab === 'placed') ? 'is-active' : '' ?>"><span>Placed Interns</span></a>
-                    <a href="<?= url('/admin/interns?tab=pending') ?>" class="admin-subnav-link <?= ($activeNav === 'interns' && $currentTab === 'pending') ? 'is-active' : '' ?>">
+                    <a href="<?= url('/admin/interns/active') ?>" class="admin-subnav-link <?= ($activeNav === 'interns' && $currentTab === 'active') ? 'is-active' : '' ?>"><span>Active Candidates</span></a>
+                    <a href="<?= url('/admin/interns/placed') ?>" class="admin-subnav-link <?= ($activeNav === 'interns' && $currentTab === 'placed') ? 'is-active' : '' ?>"><span>Placed Interns</span></a>
+                    <a href="<?= url('/admin/interns/pending') ?>" class="admin-subnav-link <?= ($activeNav === 'interns' && $currentTab === 'pending') ? 'is-active' : '' ?>">
                         <span>Awaiting Review</span>
                         <span class="admin-subnav-count">37</span>
                     </a>
@@ -94,11 +94,11 @@ $chevron = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-wi
                 </div>
                 <div class="admin-submenu" x-show="openEmployers" x-transition.opacity.duration.150ms style="display: none;">
                     <a href="<?= url('/admin/employers') ?>" class="admin-subnav-link <?= ($activeNav === 'employers' && $currentTab === '') ? 'is-active' : '' ?>"><span>All Employers</span></a>
-                    <a href="<?= url('/admin/employers?tab=pending') ?>" class="admin-subnav-link <?= ($activeNav === 'employers' && $currentTab === 'pending') ? 'is-active' : '' ?>">
+                    <a href="<?= url('/admin/employers/pending') ?>" class="admin-subnav-link <?= ($activeNav === 'employers' && $currentTab === 'pending') ? 'is-active' : '' ?>">
                         <span>Verification Queue</span>
                         <span class="admin-subnav-count is-amber">14</span>
                     </a>
-                    <a href="<?= url('/admin/employers?tab=verified') ?>" class="admin-subnav-link <?= ($activeNav === 'employers' && $currentTab === 'verified') ? 'is-active' : '' ?>"><span>Verified Employers</span></a>
+                    <a href="<?= url('/admin/employers/verified') ?>" class="admin-subnav-link <?= ($activeNav === 'employers' && $currentTab === 'verified') ? 'is-active' : '' ?>"><span>Verified Employers</span></a>
                 </div>
             </div>
         </div>
@@ -153,11 +153,36 @@ $chevron = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-wi
                     <span class="admin-nav-text">Subscriptions</span>
                 </span>
             </a>
+
+            <a href="<?= url('/admin/testimonials') ?>" class="admin-nav-link <?= $activeNav === 'testimonials' ? 'is-active' : '' ?>">
+                <span class="admin-nav-left">
+                    <svg class="admin-nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                    </svg>
+                    <span class="admin-nav-text">Testimonials</span>
+                </span>
+            </a>
+
+            <a href="<?= url('/admin/communications') ?>" class="admin-nav-link <?= $activeNav === 'communications' ? 'is-active' : '' ?>">
+                <span class="admin-nav-left">
+                    <svg class="admin-nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                    <span class="admin-nav-text">Communications</span>
+                </span>
+            </a>
         </div>
 
         <!-- Administration -->
         <div class="admin-nav-group">
             <div class="admin-nav-section-label">Administration</div>
+
+            <a href="<?= url('/admin/api-docs') ?>" class="admin-nav-link <?= $activeNav === 'api_docs' ? 'is-active' : '' ?>">
+                <span class="admin-nav-left">
+                    <svg class="admin-nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                    <span class="admin-nav-text">API Reference</span>
+                </span>
+            </a>
 
             <a href="<?= url('/admin/settings/team') ?>" class="admin-nav-link <?= in_array($activeNav, ['settings', 'team'], true) ? 'is-active' : '' ?>">
                 <span class="admin-nav-left">

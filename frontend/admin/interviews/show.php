@@ -12,7 +12,7 @@ declare(strict_types=1);
  */
 $audience = 'admin';
 $backUrl = url('/admin/interviews');
-$roomUrl = '';
+$roomUrl = url('/admin/interviews/' . (int)($report['interview']['id'] ?? 0) . '/room');
 ?>
 <div class="admin-shell">
     <?php include dirname(__DIR__, 2) . '/shared/components/admin-sidebar.php'; ?>

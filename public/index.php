@@ -6,12 +6,12 @@ if (function_exists('opcache_reset')) {
     @opcache_reset();
 }
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 require_once dirname(__DIR__) . '/backend/Core/helpers.php';
+
+// Hardened session cookie + security headers on every response (docs/51-api-and-security.md).
+\App\Core\Security::startSession();
+\App\Core\Security::sendHeaders();
 
 use App\Core\Router;
 

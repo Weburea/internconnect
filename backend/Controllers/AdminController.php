@@ -116,6 +116,13 @@ class AdminController extends Controller
         $email = trim($_POST['email'] ?? '');
         $password = trim($_POST['password'] ?? '');
 
+        if (($limited = \App\Core\Security::throttleLogin('admin-login', $email)) !== null) {
+            $_SESSION['admin_auth_error'] = $limited;
+            $_SESSION['admin_auth_email'] = $email;
+            $this->redirect('/admin/login');
+            return;
+        }
+
         if (empty($email) || empty($password)) {
             $_SESSION['admin_auth_error'] = 'Please enter both staff work email and password.';
             $_SESSION['admin_auth_email'] = $email;
@@ -178,8 +185,9 @@ class AdminController extends Controller
 
         // Check for 30-day trusted device token
         $trustedCookie = $_COOKIE['admin_trusted_device'] ?? null;
-        if (!empty($trustedCookie) && hash_equals(hash('sha256', $email . 'internconnect_salt'), $trustedCookie)) {
-            // Device trusted: log in immediately
+        if (!empty($trustedCookie) && is_string($trustedCookie) && hash_equals(self::trustedDeviceToken($email), $trustedCookie)) {
+            // Device trusted: log in immediately (new session id against fixation)
+            \App\Core\Security::regenerateSession();
             $_SESSION['admin_logged_in'] = true;
             $_SESSION['admin_email'] = $email;
             $_SESSION['admin_name'] = $matched['name'] ?? 'Jayden Okafor';
@@ -271,7 +279,8 @@ class AdminController extends Controller
             return;
         }
 
-        // Set authenticated administrative session
+        // Set authenticated administrative session (new session id against fixation)
+        \App\Core\Security::regenerateSession();
         $_SESSION['admin_logged_in'] = true;
         $_SESSION['admin_email'] = $pending['email'];
         $_SESSION['admin_name'] = $pending['name'];
@@ -280,10 +289,11 @@ class AdminController extends Controller
 
         // If remember device requested, set 30-day trusted session token cookie
         if (!empty($_POST['remember_device'])) {
-            $trustedToken = hash('sha256', $pending['email'] . 'internconnect_salt');
+            $trustedToken = self::trustedDeviceToken((string)$pending['email']);
             setcookie('admin_trusted_device', $trustedToken, [
                 'expires' => time() + (86400 * 30),
                 'path' => '/',
+                'secure' => \App\Core\Security::isHttps(),
                 'httponly' => true,
                 'samesite' => 'Lax',
             ]);
@@ -526,6 +536,45 @@ class AdminController extends Controller
         ], 'admin');
     }
 
+    /** GET /admin/interviews/{id}/room — admin joins the shared video room (any time, as a host). */
+    public function interviewRoom(array $params = []): void
+    {
+        $this->requireAdminAuth();
+        $id = (int)($params['id'] ?? 0);
+        $room = \App\Services\VideoInterviewService::getRoomDetails($id, 'employer');
+        // Admin is the authority: a closed room is reopened when they choose to start it.
+        $room['room_ended_by'] = '';
+        $room['room_status'] = 'open';
+        $this->renderView('admin/interviews/room', [
+            'title'     => 'Interview #' . $id . ' room — InternConnect Admin',
+            'staff'     => $this->staffForView(),
+            'activeNav' => 'interviews',
+            'room'      => $room,
+        ], 'admin');
+    }
+
+    /** POST /admin/interviews/{id}/room/join — Daily URL + host token for the admin. */
+    public function joinInterviewRoom(array $params = []): void
+    {
+        $this->requireAdminAuth();
+        $id = (int)($params['id'] ?? 0);
+        $name = 'InternConnect Admin' . (!empty($_SESSION['admin_name']) ? ' (' . $_SESSION['admin_name'] . ')' : '');
+        $info = \App\Services\VideoInterviewService::joinInfo($id, 'admin', $name);
+        header('Content-Type: application/json');
+        header('Cache-Control: no-store');
+        echo json_encode($info);
+        exit;
+    }
+
+    /** POST /admin/interviews/{id}/room/left */
+    public function leftInterviewRoom(array $params = []): void
+    {
+        $this->requireAdminAuth();
+        \App\Services\VideoInterviewService::logEvent((int)($params['id'] ?? 0), 'admin', 'left');
+        http_response_code(204);
+        exit;
+    }
+
     /** GET /admin/interviews/{id}/files/{fileId} */
     public function interviewFile(array $params = []): void
     {
@@ -687,6 +736,16 @@ class AdminController extends Controller
             'notifications_count' => 3,
         ];
     }
+    /** Signed "remember this device" value: HMAC of the e-mail with a server secret (APP_KEY or JWT_SECRET). */
+    private static function trustedDeviceToken(string $email): string
+    {
+        $secret = (string)($_ENV['APP_KEY'] ?? ($_ENV['JWT_SECRET'] ?? ''));
+        if (strlen($secret) < 32) {
+            return bin2hex(random_bytes(32)); // no secret configured: never matches
+        }
+        return hash_hmac('sha256', 'admin-trusted-device|' . strtolower(trim($email)), $secret);
+    }
+
     protected function requireAdminAuth(): void
     {
         if (session_status() === PHP_SESSION_NONE) {
@@ -694,7 +753,8 @@ class AdminController extends Controller
         }
 
         if (empty($_SESSION['admin_logged_in'])) {
-            if (isset($_SERVER['SERVER_NAME']) && in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1'], true)) {
+            if (strtolower(trim((string)($_ENV['APP_ENV'] ?? 'production'), "\"' ")) === 'local'
+                && isset($_SERVER['SERVER_NAME']) && in_array($_SERVER['SERVER_NAME'], ['localhost', '127.0.0.1'], true)) {
                 $_SESSION['admin_logged_in'] = true;
                 $_SESSION['admin_email'] = 'jayden.okafor@internconnect.ng';
                 $_SESSION['admin_name'] = 'Jayden Okafor';
@@ -732,68 +792,10 @@ class AdminController extends Controller
     public function liveSessions(): void
     {
         $this->requireAdminAuth();
-
-        $locations = [
-            ['city' => 'Lagos', 'country' => 'Nigeria', 'code' => 'NG', 'lat' => 6.5244, 'lng' => 3.3792, 'online' => 642, 'students' => 588, 'employers' => 54],
-            ['city' => 'Abuja', 'country' => 'Nigeria', 'code' => 'NG', 'lat' => 9.0765, 'lng' => 7.3986, 'online' => 214, 'students' => 192, 'employers' => 22],
-            ['city' => 'Ibadan', 'country' => 'Nigeria', 'code' => 'NG', 'lat' => 7.3775, 'lng' => 3.947, 'online' => 96, 'students' => 91, 'employers' => 5],
-            ['city' => 'Port Harcourt', 'country' => 'Nigeria', 'code' => 'NG', 'lat' => 4.8156, 'lng' => 7.0498, 'online' => 88, 'students' => 79, 'employers' => 9],
-            ['city' => 'Kano', 'country' => 'Nigeria', 'code' => 'NG', 'lat' => 12.0022, 'lng' => 8.592, 'online' => 41, 'students' => 39, 'employers' => 2],
-            ['city' => 'Enugu', 'country' => 'Nigeria', 'code' => 'NG', 'lat' => 6.5244, 'lng' => 7.5086, 'online' => 37, 'students' => 35, 'employers' => 2],
-            ['city' => 'Accra', 'country' => 'Ghana', 'code' => 'GH', 'lat' => 5.6037, 'lng' => -0.187, 'online' => 58, 'students' => 52, 'employers' => 6],
-            ['city' => 'Nairobi', 'country' => 'Kenya', 'code' => 'KE', 'lat' => -1.2921, 'lng' => 36.8219, 'online' => 46, 'students' => 41, 'employers' => 5],
-            ['city' => 'Johannesburg', 'country' => 'South Africa', 'code' => 'ZA', 'lat' => -26.2041, 'lng' => 28.0473, 'online' => 22, 'students' => 18, 'employers' => 4],
-            ['city' => 'Kigali', 'country' => 'Rwanda', 'code' => 'RW', 'lat' => -1.9441, 'lng' => 30.0619, 'online' => 9, 'students' => 8, 'employers' => 1],
-            ['city' => 'London', 'country' => 'United Kingdom', 'code' => 'GB', 'lat' => 51.5072, 'lng' => -0.1276, 'online' => 39, 'students' => 27, 'employers' => 12],
-            ['city' => 'Manchester', 'country' => 'United Kingdom', 'code' => 'GB', 'lat' => 53.4808, 'lng' => -2.2426, 'online' => 11, 'students' => 9, 'employers' => 2],
-            ['city' => 'Berlin', 'country' => 'Germany', 'code' => 'DE', 'lat' => 52.52, 'lng' => 13.405, 'online' => 8, 'students' => 5, 'employers' => 3],
-            ['city' => 'Toronto', 'country' => 'Canada', 'code' => 'CA', 'lat' => 43.6532, 'lng' => -79.3832, 'online' => 21, 'students' => 16, 'employers' => 5],
-            ['city' => 'New York', 'country' => 'United States', 'code' => 'US', 'lat' => 40.7128, 'lng' => -74.006, 'online' => 19, 'students' => 11, 'employers' => 8],
-            ['city' => 'Houston', 'country' => 'United States', 'code' => 'US', 'lat' => 29.7604, 'lng' => -95.3698, 'online' => 14, 'students' => 10, 'employers' => 4],
-            ['city' => 'São Paulo', 'country' => 'Brazil', 'code' => 'BR', 'lat' => -23.5558, 'lng' => -46.6396, 'online' => 7, 'students' => 5, 'employers' => 2],
-            ['city' => 'Bogotá', 'country' => 'Colombia', 'code' => 'CO', 'lat' => 4.711, 'lng' => -74.0721, 'online' => 3, 'students' => 3, 'employers' => 0],
-            ['city' => 'Dubai', 'country' => 'United Arab Emirates', 'code' => 'AE', 'lat' => 25.2048, 'lng' => 55.2708, 'online' => 12, 'students' => 7, 'employers' => 5],
-            ['city' => 'Mumbai', 'country' => 'India', 'code' => 'IN', 'lat' => 19.076, 'lng' => 72.8777, 'online' => 6, 'students' => 5, 'employers' => 1],
-        ];
-
-        $total = array_sum(array_column($locations, 'online'));
-
-        $countries = [];
-        foreach ($locations as $place) {
-            $code = $place['code'];
-            $countries[$code]['code'] = $code;
-            $countries[$code]['name'] = $place['country'];
-            $countries[$code]['online'] = ($countries[$code]['online'] ?? 0) + $place['online'];
-        }
-        $countries = array_values($countries);
-        usort($countries, static fn (array $a, array $b): int => $b['online'] <=> $a['online']);
-        foreach ($countries as &$country) {
-            $country['share'] = round($country['online'] / $total * 100, 1);
-        }
-        unset($country);
-
-        // Addresses use the ranges reserved for documentation, so none belong to a real person
-        $sessions = [
-            ['id' => 1, 'city' => 'Lagos', 'country' => 'Nigeria', 'code' => 'NG', 'ip' => '203.0.113.xxx', 'device' => 'Chrome on Android', 'role' => 'Student', 'page' => 'Browse internships', 'active' => '2m'],
-            ['id' => 2, 'city' => 'Abuja', 'country' => 'Nigeria', 'code' => 'NG', 'ip' => '198.51.100.xxx', 'device' => 'Edge on Windows', 'role' => 'Employer', 'page' => 'Candidates', 'active' => '7m'],
-            ['id' => 3, 'city' => 'Accra', 'country' => 'Ghana', 'code' => 'GH', 'ip' => '192.0.2.xxx', 'device' => 'Safari on iPhone', 'role' => 'Student', 'page' => 'AI mock interview', 'active' => '11m'],
-            ['id' => 4, 'city' => 'London', 'country' => 'United Kingdom', 'code' => 'GB', 'ip' => '203.0.113.xxx', 'device' => 'Chrome on macOS', 'role' => 'Employer', 'page' => 'Post internship', 'active' => '14m'],
-            ['id' => 5, 'city' => 'Toronto', 'country' => 'Canada', 'code' => 'CA', 'ip' => '198.51.100.xxx', 'device' => 'Firefox on Windows', 'role' => 'Student', 'page' => 'E-learning', 'active' => '18m'],
-            ['id' => 6, 'city' => 'Nairobi', 'country' => 'Kenya', 'code' => 'KE', 'ip' => '192.0.2.xxx', 'device' => 'Chrome on Android', 'role' => 'Student', 'page' => 'CV analysis', 'active' => '21m'],
-            ['id' => 7, 'city' => 'São Paulo', 'country' => 'Brazil', 'code' => 'BR', 'ip' => '203.0.113.xxx', 'device' => 'Chrome on Windows', 'role' => 'Student', 'page' => 'Browse internships', 'active' => '26m'],
-            ['id' => 8, 'city' => 'Dubai', 'country' => 'United Arab Emirates', 'code' => 'AE', 'ip' => '198.51.100.xxx', 'device' => 'Safari on macOS', 'role' => 'Employer', 'page' => 'Company profile', 'active' => '32m'],
-        ];
-
+        // Real visitors from the page beacon (App\Services\VisitService, docs/56-location-and-visits.md):
+        // sessions seen in the last 5 minutes, approximate city from MaxMind, masked IPs only.
         header('Cache-Control: no-store');
-        $this->jsonResponse([
-            'is_sample' => true,
-            'total'     => $total,
-            'students'  => array_sum(array_column($locations, 'students')),
-            'employers' => array_sum(array_column($locations, 'employers')),
-            'locations' => $locations,
-            'countries' => $countries,
-            'sessions'  => $sessions,
-        ]);
+        $this->jsonResponse(\App\Services\VisitService::live());
     }
 
     /**
@@ -1049,15 +1051,27 @@ class AdminController extends Controller
             'topPerformers'  => $topPerformers,
             'marketplace'    => $marketplace,
             'systemHealth'   => $systemHealth,
+            'recentInterviews' => \App\Services\VideoInterviewService::sessions(['limit' => 5]),
         ], 'admin');
     }
 
     /**
      * Admin Interns Directory & 420px Profile Inspector Drawer (Images 1 & 2)
      */
-    public function interns(): void
+    public function interns(array $params = []): void
     {
         $this->requireAdminAuth();
+        $segments = ['active' => ['Active Candidates', 'Students and graduates actively applying right now'], 'placed' => ['Placed Interns', 'Interns who have accepted an offer and started a placement'], 'pending' => ['Awaiting Review', 'New intern profiles waiting for an admin check']];
+        if (empty($params['segment']) && isset($segments[$_GET['tab'] ?? ''])) {
+            $this->redirect('/admin/interns/' . $_GET['tab']);
+            return;
+        }
+        $segment = (string)($params['segment'] ?? '');
+        if ($segment !== '' && !isset($segments[$segment])) {
+            $this->redirect('/admin/interns');
+            return;
+        }
+        $segmentInfo = $segment !== '' ? $segments[$segment] : null;
 
         $staff = $this->getAdminStaff();
 
@@ -1379,7 +1393,9 @@ class AdminController extends Controller
         ];
 
         $this->renderView('admin/interns/index', [
-            'title'     => 'Interns Management — InternConnect Admin',
+            'title'     => ($segmentInfo[0] ?? 'Interns Management') . ' — InternConnect Admin',
+            'segment'   => $segment,
+            'segmentInfo' => $segmentInfo,
             'staff'     => $staff,
             'activeNav' => 'interns',
             'metrics'   => $metrics,
@@ -1390,9 +1406,20 @@ class AdminController extends Controller
     /**
      * Admin Employers & Verification Desk (Image 3)
      */
-    public function employers(): void
+    public function employers(array $params = []): void
     {
         $this->requireAdminAuth();
+        $segments = ['pending' => ['Verification Queue', 'Employers waiting for their company documents to be checked'], 'verified' => ['Verified Employers', 'Companies whose registration documents have been approved']];
+        if (empty($params['segment']) && isset($segments[$_GET['tab'] ?? ''])) {
+            $this->redirect('/admin/employers/' . $_GET['tab']);
+            return;
+        }
+        $segment = (string)($params['segment'] ?? '');
+        if ($segment !== '' && !isset($segments[$segment])) {
+            $this->redirect('/admin/employers');
+            return;
+        }
+        $segmentInfo = $segment !== '' ? $segments[$segment] : null;
 
         $staff = $this->getAdminStaff();
 
@@ -1587,7 +1614,9 @@ class AdminController extends Controller
         ];
 
         $this->renderView('admin/employers/index', [
-            'title'     => 'Employers & Verification Queue — InternConnect Admin',
+            'title'     => ($segmentInfo[0] ?? 'Employers') . ' — InternConnect Admin',
+            'segment'   => $segment,
+            'segmentInfo' => $segmentInfo,
             'staff'     => $staff,
             'activeNav' => 'employers',
             'metrics'   => $metrics,
@@ -1644,18 +1673,60 @@ class AdminController extends Controller
 
         $initialQuery = $_GET['query'] ?? '';
 
+        // Real chats (docs/55-jenny-ai-chat.md): this admin's sessions, every user conversation for review, live stats.
+        $admin = \App\Services\JennyService::actor('admin');
+        $fmt = static fn (array $c) => [
+            'id'      => $c['public_id'],
+            'title'   => $c['title'] ?: 'Conversation',
+            'time'    => date('j M, g:i A', strtotime((string)$c['updated_at'])),
+            'tag'     => ucfirst((string)($c['channel'] ?? 'admin')),
+            'who'     => $c['account_type'] === 'visitor' ? 'Visitor' : (string)($c['display_name'] ?? ucfirst((string)$c['account_type'])),
+            'place'   => trim((string)($c['city'] ?? '') . (($c['city'] ?? '') && ($c['country'] ?? '') ? ', ' : '') . (string)($c['country'] ?? '')),
+            'count'   => (int)$c['message_count'],
+        ];
+        $userSessions = array_values(array_filter(\App\Services\JennyService::adminSessions('', 60), static fn ($c) => $c['channel'] !== 'admin'));
+
         $this->renderView('admin/ai/chat', [
             'title'        => 'Jenny AI Strategic Intelligence — Mission Control Chat',
             'staff'        => $staff,
             'activeNav'    => 'ai',
             'metrics'      => $metrics,
             'initialQuery' => $initialQuery,
+            'mySessions'   => array_map($fmt, \App\Services\JennyService::listFor($admin, 'admin', 30) ? array_map(static fn ($r) => $r + ['channel' => 'admin', 'account_type' => 'admin'], \App\Services\JennyService::listFor($admin, 'admin', 30)) : []),
+            'userSessions' => array_map($fmt, $userSessions),
+            'jennyStats'   => \App\Services\JennyService::stats(),
+            'geminiModel'  => \App\Services\GeminiClient::isConfigured() ? (\App\Services\GeminiClient::models()[0] ?? 'Gemini') : 'Rules (no Gemini key)',
         ], 'admin');
     }
 
     /**
      * Render the E-Learning & Course Moderation View (Section 7.0 preview / shell)
      */
+    /**
+     * Swagger UI for /api/v1 (admin only). Route: GET /admin/api-docs
+     */
+    public function apiDocs(): void
+    {
+        $this->requireAdminAuth();
+        $this->renderView('admin/api-docs/index', [
+            'title'     => 'API Reference — InternConnect Admin',
+            'staff'     => $this->staffForView(),
+            'activeNav' => 'api_docs',
+            'specUrl'   => url('/admin/api-docs/openapi.json'),
+            'apiReady'  => \App\Api\ApiAuth::isConfigured(),
+        ], 'admin');
+    }
+
+    /** OpenAPI 3.0 spec (admin only). Route: GET /admin/api-docs/openapi.json */
+    public function apiDocsSpec(): void
+    {
+        $this->requireAdminAuth();
+        header('Content-Type: application/json; charset=utf-8');
+        header('Cache-Control: no-store');
+        echo json_encode(\App\Api\OpenApiSpec::build(rtrim(absolute_url('/'), '/')), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
     public function elearning(): void
     {
         $this->requireAdminAuth();
@@ -1680,7 +1751,25 @@ class AdminController extends Controller
             'staff'     => $staff,
             'activeNav' => 'elearning',
             'metrics'   => $metrics,
+            // Learning partners shown on /elearning: logo, services, visibility and referral counts.
+            'learningPartners' => \App\Services\ElearningService::adminPartners(),
         ], 'admin');
+    }
+
+    /**
+     * Save a learning partner (details, services, visibility, optional new logo).
+     * Route: POST /admin/elearning/partners/{id}  (multipart: name, tier, website, brand_color, about, hubs, services_json, is_active, logo)
+     */
+    public function updateElearningPartner(array $params = []): void
+    {
+        $this->requireAdminAuth();
+        header('Content-Type: application/json');
+        $input = $_POST;
+        $input['services'] = json_decode((string)($_POST['services_json'] ?? '[]'), true) ?: [];
+        $result = \App\Services\ElearningService::updatePartner((int)($params['id'] ?? 0), $input, $_FILES['logo'] ?? null);
+        http_response_code($result['ok'] ? 200 : 422);
+        echo json_encode($result['ok'] ? ['success' => true, 'partner' => $result['partner']] : ['success' => false, 'error' => $result['error']]);
+        exit;
     }
 
     /**
@@ -1711,6 +1800,97 @@ class AdminController extends Controller
             'activeNav' => 'subscriptions',
             'metrics'   => $metrics,
         ], 'admin');
+    }
+
+    /**
+     * Plans & limits (docs/53-plans-and-quotas.md): what Free/Pro/Premium include, and plan grants.
+     */
+    public function plans(): void
+    {
+        $this->requireAdminAuth();
+        $flash = $_SESSION['admin_plans_flash'] ?? null;
+        unset($_SESSION['admin_plans_flash']);
+        $this->renderView('admin/subscriptions/plans', [
+            'title'     => 'Plans & Limits — InternConnect Admin',
+            'staff'     => $this->staffProfile(),
+            'activeNav' => 'subscriptions',
+            'matrix'    => \App\Services\PlanService::matrix(),
+            'settings'  => [
+                'premium_stipend_min' => \App\Services\PlanService::setting('premium_stipend_min'),
+                'premium_needs_flex'  => \App\Services\PlanService::setting('premium_needs_flex'),
+            ],
+            'grants'    => \App\Services\PlanService::recentGrants(50),
+            'flash'     => $flash,
+        ], 'admin');
+    }
+
+    public function savePlans(): void
+    {
+        $this->requireAdminAuth();
+        try {
+            \App\Services\PlanService::saveMatrix((array)($_POST['f'] ?? []), (array)($_POST['s'] ?? []));
+            $_SESSION['admin_plans_flash'] = ['ok' => true, 'text' => 'Plan limits saved. They apply immediately.'];
+        } catch (\InvalidArgumentException $e) {
+            $_SESSION['admin_plans_flash'] = ['ok' => false, 'text' => $e->getMessage()];
+        }
+        $this->redirect('/admin/subscriptions/plans');
+    }
+
+    public function grantPlan(): void
+    {
+        $this->requireAdminAuth();
+        $type = ($_POST['account_type'] ?? 'candidate') === 'employer' ? 'employer' : 'candidate';
+        $id = (int)($_POST['account_id'] ?? 0);
+        $plan = (string)($_POST['plan'] ?? '');
+        $days = (int)($_POST['days'] ?? 0);
+        $note = mb_substr(trim(strip_tags((string)($_POST['note'] ?? ''))), 0, 200);
+        try {
+            if ($id < 1 || $days > 730) {
+                throw new \InvalidArgumentException('Choose an account from the search, and at most 730 days.');
+            }
+            $g = \App\Services\PlanService::grant($type, $id, $plan, $days, 'admin', null, $note !== '' ? $note : null, (string)($_SESSION['admin_email'] ?? 'admin'));
+            $_SESSION['admin_plans_flash'] = ['ok' => true, 'text' => ucfirst($plan) . ' granted to ' . $type . ' #' . $id . ' from ' . date('j M Y', strtotime($g['starts_at'])) . ' to ' . date('j M Y', strtotime($g['expires_at'])) . '.'];
+        } catch (\InvalidArgumentException $e) {
+            $_SESSION['admin_plans_flash'] = ['ok' => false, 'text' => $e->getMessage()];
+        }
+        $this->redirect('/admin/subscriptions/plans');
+    }
+
+    /** GET /admin/subscriptions/plans/accounts?q=&type= : account picker for the grant form (JSON). */
+    public function searchAccounts(): void
+    {
+        $this->requireAdminAuth();
+        $type = in_array($_GET['type'] ?? '', ['candidate', 'employer'], true) ? $_GET['type'] : '';
+        $this->jsonResponse(['success' => true, 'accounts' => \App\Services\AccountDirectory::search((string)($_GET['q'] ?? ''), $type, 8)]);
+    }
+
+    public function reactivatePlanGrant(array $params = []): void
+    {
+        $this->requireAdminAuth();
+        $g = \App\Services\PlanService::reactivateGrant((int)($params['id'] ?? 0), (string)($_SESSION['admin_email'] ?? 'admin'));
+        $_SESSION['admin_plans_flash'] = $g
+            ? ['ok' => true, 'text' => 'Grant reactivated: ' . ucfirst((string)$g['plan']) . ' until ' . date('j M Y', strtotime((string)$g['expires_at'])) . '.']
+            : ['ok' => false, 'text' => 'That grant is already active.'];
+        $this->redirect('/admin/subscriptions/plans');
+    }
+
+    public function revokePlanGrant(array $params = []): void
+    {
+        $this->requireAdminAuth();
+        $ok = \App\Services\PlanService::revokeGrant((int)($params['id'] ?? 0), (string)($_SESSION['admin_email'] ?? 'admin'));
+        $_SESSION['admin_plans_flash'] = $ok ? ['ok' => true, 'text' => 'Grant revoked.'] : ['ok' => false, 'text' => 'That grant is not active.'];
+        $this->redirect('/admin/subscriptions/plans');
+    }
+
+    protected function staffProfile(): array
+    {
+        return [
+            'name'     => $_SESSION['admin_name'] ?? 'Jayden Okafor',
+            'role'     => $_SESSION['admin_role'] ?? 'Platform Admin',
+            'initials' => $_SESSION['admin_initials'] ?? 'JO',
+            'email'    => $_SESSION['admin_email'] ?? 'jayden.okafor@internconnect.ng',
+            'notifications_count' => 3,
+        ];
     }
 
     /**

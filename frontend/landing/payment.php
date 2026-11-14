@@ -29,7 +29,8 @@ $selectedPlan = strtolower($plan ?? 'pro');
                 },
                 body: JSON.stringify({
                     plan: this.plan,
-                    cycle: this.cycle
+                    cycle: this.cycle,
+                    account: '<?= ($account ?? 'candidate') === 'employer' ? 'employer' : 'candidate' ?>'
                 })
             });
             
@@ -158,7 +159,7 @@ $selectedPlan = strtolower($plan ?? 'pro');
                     <!-- Subscription Disclaimer -->
                     <div class="checkout-disclaimer">
                         <p>
-                            Your subscription renews automatically at the end of each billing cycle. Cancel anytime from Billing & Subscription — no penalties.
+                            Your plan runs for the billing cycle you choose. Renew or change it any time from Billing & Subscription.
                         </p>
                     </div>
 

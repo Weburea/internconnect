@@ -19,21 +19,37 @@ declare(strict_types=1);
         subject: '',
         message: ''
     },
-    submitContact() {
+    reference: '',
+    website: '',
+    toast(text, type) {
+        window.dispatchEvent(new CustomEvent('show-toast', { detail: { text: text, type: type } }));
+    },
+    async submitContact() {
         if (!this.formData.name || !this.formData.email || !this.formData.message) {
-            if (typeof window.$dispatch === 'function') {
-                window.$dispatch('show-toast', { text: 'Please fill in all required fields.', type: 'error' });
-            }
+            this.toast('Please fill in all required fields.', 'error');
             return;
         }
         this.loading = true;
-        setTimeout(() => {
-            this.loading = false;
-            this.submitted = true;
-            if (typeof window.$dispatch === 'function') {
-                window.$dispatch('show-toast', { text: 'Message sent! Our support team will respond within 4 business hours.', type: 'success' });
+        try {
+            // Stored and e-mailed to the support inbox (POST /contact, docs/54-email-newsletter-contact.md).
+            const r = await fetch('<?= url('/contact') ?>', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: JSON.stringify(Object.assign({}, this.formData, { topic: this.category, website: this.website }))
+            });
+            const d = await r.json();
+            if (d.success) {
+                this.reference = d.reference;
+                this.submitted = true;
+                this.toast('Message sent. We will reply within 4 business hours.', 'success');
+            } else {
+                this.toast(d.error || 'Your message could not be sent. Please try again.', 'error');
             }
-        }, 800);
+        } catch (e) {
+            this.toast('Network error. Please check your connection and try again.', 'error');
+        } finally {
+            this.loading = false;
+        }
     }
 }">
 
@@ -128,6 +144,8 @@ declare(strict_types=1);
                     </p>
 
                     <form @submit.prevent="submitContact()">
+                        <input type="text" name="website" x-model="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0;">
+
                         <div class="contact-form-grid">
                             
                             <!-- Full Name -->
@@ -204,6 +222,7 @@ declare(strict_types=1);
                     <p style="font-size: 14.5px; color: #64748B; max-width: 440px; margin: 0 auto 24px; line-height: 1.6;">
                         Thank you for reaching out. A confirmation has been sent to your email, and our operations desk will reply within 4 business hours.
                     </p>
+                    <p x-show="reference" style="display: none; font-size: 13px; color: #334155; margin: -12px 0 22px;">Reference: <strong x-text="reference" style="color: #4F48E6;"></strong></p>
                     <button type="button" @click="submitted = false; formData = { name: '', email: '', role: 'candidate', subject: '', message: '' }" class="ic-btn ic-btn-secondary">
                         <span>Send Another Inquiry</span>
                     </button>

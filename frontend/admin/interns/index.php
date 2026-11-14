@@ -17,7 +17,7 @@ function adminInterns() {
         interns: window.__adminInternsData || [],
         selectedIntern: null,
         drawerOpen: false,
-        activeTab: 'all',
+        activeTab: <?= json_encode(($segment ?? '') ?: 'all') ?>,
         drawerTab: 'academics',
         searchQuery: '',
         filterUniversity: '',
@@ -222,8 +222,8 @@ function adminInterns() {
             <!-- 1. Header Row -->
             <div class="admin-page-header">
                 <div>
-                    <h1 class="admin-page-title">Interns</h1>
-                    <p class="admin-page-subtitle">Review profile, applications and placement status for every student and applicant</p>
+                    <h1 class="admin-page-title"><?= htmlspecialchars($segmentInfo[0] ?? 'Interns', ENT_QUOTES, 'UTF-8') ?></h1>
+                    <p class="admin-page-subtitle"><?= htmlspecialchars($segmentInfo[1] ?? 'Review profile, applications and placement status for every student and applicant', ENT_QUOTES, 'UTF-8') ?></p>
                 </div>
                 <div>
                     <button type="button" class="admin-date-pill cursor-pointer" id="interns-datepicker" aria-label="Select date range">
@@ -381,7 +381,7 @@ function adminInterns() {
                                 <div class="space-y-3 text-xs">
                                     <div>
                                         <label class="block font-semibold text-slate-700 mb-1 text-[11.5px]">University</label>
-                                        <select class="w-full h-8 px-2.5 rounded-lg border border-slate-200 text-xs text-slate-800 bg-white outline-none focus:border-indigo-600"
+                                        <select data-ic-select class="w-full h-8 px-2.5 rounded-lg border border-slate-200 text-xs text-slate-800 bg-white outline-none focus:border-indigo-600"
                                                 x-model="filterUniversity"
                                                 @change="showFilterPopover = false;">
                                             <option value="">All Universities</option>
@@ -438,7 +438,7 @@ function adminInterns() {
                                 <th class="admin-th">
                                     <div class="flex items-center gap-1">
                                         <span>AI MATCH</span>
-                                        <svg class="w-3 h-3 text-slate-400 cursor-help" title="Calculated by Jenny AI from skills, education, and portfolio match" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <svg class="w-3 h-3 text-slate-400 cursor-help" aria-label="Calculated by Jenny AI from skills, education, and portfolio match" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                         </svg>
                                     </div>
@@ -504,7 +504,7 @@ function adminInterns() {
                                                   'admin-score-slate': intern.ai_match_score >= 70 && intern.ai_match_score < 80,
                                                   'admin-score-amber': intern.ai_match_score < 70
                                               }" 
-                                              title="Calculated by Jenny AI from skills, education, and portfolio match"
+                                              aria-label="Calculated by Jenny AI from skills, education, and portfolio match"
                                               x-text="intern.ai_match_score">
                                         </span>
                                     </td>
@@ -680,7 +680,7 @@ function adminInterns() {
                             <div class="flex items-center gap-2">
                                 <h2 class="admin-drawer-title truncate" x-text="selectedIntern?.name"></h2>
                                 <template x-if="selectedIntern?.verified_email">
-                                    <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" title="Verified Student Email">
+                                    <svg class="w-4 h-4 text-emerald-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-label="Verified Student Email">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                     </svg>
                                 </template>
@@ -836,7 +836,7 @@ function adminInterns() {
                                         <a :href="selectedIntern?.cv_document?.url || '<?= url('assets/images/dummb/testing.pdf.pdf') ?>'" 
                                            :download="selectedIntern?.cv_document?.name || 'Candidate_Resume.pdf'" 
                                            class="p-2 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer" 
-                                           title="Download Document" 
+                                           
                                            aria-label="Download Document" 
                                            @click="downloadResume(selectedIntern)">
                                             <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

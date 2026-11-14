@@ -583,8 +583,8 @@ $avatar      = $employer['avatar'] ?? null;
                             <div class="emp-chart-col">
                                 <div class="emp-chart-tooltip">UX Design - Goal: 90%, Actual: 75%</div>
                                 <div class="emp-chart-bars">
-                                    <div class="emp-chart-bar-goal" style="height: 90%;" title="UX Design Goal: 90%"></div>
-                                    <div class="emp-chart-bar-actual" style="height: 75%;" title="UX Design Actual: 75%"></div>
+                                    <div class="emp-chart-bar-goal" style="height: 90%;" aria-label="UX Design Goal: 90%"></div>
+                                    <div class="emp-chart-bar-actual" style="height: 75%;" aria-label="UX Design Actual: 75%"></div>
                                 </div>
                                 <span class="emp-chart-label">UX Design</span>
                             </div>
@@ -592,8 +592,8 @@ $avatar      = $employer['avatar'] ?? null;
                             <div class="emp-chart-col">
                                 <div class="emp-chart-tooltip">Frontend - Goal: 60%, Actual: 95%</div>
                                 <div class="emp-chart-bars">
-                                    <div class="emp-chart-bar-goal" style="height: 60%;" title="Frontend Goal: 60%"></div>
-                                    <div class="emp-chart-bar-actual" style="height: 95%;" title="Frontend Actual: 95%"></div>
+                                    <div class="emp-chart-bar-goal" style="height: 60%;" aria-label="Frontend Goal: 60%"></div>
+                                    <div class="emp-chart-bar-actual" style="height: 95%;" aria-label="Frontend Actual: 95%"></div>
                                 </div>
                                 <span class="emp-chart-label">Frontend</span>
                             </div>
@@ -601,8 +601,8 @@ $avatar      = $employer['avatar'] ?? null;
                             <div class="emp-chart-col">
                                 <div class="emp-chart-tooltip">Backend - Goal: 78%, Actual: 62%</div>
                                 <div class="emp-chart-bars">
-                                    <div class="emp-chart-bar-goal" style="height: 78%;" title="Backend Goal: 78%"></div>
-                                    <div class="emp-chart-bar-actual" style="height: 62%;" title="Backend Actual: 62%"></div>
+                                    <div class="emp-chart-bar-goal" style="height: 78%;" aria-label="Backend Goal: 78%"></div>
+                                    <div class="emp-chart-bar-actual" style="height: 62%;" aria-label="Backend Actual: 62%"></div>
                                 </div>
                                 <span class="emp-chart-label">Backend</span>
                             </div>
@@ -610,8 +610,8 @@ $avatar      = $employer['avatar'] ?? null;
                             <div class="emp-chart-col">
                                 <div class="emp-chart-tooltip">Data Science - Goal: 95%, Actual: 80%</div>
                                 <div class="emp-chart-bars">
-                                    <div class="emp-chart-bar-goal" style="height: 95%;" title="Data Science Goal: 95%"></div>
-                                    <div class="emp-chart-bar-actual" style="height: 80%;" title="Data Science Actual: 80%"></div>
+                                    <div class="emp-chart-bar-goal" style="height: 95%;" aria-label="Data Science Goal: 95%"></div>
+                                    <div class="emp-chart-bar-actual" style="height: 80%;" aria-label="Data Science Actual: 80%"></div>
                                 </div>
                                 <span class="emp-chart-label">Data Sci</span>
                             </div>
@@ -619,8 +619,8 @@ $avatar      = $employer['avatar'] ?? null;
                             <div class="emp-chart-col">
                                 <div class="emp-chart-tooltip">Marketing - Goal: 70%, Actual: 48%</div>
                                 <div class="emp-chart-bars">
-                                    <div class="emp-chart-bar-goal" style="height: 70%;" title="Digital Marketing Goal: 70%"></div>
-                                    <div class="emp-chart-bar-actual" style="height: 48%;" title="Digital Marketing Actual: 48%"></div>
+                                    <div class="emp-chart-bar-goal" style="height: 70%;" aria-label="Digital Marketing Goal: 70%"></div>
+                                    <div class="emp-chart-bar-actual" style="height: 48%;" aria-label="Digital Marketing Actual: 48%"></div>
                                 </div>
                                 <span class="emp-chart-label">Marketing</span>
                             </div>
@@ -628,8 +628,8 @@ $avatar      = $employer['avatar'] ?? null;
                             <div class="emp-chart-col">
                                 <div class="emp-chart-tooltip">Web Dev - Goal: 40%, Actual: 65%</div>
                                 <div class="emp-chart-bars">
-                                    <div class="emp-chart-bar-goal" style="height: 40%;" title="Web Dev Goal: 40%"></div>
-                                    <div class="emp-chart-bar-actual" style="height: 65%;" title="Web Dev Actual: 65%"></div>
+                                    <div class="emp-chart-bar-goal" style="height: 40%;" aria-label="Web Dev Goal: 40%"></div>
+                                    <div class="emp-chart-bar-actual" style="height: 65%;" aria-label="Web Dev Actual: 65%"></div>
                                 </div>
                                 <span class="emp-chart-label">Web Dev</span>
                             </div>

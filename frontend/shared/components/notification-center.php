@@ -99,7 +99,7 @@ $ncPayload = [
 .nc-row.is-unread:hover { background: #F4F4FF; }
 .nc-row:focus-visible { outline: 2px solid #4F48E6; outline-offset: -2px; }
 
-.nc-icon { width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.nc-icon { position: relative; width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .nc-icon svg { width: 18px; height: 18px; }
 .nc-tone-indigo { background: #EEF2FF; color: #4F48E6; }
 .nc-tone-green  { background: #ECFDF5; color: #059669; }
@@ -121,7 +121,8 @@ $ncPayload = [
 .nc-link:hover { color: #3730A3; }
 .nc-link svg { width: 12px; height: 12px; }
 
-.nc-dot { position: absolute; left: 6px; top: 50%; width: 6px; height: 6px; margin-top: -3px; border-radius: 50%; background: #4F48E6; }
+/* Unread marker sits on the icon's top-right corner, aligned with the item */
+.nc-dot { position: absolute; top: -3px; right: -3px; width: 10px; height: 10px; border-radius: 50%; background: #4F48E6; border: 2px solid #FFFFFF; }
 
 .nc-row-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; opacity: 0; transition: opacity .15s ease; }
 .nc-row:hover .nc-row-actions, .nc-row:focus-within .nc-row-actions { opacity: 1; }
@@ -406,9 +407,9 @@ function notificationCenter(cfg) {
                     <div class="nc-group-label"><span x-text="group.label"></span></div>
                     <template x-for="item in group.items" :key="item.id">
                         <article class="nc-row" role="listitem" tabindex="0" :class="{ 'is-unread': !item.is_read }" @click="open(item)" @keydown.enter.self="open(item)">
-                            <span class="nc-dot" x-show="!item.is_read" aria-hidden="true"></span>
                             <span class="nc-icon" :class="'nc-tone-' + category(item.category).tone" aria-hidden="true">
                                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" :d="iconPath(category(item.category).icon)"/></svg>
+                                <span class="nc-dot" x-show="!item.is_read"></span>
                             </span>
                             <div class="nc-body">
                                 <div class="nc-row-top">

@@ -1,9 +1,20 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Prevent direct browser access to sensitive files
-    RewriteRule ^\.env - [F,L]
-    RewriteRule ^\.git - [F,L]
+    # ── Security: only index.php and public/ are meant to be reachable ─────────────
+    # Source code, data, docs, tests and tooling are never served directly
+    # (the database file, docs and test runner were reachable before 2026-11-12).
+    RewriteRule ^(backend|database|docs|tests|vendor|storage|frontend|sql|md|scratch|node_modules|\.agents|\.vscode|\.phpunit\.cache)(/|$) - [F,L]
+    RewriteRule ^\.(env|git)  - [F,L]
+    RewriteRule ^(\.env.*|\.git.*|\.editorconfig|composer\.(json|lock)|phpunit\.xml.*|tailwind\.config\.js|README\.md|walkthrough\.md|test_showcase\.png)$ - [F,L]
+    # Any remaining data / config / source file that exists on disk outside public/assets.
+    RewriteCond %{REQUEST_URI} !/public/assets/
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteRule \.(sqlite|sqlite3|db|sql|md|json|lock|log|ini|ya?ml|xml|dist|bak|sh|env)$ - [F,L]
+    # Only the front controllers may run as PHP from the web.
+    RewriteCond %{REQUEST_FILENAME} -f
+    RewriteCond %{REQUEST_URI} !(^|/)index\.php$
+    RewriteRule \.php$ - [F,L]
 
     # If the requested file or directory exists directly, serve it
     RewriteCond %{REQUEST_FILENAME} -f [OR]
@@ -18,3 +29,13 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^ index.php [L,QSA]
 </IfModule>
+
+# Defence in depth if mod_rewrite is disabled: block the database and environment files.
+<FilesMatch "\.(sqlite|sqlite3|db|sql|env|log|lock)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Deny from all
+    </IfModule>
+</FilesMatch>

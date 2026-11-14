@@ -222,31 +222,31 @@ declare(strict_types=1);
                             <svg style="width: 16px; height: 16px; min-width: 16px; margin-right: 14px; color: #4F48E6;" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                             </svg>
-                            <span>Limited applications (15/mo)</span>
+                            <span>15 applications a month</span>
                         </li>
                         <li style="display: flex; align-items: center; font-size: 14px; color: #475569; line-height: 1.4;">
                             <svg style="width: 16px; height: 16px; min-width: 16px; margin-right: 14px; color: #4F48E6;" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                             </svg>
-                            <span>AI career features</span>
+                            <span>AI CV &amp; cover letters (5 a day)</span>
                         </li>
                         <li style="display: flex; align-items: center; font-size: 14px; color: #475569; line-height: 1.4;">
                             <svg style="width: 16px; height: 16px; min-width: 16px; margin-right: 14px; color: #4F48E6;" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                             </svg>
-                            <span>Increased recruiter visibility</span>
+                            <span>Boosted recruiter visibility</span>
                         </li>
                         <li style="display: flex; align-items: center; font-size: 14px; color: #475569; line-height: 1.4;">
                             <svg style="width: 16px; height: 16px; min-width: 16px; margin-right: 14px; color: #4F48E6;" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                             </svg>
-                            <span>Better internship recommendations</span>
+                            <span>Jenny search assist (10 a day)</span>
                         </li>
                         <li style="display: flex; align-items: center; font-size: 14px; color: #475569; line-height: 1.4;">
                             <svg style="width: 16px; height: 16px; min-width: 16px; margin-right: 14px; color: #4F48E6;" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                             </svg>
-                            <span>CV &amp; application assistance</span>
+                            <span>1 AI mock interview a week</span>
                         </li>
                     </ul>
                 </div>
@@ -292,25 +292,25 @@ declare(strict_types=1);
                             <svg style="width: 16px; height: 16px; min-width: 16px; margin-right: 14px; color: #000623;" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                             </svg>
-                            <span>Advanced AI career features</span>
+                            <span>Premium listings: higher pay, hybrid &amp; remote</span>
                         </li>
                         <li style="display: flex; align-items: center; font-size: 14px; color: #475569; line-height: 1.4;">
                             <svg style="width: 16px; height: 16px; min-width: 16px; margin-right: 14px; color: #000623;" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                             </svg>
-                            <span>Priority recruiter visibility</span>
+                            <span>Priority visibility + Featured badge</span>
                         </li>
                         <li style="display: flex; align-items: center; font-size: 14px; color: #475569; line-height: 1.4;">
                             <svg style="width: 16px; height: 16px; min-width: 16px; margin-right: 14px; color: #000623;" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                             </svg>
-                            <span>AI Interview preparation</span>
+                            <span>Unlimited AI mock interviews</span>
                         </li>
                         <li style="display: flex; align-items: center; font-size: 14px; color: #475569; line-height: 1.4;">
                             <svg style="width: 16px; height: 16px; min-width: 16px; margin-right: 14px; color: #000623;" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
                             </svg>
-                            <span>Advanced career insight</span>
+                            <span>48-hour early access, 15 AI documents a day</span>
                         </li>
                     </ul>
                 </div>
@@ -351,8 +351,16 @@ declare(strict_types=1);
 
         <!-- Comparison Table Card (Increased width to max-w-[1020px] and spacious row padding) -->
         <div style="max-width: 1020px; margin: 0 auto; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; box-shadow: 0px 4px 20px -2px rgba(0, 0, 0, 0.05); overflow: hidden;">
-            <div class="overflow-x-auto">
-                <table style="width: 100%; border-collapse: collapse; table-layout: fixed;">
+            <div class="overflow-x-auto no-scrollbar" style="overflow-x: auto;">
+                <style>
+                    /* Compare table on phones: tighter cells, scrolls inside the card instead of squeezing */
+                    @media (max-width: 640px) {
+                        .ic-compare th:first-child { width: 31% !important; }
+                        .ic-compare th, .ic-compare td { padding: 12px 6px !important; font-size: 12px !important; overflow-wrap: anywhere; }
+                        .ic-compare th:first-child, .ic-compare td:first-child { padding-left: 14px !important; }
+                    }
+                </style>
+                <table class="ic-compare" style="width: 100%; border-collapse: collapse; table-layout: fixed;">
                     <thead>
                         <tr style="border-bottom: 1px solid #F1F5F9; background-color: #FAFAFA;">
                             <th style="width: 34%; padding: 22px 28px; text-align: left; font-size: 15px; font-weight: 700; color: #0F172A;">Feature</th>
@@ -362,88 +370,42 @@ declare(strict_types=1);
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- Row 1: Applications -->
-                        <tr style="border-bottom: 1px solid #F1F5F9;">
-                            <td style="padding: 20px 28px; font-size: 14px; font-weight: 700; color: #1E293B;">Applications</td>
-                            <td style="padding: 20px 16px; font-size: 14px; color: #64748B; text-align: center;">5/month</td>
-                            <td style="padding: 20px 16px; font-size: 14px; color: #64748B; text-align: center;">15/month</td>
-                            <td style="padding: 20px 28px; text-align: center;">
-                                <span style="font-size: 24px; font-weight: 700; color: #000623; line-height: 1;">∞</span>
-                            </td>
+                        <?php
+                        // Rows come from PlanService (admin: Subscriptions > Plans & limits), so the table always matches what the plans enforce.
+                        $cmpMatrix = \App\Services\PlanService::matrix();
+                        $cmpRows = array_values(array_diff(array_keys(\App\Services\PlanService::DEFAULTS), ['jenny_refill_hours']));
+                        $cmpCell = static function (string $key, string $plan) use ($cmpMatrix): string {
+                            $d = \App\Services\PlanService::DEFAULTS[$key];
+                            $v = (string)($cmpMatrix[$key][$plan] ?? '');
+                            $per = ['day' => '/day', 'week' => '/week', 'month' => '/month'][$d[1]] ?? '';
+                            if ($d[1] === 'text') {
+                                return ($v === '' || $v === '0') ? '' : htmlspecialchars($key === 'early_access_hours' ? $v . ' hours early' : $v, ENT_QUOTES, 'UTF-8');
+                            }
+                            if ($d[1] === 'flag') {
+                                return $v === '1' ? '&#10003;' : '';
+                            }
+                            if ($key === 'jenny_coins') {
+                                $h = (int)($cmpMatrix['jenny_refill_hours'][$plan] ?? 24);
+                                return (int)$v === -1 ? 'Unlimited' : (int)$v . ' coins, refill every ' . $h . 'h';
+                            }
+                            if ((int)$v === -1) {
+                                return 'Unlimited';
+                            }
+                            return (int)$v === 0 ? '' : (int)$v . $per;
+                        };
+                        $cmpStyle = [
+                            'free'    => 'padding: 20px 16px; font-size: 14px; color: #64748B; text-align: center;',
+                            'pro'     => 'padding: 20px 16px; font-size: 14px; font-weight: 700; color: #4F48E6; text-align: center;',
+                            'premium' => 'padding: 20px 28px; font-size: 14px; font-weight: 800; color: #000623; text-align: center;',
+                        ];
+                        foreach ($cmpRows as $i => $key): ?>
+                        <tr<?= $i < count($cmpRows) - 1 ? ' style="border-bottom: 1px solid #F1F5F9;"' : '' ?>>
+                            <td style="padding: 20px 28px; font-size: 14px; font-weight: 700; color: #1E293B;"><?= htmlspecialchars(\App\Services\PlanService::DEFAULTS[$key][0], ENT_QUOTES, 'UTF-8') ?></td>
+                            <?php foreach (['free', 'pro', 'premium'] as $plan): $cell = $cmpCell($key, $plan); ?>
+                                <td style="<?= $cmpStyle[$plan] ?>"><?= $cell === '' ? '<span style="color: #CBD5E1;">&mdash;</span>' : $cell ?></td>
+                            <?php endforeach; ?>
                         </tr>
-                        <!-- Row 2: Application Tracking -->
-                        <tr style="border-bottom: 1px solid #F1F5F9;">
-                            <td style="padding: 20px 28px; font-size: 14px; font-weight: 700; color: #1E293B;">Application Tracking</td>
-                            <td style="padding: 20px 16px; font-size: 14px; color: #94A3B8; text-align: center;">Basic</td>
-                            <td style="padding: 20px 16px; text-align: center;">
-                                <span style="color: #4F48E6; font-size: 18px; font-weight: 800;">✓</span>
-                            </td>
-                            <td style="padding: 20px 28px; text-align: center;">
-                                <span style="font-size: 24px; font-weight: 700; color: #000623; line-height: 1;">∞</span>
-                            </td>
-                        </tr>
-                        <!-- Row 3: AI Career feature -->
-                        <tr style="border-bottom: 1px solid #F1F5F9;">
-                            <td style="padding: 20px 28px; font-size: 14px; font-weight: 700; color: #1E293B;">AI Career feature</td>
-                            <td style="padding: 20px 16px; color: #CBD5E1; text-align: center;">—</td>
-                            <td style="padding: 20px 16px; text-align: center;">
-                                <span style="color: #4F48E6; font-size: 18px; font-weight: 800;">✓</span>
-                            </td>
-                            <td style="padding: 20px 28px; text-align: center;">
-                                <span style="font-size: 24px; font-weight: 700; color: #000623; line-height: 1;">∞</span>
-                            </td>
-                        </tr>
-                        <!-- Row 4: Increased recruiter visibility -->
-                        <tr style="border-bottom: 1px solid #F1F5F9;">
-                            <td style="padding: 20px 28px; font-size: 14px; font-weight: 700; color: #1E293B;">Increased recruiter visibility</td>
-                            <td style="padding: 20px 16px; color: #CBD5E1; text-align: center;">—</td>
-                            <td style="padding: 20px 16px; text-align: center;">
-                                <span style="color: #4F48E6; font-size: 18px; font-weight: 800;">✓</span>
-                            </td>
-                            <td style="padding: 20px 28px; text-align: center;">
-                                <span style="font-size: 24px; font-weight: 700; color: #000623; line-height: 1;">∞</span>
-                            </td>
-                        </tr>
-                        <!-- Row 5: Better internship recommendations -->
-                        <tr style="border-bottom: 1px solid #F1F5F9;">
-                            <td style="padding: 20px 28px; font-size: 14px; font-weight: 700; color: #1E293B;">Better internship recommendations</td>
-                            <td style="padding: 20px 16px; font-size: 14px; color: #94A3B8; text-align: center;">Basic</td>
-                            <td style="padding: 20px 16px; text-align: center;">
-                                <span style="color: #4F48E6; font-size: 18px; font-weight: 800;">✓</span>
-                            </td>
-                            <td style="padding: 20px 28px; text-align: center;">
-                                <span style="font-size: 24px; font-weight: 700; color: #000623; line-height: 1;">∞</span>
-                            </td>
-                        </tr>
-                        <!-- Row 6: CV & application assistance -->
-                        <tr style="border-bottom: 1px solid #F1F5F9;">
-                            <td style="padding: 20px 28px; font-size: 14px; font-weight: 700; color: #1E293B;">CV &amp; application assistance</td>
-                            <td style="padding: 20px 16px; color: #CBD5E1; text-align: center;">—</td>
-                            <td style="padding: 20px 16px; text-align: center;">
-                                <span style="color: #4F48E6; font-size: 18px; font-weight: 800;">✓</span>
-                            </td>
-                            <td style="padding: 20px 28px; text-align: center;">
-                                <span style="font-size: 24px; font-weight: 700; color: #000623; line-height: 1;">∞</span>
-                            </td>
-                        </tr>
-                        <!-- Row 7: AI Interview Prep -->
-                        <tr style="border-bottom: 1px solid #F1F5F9;">
-                            <td style="padding: 20px 28px; font-size: 14px; font-weight: 700; color: #1E293B;">AI Interview Prep</td>
-                            <td style="padding: 20px 16px; color: #CBD5E1; text-align: center;">—</td>
-                            <td style="padding: 20px 16px; color: #CBD5E1; text-align: center;">—</td>
-                            <td style="padding: 20px 28px; text-align: center;">
-                                <span style="font-size: 24px; font-weight: 700; color: #000623; line-height: 1;">∞</span>
-                            </td>
-                        </tr>
-                        <!-- Row 8: Advanced career insight -->
-                        <tr>
-                            <td style="padding: 20px 28px; font-size: 14px; font-weight: 700; color: #1E293B;">Advanced career insight</td>
-                            <td style="padding: 20px 16px; color: #CBD5E1; text-align: center;">—</td>
-                            <td style="padding: 20px 16px; color: #CBD5E1; text-align: center;">—</td>
-                            <td style="padding: 20px 28px; text-align: center;">
-                                <span style="font-size: 24px; font-weight: 700; color: #000623; line-height: 1;">∞</span>
-                            </td>
-                        </tr>
+                        <?php endforeach; ?>
                     </tbody>
                 </table>
             </div>

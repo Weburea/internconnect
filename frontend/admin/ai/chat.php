@@ -29,6 +29,11 @@ declare(strict_types=1);
  */
 $staffName = $staff['name'] ?? 'Jayden Okafor';
 $initialQuery = $initialQuery ?? '';
+$mySessions = $mySessions ?? [];
+$userSessions = $userSessions ?? [];
+$jennyStats = $jennyStats ?? ['conversations_24h' => 0, 'messages_24h' => 0, 'gemini_share' => 0, 'visitors_24h' => 0];
+$geminiModel = $geminiModel ?? 'Gemini';
+$capPct = static fn (int $v, int $max) => max(6, min(100, (int)round($v / max(1, $max) * 100)));
 ?>
 <style>
 /* Telemetry Pulse / Beeping Beacon for iPad & Mobile */
@@ -203,13 +208,13 @@ $initialQuery = $initialQuery ?? '';
                             </div>
                             <span class="text-xs font-bold text-slate-800 tracking-wide uppercase">Operational Telemetry</span>
                         </div>
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="System Online"></span>
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" aria-label="Online"></span>
                     </div>
 
                     <!-- PROGRESS Section (Vertical Capsule Bar Meters) -->
                     <div class="space-y-2">
                         <div class="flex items-center justify-between px-1 cursor-pointer" @click="showProgress = !showProgress">
-                            <span class="text-[10.5px] font-bold text-slate-400 uppercase tracking-wider">PLATFORM PERFORMANCE</span>
+                            <span class="text-[10.5px] font-bold text-slate-400 uppercase tracking-wider">JENNY, LAST 24 HOURS</span>
                             <svg class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200" :class="{ 'rotate-180': !showProgress }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                             </svg>
@@ -218,38 +223,38 @@ $initialQuery = $initialQuery ?? '';
                         <div x-show="showProgress" x-transition class="admin-chat-capsules-grid">
                             <!-- Capsule 1: Intern Sentiment -->
                             <div class="admin-capsule-col">
-                                <span class="text-[10px] text-slate-400 font-medium">Interns</span>
+                                <span class="text-[10px] text-slate-400 font-medium">Chats</span>
                                 <div class="admin-capsule-track">
-                                    <div class="admin-capsule-fill admin-capsule-fill-green" style="height: 94%;"></div>
+                                    <div class="admin-capsule-fill admin-capsule-fill-green" style="height: <?= $capPct((int)$jennyStats['conversations_24h'], 50) ?>%;"></div>
                                 </div>
-                                <span class="text-[10px] font-bold text-slate-800">94%</span>
+                                <span class="text-[10px] font-bold text-slate-800"><?= (int)$jennyStats['conversations_24h'] ?></span>
                             </div>
 
                             <!-- Capsule 2: Employer Adoption -->
                             <div class="admin-capsule-col">
-                                <span class="text-[10px] text-slate-400 font-medium">Employers</span>
+                                <span class="text-[10px] text-slate-400 font-medium">Messages</span>
                                 <div class="admin-capsule-track">
-                                    <div class="admin-capsule-fill admin-capsule-fill-indigo" style="height: 88%;"></div>
+                                    <div class="admin-capsule-fill admin-capsule-fill-indigo" style="height: <?= $capPct((int)$jennyStats['messages_24h'], 300) ?>%;"></div>
                                 </div>
-                                <span class="text-[10px] font-bold text-slate-800">88%</span>
+                                <span class="text-[10px] font-bold text-slate-800"><?= (int)$jennyStats['messages_24h'] ?></span>
                             </div>
 
                             <!-- Capsule 3: CAC Speed -->
                             <div class="admin-capsule-col">
-                                <span class="text-[10px] text-slate-400 font-medium">CAC Speed</span>
+                                <span class="text-[10px] text-slate-400 font-medium">Visitors</span>
                                 <div class="admin-capsule-track">
-                                    <div class="admin-capsule-fill admin-capsule-fill-purple" style="height: 85%;"></div>
+                                    <div class="admin-capsule-fill admin-capsule-fill-purple" style="height: <?= $capPct((int)$jennyStats['visitors_24h'], 50) ?>%;"></div>
                                 </div>
-                                <span class="text-[10px] font-bold text-slate-800">1.8h</span>
+                                <span class="text-[10px] font-bold text-slate-800"><?= (int)$jennyStats['visitors_24h'] ?></span>
                             </div>
 
                             <!-- Capsule 4: Confidence -->
                             <div class="admin-capsule-col">
-                                <span class="text-[10px] text-slate-400 font-medium">Precision</span>
+                                <span class="text-[10px] text-slate-400 font-medium">Gemini</span>
                                 <div class="admin-capsule-track">
-                                    <div class="admin-capsule-fill admin-capsule-fill-dark" style="height: 99%;"></div>
+                                    <div class="admin-capsule-fill admin-capsule-fill-dark" style="height: <?= max(6, (int)$jennyStats['gemini_share']) ?>%;"></div>
                                 </div>
-                                <span class="text-[10px] font-bold text-slate-800">99%</span>
+                                <span class="text-[10px] font-bold text-slate-800"><?= (int)$jennyStats['gemini_share'] ?>%</span>
                             </div>
                         </div>
                     </div>
@@ -259,7 +264,7 @@ $initialQuery = $initialQuery ?? '';
                         <div class="flex items-center justify-between px-1 cursor-pointer select-none" @click="showHistory = !showHistory">
                             <div class="flex items-center gap-2">
                                 <span class="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider" style="font-size: 10.5px !important; letter-spacing: 0.05em;">HISTORY CHAT</span>
-                                <span class="px-2 py-0.5 rounded-full font-bold bg-indigo-50 text-[#4F48E6] border border-indigo-100" style="font-size: 10px !important;" x-text="recentSessions.length"></span>
+                                <span class="px-2 py-0.5 rounded-full font-bold bg-indigo-50 text-[#4F48E6] border border-indigo-100" style="font-size: 10px !important;" x-text="(historyTab === 'mine' ? recentSessions : userSessions).length"></span>
                             </div>
                             <svg class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200" :class="{ 'rotate-180': !showHistory }" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
@@ -267,7 +272,13 @@ $initialQuery = $initialQuery ?? '';
                         </div>
 
                         <div x-show="showHistory" x-transition class="space-y-2">
-                            <template x-for="item in recentSessions" :key="item.id">
+                            <!-- My chats / conversations from users (read-only review) -->
+                            <div style="display: flex; gap: 4px; padding: 3px; background: #F1F5F9; border-radius: 10px;" role="tablist" aria-label="Chat history">
+                                <button type="button" role="tab" @click="historyTab = 'mine'" :aria-selected="historyTab === 'mine'" class="adm-htab" :class="{ 'is-on': historyTab === 'mine' }">My chats</button>
+                                <button type="button" role="tab" @click="historyTab = 'users'" :aria-selected="historyTab === 'users'" class="adm-htab" :class="{ 'is-on': historyTab === 'users' }">User chats</button>
+                            </div>
+                            <div x-show="(historyTab === 'mine' ? recentSessions : userSessions).length === 0" style="font-size: 12px; color: #94A3B8; padding: 10px 4px;" x-text="historyTab === 'mine' ? 'No chats yet. Ask Jenny anything to start.' : 'No user conversations yet.'"></div>
+                            <template x-for="item in (historyTab === 'mine' ? recentSessions : userSessions)" :key="item.id">
                                 <button type="button" 
                                         @click="loadSession(item)"
                                         class="admin-history-item group"
@@ -284,7 +295,7 @@ $initialQuery = $initialQuery ?? '';
                                         <div class="admin-history-meta">
                                             <span class="admin-history-time" x-text="item.time"></span>
                                             <span class="admin-history-bullet">&bull;</span>
-                                            <span class="admin-history-tag" x-text="item.tag || 'Operations'"></span>
+                                            <span class="admin-history-tag" x-text="historyTab === 'users' ? (item.who + (item.place ? ' \u00B7 ' + item.place : '')) : (item.count + ' messages')"></span>
                                         </div>
                                     </div>
                                     <!-- Chevron -->
@@ -305,30 +316,30 @@ $initialQuery = $initialQuery ?? '';
                         <!-- 2 Metric Cards -->
                         <div class="grid grid-cols-2 gap-2.5">
                             <div class="admin-chat-dist-card">
-                                <span class="text-[11px] text-slate-500 block mb-1">Candidate Screening</span>
-                                <span class="text-base font-bold text-slate-900">58%</span>
+                                <span class="text-[11px] text-slate-500 block mb-1">Chats today</span>
+                                <span class="text-base font-bold text-slate-900"><?= (int)$jennyStats['conversations_24h'] ?></span>
                             </div>
                             <div class="admin-chat-dist-card">
-                                <span class="text-[11px] text-slate-500 block mb-1">CAC Document Audits</span>
-                                <span class="text-base font-bold text-indigo-600">42%</span>
+                                <span class="text-[11px] text-slate-500 block mb-1">Visitor chats</span>
+                                <span class="text-base font-bold text-indigo-600"><?= (int)$jennyStats['visitors_24h'] ?></span>
                             </div>
                         </div>
 
                         <!-- System Utilization Gauge Card -->
                         <div class="admin-chat-dist-card flex items-center justify-between">
                             <div class="space-y-1 text-[11px]">
-                                <span class="font-bold text-slate-800 block text-xs">System Automation</span>
-                                <span class="text-slate-500 block">Nightly Gemini 1.5 Runs</span>
-                                <span class="text-indigo-600 font-semibold text-[10.5px]">84% Automated Coverage</span>
+                                <span class="font-bold text-slate-800 block text-xs">Answered by Gemini</span>
+                                <span class="text-slate-500 block"><?= htmlspecialchars($geminiModel) ?></span>
+                                <span class="text-indigo-600 font-semibold text-[10.5px]">Rest: rule-based fallback</span>
                             </div>
 
                             <!-- Micro Circular Gauge SVG (84%) -->
                             <div class="relative w-12 h-12 flex items-center justify-center flex-shrink-0">
                                 <svg class="w-12 h-12 -rotate-90" viewBox="0 0 36 36">
                                     <path class="text-slate-100" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
-                                    <path class="text-indigo-600" stroke-width="3.5" stroke-dasharray="84, 100" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                                    <path class="text-indigo-600" stroke-width="3.5" stroke-dasharray="<?= (int)$jennyStats['gemini_share'] ?>, 100" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
                                 </svg>
-                                <span class="absolute font-bold text-[11px] text-slate-800">84%</span>
+                                <span class="absolute font-bold text-[11px] text-slate-800"><?= (int)$jennyStats['gemini_share'] ?>%</span>
                             </div>
                         </div>
                     </div>
@@ -344,7 +355,7 @@ $initialQuery = $initialQuery ?? '';
                                     @click="railOpen = !railOpen" 
                                     class="admin-telemetry-toggle-btn"
                                     :class="{ 'is-active': railOpen, 'is-beeping': !railOpen && isTabletOrMobile }"
-                                    title="Toggle Operational Telemetry Panel">
+                                    aria-label="Toggle the telemetry panel">
                                 <!-- Beeping Radar Pulse Dot (iPad & Mobile) -->
                                 <span class="admin-beacon-pulse" x-show="!railOpen && isTabletOrMobile">
                                     <span class="admin-beacon-ping"></span>
@@ -363,7 +374,7 @@ $initialQuery = $initialQuery ?? '';
                         <div class="admin-chat-header-actions">
                             <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100" style="white-space: nowrap !important; flex-shrink: 0 !important;">
                                 <span class="w-2 h-2 rounded-full bg-indigo-600 animate-pulse"></span>
-                                <span>Gemini 1.5 Pro</span>
+                                <span><?= htmlspecialchars($geminiModel) ?></span>
                             </span>
                             <button type="button" 
                                     @click="clearChat()"
@@ -422,6 +433,10 @@ $initialQuery = $initialQuery ?? '';
 
                         <!-- Conversation Message Stream (When Messages Exist) -->
                         <div x-show="messages.length > 0" class="max-w-2xl mx-auto space-y-4 pb-28 pt-2">
+                            <div x-show="readOnly" style="display: none; font-size: 12px; color: #475569; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 12px; padding: 10px 12px;">
+                                <strong style="color: #0F172A;" x-text="readOnlyTitle"></strong>
+                                <span> Read-only view of a user conversation. Start a new session to chat with Jenny yourself.</span>
+                            </div>
                             <template x-for="(msg, idx) in messages" :key="idx">
                                 <div class="flex gap-3" :class="{ 'justify-end': msg.role === 'user' }">
                                     <!-- Bot Avatar -->
@@ -433,7 +448,21 @@ $initialQuery = $initialQuery ?? '';
                                     <div class="flex flex-col" :class="{ 'items-end': msg.role === 'user' }">
                                         <div class="p-4 rounded-2xl text-xs leading-relaxed max-w-lg"
                                              :class="msg.role === 'user' ? 'bg-[#000623] text-white rounded-tr-xs shadow-xs' : 'bg-white border border-slate-200 text-slate-800 shadow-xs rounded-tl-xs'">
-                                            <p class="whitespace-pre-line" x-text="msg.text"></p>
+                                            <template x-if="msg.role === 'assistant'"><div class="adm-md" x-html="format(msg.text)"></div></template>
+                                            <template x-if="msg.role !== 'assistant'"><p class="whitespace-pre-line" x-text="msg.text"></p></template>
+                                            <template x-if="msg.file">
+                                                <a :href="msg.file.url || null" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 5px 9px; border-radius: 8px; background: rgba(255,255,255,.14); color: inherit; font-size: 11px; font-weight: 700; text-decoration: none;">
+                                                    <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                                                    <span x-text="msg.file.name"></span>
+                                                </a>
+                                            </template>
+                                            <template x-if="msg.links && msg.links.length">
+                                                <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px;">
+                                                    <template x-for="lk in msg.links" :key="lk.url + lk.label">
+                                                        <a :href="lk.url" style="display: inline-flex; padding: 5px 10px; border-radius: 999px; background: #EEF0FF; color: #4F48E6; font-size: 11px; font-weight: 700; text-decoration: none;" x-text="lk.label"></a>
+                                                    </template>
+                                                </div>
+                                            </template>
 
                                             <!-- Structured Metric Card inside Bot Response -->
                                             <template x-if="msg.stats">
@@ -496,7 +525,7 @@ $initialQuery = $initialQuery ?? '';
                             <input type="file" 
                                    id="admin-chat-file-input" 
                                    class="hidden" 
-                                   accept=".pdf,.docx,.doc,.txt,.csv,.xlsx,.png,.jpg"
+                                   accept=".pdf,.docx,.txt,.png,.jpg,.jpeg,.webp"
                                    @change="handleFileSelect($event)">
 
                             <!-- Left Sparkle Icon -->
@@ -513,7 +542,7 @@ $initialQuery = $initialQuery ?? '';
                             <button type="button" 
                                     @click="triggerFileInput()"
                                     class="admin-composer-btn-mic cursor-pointer"
-                                    title="Attach document (PDF, DOCX, CSV) or drag & drop"
+                                    
                                     aria-label="Attach document">
                                 <svg class="w-4 h-4 text-slate-500 hover:text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
@@ -540,179 +569,140 @@ $initialQuery = $initialQuery ?? '';
     </div>
 </div>
 
+<script type="application/json" id="admin-jenny-data"><?= json_encode(['sessions' => $mySessions, 'userSessions' => $userSessions, 'send' => url('/admin/ai/chat/send'), 'session' => url('/admin/ai/chat/sessions/')], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?></script>
+<style>
+.adm-md ul { margin: 6px 0; padding-left: 18px; list-style: disc; }
+.adm-md li { margin: 2px 0; }
+.adm-md strong { font-weight: 700; color: #0F172A; }
+.adm-md .gap { display: block; height: 6px; }
+.adm-htab { flex: 1; border: 0; border-radius: 8px; padding: 6px 8px; font-size: 11.5px; font-weight: 700; line-height: 1.2; cursor: pointer; background: transparent; color: #64748B; font-family: inherit; }
+.adm-htab.is-on { background: #FFFFFF; color: #0F172A; box-shadow: 0 1px 2px rgba(15, 23, 42, .08); }
+</style>
 <script>
+/** Admin Jenny console on Gemini (docs/55-jenny-ai-chat.md). */
 function adminAiChat() {
     const checkTabletOrMobile = () => window.innerWidth <= 1024 || ('ontouchstart' in window && window.innerWidth <= 1380);
     const initialTabletOrMobile = checkTabletOrMobile();
+    const data = JSON.parse(document.getElementById('admin-jenny-data').textContent);
+    const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const now = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const toast = (t, d, type) => { if (typeof window.adminToast === 'function') window.adminToast(t, d || '', null, type || 'info'); };
     return {
         isTabletOrMobile: initialTabletOrMobile,
-        railOpen: !initialTabletOrMobile, // Fully active on desktop, collapsed with beeping button on iPad & mobile
+        railOpen: !initialTabletOrMobile,
         showProgress: true,
         showHistory: true,
-        contextTitle: 'Candidate & CAC Desk',
-        currentModel: 'Gemini 1.5 Pro',
-        inputQuery: '<?= addslashes($initialQuery) ?>',
+        historyTab: 'mine',
+        inputQuery: <?= json_encode((string)$initialQuery, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>,
         isThinking: false,
         isDragging: false,
         attachedFile: null,
-        contexts: [
-            'Candidate & CAC Desk',
-            'Subscription & Billing Ledger',
-            'Candidate Academic Standing',
-            'Algorithmic Match Tuning'
-        ],
-        contextIndex: 0,
-        activeSessionId: 1,
-        recentSessions: [
-            { id: 1, title: 'CAC Document Cross-Check', time: '2 hours ago', tag: 'Registry Audit', query: 'Cross-reference Nexura Technologies CAC registry certificate with domain' },
-            { id: 2, title: 'Placement Score Anomalies', time: 'Yesterday', tag: 'Anomaly Audit', query: 'Audit flagged candidates in PaySprint and Kiro Labs' },
-            { id: 3, title: 'Q3 Intern Retention Summary', time: '8 Nov 2026', tag: 'Analytics', query: 'Summarize university internship retention across top 4 tracks' },
-            { id: 4, title: 'Paystack Webhook Sync Audit', time: '6 Nov 2026', tag: 'FinTech Ledger', query: 'Inspect cryptographically signed HMAC-SHA512 transaction logs' }
-        ],
+        file: null,
+        activeSessionId: null,
+        conversation: null,
+        readOnly: false,
+        readOnlyTitle: '',
+        recentSessions: data.sessions,
+        userSessions: data.userSessions,
         messages: [],
         init() {
-            window.addEventListener('resize', () => {
-                this.isTabletOrMobile = checkTabletOrMobile();
+            window.addEventListener('resize', () => { this.isTabletOrMobile = checkTabletOrMobile(); });
+            if (this.inputQuery.trim().length > 0) this.sendMessage();
+        },
+        format(text) {
+            const lines = esc(text || '').split(/\n/);
+            let html = '', inList = false;
+            lines.forEach((line) => {
+                const t = line.trim();
+                if (/^([-*]|\d+[.)])\s+/.test(t)) {
+                    if (!inList) { html += '<ul>'; inList = true; }
+                    html += '<li>' + t.replace(/^([-*]|\d+[.)])\s+/, '') + '</li>';
+                } else {
+                    if (inList) { html += '</ul>'; inList = false; }
+                    html += t === '' ? '<span class="gap"></span>' : t + '<br>';
+                }
             });
-            if (this.inputQuery.trim().length > 0) {
-                this.sendMessage();
-            }
+            if (inList) html += '</ul>';
+            return html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/(<br>)+$/, '');
         },
-        cycleContext() {
-            this.contextIndex = (this.contextIndex + 1) % this.contexts.length;
-            this.contextTitle = this.contexts[this.contextIndex];
-            if (typeof window.adminToast === 'function') {
-                window.adminToast('Context switched', this.contextTitle, null, 'info');
-            }
-        },
-        loadSession(item) {
+        async loadSession(item) {
             this.activeSessionId = item.id;
-            this.messages = [
-                {
-                    role: 'user',
-                    text: item.query,
-                    time: item.time
-                },
-                {
-                    role: 'assistant',
-                    text: "Operational Review for: \"" + item.title + "\"\n\nTelemetry verified against live database records. No anomalies detected.",
-                    stats: { label1: 'Audit Status', val1: 'Verified', label2: 'Integrity', val2: '100%' },
-                    time: 'Just now'
-                }
-            ];
+            this.isThinking = true;
+            try {
+                const res = await fetch(data.session + encodeURIComponent(item.id), { headers: { 'Accept': 'application/json' } });
+                const d = await res.json();
+                if (!d.success) throw new Error(d.error || 'Not found');
+                this.messages = d.messages.map((m) => ({ role: m.role, text: m.content, time: m.time, links: m.links || [], file: m.attachment }));
+                const mine = this.historyTab === 'mine';
+                this.readOnly = !mine;
+                this.readOnlyTitle = mine ? '' : (item.who + (item.place ? ' (' + item.place + ')' : '') + ', ' + item.tag + ' chat.');
+                this.conversation = mine ? item.id : null;
+                if (this.isTabletOrMobile) this.railOpen = false;
+            } catch (e) {
+                toast('Could not open that conversation', String(e.message || e), 'error');
+            }
+            this.isThinking = false;
             this.scrollToBottom();
-            if (typeof window.adminToast === 'function') {
-                window.adminToast('Session loaded', item.title, null, 'info');
-            }
         },
-        triggerFileInput() {
-            const input = document.getElementById('admin-chat-file-input');
-            if (input) input.click();
+        triggerFileInput() { const input = document.getElementById('admin-chat-file-input'); if (input) input.click(); },
+        setFile(file) {
+            if (!file) return;
+            if (file.size > 8 * 1024 * 1024) { toast('File too large', 'Attach a file under 8 MB.', 'error'); return; }
+            this.file = file;
+            this.attachedFile = { name: file.name, size: (file.size / (1024 * 1024)).toFixed(1) + ' MB' };
         },
-        attachSampleDoc(name = 'Candidate_Audit_Report.pdf') {
-            this.attachedFile = {
-                name: name,
-                size: '1.4 MB'
-            };
-            if (typeof window.adminToast === 'function') {
-                window.adminToast('Document attached', name, null, 'info');
-            }
-        },
-        handleFileSelect(e) {
-            const file = e.target.files && e.target.files[0];
-            if (file) {
-                this.attachedFile = {
-                    name: file.name,
-                    size: (file.size / (1024 * 1024)).toFixed(1) + ' MB'
-                };
-                if (typeof window.adminToast === 'function') {
-                    window.adminToast('Document attached', file.name, null, 'info');
-                }
-            }
-        },
-        handleFileDrop(e) {
-            this.isDragging = false;
-            const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
-            if (file) {
-                this.attachedFile = {
-                    name: file.name,
-                    size: (file.size / (1024 * 1024)).toFixed(1) + ' MB'
-                };
-                if (typeof window.adminToast === 'function') {
-                    window.adminToast('Document dropped & attached', file.name, null, 'info');
-                }
-            }
-        },
-        sendDirect(text) {
-            this.inputQuery = text;
-            this.sendMessage();
-        },
-        sendMessage() {
+        handleFileSelect(e) { this.setFile(e.target.files && e.target.files[0]); e.target.value = ''; },
+        handleFileDrop(e) { this.isDragging = false; this.setFile(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]); },
+        sendDirect(text) { this.inputQuery = text; this.sendMessage(); },
+        async sendMessage() {
             const query = this.inputQuery.trim();
-            if ((!query && !this.attachedFile) || this.isThinking) return;
-
-            const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            let userPrompt = query;
-            if (this.attachedFile) {
-                userPrompt += (userPrompt ? '\n\n' : '') + '[Attached: ' + this.attachedFile.name + ' (' + this.attachedFile.size + ')]';
-            }
-
-            // Push User Message
-            this.messages.push({
-                role: 'user',
-                text: userPrompt,
-                time: timeNow
-            });
-
-            const currentFile = this.attachedFile;
+            if ((!query && !this.file) || this.isThinking) return;
+            if (this.readOnly) { this.clearChat(); }
+            const file = this.file;
+            this.messages.push({ role: 'user', text: query || 'Please review the attached file.', time: now(), file: file ? { name: file.name } : null });
             this.inputQuery = '';
+            this.file = null;
             this.attachedFile = null;
             this.isThinking = true;
             this.scrollToBottom();
-
-            setTimeout(() => {
-                let reply = "I have analyzed platform telemetry across active records.";
-                let stats = null;
-
-                const qLower = query.toLowerCase();
-                if (currentFile) {
-                    reply = "Inspection of attached document (" + currentFile.name + "):\n\n• Document integrity: Verified authentic.\n• Cross-check against records: All fields match platform database entries with zero discrepancies.\n• Operational recommendation: Proceed with document verification approval.";
-                    stats = { label1: 'Document Status', val1: 'Verified Authentic', label2: 'Confidence', val2: '99.4%' };
-                } else if (qLower.includes('flagged') || qLower.includes('match') || qLower.includes('discrepancy')) {
-                    reply = "Flagged Match Discrepancy Queue Audit:\n\n• 6 candidate-role pairings currently flagged for review.\n• Chinedu Okafor (Score: 62%): GPA slightly below role filter, but verified GitHub repository contains 14 production REST API projects.\n• Recommendation: Confirm match for Chinedu Okafor to unblock backend hiring.";
-                    stats = { label1: 'Flagged Queue', val1: '6 Pairs', label2: 'Recommendation', val2: 'Confirm Top Match' };
-                } else if (qLower.includes('cac') || qLower.includes('filing') || qLower.includes('corporate') || qLower.includes('employer')) {
-                    reply = "Corporate CAC Verification Audit:\n\n• 14 employers currently awaiting desk verification.\n• Nexura Technologies (RC-1849204): 100% domain and seal match with active corporate registry status.\n• Recommendation: Approve Nexura Technologies immediately to open 6 active internship roles.";
-                    stats = { label1: 'Pending CAC', val1: '14 Accounts', label2: 'Priority Desk', val2: 'Nexura Tech' };
-                } else if (qLower.includes('paystack') || qLower.includes('ledger') || qLower.includes('transaction')) {
-                    reply = "Paystack Ledger & Webhook Telemetry:\n\n• Current MRR stands at ₦4,850,000 across 1,420 Student Pro subscribers and 32 corporate placements.\n• Cryptographic HMAC-SHA512 verification: 100% success rate across all 10 recent transactions.\n• Zero webhook failures recorded.";
-                    stats = { label1: 'MRR Balance', val1: '₦4.85M', label2: 'HMAC Webhooks', val2: '100% Verified' };
-                } else if (qLower.includes('retention') || qLower.includes('university') || qLower.includes('placement')) {
-                    reply = "Candidate Placement & Retention Telemetry:\n\n1. University of Lagos (UNILAG) leads with 412 placed interns (88.4% retention).\n2. Covenant University (OTA) follows with 294 placements (91.2% satisfaction).\n3. Overall platform conversion rate: 71.4% match acceptance.";
-                    stats = { label1: 'Top Institution', val1: 'UNILAG (412)', label2: 'Conversion Rate', val2: '71.4%' };
+            let body, headers = { 'Accept': 'application/json' };
+            if (file) {
+                body = new FormData();
+                body.append('message', query);
+                if (this.conversation) body.append('conversation', this.conversation);
+                body.append('page', location.pathname);
+                body.append('file', file);
+            } else {
+                headers['Content-Type'] = 'application/json';
+                body = JSON.stringify({ message: query, conversation: this.conversation, page: location.pathname });
+            }
+            try {
+                const res = await fetch(data.send, { method: 'POST', headers: headers, body: body });
+                const d = await res.json().catch(() => ({}));
+                if (d.success) {
+                    const isNew = !this.conversation;
+                    this.conversation = d.conversation;
+                    this.activeSessionId = d.conversation;
+                    this.messages.push({ role: 'assistant', text: d.reply, links: (d.links || []).concat((d.listings || []).map((l) => ({ label: l.title + ' at ' + l.company, url: l.url }))), time: now() });
+                    if (isNew) this.recentSessions.unshift({ id: d.conversation, title: (query || 'File review').slice(0, 80), time: 'Just now', tag: 'Admin', who: '', place: '', count: 2 });
+                    if (d.source === 'rules') toast('Answered without Gemini', 'Gemini was busy, so Jenny used the built-in answers.', 'info');
                 } else {
-                    reply = "Strategic synthesis for: \"" + query + "\"\n\nPlatform metrics indicate operational stability. Nightly scoring evaluated 1,904 pairs with 71.4% acceptance. All verified HMAC-SHA512 Paystack webhooks are synchronized with zero latency bottlenecks.";
-                    stats = { label1: 'Pairs Scored', val1: '1,904 Pairs', label2: 'Acceptance Rate', val2: '71.4%' };
+                    this.messages.push({ role: 'assistant', text: d.error || 'Jenny could not answer just now. Please try again.', time: now() });
                 }
-
-                this.messages.push({
-                    role: 'assistant',
-                    text: reply,
-                    stats: stats,
-                    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                });
-
-                this.isThinking = false;
-                this.scrollToBottom();
-            }, 600);
+            } catch (e) {
+                this.messages.push({ role: 'assistant', text: 'Network error. Check your connection and try again.', time: now() });
+            }
+            this.isThinking = false;
+            this.scrollToBottom();
         },
         clearChat() {
             this.messages = [];
             this.inputQuery = '';
             this.attachedFile = null;
-            if (typeof window.adminToast === 'function') {
-                window.adminToast('New session started', 'Conversation history cleared', null, 'info');
-            }
+            this.file = null;
+            this.conversation = null;
+            this.activeSessionId = null;
+            this.readOnly = false;
         },
         scrollToBottom() {
             this.$nextTick(() => {

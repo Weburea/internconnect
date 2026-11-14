@@ -20,7 +20,7 @@ declare(strict_types=1);
  */
 ?>
 
-<link rel="stylesheet" href="<?= asset('assets/css/employer-candidates.css') ?>?v=<?= time() ?>">
+<link rel="stylesheet" href="<?= asset('assets/css/employer-candidates.css') ?>?v=<?= @filemtime(dirname(__DIR__, 3) . '/public/assets/css/employer-candidates.css') ?: 1 ?>">
 
 <style>
     /* Cloudinary Graphic Tinting for AI Suggested Time Box */

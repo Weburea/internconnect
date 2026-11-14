@@ -43,16 +43,75 @@ $avatar    = $candidate['avatar'] ?? null;
 
     sendMessage() {
         this.showMessageModal = false;
-        if (typeof window.$dispatch === 'function') {
-            window.$dispatch('show-toast', { 
-                text: 'Your message has been sent to Akinyele Okoro.', 
-                type: 'success' 
-            });
-        }
+        window.dispatchEvent(new CustomEvent('show-toast', { detail: { text: 'Your message has been sent to Akinyele Okoro.', message: 'Your message has been sent to Akinyele Okoro.', type: 'success' } }));
     },
 
-    downloadPdf() {
-        window.print();
+    pdfBusy: false,
+    // Real A4 offer letter PDF (jsPDF, vector text). The letter text is read from the page so both always match.
+    async downloadPdf() {
+        if (this.pdfBusy) return;
+        this.pdfBusy = true;
+        const toast = (text, type) => window.dispatchEvent(new CustomEvent('show-toast', { detail: { text: text, message: text, type: type } }));
+        try {
+            if (!window.jspdf) {
+                await new Promise((resolve, reject) => { const s = document.createElement('script'); s.src = '<?= asset('assets/js/jspdf.umd.min.js') ?>'; s.onload = resolve; s.onerror = reject; document.head.appendChild(s); });
+            }
+            const o = JSON.parse(document.getElementById('offer-pdf-data').textContent);
+            const clean = (el) => el.textContent.replace(/\s+/g, ' ').replace(/₦/g, 'NGN ').trim();
+            const paragraphs = Array.from(document.querySelectorAll('.db-offer-letter-body .db-offer-letter-p:not(.db-offer-warm-regards)')).map(clean).filter(Boolean);
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+            const L = 22, R = 188, W = R - L, navy = [0, 6, 35], indigo = [79, 72, 230], slate = [71, 85, 105], muted = [148, 163, 184];
+            doc.setProperties({ title: o.company + ' offer letter - ' + o.name, author: o.company, subject: 'Internship offer', creator: 'InternConnect' });
+            // Letterhead
+            doc.setFillColor.apply(doc, indigo); doc.rect(0, 0, 210, 4, 'F');
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(20); doc.setTextColor.apply(doc, navy); doc.text(o.company, L, 24);
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor.apply(doc, slate); doc.text(o.location, L, 30);
+            doc.setFontSize(9); doc.setTextColor.apply(doc, muted); doc.text('Offer reference ' + o.reference, R, 24, { align: 'right' }); doc.text(o.issued, R, 30, { align: 'right' });
+            doc.setDrawColor(226, 232, 240); doc.setLineWidth(0.4); doc.line(L, 36, R, 36);
+            // Title + letter
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(15); doc.setTextColor.apply(doc, navy); doc.text('Offer of Internship: ' + o.role, L, 48);
+            let y = 60;
+            const para = (text, opts) => {
+                doc.setFont('helvetica', (opts && opts.bold) ? 'bold' : 'normal'); doc.setFontSize((opts && opts.size) || 10.5); doc.setTextColor.apply(doc, (opts && opts.color) || [30, 41, 59]);
+                const lines = doc.splitTextToSize(text, W);
+                if (y + lines.length * 5.4 > 272) { doc.addPage(); y = 24; }
+                doc.text(lines, L, y, { lineHeightFactor: 1.55 }); y += lines.length * 5.4 + 4;
+            };
+            para('Dear ' + o.name + ',');
+            paragraphs.forEach(p => para(p));
+            para('Warm regards,');
+            y += 6; para(o.signatory, { bold: true }); y -= 3; para(o.signatoryTitle + ', ' + o.company, { color: slate, size: 9.5 });
+            // Offer summary
+            y += 4; if (y > 220) { doc.addPage(); y = 24; }
+            doc.setFillColor(248, 250, 252); const rows = [['Position', o.role], ['Location', o.location], ['Type', o.type], ['Duration', o.duration], ['Start date', o.start], ['Respond by', o.deadline]].filter(r => r[1]);
+            doc.roundedRect(L, y, W, 10 + rows.length * 7, 3, 3, 'F');
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor.apply(doc, indigo); doc.text('OFFER SUMMARY', L + 6, y + 7, { charSpace: 0.4 });
+            rows.forEach((r, i) => {
+                doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); doc.setTextColor.apply(doc, slate); doc.text(r[0], L + 6, y + 14 + i * 7);
+                doc.setFont('helvetica', 'bold'); doc.setTextColor.apply(doc, navy); doc.text(doc.splitTextToSize(String(r[1]), W - 52)[0], L + 46, y + 14 + i * 7);
+            });
+            y += 18 + rows.length * 7;
+            if (o.responsibilities.length) {
+                if (y > 240) { doc.addPage(); y = 24; }
+                para('What you will do', { bold: true, size: 11, color: navy }); y -= 2;
+                o.responsibilities.forEach(t => { doc.setFillColor.apply(doc, indigo); doc.circle(L + 1.5, y - 1.3, 0.9, 'F'); const lines = doc.splitTextToSize(t, W - 7); doc.setFont('helvetica', 'normal'); doc.setFontSize(10); doc.setTextColor(30, 41, 59); if (y + lines.length * 5 > 272) { doc.addPage(); y = 24; } doc.text(lines, L + 5, y, { lineHeightFactor: 1.5 }); y += lines.length * 5 + 2; });
+            }
+            // Footer on every page
+            const pages = doc.getNumberOfPages();
+            for (let i = 1; i <= pages; i++) {
+                doc.setPage(i); doc.setDrawColor(226, 232, 240); doc.line(L, 282, R, 282);
+                doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor.apply(doc, muted);
+                doc.text('Delivered through InternConnect' + (o.verified ? ' by a verified employer' : '') + '. Accept or decline in your InternConnect account.', L, 287);
+                doc.text('Page ' + i + ' of ' + pages, R, 287, { align: 'right' });
+            }
+            doc.save(o.file + '.pdf');
+            toast('Offer letter downloaded as PDF.', 'success');
+        } catch (e) {
+            toast('The PDF could not be created. Please try again.', 'error');
+        } finally {
+            this.pdfBusy = false;
+        }
     }
 }">
 
@@ -105,7 +164,7 @@ $avatar    = $candidate['avatar'] ?? null;
                         <div class="db-offer-company-name-row">
                             <span class="db-offer-company-name"><?= htmlspecialchars($offer['company']) ?></span>
                             <?php if (!empty($offer['verified'])): ?>
-                                <span class="db-offer-verified-badge" title="Verified Employer">
+                                <span class="db-offer-verified-badge" aria-label="Verified Employer">
                                     <svg fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                                     </svg>
@@ -192,7 +251,7 @@ $avatar    = $candidate['avatar'] ?? null;
                         
                         <div class="db-offer-signature-block">
                             <div class="db-offer-signatory-name"><?= htmlspecialchars($offer['signatory_name']) ?></div>
-                            <div class="db-offer-signatory-role"><?= htmlspecialchars($offer['signatory_title']) ?></div>
+                            <div class="db-offer-signatory-role"><?= htmlspecialchars($offer['signatory_title'] . ', ' . $offer['company']) ?></div>
                         </div>
                     </div>
                 </div>
@@ -548,3 +607,25 @@ $avatar    = $candidate['avatar'] ?? null;
 
 </div>
 
+
+<?php
+// Data for the offer letter PDF (downloadPdf above). JSON in a script block: never executed, safely escaped.
+$offerPdf = [
+    'name'             => $name,
+    'company'          => (string)($offer['company'] ?? ''),
+    'role'             => (string)($offer['job_title'] ?? $offer['role'] ?? ''),
+    'location'         => (string)($offer['location'] ?? ''),
+    'type'             => (string)($offer['type'] ?? ''),
+    'duration'         => (string)($offer['duration'] ?? ''),
+    'start'            => (string)($offer['commencement_date'] ?? ''),
+    'deadline'         => (string)($offer['response_deadline'] ?? ''),
+    'signatory'        => (string)($offer['signatory_name'] ?? ''),
+    'signatoryTitle'   => (string)($offer['signatory_title'] ?? ''),
+    'responsibilities' => array_values(array_map('strval', (array)($offer['responsibilities'] ?? []))),
+    'verified'         => !empty($offer['verified']),
+    'reference'        => 'OFR-' . strtoupper(substr(hash('sha256', ($offer['company'] ?? '') . '|' . ($offer['role'] ?? '') . '|' . $name), 0, 8)),
+    'issued'           => date('j F Y'),
+    'file'             => preg_replace('/[^A-Za-z0-9]+/', '-', ($offer['company'] ?? 'Offer') . ' offer letter ' . $name),
+];
+?>
+<script type="application/json" id="offer-pdf-data"><?= json_encode($offerPdf, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) ?></script>

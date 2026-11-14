@@ -1321,7 +1321,7 @@ declare(strict_types=1);
                                     <span class="process-profile-sub">PDF · ATS Optimized</span>
                                 </div>
                             </div>
-                            <div class="process-check-circle" title="Verified Asset">
+                            <div class="process-check-circle" aria-label="Verified Asset">
                                 <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                 </svg>
@@ -1341,7 +1341,7 @@ declare(strict_types=1);
                                     <span class="process-profile-sub">Verified Candidate Dossier</span>
                                 </div>
                             </div>
-                            <div class="process-check-circle" title="Verified Asset">
+                            <div class="process-check-circle" aria-label="Verified Asset">
                                 <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                 </svg>
@@ -1362,7 +1362,7 @@ declare(strict_types=1);
                                     <span class="process-profile-sub">University Certification Checkup</span>
                                 </div>
                             </div>
-                            <div class="process-check-circle" title="Verified Asset">
+                            <div class="process-check-circle" aria-label="Verified Asset">
                                 <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                                 </svg>

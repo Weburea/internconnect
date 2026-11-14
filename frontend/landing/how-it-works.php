@@ -612,7 +612,7 @@ declare(strict_types=1);
                         </div>
                         <h2 class="hiw-chapter-title">Publish Role Openings with AI Optimization &amp; Screening Rules</h2>
                         <p class="hiw-chapter-desc">
-                            Writing internship job descriptions is tedious. Our 3-step publishing wizard uses DeepSeek AI to automatically suggest industry-standard responsibilities, required qualifications, and custom screening questions tailored to undergraduate and graduate cohorts.
+                            Writing internship job descriptions is tedious. Our 3-step publishing wizard uses Jenny AI (powered by Google Gemini) to suggest industry-standard responsibilities, required qualifications, and custom screening questions tailored to undergraduate and graduate cohorts.
                         </p>
                         <ul class="hiw-points-list">
                             <li class="hiw-point-item">

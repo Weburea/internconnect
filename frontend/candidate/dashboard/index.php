@@ -805,7 +805,7 @@ $avatar    = $candidate['avatar'] ?? null;
                     <div class="db-card db-profile-card" x-show="!isProfileComplete">
                         <div class="db-card-header">
                             <h3 class="db-card-title">Complete Profile</h3>
-                            <button type="button" @click="isProfileComplete = true" title="Preview completed profile with Career Insights" style="background: none; border: none; font-size: 11px; color: #4F48E6; cursor: pointer; text-decoration: underline; padding: 0;">
+                            <button type="button" @click="isProfileComplete = true" aria-label="Preview completed profile with Career Insights" style="background: none; border: none; font-size: 11px; color: #4F48E6; cursor: pointer; text-decoration: underline; padding: 0;">
                                 Test 100%
                             </button>
                         </div>
@@ -853,11 +853,10 @@ $avatar    = $candidate['avatar'] ?? null;
                             <div class="cand-insights-header">
                                 <div class="cand-insights-top">
                                     <h3 class="cand-insights-title">Your Pro Career Insights</h3>
-                                    <button type="button" @click="isPro = !isPro" :title="isPro ? 'Switch to Free Mode preview' : 'Switch to Pro Plan preview'" 
-                                            class="cand-pro-pill" :class="isPro ? 'is-pro' : 'is-free'">
+                                    <span class="cand-pro-pill" :class="isPro ? 'is-pro' : 'is-free'">
                                         <span class="cand-pro-dot"></span>
-                                        <span x-text="isPro ? 'PRO UNLOCKED' : 'FREE MODE'"></span>
-                                    </button>
+                                        <span><?= ($candidate['plan'] ?? 'free') === 'premium' ? 'PREMIUM UNLOCKED' : (!empty($candidate['is_pro']) ? 'PRO UNLOCKED' : 'FREE MODE') ?></span>
+                                    </span>
                                 </div>
                                 <p class="cand-insights-sub">See how your profile and applications are performing against peers.</p>
                             </div>
@@ -939,6 +938,56 @@ $avatar    = $candidate['avatar'] ?? null;
 
             </div>
 
+            <!-- ── Jenny Coins (docs/55) ── -->
+            <?php include dirname(__DIR__, 2) . '/shared/components/jenny-coins-card.php'; ?>
+
+            <!-- ── Training programmes with partners (docs/57-training-partners.md) ── -->
+            <?php
+            $icTraining = \App\Services\PartnerService::forCandidate((int)($_SESSION['candidate_id'] ?? 1));
+            $icTrainingOpen = \App\Services\PartnerService::activePartners();
+            $icStatus = ['started' => 'Started', 'enrolled' => 'Enrolled', 'in_progress' => 'In progress', 'completed' => 'Completed', 'failed' => 'Not passed', 'withdrawn' => 'Withdrawn', 'expired' => 'Expired'];
+            ?>
+            <?php if ($icTraining || $icTrainingOpen): ?>
+            <div class="db-card" style="margin-bottom: 24px; padding: 20px;">
+                <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px;">
+                    <div style="min-width: 0;">
+                        <h3 style="font-size: 16px; font-weight: 800; color: #000623; margin: 0;">Training programmes</h3>
+                        <p style="font-size: 13px; color: #64748B; margin: 4px 0 0;">Pass a partner course to unlock free Pro or Premium time and a "Certified by" badge for employers.</p>
+                    </div>
+                    <a href="<?= url('/elearning#certified-training') ?>" style="display: inline-flex; align-items: center; height: 36px; padding: 0 14px; border-radius: 10px; background: #EEF0FF; color: #4F48E6; font-size: 13px; font-weight: 700; text-decoration: none; white-space: nowrap;">Browse partners</a>
+                </div>
+                <?php if (!$icTraining): ?>
+                    <p style="font-size: 13px; color: #94A3B8; margin: 0;">You have not started a partner course yet.</p>
+                <?php else: ?>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <?php foreach ($icTraining as $t): $res = $t['result']; ?>
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px 14px; border: 1px solid #F1F5F9; border-radius: 12px;">
+                                <div style="min-width: 0;">
+                                    <div style="font-size: 14px; font-weight: 700; color: #0F172A;"><?= htmlspecialchars($t['partner_name']) ?><?= $t['program'] ? ' · ' . htmlspecialchars($t['program']) : '' ?></div>
+                                    <div style="font-size: 12px; color: #64748B; margin-top: 2px;">Reference <?= htmlspecialchars($t['reference']) ?> · <?= htmlspecialchars($icStatus[$t['status']] ?? ucfirst($t['status'])) ?></div>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                    <?php if ($res): ?>
+                                        <span style="font-size: 13px; font-weight: 800; color: #000623;"><?= rtrim(rtrim(number_format((float)$res['score'], 2), '0'), '.') ?>%</span>
+                                        <?php if ($res['plan']): ?>
+                                            <span style="font-size: 11px; font-weight: 800; color: #FFFFFF; background: #4F48E6; padding: 3px 9px; border-radius: 999px; white-space: nowrap;"><?= htmlspecialchars(ucfirst($res['plan'])) ?> for <?= (int)$res['plan_days'] ?> days</span>
+                                        <?php elseif ($res['passed']): ?>
+                                            <span style="font-size: 11px; font-weight: 800; color: #047857; background: #ECFDF5; padding: 3px 9px; border-radius: 999px;">Certified</span>
+                                        <?php endif; ?>
+                                        <?php if ($res['certificate_url']): ?>
+                                            <a href="<?= htmlspecialchars($res['certificate_url']) ?>" target="_blank" rel="noopener" style="font-size: 12.5px; font-weight: 700; color: #4F48E6; text-decoration: none;">Certificate</a>
+                                        <?php endif; ?>
+                                    <?php else: ?>
+                                        <span style="font-size: 12px; color: #94A3B8;">Result pending</span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
+            <?php endif; ?>
+
             <!-- ── Recommended For You (Original Section Restored) ── -->
             <section aria-labelledby="db-recs-heading" style="margin-top: 36px;">
                 <div class="db-section-header">
@@ -965,7 +1014,7 @@ $avatar    = $candidate['avatar'] ?? null;
                                         <span style="display: block; font-size: 10px; font-weight: 700; color: #4F47E6; text-transform: uppercase; letter-spacing: 0.08em; line-height: 1.2; margin-bottom: 2px;">
                                             <?= htmlspecialchars($rec['category']) ?>
                                         </span>
-                                        <h4 style="font-size: 14.5px; font-weight: 700; color: #111827; margin: 0; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="<?= htmlspecialchars($rec['title']) ?>">
+                                        <h4 style="font-size: 14.5px; font-weight: 700; color: #111827; margin: 0; line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" aria-label="<?= htmlspecialchars($rec['title']) ?>">
                                             <?= htmlspecialchars($rec['title']) ?>
                                         </h4>
                                     </div>
@@ -1043,7 +1092,7 @@ $avatar    = $candidate['avatar'] ?? null;
                         <div>
                             <!-- Card Top: Company Logo & Employment Badge -->
                             <div class="cand-ai-card-top">
-                                <a href="<?= url('/company/' . ($rec['slug'] ?? 'kiro-labs')) ?>" class="cand-ai-logo-box" style="background-color: <?= htmlspecialchars($rec['logo_bg'] ?? '#FFFFFF') ?>; <?= ($rec['logo_bg'] ?? '') === '#000623' ? 'border-color: #1E293B;' : '' ?>" title="View <?= htmlspecialchars($rec['company']) ?> Profile">
+                                <a href="<?= url('/company/' . ($rec['slug'] ?? 'kiro-labs')) ?>" class="cand-ai-logo-box" style="background-color: <?= htmlspecialchars($rec['logo_bg'] ?? '#FFFFFF') ?>; <?= ($rec['logo_bg'] ?? '') === '#000623' ? 'border-color: #1E293B;' : '' ?>" aria-label="View <?= htmlspecialchars($rec['company']) ?> Profile">
                                     <img src="<?= htmlspecialchars($rec['logo']) ?>" alt="<?= htmlspecialchars($rec['company']) ?>" class="cand-ai-logo-img" loading="lazy">
                                 </a>
                                 <span class="cand-ai-type-badge cand-ai-<?= htmlspecialchars($rec['type_class']) ?>">

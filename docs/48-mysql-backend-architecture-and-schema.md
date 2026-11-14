@@ -471,3 +471,18 @@ DB_PASSWORD=StrongProductionPassword123!
 
 The singleton connection manager in [`backend/Core/Database.php`](file:///c:/xampp/htdocs/InternConnect/backend/Core/Database.php) automatically initializes the requested driver with persistent connection options, error exception mode (`PDO::ERRMODE_EXCEPTION`), and default associative fetch modes.
 
+
+---
+
+## Addendum (2026-11-11): tables added by the frontend phase
+
+These tables are created on first use by their services (SQLite locally, MySQL in production) and are now also in `database/schema_mysql.sql`:
+
+| Section | Tables | Service / spec |
+|---|---|---|
+| 7b, 7c | `interview_rooms`, `interview_room_events`, `platform_settings`, `scheduled_interviews`, `interview_scorecards`, `interview_files`, `interview_chat`, `interview_reports`, `geo_cache` | `VideoInterviewService`, docs/47 |
+| 12 | `candidate_cv_profiles`, `application_submissions` | `CvService`, `ApplicationService`, docs/49 |
+| 13 | `billing_transactions`, `billing_subscriptions` | `BillingService`, docs/08 |
+| 14 | `elearning_partners`, `elearning_programs`, `elearning_referrals` | `ElearningService`, docs/50 |
+
+The full rewrite of this document (live vs planned tables, merging `application_submissions` into `applications`, `billing_*` into `subscriptions`/`payment_transactions`) is the first task of the backend phase.

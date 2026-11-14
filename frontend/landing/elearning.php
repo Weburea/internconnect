@@ -1034,6 +1034,35 @@ declare(strict_types=1);
     background: #F1F5F9;
     color: #000623;
 }
+/* Partner logo tiles (cards + modal) */
+.elearn-logo-tile { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; background: #FFFFFF; border: 1px solid #E2E8F0; overflow: hidden; color: #FFFFFF; font-weight: 800; }
+.elearn-logo-tile img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.elearn-logo-tile.is-sm { width: 34px; height: 34px; border-radius: 10px; padding: 3px; font-size: 11px; }
+.elearn-logo-tile.is-lg { width: 60px; height: 60px; border-radius: 16px; padding: 8px; font-size: 18px; box-shadow: 0 6px 18px -8px rgba(15, 23, 42, .25); }
+.elearn-card-header { align-items: center; }
+.elearn-modal-dialog { max-width: 720px; }
+.elearn-modal-brand { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; padding-right: 44px; }
+.elearn-modal-brand-text { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.elearn-modal-brand-text strong { font-size: 18px; font-weight: 800; color: #000623; line-height: 1.2; }
+.elearn-modal-brand-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.elearn-cat-chip { font-size: 11.5px; font-weight: 600; color: #475569; background: #F1F5F9; padding: 3px 9px; border-radius: 9999px; }
+.elearn-section-label { font-size: 11.5px; font-weight: 800; text-transform: uppercase; color: #000623; letter-spacing: .05em; margin-bottom: 12px; }
+.elearn-services { border: 1px solid #E2E8F0; border-radius: 14px; padding: 16px; margin-bottom: 18px; }
+.elearn-services-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; }
+.elearn-service { display: flex; gap: 10px; align-items: flex-start; min-width: 0; }
+.elearn-service .elearn-service-icon { width: 22px; height: 22px; border-radius: 7px; background: #EEF2FF; color: #4F48E6; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.elearn-service strong { display: block; font-size: 13px; font-weight: 700; color: #0F172A; line-height: 1.35; }
+.elearn-service > div > span { display: block; font-size: 12px; color: #64748B; line-height: 1.45; margin-top: 2px; }
+.elearn-steps { margin-bottom: 22px; }
+.elearn-steps ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.elearn-steps li { display: flex; gap: 12px; align-items: flex-start; font-size: 13px; color: #334155; line-height: 1.5; }
+.elearn-steps li b { width: 24px; height: 24px; border-radius: 50%; background: #4F48E6; color: #FFFFFF; font-size: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.elearn-site-link { margin-right: auto; align-self: center; font-size: 13px; font-weight: 700; color: #4F48E6; text-decoration: none; }
+.elearn-site-link:hover { text-decoration: underline; }
+@media (max-width: 640px) {
+    .elearn-services-grid { grid-template-columns: minmax(0, 1fr); }
+    .elearn-site-link { width: 100%; text-align: center; margin: 0 0 4px; }
+}
 
 /* ==========================================================================
    7. RESPONSIVE MEDIA QUERIES (IPAD, TABLET & MOBILE VIEWPORTS)
@@ -1247,152 +1276,7 @@ declare(strict_types=1);
     selectedPartner: null,
     partnerModal: false,
     copiedCode: false,
-    partners: [
-        {
-            id: 1,
-            platform: 'ALX Africa',
-            tier: 'Accredited Partner',
-            title: 'ALX Full-Stack Software Engineering & Cloud',
-            category: 'tech',
-            category_label: 'Software & Cloud',
-            duration: '9 Months &bull; Intensive Cohort',
-            delivery: 'Hybrid Hubs &amp; 100% Online',
-            cities: 'Lagos, Nairobi, Kigali, Accra, Johannesburg &amp; Remote',
-            level: 'Beginner to Advanced',
-            desc: 'World-class software engineering program covering low-level programming, data structures, full-stack web applications, and DevOps workflows.',
-            about_platform: 'ALX Africa is a leading tech training initiative transforming young African leaders through rigorous, market-aligned technical training programs.',
-            perk: 'Direct Fast-Track to Employer Tech Shortlists',
-            perk_code: 'IC-ALX-FAST',
-            external_url: 'https://www.alxafrica.com',
-            highlights: [
-                'C, Python, and modern JavaScript foundations',
-                'System design and database architectures',
-                'Peer-to-peer code reviews & agile team projects',
-                'Alumni network of 50,000+ African technologists'
-            ],
-            outcomes: 'Full-Stack Developer, Backend Software Engineer, Cloud Practitioner'
-        },
-        {
-            id: 2,
-            platform: 'Coursera',
-            tier: 'Global Partner',
-            title: 'Google UX Design Professional Certificate',
-            category: 'design',
-            category_label: 'Product & Design',
-            duration: '3 - 6 Months &bull; Self-Paced',
-            delivery: '100% Online &amp; Self-Paced',
-            cities: 'Global &amp; Fully Remote',
-            level: 'Beginner',
-            desc: 'Master the complete UX design process, conduct usability studies, build wireframes and high-fidelity prototypes in Figma, and build 3 portfolio case studies.',
-            about_platform: 'Coursera partners with more than 300 leading universities and companies to bring flexible, affordable, job-relevant online learning.',
-            perk: 'Free Financial Aid & 100% Audit Available',
-            perk_code: 'COURSERA-AID',
-            external_url: 'https://www.coursera.org/professional-certificates/google-ux-design',
-            highlights: [
-                'User research, personas, and journey maps',
-                'Figma design system components and auto-layout',
-                'Cross-platform mobile and web responsiveness',
-                'Official Google Professional Certificate badge'
-            ],
-            outcomes: 'Entry-level UX Designer, UI Designer, Product Design Intern'
-        },
-        {
-            id: 3,
-            platform: 'DataCamp',
-            tier: 'Data & AI Partner',
-            title: 'Associate Data Analyst with Python & SQL',
-            category: 'data',
-            category_label: 'Data Science & AI',
-            duration: '2 - 4 Months &bull; Interactive Labs',
-            delivery: 'Hands-on Browser Labs &amp; Online',
-            cities: 'Global &amp; Fully Remote',
-            level: 'Intermediate',
-            desc: 'Interactive coding environment to query relational databases with SQL, clean data using pandas, and build data visualization stories for business teams.',
-            about_platform: 'DataCamp helps individuals and businesses acquire the in-demand data and AI skills needed to thrive in the modern economy.',
-            perk: 'Exclusive: 20% Off Premium for InternConnect Students',
-            perk_code: 'ICDATA20',
-            external_url: 'https://www.datacamp.com',
-            highlights: [
-                'PostgreSQL querying, joins, and aggregations',
-                'Exploratory data analysis with Python & pandas',
-                'Statistical hypothesis testing and dashboard reporting',
-                'Industry-recognized DataCamp certification'
-            ],
-            outcomes: 'Junior Data Analyst, BI Intern, SQL Reporting Specialist'
-        },
-        {
-            id: 4,
-            platform: 'freeCodeCamp',
-            tier: 'Free Certifications',
-            title: 'Scientific Computing with Python & Algorithms',
-            category: 'free',
-            category_label: 'Free Certifications',
-            duration: '300 Hours &bull; Self-Paced',
-            delivery: '100% Free &amp; Open-Source',
-            cities: 'Global &amp; Fully Remote',
-            level: 'All Levels',
-            desc: 'Acclaimed non-profit curriculum covering Python algorithms, data structures, and numerical computing through 5 verified portfolio projects.',
-            about_platform: 'freeCodeCamp is a proven donor-supported non-profit community that has helped more than 40,000 graduates land jobs at tech companies.',
-            perk: '100% Free Credential Recognized by Verified Recruiters',
-            perk_code: 'FREE-ALWAYS',
-            external_url: 'https://www.freecodecamp.org/learn/scientific-computing-with-python/',
-            highlights: [
-                'Algorithm time and space complexity (Big O)',
-                'Object-oriented programming patterns in Python',
-                'Hands-on computational problem solving projects',
-                'Free verifiable cryptographic certificate'
-            ],
-            outcomes: 'Python Developer Intern, Algorithm Engineer, Software Apprentice'
-        },
-        {
-            id: 5,
-            platform: 'Google Certificates',
-            tier: 'Global Tech Partner',
-            title: 'Google IT Support & Cybersecurity Specialization',
-            category: 'tech',
-            category_label: 'Software & Cloud',
-            duration: '3 - 6 Months &bull; Self-Paced',
-            delivery: '100% Online &amp; Self-Paced',
-            cities: 'Global &amp; Fully Remote',
-            level: 'Beginner',
-            desc: 'Hands-on practical training covering hardware diagnostics, networking protocols, Linux terminal administration, and enterprise cyber defense.',
-            about_platform: 'Google Career Certificates provide pathways to great jobs in high-growth fields, without requiring a 4-year degree.',
-            perk: 'Fast-Tracks Applications for Corporate IT Roles',
-            perk_code: 'GOOGLE-CERT',
-            external_url: 'https://grow.google/certificates',
-            highlights: [
-                'TCP/IP networking and DNS server configuration',
-                'Linux and Windows command line troubleshooting',
-                'System security encryption and incident response',
-                'Direct access to Google Hiring Consortium'
-            ],
-            outcomes: 'IT Support Specialist, Systems Administrator, Cyber Defense Analyst'
-        },
-        {
-            id: 6,
-            platform: 'CFI Institute',
-            tier: 'Accredited Partner',
-            title: 'Financial Modeling & Valuation Analyst (FMVA)',
-            category: 'business',
-            category_label: 'Business & Finance',
-            duration: '4 - 6 Months &bull; Self-Paced',
-            delivery: '100% Online &amp; Interactive Models',
-            cities: 'Global &amp; Fully Remote',
-            level: 'Intermediate to Advanced',
-            desc: 'The global standard certification for corporate finance, teaching 3-statement financial modeling, DCF valuations, and Excel shortcuts for investment analysts.',
-            about_platform: 'Corporate Finance Institute (CFI) is the leading provider of online financial analyst certification programs and corporate training.',
-            perk: 'Unlocks Verified Financial Analyst Badge on InternConnect',
-            perk_code: 'CFI-FMVA-IC',
-            external_url: 'https://corporatefinanceinstitute.com',
-            highlights: [
-                'Dynamic 3-statement forecasting in Excel',
-                'Discounted cash flow (DCF) models & sensitivity analysis',
-                'M&amp;A and corporate pitch deck structuring',
-                'Global FMVA certification recognized by top investment banks'
-            ],
-            outcomes: 'Investment Banking Intern, Financial Analyst, Private Equity Trainee'
-        }
-    ],
+    partners: <?= htmlspecialchars(json_encode($programs ?? [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') ?>,
     filteredPartners() {
         return this.partners.filter(p => {
             const matchesCat = (this.activeCategory === 'all') || 
@@ -1734,6 +1618,37 @@ declare(strict_types=1);
     <!-- ====================================================================
          4. PARTNER DIRECTORY (SEARCH, FILTERS & CARDS)
          ==================================================================== -->
+    <?php
+    // Certified training (docs/57-training-partners.md): only active partners with an application link.
+    $icTrainingPartners = \App\Services\PartnerService::activePartners();
+    $icTrainingNotice = ['unavailable' => 'That training partner is not taking applications right now.', 'candidates-only' => 'Certified training is for student accounts.'][$_GET['training'] ?? ''] ?? '';
+    ?>
+    <?php if ($icTrainingPartners || $icTrainingNotice): ?>
+    <section id="certified-training" style="padding: 56px 0 8px;">
+        <div class="ic-container">
+            <div style="background: #000623; border-radius: 22px; padding: 28px; color: #FFFFFF; display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px;">
+                <div style="max-width: 640px;">
+                    <span style="display: inline-flex; font-size: 11px; font-weight: 800; letter-spacing: .08em; color: #A5B4FC; text-transform: uppercase;">Certified training</span>
+                    <h2 style="font-size: 26px; font-weight: 800; letter-spacing: -0.02em; margin: 8px 0 8px; color: #FFFFFF;">Train with our partners. Get certified. Get hired.</h2>
+                    <p style="font-size: 14.5px; line-height: 1.6; color: #CBD5E1; margin: 0;">Pass a course with a certifying partner and your score unlocks free InternConnect Pro or Premium time, plus a "Certified by" badge employers can see.</p>
+                </div>
+                <?php if ($icTrainingNotice): ?>
+                    <div style="background: rgba(255,255,255,.08); border-radius: 12px; padding: 10px 14px; font-size: 13px; color: #FDE68A;"><?= htmlspecialchars($icTrainingNotice) ?></div>
+                <?php endif; ?>
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px;">
+                    <?php foreach ($icTrainingPartners as $tp): ?>
+                        <form method="POST" action="<?= url('/training/start/' . (int)$tp['id']) ?>" style="background: #FFFFFF; border-radius: 16px; padding: 16px; color: #0F172A; display: flex; flex-direction: column; gap: 10px; margin: 0;">
+                            <div style="font-size: 16px; font-weight: 800; color: #000623;"><?= htmlspecialchars($tp['name']) ?></div>
+                            <div style="font-size: 12.5px; color: #64748B; line-height: 1.5;">Pass mark <?= rtrim(rtrim(number_format((float)$tp['pass_mark'], 2), '0'), '.') ?>%. Your result is sent to InternConnect automatically.</div>
+                            <button type="submit" style="height: 40px; border: 0; border-radius: 11px; background: #4F48E6; color: #FFFFFF; font-size: 13.5px; font-weight: 700; cursor: pointer; font-family: inherit;">Start with <?= htmlspecialchars($tp['name']) ?></button>
+                        </form>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </div>
+    </section>
+    <?php endif; ?>
+
     <section id="partner-directory" class="elearn-directory-wrap">
         <div class="ic-container">
             <div class="elearn-dir-header">
@@ -1767,6 +1682,10 @@ declare(strict_types=1);
                     <article class="elearn-partner-card">
                         <div>
                             <div class="elearn-card-header">
+                                <span class="elearn-logo-tile is-sm" :style="partner.logo ? '' : 'background:' + partner.brand_color">
+                                    <template x-if="partner.logo"><img :src="partner.logo" :alt="partner.platform + ' logo'" width="28" height="28" loading="lazy"></template>
+                                    <template x-if="!partner.logo"><span x-text="partner.initials"></span></template>
+                                </span>
                                 <span class="elearn-platform-badge" x-text="partner.platform"></span>
                                 <span class="elearn-tier-badge" x-text="partner.tier"></span>
                             </div>
@@ -1781,14 +1700,14 @@ declare(strict_types=1);
                                         <circle cx="12" cy="12" r="10"/>
                                         <polyline points="12 6 12 12 16 14"/>
                                     </svg>
-                                    <span x-html="partner.duration"></span>
+                                    <span x-text="partner.duration"></span>
                                 </span>
                                 <span class="elearn-tag-pill">
                                     <svg style="width: 12px; height: 12px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                                     </svg>
-                                    <span x-html="partner.delivery"></span>
+                                    <span x-text="partner.delivery"></span>
                                 </span>
                             </div>
 
@@ -1915,11 +1834,19 @@ declare(strict_types=1);
                 </button>
 
                 <div>
-                    <!-- Header Meta -->
-                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;">
-                        <span class="elearn-platform-badge" x-text="selectedPartner.platform"></span>
-                        <span class="elearn-tier-badge" x-text="selectedPartner.tier"></span>
-                        <span style="font-size: 11.5px; font-weight: 600; color: #475569; background: #F1F5F9; padding: 3px 8px; border-radius: 9999px;" x-text="selectedPartner.category_label"></span>
+                    <!-- Partner identity: logo, name, tier, category -->
+                    <div class="elearn-modal-brand">
+                        <span class="elearn-logo-tile is-lg" :style="selectedPartner.logo ? '' : 'background:' + selectedPartner.brand_color">
+                            <template x-if="selectedPartner.logo"><img :src="selectedPartner.logo" :alt="selectedPartner.platform + ' logo'" width="44" height="44"></template>
+                            <template x-if="!selectedPartner.logo"><span x-text="selectedPartner.initials"></span></template>
+                        </span>
+                        <div class="elearn-modal-brand-text">
+                            <strong x-text="selectedPartner.platform"></strong>
+                            <div class="elearn-modal-brand-tags">
+                                <span class="elearn-tier-badge" x-text="selectedPartner.tier"></span>
+                                <span class="elearn-cat-chip" x-text="selectedPartner.category_label"></span>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Title & Overview -->
@@ -1935,7 +1862,25 @@ declare(strict_types=1);
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                             </svg>
-                            <span x-html="selectedPartner.cities"></span>
+                            <span x-text="selectedPartner.cities"></span>
+                        </div>
+                    </div>
+
+                    <!-- Everything the partner offers -->
+                    <div class="elearn-services" x-show="selectedPartner.services && selectedPartner.services.length">
+                        <div class="elearn-section-label" x-text="'Services offered by ' + selectedPartner.platform"></div>
+                        <div class="elearn-services-grid">
+                            <template x-for="(service, sIdx) in selectedPartner.services" :key="sIdx">
+                                <div class="elearn-service">
+                                    <span class="elearn-service-icon" aria-hidden="true">
+                                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.6"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                    </span>
+                                    <div>
+                                        <strong x-text="service.name"></strong>
+                                        <span x-text="service.desc" x-show="service.desc"></span>
+                                    </div>
+                                </div>
+                            </template>
                         </div>
                     </div>
 
@@ -1970,10 +1915,21 @@ declare(strict_types=1);
                         <span style="font-size: 13px; font-weight: 700; color: #000623;" x-text="selectedPartner.outcomes"></span>
                     </div>
 
+                    <!-- How the partnership works for the student -->
+                    <div class="elearn-steps">
+                        <div class="elearn-section-label">How it works with InternConnect</div>
+                        <ol>
+                            <li><b>1</b><span>Enroll through this page so <strong x-text="selectedPartner.platform"></strong> knows you came from InternConnect, and use your student code.</span></li>
+                            <li><b>2</b><span>Finish the program and add your certificate to your InternConnect profile.</span></li>
+                            <li><b>3</b><span>Your verified credential boosts your Match Score and is shown to employers hiring for these roles.</span></li>
+                        </ol>
+                    </div>
+
                     <!-- Dialog Actions -->
                     <div style="display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap; border-top: 1px solid #F1F5F9; padding-top: 20px;">
+                        <a :href="selectedPartner.website" target="_blank" rel="noopener noreferrer" class="elearn-site-link" x-text="'About ' + selectedPartner.platform"></a>
                         <button type="button" @click="closeModal()" class="ic-btn ic-btn-secondary">Close</button>
-                        <a :href="selectedPartner.external_url" target="_blank" rel="noopener noreferrer" class="ic-btn ic-btn-primary" style="background: #4F48E6; color: #FFFFFF !important;">
+                        <a :href="selectedPartner.go_url" target="_blank" rel="noopener" class="ic-btn ic-btn-primary" style="background: #4F48E6; color: #FFFFFF !important;">
                             <span>Visit Platform &amp; Enroll</span>
                             <svg style="width: 14px; height: 14px; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>

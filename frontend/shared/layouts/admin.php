@@ -12,6 +12,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSRF token for every POST (App\Core\Security; ic-csrf.js attaches it to fetch, forms and beacons) -->
+    <meta name="csrf-token" content="<?= htmlspecialchars(\App\Core\Security::csrfToken(), ENT_QUOTES) ?>">
+    <script src="<?= asset('assets/js/ic-csrf.js') ?>?v=<?= @filemtime(dirname(__DIR__, 3) . '/public/assets/js/ic-csrf.js') ?: 1 ?>"></script>
     <title><?= htmlspecialchars($title ?? 'Admin Mission Control — InternConnect') ?></title>
     <meta name="robots" content="noindex, nofollow">
     
@@ -32,7 +35,8 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     
     <!-- Alpine.js & Chart.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.17.5/dist/cdn.min.js"></script>
+    <script defer src="<?= asset('assets/js/ic-select.js') ?>?v=<?= @filemtime(dirname(__DIR__, 3) . '/public/assets/js/ic-select.js') ?: 1 ?>"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <!-- PDF.js Engine (Cross-Browser Local Canvas Rendering) -->

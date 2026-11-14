@@ -20,6 +20,12 @@ class AuthController extends Controller
     public function loginPost(): void
     {
         $email = $_POST['email'] ?? '';
+        if (($limited = \App\Core\Security::throttleLogin('web-login', (string)$email)) !== null) {
+            $_SESSION['auth_error'] = $limited;
+            header('Location: ' . url('/login?error=too_many_attempts'));
+            exit;
+        }
+        \App\Core\Security::regenerateSession();
         $name = 'Sarah';
         if (!empty($email)) {
             $parts = explode('@', $email);
@@ -35,6 +41,10 @@ class AuthController extends Controller
             strpos($lowerEmail, 'global') !== false) {
             $role = 'employer';
         }
+
+        // Demo sign-in (real accounts arrive with MySQL): remember who is signed in, for plans and Jenny.
+        $_SESSION['is_logged_in'] = true;
+        $_SESSION['user_role'] = $role;
 
         header('Location: ' . url('/welcome-back?name=' . urlencode($name) . '&role=' . $role));
         exit;
@@ -61,6 +71,27 @@ class AuthController extends Controller
             'title'      => 'Create Account - InternConnect',
             'showLoader' => false,
         ], 'auth');
+    }
+
+    /**
+     * Read the CV chosen during signup (step 5) so the page can confirm what Jenny AI found.
+     * Route: POST /register/student/parse-resume (multipart field "resume")
+     */
+    public function parseSignupResume(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        header('Content-Type: application/json');
+        header('Cache-Control: no-store');
+        $result = \App\Services\CvService::parseUpload($_FILES['resume'] ?? null, 'signup_cv_parse');
+        if (!$result['ok']) {
+            http_response_code(422);
+            echo json_encode(['success' => false, 'error' => $result['error']]);
+            exit;
+        }
+        echo json_encode(['success' => true, 'source' => $result['parsed']['source'], 'fields' => \App\Services\CvService::fieldsForForm($result['parsed'])]);
+        exit;
     }
 
     /**
@@ -108,6 +139,11 @@ class AuthController extends Controller
         $_SESSION['profile_last_name']  = $last;
         $_SESSION['profile_name']       = trim($first . ' ' . $last);
         $_SESSION['profile_email']      = $email;
+        try {
+            \App\Services\MailService::queue($email, 'Welcome to InternConnect, ' . $first . '!', \App\Services\AuthCodeService::welcomeEmail($first), 'welcome', trim($first . ' ' . $last));
+        } catch (\Throwable $ex) {
+            error_log('[auth] welcome mail failed: ' . $ex->getMessage());
+        }
         $_SESSION['profile_role']       = 'Student Applicant';
 
         $password = (string)($data['password'] ?? '');
@@ -144,12 +180,23 @@ class AuthController extends Controller
             if ($result['ok']) {
                 UploadStorage::delete($_SESSION['profile_resume'] ?? null);
                 $_SESSION['profile_resume'] = $result['meta'];
+                // Remember the parsed CV (reuses the parse made when the file was chosen).
+                $parsed = \App\Services\CvService::saveForCandidate(
+                    \App\Services\CvService::currentCandidateId(),
+                    $result['meta'],
+                    \App\Services\CvService::takeSessionParse('signup_cv_parse', (string)$result['meta']['name'])
+                );
+                if (empty($_SESSION['profile_phone']) && ($parsed['phone'] ?? '') !== '') {
+                    $_SESSION['profile_phone'] = $parsed['phone'];
+                }
             } else {
                 $resumeError = $result['error'];
             }
         }
 
+        \App\Core\Security::regenerateSession();
         $_SESSION['is_logged_in'] = true;
+        $_SESSION['user_role'] = 'candidate';
         $_SESSION['candidate_onboarded'] = true;
 
         echo json_encode([
@@ -236,7 +283,9 @@ class AuthController extends Controller
             }
         }
 
+        \App\Core\Security::regenerateSession();
         $_SESSION['is_logged_in'] = true;
+        $_SESSION['user_role'] = 'employer';
         $_SESSION['employer_onboarded'] = true;
 
         echo json_encode([
@@ -295,13 +344,24 @@ class AuthController extends Controller
 
     public function forgotPasswordPost(): void
     {
-        // TODO: Integrate with mailer service to dispatch a password reset email.
-        // For now, redirect back to the form with a success indicator.
-        $email = filter_var($_POST['email'] ?? '', FILTER_VALIDATE_EMAIL);
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $email = filter_var(trim((string)($_POST['email'] ?? '')), FILTER_VALIDATE_EMAIL);
 
         if ($email) {
-            // Placeholder: password reset email logic will go here.
-            header('Location: ' . url('/verify-code'));
+            // Same answer whether or not the address has an account (no account enumeration).
+            $_SESSION['reset_email'] = strtolower($email);
+            if (\App\Services\RateLimiter::hit('reset:' . strtolower($email), 5, 900)['allowed']) {
+                try {
+                    $code = \App\Services\AuthCodeService::issue($email, 'reset');
+                    $name = ucfirst((string)strtok((string)$email, '@.'));
+                    \App\Services\MailService::sendNow($email, 'Your InternConnect password reset code', \App\Services\AuthCodeService::resetEmail($name, $code), 'password_reset');
+                } catch (\Throwable $ex) {
+                    error_log('[auth] reset mail failed: ' . $ex->getMessage());
+                }
+            }
+            header('Location: ' . url('/verify-code?email=' . urlencode($email)));
         } else {
             header('Location: ' . url('/forgot-password?error=invalid'));
         }
@@ -318,13 +378,27 @@ class AuthController extends Controller
 
     public function verifyCodePost(): void
     {
-        $code = $_POST['code'] ?? '';
-        
-        // Placeholder check: verify 6-digit code
-        if (preg_match('/^\d{6}$/', $code)) {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $code = preg_replace('/\D/', '', (string)($_POST['code'] ?? ''));
+        $email = (string)($_SESSION['reset_email'] ?? '');
+
+        $ok = $email !== '' && \App\Services\AuthCodeService::verify($email, 'reset', $code);
+        if (str_contains((string)($_SERVER['HTTP_ACCEPT'] ?? ''), 'application/json')) {
+            if ($ok) {
+                $_SESSION['reset_verified'] = $email;
+            }
+            header('Content-Type: application/json');
+            echo json_encode($ok ? ['success' => true, 'redirect' => url('/reset-password')]
+                : ['success' => false, 'error' => $email === '' ? 'Your session ended. Request a new code.' : 'That code is not right or has expired. Check the e-mail or resend the code.']);
+            exit;
+        }
+        if ($ok) {
+            $_SESSION['reset_verified'] = $email;
             header('Location: ' . url('/reset-password'));
         } else {
-            header('Location: ' . url('/verify-code?error=invalid'));
+            header('Location: ' . url('/verify-code?error=invalid' . ($email !== '' ? '&email=' . urlencode($email) : '')));
         }
         exit;
     }

@@ -34,6 +34,7 @@ declare(strict_types=1);
                     <div class="inline-flex items-center gap-2 border border-primary/20 rounded-full px-4 py-1.5 bg-primary/5">
                         <span class="text-[12px] font-bold tracking-wider text-primary uppercase">Get Started</span>
                     </div>
+                    <h1 class="sr-only">Create your InternConnect account</h1>
                     <h2 class="text-[40px] lg:text-[48px] leading-[44px] lg:leading-[50px] font-bold tracking-tight text-[#191C1D]">
                         Your next opportunity starts <span class="text-primary">right here.</span>
                     </h2>

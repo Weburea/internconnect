@@ -1528,7 +1528,7 @@ $initialCategory = $initialCategory ?? '';
                                     <a :href="'<?= url('/company/') ?>' + (item.companySlug || 'techflow')" 
                                        class="int-company-logo"
                                        :style="item.logoBg ? 'background-color:' + item.logoBg + '; color:' + (item.logoColor || '#FFFFFF') : ''"
-                                       title="View Company Profile">
+                                       aria-label="View Company Profile">
                                         <template x-if="item.logoUrl">
                                             <img :src="item.logoUrl" :alt="item.company" loading="lazy">
                                         </template>

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Services\BillingService;
 use App\Services\PaystackService;
 
 class PaymentController extends Controller
@@ -27,11 +28,13 @@ class PaymentController extends Controller
 
         $plan = $_GET['plan'] ?? 'pro';
         $cycle = $_GET['cycle'] ?? 'monthly';
+        $account = BillingService::account((string)($_GET['account'] ?? ''));
 
         $this->renderView('landing/payment', [
-            'title' => 'Upgrade Plan - InternConnect',
-            'plan'  => htmlspecialchars((string)$plan),
-            'cycle' => htmlspecialchars((string)$cycle),
+            'title'   => 'Upgrade Plan - InternConnect',
+            'plan'    => htmlspecialchars((string)$plan),
+            'cycle'   => htmlspecialchars((string)$cycle),
+            'account' => $account['type'],
         ]);
     }
 
@@ -53,7 +56,11 @@ class PaymentController extends Controller
         $email = $jsonData['email'] ?? $_POST['email'] ?? ($_SESSION['profile_email'] ?? 'sarah.peters@example.com');
 
         $plan = strtolower(trim((string)$plan));
-        $cycle = strtolower(trim((string)$cycle));
+        $cycle = strtolower(trim((string)$cycle)) === 'annual' ? 'annual' : 'monthly';
+        $account = BillingService::account((string)($jsonData['account'] ?? $_POST['account'] ?? ''));
+        if ($account['type'] === 'employer' && empty($jsonData['email']) && empty($_POST['email'])) {
+            $email = $_SESSION['employer_email'] ?? $email;
+        }
 
         // Compute authoritative server-side amount in kobo
         $amountInKobo = PaystackService::getAmountInKobo($plan, $cycle);
@@ -76,6 +83,9 @@ class PaymentController extends Controller
             'user_name'  => $_SESSION['profile_name'] ?? 'Sarah Peters',
             'user_email' => $email,
             'initiated'  => date('c'),
+            // Read back by the webhook to file the payment under the right account.
+            'account_type' => $account['type'],
+            'account_id'   => $account['id'],
         ];
 
         // Store pending transaction in session for verification cross-checking
@@ -85,8 +95,10 @@ class PaymentController extends Controller
             'cycle'          => $cycle,
             'amount_kobo'    => $amountInKobo,
             'email'          => $email,
+            'account'        => $account['type'],
             'created_at'     => time(),
         ];
+        BillingService::recordPending($account, $reference, $plan, $cycle, $amountInKobo, (string)$email);
 
         $result = $this->paystack->initializeTransaction(
             email: $email,
@@ -169,6 +181,12 @@ class PaymentController extends Controller
             $cycle = $metadata['cycle'] ?? $cycle;
             $paidAmountKobo = (int)($data['amount'] ?? 249900);
             $amount = (int)round($paidAmountKobo / 100);
+            // Billing history + subscription (amount is checked against the plan price).
+            $stored = BillingService::applyPaystackResult($data);
+            if ($stored) {
+                $status = (string)$stored['status'];
+            }
+            $billingUrl = url((($stored['account_type'] ?? ($pending['account'] ?? 'candidate')) === 'employer' ? '/employer' : '/candidate') . '/billing');
 
             if ($status === 'success') {
                 // Activate subscription in session
@@ -183,11 +201,12 @@ class PaymentController extends Controller
                 unset($_SESSION['pending_payment']);
 
                 $this->renderView('landing/payment-success', [
-                    'title'     => 'Payment Successful - InternConnect',
-                    'reference' => htmlspecialchars((string)$reference),
-                    'plan'      => htmlspecialchars((string)$plan),
-                    'cycle'     => htmlspecialchars((string)$cycle),
-                    'amount'    => $amount,
+                    'title'      => 'Payment Successful - InternConnect',
+                    'reference'  => htmlspecialchars((string)$reference),
+                    'plan'       => htmlspecialchars((string)$plan),
+                    'cycle'      => htmlspecialchars((string)$cycle),
+                    'amount'     => $amount,
+                    'billingUrl' => $billingUrl,
                 ]);
                 return;
             } elseif ($status === 'abandoned') {
@@ -307,9 +326,8 @@ class PaymentController extends Controller
                 $data = $event['data'] ?? [];
                 $reference = $data['reference'] ?? '';
                 $customerEmail = $data['customer']['email'] ?? '';
-                $metadata = $data['metadata'] ?? [];
-                
-                // TODO: Save to database subscriptions table
+                // Signature already verified above; the same reference may also arrive through the callback.
+                BillingService::applyPaystackResult($data + ['status' => 'success']);
                 error_log("Paystack Webhook [charge.success]: Verified {$reference} for {$customerEmail}");
                 break;
 

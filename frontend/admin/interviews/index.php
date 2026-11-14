@@ -51,6 +51,7 @@ $aivPayload = [
         'status'   => url('/admin/interviews/__ID__/status'),
         'presence' => url('/admin/api/interviews/presence'),
         'detail'   => url('/admin/interviews/__ID__'),
+        'room'     => url('/admin/interviews/__ID__/room'),
     ],
     'configured'  => $configured,
 ];
@@ -159,6 +160,8 @@ $aivPayload = [
             .aiv-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
             .aiv-field label { font-size: 12px; font-weight: 700; color: #334155; }
             .aiv-field select, .aiv-field input { height: 40px; border: 1px solid #E2E8F0; border-radius: 10px; padding: 0 12px; font-size: 13px; color: #0F172A; background: #FFFFFF; width: 100%; }
+            .aiv-field .ic-sel-btn { height: 40px; border: 1px solid #E2E8F0; border-radius: 10px; padding: 0 12px; font-size: 13px; color: #0F172A; background: #FFFFFF; width: 100%; }
+            .aiv-field .ic-sel-btn:focus { outline: none; border-color: #4F48E6; box-shadow: 0 0 0 3px rgba(79,72,230,.1); }
             .aiv-field select:focus, .aiv-field input:focus { outline: none; border-color: #4F48E6; box-shadow: 0 0 0 3px rgba(79,72,230,.1); }
             .aiv-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
             .aiv-modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
@@ -236,7 +239,7 @@ $aivPayload = [
                         </div>
                         <div class="aiv-filters" role="tablist" aria-label="Filter sessions">
                             <template x-for="f in filters" :key="f.key">
-                                <button type="button" role="tab" class="aiv-filter" :class="{ 'is-on': filter === f.key }" :aria-selected="filter === f.key" @click="filter = f.key">
+                                <button type="button" role="tab" class="aiv-filter" :class="{ 'is-on': filter === f.key }" :aria-selected="filter === f.key" @click="filter = f.key; page = 0">
                                     <span x-text="f.label"></span><b x-text="count(f.key)"></b>
                                 </button>
                             </template>
@@ -245,7 +248,7 @@ $aivPayload = [
                             <table class="aiv-table">
                                 <thead><tr><th>Interview</th><th>Employer</th><th>When</th><th>Status</th><th>In the room</th><th>Result</th><th></th></tr></thead>
                                 <tbody>
-                                    <template x-for="s in visible" :key="s.id">
+                                    <template x-for="s in pageSessions" :key="s.id">
                                         <tr>
                                             <td class="aiv-td-main" data-label="Interview">
                                                 <span class="aiv-name" x-text="'#' + s.id + ' · ' + s.candidate_name"></span>
@@ -258,6 +261,7 @@ $aivPayload = [
                                             <td data-label="Result"><span class="aiv-nowrap" x-text="s.recommendation ? s.recommendation + (s.score_average ? ' · ' + s.score_average + '/5' : '') : '-'"></span></td>
                                             <td data-label="">
                                                 <div class="aiv-actions">
+                                                    <a class="aiv-btn is-primary" x-show="!['Completed', 'Cancelled'].includes(s.status)" :href="url('room', s.id)" :aria-label="'Join the room for interview ' + s.id">Join</a>
                                                     <a class="aiv-btn" :href="url('detail', s.id)">View</a>
                                                     <div class="aiv-more" x-data="{ open: false }" @click.outside="open = false" @keydown.escape="open = false">
                                                         <button type="button" class="aiv-btn aiv-icon-btn" @click="open = !open" :aria-expanded="open" :aria-label="'More actions for interview ' + s.id">
@@ -276,6 +280,17 @@ $aivPayload = [
                                     </template>
                                 </tbody>
                             </table>
+                        </div>
+                        <div class="aiv-pager" x-show="pages > 1">
+                            <span x-text="(Math.min(page, pages - 1) * perPage + 1) + '-' + Math.min(visible.length, (Math.min(page, pages - 1) + 1) * perPage) + ' of ' + visible.length + ' sessions'"></span>
+                            <div class="aiv-pager-btns">
+                                <button type="button" class="aiv-btn aiv-icon-btn" @click="page = Math.max(0, page - 1)" :disabled="page === 0" aria-label="Previous sessions">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                                </button>
+                                <button type="button" class="aiv-btn aiv-icon-btn" @click="page = Math.min(pages - 1, page + 1)" :disabled="page >= pages - 1" aria-label="Next sessions">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                                </button>
+                            </div>
                         </div>
                         <div class="aiv-empty" x-show="!visible.length" x-text="sessions.length ? 'No sessions match this filter.' : 'No interviews yet. Employers schedule them from their Interviews page, or use Schedule interview above.'"></div>
                     </section>
@@ -309,8 +324,8 @@ $aivPayload = [
                                     <input type="number" class="aiv-num" min="0" max="10" step="1" x-model.number="settings.grace_min" aria-label="Wrap-up minutes">
                                 </div>
                                 <div class="aiv-setting">
-                                    <div><strong>Early join</strong><span>Minutes before the start time the room opens (0-60).</span></div>
-                                    <input type="number" class="aiv-num" min="0" max="60" step="5" x-model.number="settings.join_early_min" aria-label="Early join window in minutes">
+                                    <div><strong>Candidate early join</strong><span>Minutes before the start a candidate can enter (0-60). Employers and admins can open the room any time.</span></div>
+                                    <input type="number" class="aiv-num" min="0" max="60" step="1" x-model.number="settings.join_early_min" aria-label="Early join window in minutes">
                                 </div>
                                 <button type="button" class="aiv-btn is-primary is-block" @click="saveSettings()" :disabled="savingSettings" x-text="savingSettings ? 'Saving...' : 'Save settings'"></button>
                             </div>
@@ -380,17 +395,17 @@ $aivPayload = [
                 <div class="aiv-modal" x-show="scheduleOpen" x-cloak style="display: none;" @keydown.escape.window="scheduleOpen = false">
                     <form class="aiv-modal-card" role="dialog" aria-modal="true" aria-labelledby="aiv-sched-title" @click.outside="scheduleOpen = false" @submit.prevent="schedule()">
                         <h3 id="aiv-sched-title">Schedule an interview</h3>
-                        <p>Book a video interview between an employer and a candidate. Both are notified and the room opens <span x-text="settings.join_early_min"></span> minutes before the start.</p>
+                        <p>Book a video interview between an employer and a candidate. Both are notified. The candidate can join <span x-text="settings.join_early_min"></span> minutes before the start; the employer and admins can open the room any time.</p>
                         <p class="aiv-error" x-show="scheduleError" x-text="scheduleError" role="alert" style="display: none;"></p>
                         <div class="aiv-field">
                             <label for="aiv-cand">Candidate</label>
-                            <select id="aiv-cand" x-model.number="form.candidate_id" required>
+                            <select data-ic-select id="aiv-cand" x-model.number="form.candidate_id" required>
                                 <template x-for="p in cfg.people.candidates" :key="p.id"><option :value="p.id" x-text="p.name + ' · ' + p.role"></option></template>
                             </select>
                         </div>
                         <div class="aiv-field">
                             <label for="aiv-emp">Employer</label>
-                            <select id="aiv-emp" x-model.number="form.employer_id" required>
+                            <select data-ic-select id="aiv-emp" x-model.number="form.employer_id" required>
                                 <template x-for="p in cfg.people.employers" :key="p.id"><option :value="p.id" x-text="p.company + ' · ' + p.interviewer"></option></template>
                             </select>
                         </div>
@@ -444,6 +459,7 @@ function adminVideoInterviews(cfg) {
         presenceAt: '',
         savingSettings: false,
         filter: 'all',
+        page: 0, perPage: 10,
         filters: [
             { key: 'all', label: 'All' }, { key: 'live', label: 'Live' }, { key: 'upcoming', label: 'Upcoming' },
             { key: 'completed', label: 'Completed' }, { key: 'cancelled', label: 'Cancelled' },
@@ -478,6 +494,9 @@ function adminVideoInterviews(cfg) {
         },
         count(key) { return key === 'all' ? this.sessions.length : this.sessions.filter((s) => this.bucket(s) === key).length; },
         get visible() { return this.filter === 'all' ? this.sessions : this.sessions.filter((s) => this.bucket(s) === this.filter); },
+        // Sessions table shows 10 per page so a busy day does not stretch the page.
+        get pages() { return Math.max(1, Math.ceil(this.visible.length / this.perPage)); },
+        get pageSessions() { const p = Math.min(this.page, this.pages - 1); return this.visible.slice(p * this.perPage, (p + 1) * this.perPage); },
         get livePeople() { return this.sessions.reduce((n, s) => n + (this.presence[s.room_name] || []).length, 0); },
         statusTone(s) {
             if (this.isLive(s)) return 'green';

@@ -597,6 +597,14 @@ $initialCategory = $initialCategory ?? ($_GET['category'] ?? '');
     selectedDatePosted: 'all',
     maxStipendSlider: 500000,
     appliedMaxStipend: 500000,
+    // Jenny search assist (POST /jenny/search; Pro 10 a day, Premium unlimited, docs/55-jenny-ai-chat.md)
+    appliedMinStipend: 0,
+    jennyQuery: '',
+    jennyBusy: false,
+    jennySummary: '',
+    jennyError: '',
+    jennyUpgrade: '',
+    jennyLeft: null,
     selectedTags: [],
     mobileFiltersOpen: false,
     currentPage: 1,
@@ -661,350 +669,8 @@ $initialCategory = $initialCategory ?? ($_GET['category'] ?? '');
         'Python', 'React', 'Figma', 'Fintech', 'Data Analysis', 'Soft Skills'
     ],
 
-    internships: [
-        {
-            id: 'forward-security-engineering-intern-techflow',
-            company: 'TechFlow Systems',
-            companySlug: 'techflow-systems',
-            logoBg: 'bg-amber-900 text-white',
-            logoInitial: 'TF',
-            category: 'ENGINEERING',
-            title: 'Forward Security Engineering Intern',
-            location: 'Lagos, Nigeria',
-            country: 'Nigeria',
-            commitment: 'Full-time',
-            tag: 'ON SITE',
-            hoursAgo: 0.16,
-            posted: '10 min ago',
-            stipendAmount: 280000,
-            stipendText: '₦280,000 - ₦350,000/mo',
-            tags: ['Engineering', 'Management'],
-            description: 'Build robust cloud access gateways, analyze network anomalies, and collaborate with enterprise infrastructure engineers.'
-        },
-        {
-            id: 'software-engineer-intern-nexura',
-            company: 'Nexura',
-            companySlug: 'nexura',
-            logoBg: 'bg-black text-white',
-            logoInitial: 'N',
-            category: 'FINANCE',
-            title: 'Software Engineer Intern (Payments Core)',
-            location: 'Lagos, Nigeria',
-            country: 'Nigeria',
-            commitment: 'Full-time',
-            tag: 'REMOTE',
-            hoursAgo: 0.2,
-            posted: '12 min ago',
-            stipendAmount: 320000,
-            stipendText: '₦320,000 - ₦400,000/mo',
-            tags: ['Engineering', 'Python', 'React', 'Fintech'],
-            description: 'Join our high-scale financial infrastructure team to build real-time transaction pipelines and developer APIs.'
-        },
-        {
-            id: 'product-design-intern-airbnb',
-            company: 'Airbnb',
-            companySlug: 'airbnb',
-            logoBg: 'bg-rose-100 text-rose-600',
-            logoInitial: 'A',
-            category: 'DESIGN',
-            title: 'Product Design & UX/UI Intern',
-            location: 'Lagos, Nigeria',
-            country: 'Nigeria',
-            commitment: 'Full-time',
-            tag: 'HYBRID',
-            hoursAgo: 0.25,
-            posted: '15 min ago',
-            stipendAmount: 250000,
-            stipendText: '₦250,000 - ₦320,000/mo',
-            tags: ['Design', 'UI/UX', 'Figma'],
-            description: 'Craft frictionless booking journeys, iterate on host management tools, and participate in global design critique sessions.'
-        },
-        {
-            id: 'senior-product-design-intern-wellspring',
-            company: 'WellSpring Care',
-            companySlug: 'wellspring-care',
-            logoBg: 'bg-emerald-100 text-emerald-700',
-            logoInitial: 'W',
-            category: 'DESIGN',
-            title: 'Senior Product Design Intern',
-            location: 'Lagos, Nigeria',
-            country: 'Nigeria',
-            commitment: 'Full-time',
-            tag: 'HYBRID',
-            hoursAgo: 0.5,
-            posted: '30 min ago',
-            stipendAmount: 280000,
-            stipendText: '₦280,000 - ₦340,000/mo',
-            tags: ['Design', 'UI/UX', 'Soft Skills'],
-            description: 'Shape the future of patient healthcare experiences by defining user-centric interface flows alongside medical researchers.'
-        },
-        {
-            id: 'uiux-design-intern-paystack',
-            company: 'Paystack',
-            companySlug: 'paystack',
-            logoBg: 'bg-sky-100 text-sky-700',
-            logoInitial: 'P',
-            category: 'FINANCE',
-            title: 'UI/UX Design Intern',
-            location: 'Lagos, Nigeria',
-            country: 'Nigeria',
-            commitment: 'Full-time',
-            tag: 'HYBRID',
-            hoursAgo: 0.6,
-            posted: '36 min ago',
-            stipendAmount: 300000,
-            stipendText: '₦300,000 - ₦380,000/mo',
-            tags: ['Design', 'UI/UX', 'Figma', 'Fintech'],
-            description: 'Collaborate with product squads to build seamless payment checkouts and design accessible web and mobile components.'
-        },
-        {
-            id: 'growth-marketing-intern-brightwave',
-            company: 'BrightWave',
-            companySlug: 'brightwave',
-            logoBg: 'bg-amber-100 text-amber-700',
-            logoInitial: 'B',
-            category: 'MARKETING',
-            title: 'Growth Marketing Intern',
-            location: 'Lagos, Nigeria',
-            country: 'Nigeria',
-            commitment: 'Part-time',
-            tag: 'ON SITE',
-            hoursAgo: 0.75,
-            posted: '45 min ago',
-            stipendAmount: 180000,
-            stipendText: '₦180,000 - ₦240,000/mo',
-            tags: ['Marketing', 'Management', 'Soft Skills'],
-            description: 'Help us reach more users by running data-driven acquisition experiments, analyzing funnels, and crafting compelling narratives.'
-        },
-        {
-            id: 'data-analytics-intern-flutterwave',
-            company: 'Flutterwave',
-            companySlug: 'flutterwave',
-            logoBg: 'bg-orange-100 text-orange-700',
-            logoInitial: 'FW',
-            category: 'DATA',
-            title: 'Data Analytics Intern',
-            location: 'Lagos, Nigeria',
-            country: 'Nigeria',
-            commitment: 'Full-time',
-            tag: 'REMOTE',
-            hoursAgo: 0.8,
-            posted: '48 min ago',
-            stipendAmount: 350000,
-            stipendText: '₦350,000 - ₦420,000/mo',
-            tags: ['Data Analysis', 'Python', 'Fintech'],
-            description: 'Analyze cross-border transaction funnels, develop merchant retention dashboards, and build SQL forecasting models.'
-        },
-        {
-            id: 'cybersecurity-intern-mainone',
-            company: 'MainOne',
-            companySlug: 'mainone',
-            logoBg: 'bg-slate-800 text-cyan-400',
-            logoInitial: 'MO',
-            category: 'ENGINEERING',
-            title: 'Cybersecurity Analyst Intern',
-            location: 'Lagos, Nigeria',
-            country: 'Nigeria',
-            commitment: 'Full-time',
-            tag: 'ON SITE',
-            hoursAgo: 3,
-            posted: '3 hours ago',
-            stipendAmount: 260000,
-            stipendText: '₦260,000 - ₦310,000/mo',
-            tags: ['Engineering', 'Management'],
-            description: 'Monitor Security Operations Center logs, audit firewalls, and assess vulnerability reports across submarine cable networks.'
-        },
-        {
-            id: 'copywriting-intern-edenlife',
-            company: 'Eden Life',
-            companySlug: 'edenlife',
-            logoBg: 'bg-emerald-100 text-emerald-700',
-            logoInitial: 'EL',
-            category: 'OPERATIONS',
-            title: 'Content & Copywriting Intern',
-            location: 'Lagos, Nigeria',
-            country: 'Nigeria',
-            commitment: 'Full-time',
-            tag: 'REMOTE',
-            hoursAgo: 6,
-            posted: '6 hours ago',
-            stipendAmount: 200000,
-            stipendText: '₦200,000 - ₦260,000/mo',
-            tags: ['Marketing', 'Soft Skills'],
-            description: 'Write compelling weekly newsletters, app microcopy, and customer success stories celebrating convenient home services.'
-        },
-        {
-            id: 'backend-engineering-intern-moniepoint',
-            company: 'Moniepoint',
-            companySlug: 'moniepoint',
-            logoBg: 'bg-blue-900 text-white',
-            logoInitial: 'MP',
-            category: 'FINANCE',
-            title: 'Backend Engineering Intern (Core Banking)',
-            location: 'Lagos, Nigeria',
-            country: 'Nigeria',
-            commitment: 'Full-time',
-            tag: 'HYBRID',
-            hoursAgo: 8,
-            posted: '8 hours ago',
-            stipendAmount: 310000,
-            stipendText: '₦310,000 - ₦380,000/mo',
-            tags: ['Engineering', 'Python', 'Fintech'],
-            description: 'Implement distributed ledger APIs, audit event streams, and build resilient microservices processing high transaction volumes.'
-        },
-        {
-            id: 'product-operations-intern-kuda',
-            company: 'Kuda Bank',
-            companySlug: 'kuda-bank',
-            logoBg: 'bg-indigo-900 text-white',
-            logoInitial: 'KB',
-            category: 'PRODUCT',
-            title: 'Product Operations Intern',
-            location: 'Lagos, Nigeria',
-            country: 'Nigeria',
-            commitment: 'Full-time',
-            tag: 'REMOTE',
-            hoursAgo: 14,
-            posted: '14 hours ago',
-            stipendAmount: 270000,
-            stipendText: '₦270,000 - ₦330,000/mo',
-            tags: ['Management', 'Fintech', 'Soft Skills'],
-            description: 'Coordinate feature testing, synthesize user feedback loops, and assist product leads in drafting roadmap specifications.'
-        },
-        {
-            id: 'financial-analyst-intern-piggyvest',
-            company: 'PiggyVest',
-            companySlug: 'piggyvest',
-            logoBg: 'bg-blue-600 text-white',
-            logoInitial: 'PV',
-            category: 'PRODUCT',
-            title: 'Financial Planning & Analysis Intern',
-            location: 'Lagos, Nigeria',
-            country: 'Nigeria',
-            commitment: 'Full-time',
-            tag: 'HYBRID',
-            hoursAgo: 48,
-            posted: '2 days ago',
-            stipendAmount: 290000,
-            stipendText: '₦290,000 - ₦360,000/mo',
-            tags: ['Fintech', 'Data Analysis'],
-            description: 'Evaluate fixed-income portfolios, simulate automated savings returns, and prepare weekly investor financial models.'
-        },
-        {
-            id: 'qa-engineer-intern-interswitch',
-            company: 'Interswitch',
-            companySlug: 'interswitch',
-            logoBg: 'bg-red-700 text-white',
-            logoInitial: 'IS',
-            category: 'ENGINEERING',
-            title: 'Quality Assurance & Testing Intern',
-            location: 'Lagos, Nigeria',
-            country: 'Nigeria',
-            commitment: 'Full-time',
-            tag: 'ON SITE',
-            hoursAgo: 72,
-            posted: '3 days ago',
-            stipendAmount: 280000,
-            stipendText: '₦280,000 - ₦340,000/mo',
-            tags: ['Engineering', 'React'],
-            description: 'Develop automated integration test suites for electronic payment switches and conduct stress simulations under peak load.'
-        },
-        {
-            id: 'frontend-development-intern-andela',
-            company: 'Andela',
-            companySlug: 'andela',
-            logoBg: 'bg-teal-700 text-white',
-            logoInitial: 'AN',
-            category: 'OPERATIONS',
-            title: 'Frontend Web Development Intern',
-            location: 'Lagos, Nigeria',
-            country: 'Nigeria',
-            commitment: 'Full-time',
-            tag: 'REMOTE',
-            hoursAgo: 96,
-            posted: '4 days ago',
-            stipendAmount: 340000,
-            stipendText: '₦340,000 - ₦420,000/mo',
-            tags: ['Engineering', 'React', 'Figma'],
-            description: 'Build responsive web client applications using modern TypeScript and React ecosystems with global client engineering squads.'
-        },
-        {
-            id: 'corporate-comms-intern-sterling',
-            company: 'Sterling Bank',
-            companySlug: 'sterling-bank',
-            logoBg: 'bg-rose-900 text-white',
-            logoInitial: 'SB',
-            category: 'OPERATIONS',
-            title: 'Corporate Communications & PR Intern',
-            location: 'Lagos, Nigeria',
-            country: 'Nigeria',
-            commitment: 'Project-based',
-            tag: 'ON SITE',
-            hoursAgo: 110,
-            posted: '4 days ago',
-            stipendAmount: 220000,
-            stipendText: '₦220,000 - ₦280,000/mo',
-            tags: ['Management', 'Soft Skills'],
-            description: 'Draft executive media releases, coordinate internal stakeholder townhalls, and maintain public relations archives.'
-        },
-        {
-            id: 'health-systems-analyst-nomad',
-            company: 'Nomad Health',
-            companySlug: 'nomad-health',
-            logoBg: 'bg-emerald-800 text-white',
-            logoInitial: 'NH',
-            category: 'OPERATIONS',
-            title: 'Health Systems Product Intern',
-            location: 'Lagos, Nigeria',
-            country: 'Nigeria',
-            commitment: 'Project-based',
-            tag: 'REMOTE',
-            hoursAgo: 120,
-            posted: '5 days ago',
-            stipendAmount: 300000,
-            stipendText: '₦300,000 - ₦370,000/mo',
-            tags: ['Data Analysis', 'Python', 'Management'],
-            description: 'Map clinical workflow software dependencies, optimize clinician on-boarding funnels, and test tele-consultation integrations.'
-        },
-        {
-            id: 'risk-modelling-intern-carbon',
-            company: 'Carbon',
-            companySlug: 'carbon',
-            logoBg: 'bg-cyan-900 text-white',
-            logoInitial: 'CB',
-            category: 'OPERATIONS',
-            title: 'Credit Risk Modeling & Data Intern',
-            location: 'Lagos, Nigeria',
-            country: 'Nigeria',
-            commitment: 'Full-time',
-            tag: 'HYBRID',
-            hoursAgo: 140,
-            posted: '5 days ago',
-            stipendAmount: 310000,
-            stipendText: '₦310,000 - ₦390,000/mo',
-            tags: ['Fintech', 'Data Analysis', 'Python'],
-            description: 'Evaluate machine learning credit scoring formulas, analyze customer repayment trends, and automate fraud risk reports.'
-        },
-        {
-            id: 'investment-operations-intern-bamboo',
-            company: 'Bamboo',
-            companySlug: 'bamboo',
-            logoBg: 'bg-green-800 text-white',
-            logoInitial: 'BM',
-            category: 'OPERATIONS',
-            title: 'Global Investment Operations Intern',
-            location: 'Lagos, Nigeria',
-            country: 'Nigeria',
-            commitment: 'Project-based',
-            tag: 'ON SITE',
-            hoursAgo: 160,
-            posted: '6 days ago',
-            stipendAmount: 250000,
-            stipendText: '₦250,000 - ₦310,000/mo',
-            tags: ['Fintech', 'Management'],
-            description: 'Assist in reconciling international equities settlements, monitor trade executions, and manage customer portfolio inquiries.'
-        }
-    ],
+    // premium/locked come from PlanService (admin sets the Premium rule in Plans & limits).
+    internships: <?= htmlspecialchars(json_encode(\App\Services\PlanService::annotateListings(require dirname(__DIR__, 2) . '/backend/Data/internships.php'), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') ?>,
 
     get filteredCategoriesList() {
         if (!this.catSearch || !this.catSearch.trim()) {
@@ -1012,6 +678,64 @@ $initialCategory = $initialCategory ?? ($_GET['category'] ?? '');
         }
         const q = this.catSearch.toLowerCase().trim();
         return this.categoriesList.filter(c => c.name.toLowerCase().includes(q));
+    },
+
+    async jennySearch() {
+        const q = this.jennyQuery.trim();
+        if (!q || this.jennyBusy) return;
+        this.jennyBusy = true; this.jennyError = ''; this.jennyUpgrade = '';
+        try {
+            const r = await fetch('<?= url('/jenny/search') ?>', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' }, body: JSON.stringify({ q: q }) });
+            const d = await r.json().catch(() => ({}));
+            if (!d.success) {
+                this.jennyError = d.error || 'Jenny could not search just now. Please try again.';
+                this.jennyUpgrade = d.upgrade ? (d.upgrade_url || '<?= url('/pricing') ?>') : '';
+            } else {
+                const f = d.filters;
+                this.search = f.keywords || '';
+                this.location = f.location || '';
+                this.category = f.category || '';
+                const modes = { 'REMOTE': 'Remote', 'HYBRID': 'Hybrid', 'ON SITE': 'On-site' };
+                this.selectedTypes = f.work_mode && modes[f.work_mode] ? [modes[f.work_mode]] : [];
+                this.appliedMinStipend = f.min_stipend || 0;
+                this.selectedTags = [];
+                this.currentPage = 1;
+                this.jennySummary = f.summary || 'Filters set by Jenny.';
+                this.jennyLeft = d.usage && d.usage.remaining !== null ? d.usage.remaining : null;
+            }
+        } catch (e) {
+            this.jennyError = 'Network error. Please try again.';
+        }
+        this.jennyBusy = false;
+    },
+    // Near me (docs/56-location-and-visits.md): browser location if allowed, else the city from the IP address.
+    nearMeBusy: false,
+    async nearMe() {
+        if (this.nearMeBusy) return;
+        this.nearMeBusy = true;
+        const toast = (t, type) => window.dispatchEvent(new CustomEvent('show-toast', { detail: { text: t, message: t, type: type } }));
+        const cities = [['Lagos', 6.5244, 3.3792], ['Abuja', 9.0765, 7.3986], ['Port Harcourt', 4.8156, 7.0498], ['Ibadan', 7.3775, 3.947], ['Enugu', 6.4584, 7.5464], ['Kano', 12.0022, 8.592], ['Benin City', 6.335, 5.6037], ['Kaduna', 10.5105, 7.4165], ['Accra', 5.6037, -0.187], ['Nairobi', -1.2921, 36.8219]];
+        const gps = () => new Promise((resolve) => {
+            if (!navigator.geolocation) return resolve(null);
+            navigator.geolocation.getCurrentPosition((p) => resolve(p.coords), () => resolve(null), { timeout: 6000, maximumAge: 600000 });
+        });
+        let city = null;
+        const c = await gps();
+        if (c) {
+            let best = null, bestD = Infinity;
+            cities.forEach(([name, lat, lng]) => { const d = Math.pow(lat - c.latitude, 2) + Math.pow(lng - c.longitude, 2); if (d < bestD) { bestD = d; best = name; } });
+            city = best;
+        }
+        if (!city) {
+            try { const r = await fetch('<?= url('/geo/me') ?>', { headers: { 'Accept': 'application/json' } }); const d = await r.json(); if (d.success) city = d.city; } catch (e) {}
+        }
+        if (city) { this.location = city; this.currentPage = 1; toast('Showing internships near ' + city + '.', 'success'); }
+        else { toast('We could not find your location. Choose a city instead.', 'error'); }
+        this.nearMeBusy = false;
+    },
+    clearJenny() {
+        this.jennySummary = ''; this.jennyQuery = ''; this.appliedMinStipend = 0;
+        this.search = ''; this.location = ''; this.category = ''; this.selectedTypes = []; this.currentPage = 1;
     },
 
     get filteredInternships() {
@@ -1061,6 +785,9 @@ $initialCategory = $initialCategory ?? ($_GET['category'] ?? '');
 
             // Monthly Stipend
             if (this.appliedMaxStipend && item.stipendAmount > this.appliedMaxStipend) {
+                return false;
+            }
+            if (this.appliedMinStipend && !item.locked && item.stipendAmount < this.appliedMinStipend) {
                 return false;
             }
 
@@ -1208,6 +935,12 @@ $initialCategory = $initialCategory ?? ($_GET['category'] ?? '');
                          style="display: none;">
                         <div class="db-dropdown-items-scroll">
                             <div class="db-dropdown-item-header">Select Location / Country</div>
+                            <button type="button" class="db-dropdown-item" @click="open = false; nearMe()" style="color: #4F48E6; font-weight: 700;">
+                                <span style="display: inline-flex; align-items: center; gap: 8px;">
+                                    <svg width="14" height="14" style="width: 14px; height: 14px; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 2v3m0 14v3M2 12h3m14 0h3"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                                    <span x-text="nearMeBusy ? 'Finding you...' : 'Near me'"></span>
+                                </span>
+                            </button>
                             <template x-for="loc in locationList.filter(l => !location || l.label.toLowerCase().includes(location.toLowerCase()) || l.country.toLowerCase().includes(location.toLowerCase()))" :key="loc.label">
                                 <button type="button" 
                                         class="db-dropdown-item" 
@@ -1466,6 +1199,72 @@ $initialCategory = $initialCategory ?? ($_GET['category'] ?? '');
 
             <!-- Right Grid List Column -->
             <div class="lg:col-span-9 space-y-8">
+
+                <!-- Jenny search assist: describe the internship in your own words (Pro and Premium) -->
+                <style>
+                    .ijs { position: relative; border-radius: 20px; padding: 18px; background: linear-gradient(135deg, #F5F3FF 0%, #EEF2FF 45%, #FFFFFF 100%); border: 1px solid #E0E7FF; box-shadow: 0 10px 30px -18px rgba(79, 72, 230, .45); overflow: hidden; }
+                    .ijs::after { content: ''; position: absolute; right: -60px; top: -60px; width: 180px; height: 180px; border-radius: 50%; background: radial-gradient(circle, rgba(79, 72, 230, .14), transparent 70%); pointer-events: none; }
+                    .ijs-head { position: relative; display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+                    .ijs-avatar { width: 36px; height: 36px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 0 0 3px #E0E7FF; flex-shrink: 0; }
+                    .ijs-title { font-size: 15px; font-weight: 800; color: #000623; line-height: 1.2; }
+                    .ijs-sub { font-size: 12.5px; color: #64748B; margin-top: 2px; }
+                    .ijs-badge { font-size: 10px; font-weight: 800; letter-spacing: .06em; color: #FFFFFF; background: #4F48E6; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+                    .ijs-left { margin-left: auto; font-size: 11.5px; font-weight: 700; color: #4F48E6; background: #FFFFFF; border: 1px solid #E0E7FF; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+                    .ijs-row { position: relative; display: flex; align-items: center; gap: 8px; background: #FFFFFF; border: 1.5px solid #C7D2FE; border-radius: 16px; padding: 6px 6px 6px 14px; transition: border-color .15s ease, box-shadow .15s ease; }
+                    .ijs-row:focus-within { border-color: #4F48E6; box-shadow: 0 0 0 4px rgba(79, 72, 230, .12); }
+                    .ijs-row svg.ijs-spark { width: 18px; height: 18px; color: #4F48E6; flex-shrink: 0; }
+                    .ijs-input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font-size: 14.5px; color: #0F172A; font-family: inherit; height: 40px; }
+                    .ijs-input::placeholder { color: #94A3B8; }
+                    .ijs-btn { display: inline-flex; align-items: center; gap: 7px; height: 42px; padding: 0 18px; border: 0; border-radius: 12px; background: #4F48E6; color: #FFFFFF; font-size: 14px; font-weight: 700; cursor: pointer; white-space: nowrap; font-family: inherit; flex-shrink: 0; transition: background .15s ease; }
+                    .ijs-btn:hover { background: #4338CA; }
+                    .ijs-btn[disabled] { opacity: .65; cursor: progress; }
+                    .ijs-btn svg { width: 16px; height: 16px; }
+                    .ijs-chips { position: relative; display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+                    .ijs-chip { border: 1px solid #E0E7FF; background: #FFFFFF; color: #3730A3; font-size: 12.5px; font-weight: 600; padding: 6px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; }
+                    .ijs-chip:hover { border-color: #4F48E6; color: #4F48E6; }
+                    .ijs-note { position: relative; margin-top: 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; font-size: 13px; border-radius: 12px; padding: 9px 12px; }
+                    .ijs-note.ok { background: #FFFFFF; color: #312E81; border: 1px solid #E0E7FF; }
+                    .ijs-note.warn { background: #FFFBEB; color: #92400E; border: 1px solid #FDE68A; }
+                    .ijs-note a, .ijs-note button { color: #4F48E6; font-weight: 700; text-decoration: none; background: none; border: 0; cursor: pointer; font-size: 13px; font-family: inherit; padding: 0; }
+                    .ijs-spin { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,.4); border-top-color: #FFFFFF; border-radius: 50%; animation: ijsSpin .8s linear infinite; }
+                    @keyframes ijsSpin { to { transform: rotate(360deg); } }
+                    @media (max-width: 520px) { .ijs-row { flex-wrap: wrap; padding: 8px; } .ijs-input { flex-basis: calc(100% - 30px); } .ijs-btn { width: 100%; justify-content: center; } .ijs-left { margin-left: 0; } }
+                    @media (prefers-reduced-motion: reduce) { .ijs-spin { animation: none; } }
+                </style>
+                <form class="ijs ic-jenny-search" @submit.prevent="jennySearch()" aria-label="Search with Jenny">
+                    <div class="ijs-head">
+                        <img class="ijs-avatar" src="<?= asset('assets/images/jenny_ai/jenny_icon.png') ?>" alt="" width="36" height="36">
+                        <div style="min-width: 0;">
+                            <div class="ijs-title">Describe it, Jenny finds it</div>
+                            <div class="ijs-sub">Type what you want in your own words. Jenny sets the filters for you.</div>
+                        </div>
+                        <span class="ijs-badge">PRO &amp; PREMIUM</span>
+                        <span class="ijs-left" x-show="jennyLeft !== null" x-cloak x-text="jennyLeft + ' searches left today'"></span>
+                    </div>
+                    <div class="ijs-row">
+                        <svg class="ijs-spark" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                        <input class="ijs-input" type="text" x-model="jennyQuery" maxlength="300" placeholder="e.g. Remote design internship paying over 250k" aria-label="Describe the internship you want">
+                        <button type="submit" class="ijs-btn" :disabled="jennyBusy">
+                            <span class="ijs-spin" x-show="jennyBusy" x-cloak></span>
+                            <svg x-show="!jennyBusy" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                            <span x-text="jennyBusy ? 'Searching...' : 'Ask Jenny'">Ask Jenny</span>
+                        </button>
+                    </div>
+                    <div class="ijs-chips" x-show="!jennySummary && !jennyError">
+                        <button type="button" class="ijs-chip" @click="jennyQuery = 'Remote design internship paying over 250k'; jennySearch()">Remote design, 250k+</button>
+                        <button type="button" class="ijs-chip" @click="jennyQuery = 'Hybrid data analyst internship'; jennySearch()">Hybrid data roles</button>
+                        <button type="button" class="ijs-chip" @click="jennyQuery = 'Software engineering internship in London'; jennySearch()">Engineering in London</button>
+                        <button type="button" class="ijs-chip" @click="jennyQuery = 'Marketing internship I can do remotely'; jennySearch()">Remote marketing</button>
+                    </div>
+                    <div class="ijs-note ok" x-show="jennySummary" x-cloak>
+                        <span x-text="jennySummary"></span>
+                        <button type="button" @click="clearJenny()">Clear</button>
+                    </div>
+                    <div class="ijs-note warn" x-show="jennyError" x-cloak>
+                        <span x-text="jennyError"></span>
+                        <a x-show="jennyUpgrade" :href="jennyUpgrade">See plans</a>
+                    </div>
+                </form>
                 
                 <!-- Zero State -->
                 <div x-show="filteredInternships.length === 0" x-transition 
@@ -1485,21 +1284,21 @@ $initialCategory = $initialCategory ?? ($_GET['category'] ?? '');
                     <template x-for="item in paginatedInternships" :key="item.id">
                         
                         <!-- Internship Card -->
-                        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow relative flex flex-col justify-between h-full">
+                        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow relative flex flex-col justify-between h-full" style="min-width: 0;">
                             
                             <!-- Card Header Info -->
                             <div>
-                                <div class="flex justify-between items-start">
-                                    <!-- Brand Logo / Category -->
-                                    <div class="flex items-center space-x-3">
+                                <div class="flex justify-between items-start gap-3">
+                                    <!-- Brand Logo / Category (shrinks so the title truncates instead of pushing the actions off-screen) -->
+                                    <div class="flex items-center space-x-3" style="min-width: 0; flex: 1 1 auto;">
                                         <!-- Clickable Company Logo linking to Company Profile -->
                                         <a :href="'<?= url('/company/') ?>' + (item.companySlug || item.company.toLowerCase().replace(/[^a-z0-9]+/g, '-'))" 
                                            class="hover:opacity-90 transition flex-shrink-0"
-                                           :title="'View ' + item.company + ' profile'">
+                                           :aria-label="'View ' + item.company + ' profile'">
                                             <div :class="item.logoBg + ' h-10 w-10 rounded-xl flex items-center justify-center font-bold text-lg shadow-sm flex-shrink-0'" x-text="item.logoInitial"></div>
                                         </a>
-                                        <div class="min-w-0">
-                                            <span class="text-[10px] font-bold text-primary uppercase tracking-widest block" x-text="item.category"></span>
+                                        <div style="min-width: 0;">
+                                            <span style="display: flex; align-items: center; gap: 6px; min-width: 0;"><span class="text-[10px] font-bold text-primary uppercase tracking-widest" x-text="item.category"></span><span x-show="item.premium" style="display: none; font-size: 9.5px; font-weight: 800; letter-spacing: .06em; color: #FFFFFF; background: #000623; padding: 2px 7px; border-radius: 999px; white-space: nowrap;">PREMIUM</span></span>
                                             <h3 class="font-bold text-gray-900 text-base leading-tight mt-0.5 truncate">
                                                 <a :href="'<?= url('/internship/') ?>' + item.id" class="text-gray-900 hover:text-primary transition" x-text="item.title"></a>
                                             </h3>
@@ -1543,13 +1342,14 @@ $initialCategory = $initialCategory ?? ($_GET['category'] ?? '');
                                     <!-- Remote Badge -->
                                     <span class="bg-gray-100 text-gray-700 text-[10px] font-bold px-3 py-1.5 rounded-lg tracking-wide uppercase" x-text="item.tag"></span>
                                     <!-- Stipend Badge -->
-                                    <span class="text-xs font-semibold text-gray-800" x-text="'₦' + Number(item.stipendAmount).toLocaleString() + '/mo'"></span>
+                                    <span class="text-xs font-semibold text-gray-800" x-text="item.locked ? 'Pay shown to Premium' : '₦' + Number(item.stipendAmount).toLocaleString() + '/mo'" :style="item.locked ? 'color: #64748B; font-weight: 500;' : ''"></span>
                                 </div>
                                 
                                 <!-- Apply Action Button -->
-                                <a :href="'<?= url('/internship/') ?>' + item.id"
+                                <a :href="item.locked ? '<?= url('/pricing?plan=premium&ref=premium-listing') ?>' : '<?= url('/internship/') ?>' + item.id"
                                    class="bg-primary hover:bg-primary-hover text-white text-xs font-bold px-4 py-2 rounded-xl transition active:scale-95 shadow-sm inline-flex items-center justify-center"
-                                   style="white-space: nowrap !important; flex-shrink: 0 !important;">
+                                   :style="'white-space: nowrap !important; flex-shrink: 0 !important;' + (item.locked ? ' background: #000623;' : '')"
+                                   x-text="item.locked ? 'Unlock' : 'Apply'">
                                     Apply
                                 </a>
                             </div>

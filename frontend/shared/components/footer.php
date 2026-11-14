@@ -16,7 +16,7 @@ declare(strict_types=1);
                     <img src="<?= asset('assets/images/logos/Logo_dark_dx00tg.svg') ?>" alt="InternConnect" style="height: 28px; width: auto; max-height: 28px; display: block;">
                 </a>
                 <p class="footer-brand-text">
-                    Empowering the next generation of global talent through editorial-grade career resources.
+                    Find verified internships, train with our learning partners and get hired. Built for students, graduates and employers everywhere.
                 </p>
             </div>
             
@@ -24,8 +24,10 @@ declare(strict_types=1);
             <div class="footer-col">
                 <h3 class="footer-heading">Platform</h3>
                 <ul class="footer-list">
-                    <li><a href="<?= url('/elearning') ?>" class="footer-link">E-Learning</a></li>
                     <li><a href="<?= url('/internships') ?>" class="footer-link">Find Jobs</a></li>
+                    <li><a href="<?= url('/elearning') ?>" class="footer-link">E-Learning</a></li>
+                    <li><a href="<?= url('/pricing') ?>" class="footer-link">Pricing</a></li>
+                    <li><a href="<?= url('/how-it-works') ?>" class="footer-link">How It Works</a></li>
                 </ul>
             </div>
             
@@ -47,7 +49,7 @@ declare(strict_types=1);
                     <li><a href="<?= url('/about') ?>" class="footer-link">About Us</a></li>
                     <li><a href="<?= url('/testimonials') ?>" class="footer-link">Success Stories</a></li>
                     <li>
-                        <a href="<?= url('/#meet-jenny-block') ?>" class="footer-link footer-link-jenny" @click.prevent="$dispatch('open-jenny')">
+                        <a href="<?= url('/#meet-jenny-block') ?>" class="footer-link footer-link-jenny" onclick="if (document.getElementById('ic-jenny-ai-widget')) { event.preventDefault(); window.dispatchEvent(new CustomEvent('open-jenny-ai')); }">
                             <span>Ask Jenny</span>
                             <span class="footer-jenny-badge">AI</span>
                         </a>
@@ -90,10 +92,10 @@ declare(strict_types=1);
         <!-- Bottom Bar -->
         <div class="footer-bottom-bar">
             <p class="footer-copyright">
-                &copy; <script>document.write(new Date().getFullYear())</script> InternConnect. All rights reserved.
+                &copy; <?= date('Y') ?> InternConnect. All rights reserved.
             </p>
             <p class="footer-legal-notice">
-                Read our <a href="<?= url('/privacy') ?>" class="footer-legal-link">Privacy Policy</a> and <a href="<?= url('/terms') ?>" class="footer-legal-link">Terms &amp; Conditions</a>.
+                Read our <a href="<?= url('/privacy') ?>" class="footer-legal-link">Privacy Policy</a> and <a href="<?= url('/terms') ?>" class="footer-legal-link">Terms &amp; Conditions</a>, or change your <a href="<?= url('/cookies#manage-preferences') ?>" class="footer-legal-link">cookie settings</a>.
             </p>
         </div>
     </div>

@@ -50,7 +50,7 @@ declare(strict_types=1);
         <!-- Header / Search Input -->
         <div class="flex items-center gap-3 px-4 py-3.5 border-b border-slate-100 bg-white">
             <!-- Jenny AI Chip -->
-            <div class="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 flex-shrink-0" title="Jenny AI Enabled">
+            <div class="w-8 h-8 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 flex-shrink-0" aria-label="Jenny AI Enabled">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
                 </svg>
@@ -74,7 +74,7 @@ declare(strict_types=1);
             <button type="button" 
                     @click="closePalette()" 
                     class="px-2 py-1 text-[11px] font-semibold text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-md transition-colors flex items-center gap-1 flex-shrink-0" 
-                    title="Close palette (Esc)">
+                    aria-label="Close palette (Esc)">
                 <span>ESC</span>
             </button>
         </div>

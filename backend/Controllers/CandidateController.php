@@ -9,6 +9,9 @@ use App\Services\HelpService;
 use App\Services\AiService;
 use App\Services\CommunicationService;
 use App\Services\UploadStorage;
+use App\Services\CvService;
+use App\Services\ApplicationService;
+use App\Services\PlanService;
 use App\Services\VideoInterviewService;
 
 /**
@@ -41,7 +44,13 @@ class CandidateController extends Controller
 
         $slug = $params['slug'] ?? 'software-engineer-intern';
 
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
         // --- Input Sanitization ---
+        $fullName       = mb_substr(trim(strip_tags($_POST['full_name'] ?? ($_SESSION['profile_name'] ?? ''))), 0, 120);
+        $email          = mb_substr(trim(strip_tags($_POST['email'] ?? ($_SESSION['profile_email'] ?? ''))), 0, 190);
         $phone          = trim(strip_tags($_POST['phone'] ?? ''));
         $jobTitle       = trim(strip_tags($_POST['job_title'] ?? ''));
         $company        = trim(strip_tags($_POST['experience_company'] ?? ''));
@@ -55,6 +64,14 @@ class CandidateController extends Controller
 
         // --- Validation ---
         $errors = [];
+
+        if ($fullName === '') {
+            $errors[] = 'Full name is required.';
+        }
+
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = 'A valid email address is required.';
+        }
 
         if (empty($phone)) {
             $errors[] = 'Phone number is required.';
@@ -78,17 +95,19 @@ class CandidateController extends Controller
 
         // Resume file validation
         $resumeUploaded = isset($_FILES['resume']) && $_FILES['resume']['error'] === UPLOAD_ERR_OK;
+        // The resume already saved on the profile (signup or profile page) can be used instead of a new upload.
+        $useSavedResume = !$resumeUploaded && !empty($_POST['use_saved_resume']) && UploadStorage::path($_SESSION['profile_resume'] ?? null) !== null;
 
-        if (!$resumeUploaded) {
+        if (!$resumeUploaded && !$useSavedResume) {
             $errors[] = 'A resume file is required.';
-        } else {
-            $allowedExtensions = ['pdf', 'docx', 'rtf'];
+        } elseif ($resumeUploaded) {
+            $allowedExtensions = ['pdf', 'docx'];
             $originalName      = $_FILES['resume']['name'] ?? '';
             $ext               = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
             $fileSize          = $_FILES['resume']['size'] ?? 0;
 
             if (!in_array($ext, $allowedExtensions, true)) {
-                $errors[] = 'Unsupported file type. Please upload a PDF, DOCX, or RTF file.';
+                $errors[] = 'Unsupported file type. Please upload a PDF or DOCX file.';
             }
 
             if ($fileSize > 5 * 1024 * 1024) {
@@ -113,7 +132,30 @@ class CandidateController extends Controller
             }
         }
 
-        // --- If errors, redirect back (mock: render error view) ---
+        // Plan limit: applications per month (PlanService, docs/53).
+        if (empty($errors)) {
+            $quota = PlanService::useCandidate('applications', false);
+            if (!$quota['ok']) {
+                $errors[] = $quota['message'] . ' Upgrade on the Pricing page to apply to more internships.';
+            }
+        }
+
+        // Store the resume privately (checked by extension, size, MIME and signature).
+        $resumeStored = ['ok' => false];
+        if (empty($errors)) {
+            if ($useSavedResume) {
+                // Own copy for this application, so a later profile change never alters what the employer received.
+                $copy = UploadStorage::duplicate($_SESSION['profile_resume']);
+                $resumeStored = $copy ? ['ok' => true, 'meta' => $copy] : ['ok' => false, 'error' => 'Your saved resume could not be attached. Please upload it again.'];
+            } else {
+                $resumeStored = UploadStorage::store($_FILES['resume'], 'resume');
+            }
+            if (!$resumeStored['ok']) {
+                $errors[] = $resumeStored['error'];
+            }
+        }
+
+        // --- If errors, re-render the form with the messages ---
         if (!empty($errors)) {
             // Find correct internship details
             $internships = [
@@ -138,6 +180,8 @@ class CandidateController extends Controller
                 'slug'       => $slug,
                 'errors'     => $errors,
                 'oldInput'   => [
+                    'full_name' => $fullName,
+                    'email' => $email,
                     'phone' => $phone,
                     'job_title' => $jobTitle,
                     'experience_company' => $company,
@@ -153,17 +197,39 @@ class CandidateController extends Controller
             return;
         }
 
-        // --- Mock Processing (replace with real DB + file storage logic) ---
-        // TODO: Move uploaded file to secure storage path (e.g. storage/resumes/)
-        // TODO: Parse resume metadata via AI service (09-ai-system.md)
-        // TODO: Insert application record into `applications` table (see sql/)
+        // --- Store the files privately, remember the CV, save the submission (docs/49-cv-autofill-and-applications.md) ---
         // TODO: Send confirmation email to candidate (13-notification-system.md)
+        $candidateId = CvService::currentCandidateId();
+        $resumeMeta = $resumeStored['meta'];
+        if (!$useSavedResume) {
+            // A new resume becomes the candidate's current CV; reuse the live parse if it is the same file.
+            CvService::saveForCandidate($candidateId, $resumeMeta, CvService::takeSessionParse('application_cv_parse', (string)$resumeMeta['name']));
+            $profileCopy = UploadStorage::duplicate($resumeMeta);
+            if ($profileCopy) {
+                UploadStorage::delete($_SESSION['profile_resume'] ?? null);
+                $_SESSION['profile_resume'] = $profileCopy;
+            }
+        }
+        if ($phone !== '') {
+            $_SESSION['profile_phone'] = $phone;
+        }
+
+        $coverFileMeta = null;
+        if (isset($_FILES['cover_letter_file']) && ($_FILES['cover_letter_file']['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_OK) {
+            $stored = UploadStorage::store($_FILES['cover_letter_file'], 'resume');
+            $coverFileMeta = $stored['ok'] ? $stored['meta'] : null;
+        }
+        $portfolioMeta = null;
+        if ($portfolioUploaded) {
+            $stored = UploadStorage::store($_FILES['portfolio_piece'], 'business_doc');
+            $portfolioMeta = $stored['ok'] ? $stored['meta'] : null;
+        }
 
         $applicationData = [
             'slug'            => $slug,
             'phone'           => $phone,
             'cover_letter'    => $coverLetter,
-            'resume_name'     => $resumeUploaded ? ($_FILES['resume']['name'] ?? '') : '',
+            'resume_name'     => (string)($resumeMeta['name'] ?? ''),
             'interest_reason' => $interestReason,
             'design_process'  => $designProcess,
             'learning_goals'  => $learningGoals,
@@ -191,12 +257,58 @@ class CandidateController extends Controller
         ];
         $internship = $internships[$slug] ?? $internships['software-engineer-intern'];
 
+        PlanService::useCandidate('applications');
+        $applicationData['id'] = ApplicationService::submit($candidateId, [
+            'slug'               => $slug,
+            'internship_title'   => $internship['title'],
+            'company_name'       => $internship['company'],
+            'full_name'          => $fullName,
+            'email'              => $email,
+            'phone'              => $phone,
+            'job_title'          => $jobTitle,
+            'job_company'        => $company,
+            'salary_expectation' => $salary,
+            'cover_letter'       => $coverLetter,
+            'cover_letter_file'  => $coverFileMeta,
+            'answers'            => array_values(array_filter([
+                ['question' => 'Why are you interested in joining ' . $internship['company'] . '?', 'answer' => $interestReason],
+                ['question' => 'Describe your proudest project or process.', 'answer' => $designProcess],
+                ['question' => 'What are your primary learning goals for this internship?', 'answer' => $learningGoals],
+            ], static fn ($a) => $a['answer'] !== '')),
+            'links'              => array_filter(['portfolio' => $portfolioLink, 'figma' => $figmaLink]),
+            'resume_file'        => $resumeMeta,
+            'portfolio_file'     => $portfolioMeta,
+        ]);
+
         // Render success confirmation
         $this->renderView('candidate/application-success', [
             'title'           => 'Application Submitted — InternConnect',
             'applicationData' => $applicationData,
             'internship'      => $internship,
         ]);
+    }
+
+    /**
+     * Read a CV as soon as it is added to an application and return the fields to fill in.
+     * Route: POST /apply/{slug}/parse-resume (multipart field "resume")
+     */
+    public function parseApplicationResume(array $params = []): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        header('Content-Type: application/json');
+        header('Cache-Control: no-store');
+
+        // Kept for the submit step (same file name = reuse this parse instead of reading the CV twice).
+        $result = CvService::parseUpload($_FILES['resume'] ?? null, 'application_cv_parse');
+        if (!$result['ok']) {
+            http_response_code(422);
+            echo json_encode(['success' => false, 'error' => $result['error']]);
+            exit;
+        }
+        echo json_encode(['success' => true, 'source' => $result['parsed']['source'], 'fields' => CvService::fieldsForForm($result['parsed'])]);
+        exit;
     }
 
     /**
@@ -222,7 +334,8 @@ class CandidateController extends Controller
             'role'        => $_SESSION['profile_role'] ?? 'Student Applicant',
             'avatar'      => $_SESSION['profile_avatar'] ?? asset('assets/images/profile.png'),
             'profile_pct' => 100,
-            'is_pro'      => false,
+            'is_pro'      => PlanService::candidatePlan() !== 'free',
+            'plan'        => PlanService::candidatePlan(),
             'checklist'   => [
                 ['label' => 'Upload Resume',       'done' => true],
                 ['label' => 'Technical Skills',    'done' => true],
@@ -816,10 +929,13 @@ class CandidateController extends Controller
 
         UploadStorage::delete($_SESSION['profile_resume'] ?? null);
         $_SESSION['profile_resume'] = $result['meta'];
+        // Keep the parsed CV in step with the newest resume (application autofill, employer view).
+        $parsed = CvService::saveForCandidate(CvService::currentCandidateId(), $result['meta']);
 
         echo json_encode([
             'success' => true,
             'resume'  => UploadStorage::describe($result['meta'], url('/candidate/profile/resume')),
+            'parsed'  => $parsed['source'] !== 'none',
         ]);
         exit;
     }
@@ -1329,6 +1445,11 @@ class CandidateController extends Controller
 
         $interviewId = (int)($params['id'] ?? (isset($_GET['id']) ? (int)$_GET['id'] : 1));
         $room = VideoInterviewService::getRoomDetails($interviewId, 'candidate');
+        // Someone else's interview renders as "not found" (no details leak).
+        if (!VideoInterviewService::accessibleBy($interviewId, 'candidate')) {
+            http_response_code(404);
+            $room = ['exists' => false] + $room;
+        }
 
         $this->renderView('candidate/interview/room', [
             'title'     => 'In-Platform Video Interview — ' . $room['title'] . ' | InternConnect',
@@ -1347,6 +1468,12 @@ class CandidateController extends Controller
             session_start();
         }
         $interviewId = (int)($params['id'] ?? 0);
+        if (!VideoInterviewService::accessibleBy($interviewId, 'candidate')) {
+            http_response_code(403);
+            header('Content-Type: application/json');
+            echo json_encode(['ok' => false, 'code' => 'forbidden', 'error' => 'You do not have access to this interview.']);
+            exit;
+        }
         $name = $_SESSION['profile_name'] ?? VideoInterviewService::getRoomDetails($interviewId, 'candidate')['candidate_name'];
         $info = VideoInterviewService::joinInfo($interviewId, 'candidate', $name . ' (Candidate)');
 
@@ -1361,7 +1488,9 @@ class CandidateController extends Controller
      */
     public function leftInterviewRoom(array $params = []): void
     {
-        VideoInterviewService::logEvent((int)($params['id'] ?? 0), 'candidate', 'left');
+        if (VideoInterviewService::accessibleBy((int)($params['id'] ?? 0), 'candidate')) {
+            VideoInterviewService::logEvent((int)($params['id'] ?? 0), 'candidate', 'left');
+        }
         http_response_code(204);
         exit;
     }
@@ -1386,29 +1515,29 @@ class CandidateController extends Controller
 
         $offer = [
             'id'             => 3,
-            'company'        => 'FinTech Global',
+            'company'        => 'Stellar Systems',
             'verified'       => true,
-            'role'           => 'Backend Engineer Intern',
-            'tags'           => ['Remote', 'Internship'],
-            'status'         => 'Applied',
-            'status_type'    => 'applied',
-            'current_stage'  => 'Application Submitted',
-            'stage_type'     => 'applied',
-            'applied_date'   => 'Sep 28, 2024',
-            'letter'         => 'F',
-            'letter_color'   => '#2563EB',
-            'letter_bg'      => '#DBEAFE',
+            'role'           => 'Data Analyst Intern',
+            'tags'           => ['Paid', 'On-site'],
+            'status'         => 'Offer Received',
+            'status_type'    => 'offer',
+            'current_stage'  => 'Offer Received',
+            'stage_type'     => 'offer',
+            'applied_date'   => 'Sep 20, 2024',
+            'letter'         => 'S',
+            'letter_color'   => '#FFFFFF',
+            'letter_bg'      => '#000623',
 
             // Offer Recipient & Terms
             'candidate_name'      => $candidate['name'],
             'commencement_date'   => 'February 1, 2027',
-            'response_deadline'   => 'October 15, 2026',
+            'response_deadline'   => 'November 30, 2026',
             'signatory_name'      => 'Akinyele Okoro',
-            'signatory_title'     => 'Talent Acquisition Lead, Stellar Systems',
+            'signatory_title'     => 'Talent Acquisition Lead',
 
             // Job Description details
             'job_title'      => 'Data Analyst Intern',
-            'location'       => 'Remote',
+            'location'       => 'Lagos, Nigeria (On-site)',
             'type'           => 'Internship',
             'duration'       => '6 months',
             'responsibilities' => [
@@ -1644,14 +1773,8 @@ class CandidateController extends Controller
             session_start();
         }
 
-        if (isset($_GET['plan'])) {
-            $requestedPlan = strtolower(trim((string)$_GET['plan']));
-            if (in_array($requestedPlan, ['free', 'pro', 'premium'], true)) {
-                $_SESSION['candidate_plan'] = $requestedPlan;
-            }
-        }
-
-        $candPlan = $_SESSION['candidate_plan'] ?? 'pro';
+        // Plan comes from billing + grants only (PlanService), never from the URL or session.
+        $candPlan = PlanService::candidatePlan();
 
         // Free plan gate: redirect or prompt upgrade
         if ($candPlan === 'free') {
@@ -1769,14 +1892,8 @@ class CandidateController extends Controller
             session_start();
         }
 
-        if (isset($_GET['plan'])) {
-            $requestedPlan = strtolower(trim((string)$_GET['plan']));
-            if (in_array($requestedPlan, ['free', 'pro', 'premium'], true)) {
-                $_SESSION['candidate_plan'] = $requestedPlan;
-            }
-        }
-
-        $candPlan = $_SESSION['candidate_plan'] ?? 'pro';
+        // Plan comes from billing + grants only (PlanService), never from the URL or session.
+        $candPlan = PlanService::candidatePlan();
         if ($candPlan === 'free') {
             header('Location: ' . url('/pricing?plan=pro&ref=ai-cv-analyze'));
             exit;
@@ -1852,12 +1969,32 @@ class CandidateController extends Controller
             ];
         }
 
+        // Gemini reads PDFs directly (better than text extraction); fall back to the saved resume.
+        $cvFile = null;
+        if (!empty($_FILES['cv_file']['tmp_name']) && is_uploaded_file($_FILES['cv_file']['tmp_name'])) {
+            if (strtolower((string)pathinfo((string)$fileName, PATHINFO_EXTENSION)) === 'pdf') {
+                $cvFile = ['path' => $_FILES['cv_file']['tmp_name'], 'mime' => 'application/pdf'];
+            }
+        } elseif (($savedPath = UploadStorage::path($_SESSION['profile_resume'] ?? null)) !== null) {
+            $savedExt = (string)($_SESSION['profile_resume']['ext'] ?? 'pdf');
+            $cvText = AiService::extractCvText($savedPath, $savedExt);
+            $fileName = (string)($_SESSION['profile_resume']['name'] ?? $fileName);
+            $cvFile = $savedExt === 'pdf' ? ['path' => $savedPath, 'mime' => 'application/pdf'] : null;
+        }
+
         $candidateProfile = [
             'user_id' => $_SESSION['candidate_id'] ?? 1,
             'name'    => $_SESSION['profile_name'] ?? 'Sarah Peters',
             'skills'  => $_SESSION['profile_skills'] ?? [],
+            'cv_file' => $cvFile,
         ];
 
+        $quota = PlanService::useCandidate('ai_documents');
+        if (!$quota['ok']) {
+            $_SESSION['flash_error'] = $quota['message'];
+            header('Location: ' . url('/pricing?ref=ai-cv'));
+            exit;
+        }
         $analysis = AiService::analyzeCv($cvText, $targetRole, $opportunity, $candidateProfile);
         $analysis['file_name'] = $fileName;
 
@@ -1877,14 +2014,8 @@ class CandidateController extends Controller
             session_start();
         }
 
-        if (isset($_GET['plan'])) {
-            $requestedPlan = strtolower(trim((string)$_GET['plan']));
-            if (in_array($requestedPlan, ['free', 'pro', 'premium'], true)) {
-                $_SESSION['candidate_plan'] = $requestedPlan;
-            }
-        }
-
-        $candPlan = $_SESSION['candidate_plan'] ?? 'pro';
+        // Plan comes from billing + grants only (PlanService), never from the URL or session.
+        $candPlan = PlanService::candidatePlan();
         if ($candPlan === 'free') {
             header('Location: ' . url('/pricing?plan=pro&ref=ai-cv-results'));
             exit;
@@ -1928,14 +2059,8 @@ class CandidateController extends Controller
             session_start();
         }
 
-        if (isset($_GET['plan'])) {
-            $requestedPlan = strtolower(trim((string)$_GET['plan']));
-            if (in_array($requestedPlan, ['free', 'pro', 'premium'], true)) {
-                $_SESSION['candidate_plan'] = $requestedPlan;
-            }
-        }
-
-        $candPlan = $_SESSION['candidate_plan'] ?? 'pro';
+        // Plan comes from billing + grants only (PlanService), never from the URL or session.
+        $candPlan = PlanService::candidatePlan();
 
         // Free plan gate: redirect to pricing
         if ($candPlan === 'free') {
@@ -2097,14 +2222,8 @@ class CandidateController extends Controller
             session_start();
         }
 
-        if (isset($_GET['plan'])) {
-            $requestedPlan = strtolower(trim((string)$_GET['plan']));
-            if (in_array($requestedPlan, ['free', 'pro', 'premium'], true)) {
-                $_SESSION['candidate_plan'] = $requestedPlan;
-            }
-        }
-
-        $candPlan = $_SESSION['candidate_plan'] ?? 'pro';
+        // Plan comes from billing + grants only (PlanService), never from the URL or session.
+        $candPlan = PlanService::candidatePlan();
         if ($candPlan === 'free') {
             header('Location: ' . url('/pricing?plan=pro&ref=ai-mock-interview'));
             exit;
@@ -2185,6 +2304,14 @@ class CandidateController extends Controller
             exit;
         }
 
+        $mockKey = strtolower($role) . '|' . date('Y-m-d');
+        if (empty($_SESSION['mock_sessions'][$mockKey])) {
+            $quota = PlanService::useCandidate('mock_interviews');
+            if (!$quota['ok']) {
+                PlanService::denyJson($quota);
+            }
+            $_SESSION['mock_sessions'][$mockKey] = true;
+        }
         $evaluation = AiService::evaluateInterviewAnswer($role, $question, $answer, [
             'user_id' => $_SESSION['user_id'] ?? 1,
         ]);
@@ -2211,8 +2338,8 @@ class CandidateController extends Controller
             'role'       => 'Student Applicant',
             'email'      => $_SESSION['user_email'] ?? 'sarah.peters@student.unilag.edu.ng',
             'avatar'     => $_SESSION['user_avatar'] ?? null,
-            'is_pro'     => true,
-            'plan'       => 'pro',
+            'is_pro'     => PlanService::candidatePlan() !== 'free',
+            'plan'       => PlanService::candidatePlan(),
         ];
 
         $activeThreadId = isset($params['id']) ? (int)$params['id'] : 1;
@@ -2608,8 +2735,27 @@ class CandidateController extends Controller
         ];
 
         $tone = trim((string)($input['tone'] ?? 'professional'));
+        if (!empty($input['max_chars'])) {
+            $jobData['max_chars'] = max(600, min(4000, (int)$input['max_chars']));
+        }
+        if (!empty($input['description'])) {
+            $jobData['description'] = mb_substr(trim(strip_tags((string)$input['description'])), 0, 2000);
+        }
 
+        $quota = PlanService::useCandidate('ai_documents', false);
+        if (!$quota['ok']) {
+            PlanService::denyJson($quota);
+        }
         $result = AiService::generateCoverLetter($candidate, $jobData, $tone);
+        PlanService::useCandidate('ai_documents');
+        // Latest letter, offered as "Use my saved letter" on internship applications.
+        $_SESSION['ai_last_cover_letter'] = [
+            'text'       => $result['full_letter'],
+            'company'    => $result['company'],
+            'role'       => $result['role'],
+            'tone'       => $result['tone'],
+            'created_at' => date('M j, g:i A'),
+        ];
 
         header('Content-Type: application/json');
         echo json_encode(['success' => true, 'letter' => $result]);
@@ -2664,6 +2810,36 @@ class CandidateController extends Controller
     }
 
     /**
+     * AI Assistant chat workspace (docs/55-jenny-ai-chat.md): Jenny on Gemini with file attachments.
+     * Route: GET /candidate/ai-assistant/chat (?c=conversation to reopen, ?q=question to ask straight away)
+     * Free plan sees the upgrade card; Pro 5 and Premium 15 new chats a day (admin-editable).
+     */
+    public function aiAssistantChat(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $candidateId = (int)($_SESSION['candidate_id'] ?? 1);
+        $plan = PlanService::candidatePlan();
+        $actor = \App\Services\JennyService::actor('assistant');
+        $this->renderView('candidate/ai-assistant/chat', [
+            'title'     => 'Chat with Jenny — AI Assistant — InternConnect',
+            'activeNav' => 'ai-assistant',
+            'candidate' => [
+                'name'   => $_SESSION['profile_name'] ?? 'Sarah Peters',
+                'role'   => $_SESSION['profile_role'] ?? 'Student Applicant',
+                'avatar' => $_SESSION['profile_avatar'] ?? asset('assets/images/profile.png'),
+                'plan'   => $plan,
+            ],
+            'plan'      => $plan,
+            'chatUsage' => PlanService::usage('candidate', $candidateId, 'assistant_chats'),
+            'coins'     => \App\Services\JennyService::coinState(PlanService::coins('candidate', $candidateId)),
+            'history'   => \App\Services\JennyService::listFor($actor, 'assistant', 40),
+            'openId'    => preg_match('/^[a-f0-9]{24}$/', (string)($_GET['c'] ?? '')) ? (string)$_GET['c'] : '',
+            'question'  => mb_substr(trim(strip_tags((string)($_GET['q'] ?? ''))), 0, 500),
+        ], 'dashboard');
+    }
+    /**
      * API: Generate AI Roadmap via AJAX
      * Route: /candidate/ai-assistant/career-coach/roadmap
      */
@@ -2683,6 +2859,15 @@ class CandidateController extends Controller
             'skills' => ['Figma', 'User Research', 'Wireframing', 'Prototyping', 'Design Systems'],
         ];
 
+        // One Jenny Coin per roadmap (docs/55).
+        $coinOk = PlanService::canSpendCoins('candidate', (int)($_SESSION['candidate_id'] ?? 1), 1);
+        if (!$coinOk['ok']) {
+            http_response_code(429);
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'error' => $coinOk['message'], 'code' => 'no_coins', 'upgrade_url' => url('/pricing')]);
+            exit;
+        }
+        PlanService::spendCoins('candidate', (int)($_SESSION['candidate_id'] ?? 1), 1);
         $result = AiService::generateCareerRoadmap($candidate, $targetRole);
 
         header('Content-Type: application/json');

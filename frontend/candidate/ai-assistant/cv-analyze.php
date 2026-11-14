@@ -610,7 +610,7 @@ $candFirstName = $candidate['first_name'] ?? 'Sarah';
 
                             <div class="cv-input-wrap">
                                 <input type="text" name="opportunity" class="cv-text-input" x-model="opportunity" placeholder="e.g. Google, Product Design Intern">
-                                <button type="button" class="cv-input-clear" x-show="opportunity.length > 0" @click="opportunity = ''" title="Clear">
+                                <button type="button" class="cv-input-clear" x-show="opportunity.length > 0" @click="opportunity = ''" aria-label="Clear">
                                     <svg style="width: 16px; height: 16px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>

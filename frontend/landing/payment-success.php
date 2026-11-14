@@ -67,8 +67,8 @@ $renewalDate = date('d M Y', strtotime($cycleKey === 'annual' ? '+1 year' : '+1 
 
                 <!-- Action Button -->
                 <div class="payment-result-actions">
-                    <a href="<?= url('/candidate/dashboard') ?>" class="payment-result-btn-primary">
-                        <span>Go to Dashboard</span>
+                    <a href="<?= htmlspecialchars($billingUrl ?? url('/candidate/billing')) ?>" class="payment-result-btn-primary">
+                        <span>View billing &amp; receipts</span>
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>

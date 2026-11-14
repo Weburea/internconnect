@@ -623,6 +623,78 @@ function adminOverview() {
                 include dirname(__DIR__, 2) . '/shared/components/admin-live-map.php';
                 ?>
 
+                <!-- Recent interview sessions (latest 5; full list on /admin/interviews) -->
+                <?php
+                $recentInterviews = $recentInterviews ?? [];
+                $aovTone = static function (string $status): string {
+                    return ['In progress' => 'green', 'Completed' => 'slate', 'Cancelled' => 'red', 'Ready' => 'indigo'][$status] ?? 'violet';
+                };
+                ?>
+                <style>
+                .aov-sessions { padding: 0; overflow: hidden; }
+                .aov-sessions .admin-card-header { padding: 18px 20px 14px; margin: 0; border-bottom: 1px solid #F1F5F9; }
+                .aov-table { width: 100%; border-collapse: collapse; }
+                .aov-table th { text-align: left; font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: .05em; padding: 10px 20px; background: #F8FAFC; white-space: nowrap; }
+                .aov-table td { padding: 12px 20px; border-top: 1px solid #F1F5F9; font-size: 13px; color: #334155; vertical-align: middle; }
+                .aov-name { display: block; font-weight: 700; color: #0F172A; white-space: nowrap; }
+                .aov-sub { display: block; font-size: 12px; color: #64748B; margin-top: 2px; white-space: nowrap; }
+                .aov-badge { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 9999px; font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+                .aov-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+                .aov-tone-green { background: #ECFDF5; color: #047857; }
+                .aov-tone-slate { background: #F1F5F9; color: #475569; }
+                .aov-tone-red { background: #FEF2F2; color: #B91C1C; }
+                .aov-tone-indigo { background: #EEF2FF; color: #4F48E6; }
+                .aov-tone-violet { background: #F5F3FF; color: #6D28D9; }
+                .aov-actions { display: flex; gap: 6px; justify-content: flex-end; }
+                .aov-btn { display: inline-flex; align-items: center; height: 32px; padding: 0 12px; border-radius: 8px; border: 1px solid #E2E8F0; background: #FFFFFF; font-size: 12.5px; font-weight: 700; color: #334155; text-decoration: none; white-space: nowrap; }
+                .aov-btn:hover { background: #F8FAFC; color: #0F172A; }
+                .aov-btn.is-primary { background: #4F48E6; border-color: #4F48E6; color: #FFFFFF; }
+                .aov-btn.is-primary:hover { background: #4338CA; color: #FFFFFF; }
+                .aov-empty { padding: 28px 20px; text-align: center; font-size: 13px; color: #64748B; }
+                @media (max-width: 900px) {
+                    .aov-table thead { display: none; }
+                    .aov-table, .aov-table tbody, .aov-table tr, .aov-table td { display: block; width: 100%; }
+                    .aov-table tr { padding: 12px 16px; border-top: 1px solid #F1F5F9; }
+                    .aov-table td { border: 0; padding: 3px 0; }
+                    .aov-name, .aov-sub { white-space: normal; }
+                    .aov-actions { justify-content: flex-start; padding-top: 6px; }
+                }
+                </style>
+                <div class="admin-card aov-sessions admin-fade-in admin-fade-in-3">
+                    <div class="admin-card-header">
+                        <div class="admin-live-heading">
+                            <h2 class="admin-card-title">Recent interview sessions</h2>
+                            <p class="admin-card-subtitle">The latest video interviews across InternConnect</p>
+                        </div>
+                        <a href="<?= url('/admin/interviews') ?>" class="admin-card-link">View all</a>
+                    </div>
+                    <?php if ($recentInterviews): ?>
+                    <table class="aov-table">
+                        <thead><tr><th>Interview</th><th>Employer</th><th>When</th><th>Status</th><th><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;">Actions</span></th></tr></thead>
+                        <tbody>
+                            <?php foreach ($recentInterviews as $s): ?>
+                            <tr>
+                                <td><span class="aov-name"><?= htmlspecialchars($s['candidate_name']) ?> <span style="color:#94A3B8; font-weight:600;">#<?= (int)$s['id'] ?></span></span><span class="aov-sub"><?= htmlspecialchars($s['candidate_role']) ?></span></td>
+                                <td><span class="aov-name"><?= htmlspecialchars($s['company_name']) ?></span><span class="aov-sub"><?= htmlspecialchars($s['interviewer_name']) ?></span></td>
+                                <td><span class="aov-name"><?= htmlspecialchars((string)$s['when']) ?></span><span class="aov-sub"><?= htmlspecialchars((string)$s['when_time']) ?> &middot; <?= (int)$s['duration_min'] ?> min</span></td>
+                                <td><span class="aov-badge aov-tone-<?= $aovTone((string)$s['status']) ?>"><?= htmlspecialchars((string)$s['status']) ?></span></td>
+                                <td>
+                                    <div class="aov-actions">
+                                        <?php if (!in_array($s['status'], ['Completed', 'Cancelled'], true)): ?>
+                                        <a class="aov-btn is-primary" href="<?= url('/admin/interviews/' . (int)$s['id'] . '/room') ?>">Join</a>
+                                        <?php endif; ?>
+                                        <a class="aov-btn" href="<?= url('/admin/interviews/' . (int)$s['id']) ?>">View</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                    <?php else: ?>
+                    <p class="aov-empty">No interview sessions yet.</p>
+                    <?php endif; ?>
+                </div>
+
                 <!-- Finance, Top Performers & Marketplace -->
                 <div class="admin-grid-insights">
                     <?php if ($canViewFinance): ?>

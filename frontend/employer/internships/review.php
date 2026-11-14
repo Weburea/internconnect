@@ -329,7 +329,7 @@ if (!function_exists('renderQualIcon')) {
                                                     <span style="font-size: 11.5px; font-weight: 700; color: #4F48E6; flex-shrink: 0;"><?= ($idx + 1) ?>.</span>
                                                     <span class="emp-review-item-title"><?= htmlspecialchars($cleanTitle) ?></span>
                                                     <?php if (!empty($field['required'])): ?>
-                                                        <span style="color: #EF4444; font-size: 12px; font-weight: 700; flex-shrink: 0;" title="Required">*</span>
+                                                        <span style="color: #EF4444; font-size: 12px; font-weight: 700; flex-shrink: 0;" aria-label="Required">*</span>
                                                     <?php endif; ?>
                                                 </div>
                                                 <span class="emp-review-item-pill">
@@ -366,7 +366,7 @@ if (!function_exists('renderQualIcon')) {
                                             <div class="emp-review-item-row">
                                                 <div class="emp-review-item-left">
                                                     <span style="font-size: 11.5px; font-weight: 700; color: #4F48E6; flex-shrink: 0; margin-top: 1px;">Q<?= ($qIdx + 1) ?>.</span>
-                                                    <span class="emp-review-item-title" title="<?= htmlspecialchars($questionText) ?>">
+                                                    <span class="emp-review-item-title" aria-label="<?= htmlspecialchars($questionText) ?>">
                                                         <?= htmlspecialchars($questionText) ?>
                                                     </span>
                                                 </div>

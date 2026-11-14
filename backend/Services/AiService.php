@@ -169,8 +169,12 @@ class AiService
         array $candidateProfile = []
     ): array {
         $startTime = microtime(true);
+        $ai = self::geminiCvAnalysis($cvText, $targetRole, $opportunity, $candidateProfile, $startTime);
+        if ($ai !== null) {
+            return $ai;
+        }
 
-        // Normalize target role to known profile or nearest match
+        // Rule-based fallback. Normalize target role to known profile or nearest match
         $matchedRoleKey = 'Product Designer';
         foreach (array_keys(self::$roleTaxonomy) as $roleKey) {
             if (stripos($targetRole, $roleKey) !== false || stripos($roleKey, $targetRole) !== false) {
@@ -291,7 +295,7 @@ class AiService
             $candidateProfile['user_id'] ?? 1,
             'candidate',
             'Resume Optimization',
-            'DeepSeek-V3 / InternConnect ATS Engine',
+            'InternConnect rules (fallback)',
             $promptTokens,
             $completionTokens,
             $latencyMs
@@ -362,7 +366,8 @@ class AiService
         // 2. Persist to Database if available
         try {
             $pdo = Database::getConnection();
-            // Ensure table exists
+            // Ensure table exists (SQLite; on MySQL it comes from database/migrations)
+            if ((string)$pdo->getAttribute(\PDO::ATTR_DRIVER_NAME) !== 'mysql') {
             $pdo->exec("
                 CREATE TABLE IF NOT EXISTS ai_usage_logs (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -377,6 +382,7 @@ class AiService
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             ");
+            }
 
             $stmt = $pdo->prepare("
                 INSERT INTO ai_usage_logs 
@@ -559,6 +565,10 @@ class AiService
         array $candidateProfile = []
     ): array {
         $startTime = microtime(true);
+        $ai = self::geminiAnswerEvaluation($role, $question, $answer, $candidateProfile, $startTime);
+        if ($ai !== null) {
+            return $ai;
+        }
         $cleanAnswer = trim($answer);
         $length = strlen($cleanAnswer);
 
@@ -663,7 +673,7 @@ class AiService
             $candidateProfile['user_id'] ?? 1,
             'candidate',
             'Mock Interview Assistant',
-            'DeepSeek-V3 / InternConnect Interview Engine',
+            'InternConnect rules (fallback)',
             $promptTokens,
             $completionTokens,
             $latencyMs
@@ -702,7 +712,12 @@ class AiService
         $location  = $jobData['location'] ?? 'Lagos, Nigeria (Hybrid)';
         $skills    = $candidate['skills'] ?? ['Problem Solving', 'Git', 'Agile Collaboration'];
 
-        // Determine matching taxonomy
+        $ai = self::geminiCoverLetter($candidate, $jobData, $tone, $startTime);
+        if ($ai !== null) {
+            return $ai;
+        }
+
+        // Rule-based fallback. Determine matching taxonomy
         $taxonomyKey = 'Software Engineer';
         foreach (array_keys(self::$roleTaxonomy) as $taxRole) {
             if (stripos($role, $taxRole) !== false || stripos($taxRole, $role) !== false) {
@@ -766,7 +781,7 @@ class AiService
             $candidate['user_id'] ?? 1,
             'candidate',
             'AI Cover Letter Generator',
-            'DeepSeek-V3 / InternConnect Language Model',
+            'InternConnect rules (fallback)',
             $promptTokens,
             $completionTokens,
             $latencyMs
@@ -797,7 +812,12 @@ class AiService
         $name       = $candidate['name'] ?? 'Candidate';
         $userSkills = $candidate['skills'] ?? ['Git', 'HTML5', 'CSS3', 'JavaScript'];
 
-        // Normalize target role
+        $ai = self::geminiRoadmap($candidate, $targetRole, $startTime);
+        if ($ai !== null) {
+            return $ai;
+        }
+
+        // Rule-based fallback. Normalize target role
         $roleKey = 'Software Engineer';
         foreach (array_keys(self::$roleTaxonomy) as $k) {
             if (stripos($targetRole, $k) !== false || stripos($k, $targetRole) !== false) {
@@ -961,7 +981,7 @@ class AiService
             $candidate['user_id'] ?? 1,
             'candidate',
             'AI Career Coach & Skill Roadmap',
-            'DeepSeek-V3 / InternConnect Coach Engine',
+            'InternConnect rules (fallback)',
             $promptTokens,
             $completionTokens,
             $latencyMs
@@ -977,6 +997,283 @@ class AiService
             'courses'            => $recommendedCourses,
             'tokens_used'        => $promptTokens + $completionTokens,
             'latency_ms'         => $latencyMs,
+        ];
+    }
+    /* ══════════════════════════════════════════════════════════════════════
+       GEMINI (Jenny AI) — first choice for every tool above; null = use the rules.
+       Each helper returns exactly the same shape as the rule-based result.
+       ══════════════════════════════════════════════════════════════════════ */
+
+    /** Candidate's parsed CV (experience, education, skills) to ground AI answers. */
+    private static function cvContext(): array
+    {
+        if (session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['profile_cv'])) {
+            return $_SESSION['profile_cv'];
+        }
+        return CvService::forCandidate(CvService::currentCandidateId())['parsed'] ?? [];
+    }
+
+    private static function cvFacts(array $cv): array
+    {
+        return [
+            'headline'   => $cv['headline'] ?? '',
+            'summary'    => $cv['summary'] ?? '',
+            'experience' => array_map(static fn ($e) => trim(($e['title'] ?? '') . ' at ' . ($e['company'] ?? '') . ' (' . ($e['start'] ?? '') . ' - ' . ($e['end'] ?? '') . '): ' . implode('; ', $e['highlights'] ?? [])), array_slice($cv['experience'] ?? [], 0, 5)),
+            'education'  => array_map(static fn ($e) => trim(($e['degree'] ?? '') . ' ' . ($e['field'] ?? '') . ', ' . ($e['school'] ?? '')), array_slice($cv['education'] ?? [], 0, 2)),
+            'skills'     => array_slice($cv['skills'] ?? [], 0, 15),
+        ];
+    }
+
+    private static function clampInt($v, int $min, int $max, int $default): int
+    {
+        return is_numeric($v) ? max($min, min($max, (int)$v)) : $default;
+    }
+
+    private static function strList($v, int $max, int $len = 300): array
+    {
+        if (!is_array($v)) {
+            return [];
+        }
+        $out = [];
+        foreach ($v as $item) {
+            $t = trim(strip_tags(is_scalar($item) ? (string)$item : ''));
+            if ($t !== '') {
+                $out[] = mb_substr($t, 0, $len);
+            }
+            if (count($out) >= $max) {
+                break;
+            }
+        }
+        return $out;
+    }
+
+    private static function geminiCvAnalysis(string $cvText, string $targetRole, string $opportunity, array $profile, float $startTime): ?array
+    {
+        $file = is_array($profile['cv_file'] ?? null) ? $profile['cv_file'] : null;
+        if (!GeminiClient::isConfigured() || (trim($cvText) === '' && !$file)) {
+            return null;
+        }
+        $prompt = "You are Jenny AI, an ATS and CV coach for Nigerian internship applicants on InternConnect. Review this CV for the target role "
+            . json_encode($targetRole) . ($opportunity !== '' ? ' (opportunity: ' . json_encode($opportunity) . ')' : '')
+            . ". Be specific to the CV content and honest; do not invent experience."
+            . ($file ? ' The CV is attached as a PDF.' : "\n\nCV TEXT:\n" . mb_substr($cvText, 0, 12000))
+            . "\n\nReturn JSON only: {\"score\":0-100,\"summary\":\"3-4 sentence assessment\",\"metrics\":{\"role_relevance\":0-100,\"experience\":0-100,"
+            . "\"content_quality\":0-100,\"skills_mapping\":0-100,\"ats_compatibility\":0-100},\"detected_skills\":[\"...\"],\"missing_skills\":[\"up to 4 role keywords not in the CV\"],"
+            . "\"whats_working\":[\"4 short strengths\"],\"suggestions\":[{\"priority\":\"high|medium\",\"heading\":\"\",\"problem\":\"\",\"recommendation\":\"\"}]} with 4 suggestions.";
+        $ai = GeminiClient::json($prompt, 25, $file ? [$file] : []);
+        if (!is_array($ai) || !isset($ai['score'])) {
+            return null;
+        }
+        $score = self::clampInt($ai['score'], 0, 100, 75);
+        $m = is_array($ai['metrics'] ?? null) ? $ai['metrics'] : [];
+        $suggestions = [];
+        foreach (array_slice(is_array($ai['suggestions'] ?? null) ? $ai['suggestions'] : [], 0, 5) as $sg) {
+            if (!is_array($sg) || trim((string)($sg['heading'] ?? '')) === '') {
+                continue;
+            }
+            $high = strtolower((string)($sg['priority'] ?? '')) === 'high';
+            $suggestions[] = [
+                'priority'       => $high ? 'HIGH PRIORITY' : 'MEDIUM PRIORITY',
+                'prio_class'     => $high ? 'res-prio-high' : 'res-prio-med',
+                'heading'        => mb_substr(strip_tags((string)$sg['heading']), 0, 120),
+                'problem'        => mb_substr(strip_tags((string)($sg['problem'] ?? '')), 0, 400),
+                'recommendation' => mb_substr(strip_tags((string)($sg['recommendation'] ?? '')), 0, 400),
+            ];
+        }
+        $latencyMs = (int)round((microtime(true) - $startTime) * 1000);
+        self::logUsage($profile['user_id'] ?? 1, 'candidate', 'Resume Optimization', 'Gemini (Jenny AI)', (int)(strlen($cvText) / 4) + 200, 600, $latencyMs);
+        return [
+            'target_role'    => $targetRole,
+            'matched_role'   => $targetRole,
+            'opportunity'    => $opportunity,
+            'score'          => $score,
+            'score_rating'   => $score >= 80 ? 'Above Average' : 'Needs Optimization',
+            'score_headline' => $score >= 80 ? 'Good foundation' : 'Action items identified',
+            'score_subtext'  => 'Jenny AI reviewed your CV against ' . $targetRole . ' expectations and ATS screening.',
+            'ai_summary'     => mb_substr(strip_tags((string)($ai['summary'] ?? '')), 0, 900),
+            'metrics'        => [
+                'role_relevance'    => self::clampInt($m['role_relevance'] ?? null, 0, 100, $score),
+                'experience'        => self::clampInt($m['experience'] ?? null, 0, 100, $score),
+                'content_quality'   => self::clampInt($m['content_quality'] ?? null, 0, 100, $score),
+                'skills_mapping'    => self::clampInt($m['skills_mapping'] ?? null, 0, 100, $score),
+                'ats_compatibility' => self::clampInt($m['ats_compatibility'] ?? null, 0, 100, $score),
+            ],
+            'detected_skills' => self::strList($ai['detected_skills'] ?? [], 12, 40),
+            'missing_skills'  => self::strList($ai['missing_skills'] ?? [], 4, 40),
+            'whats_working'   => self::strList($ai['whats_working'] ?? [], 4, 80) ?: ['Relevant experience for the role'],
+            'suggestions'     => $suggestions,
+            'analyzed_at'     => date('M j, Y'),
+            'tokens_used'     => (int)(strlen($cvText) / 4) + 800,
+            'latency_ms'      => $latencyMs,
+            'source'          => 'gemini',
+        ];
+    }
+
+    private static function geminiAnswerEvaluation(string $role, string $question, string $answer, array $profile, float $startTime): ?array
+    {
+        if (!GeminiClient::isConfigured() || mb_strlen(trim($answer)) < 15) {
+            return null;
+        }
+        $prompt = "You are Jenny AI, an interview coach. Evaluate this mock interview answer for a " . json_encode($role) . " internship using the STAR method.\n"
+            . 'QUESTION: ' . json_encode($question) . "\nANSWER: " . json_encode(mb_substr($answer, 0, 4000))
+            . "\nReturn JSON only: {\"score\":0-100,\"star\":{\"situation\":bool,\"task\":bool,\"action\":bool,\"result\":bool},\"skills\":[\"role skills shown\"],"
+            . "\"strengths\":[\"2-3\"],\"improvements\":[\"2-3 specific, actionable\"],\"model_answer\":\"a stronger 120-180 word answer in first person using STAR\"}";
+        $ai = GeminiClient::json($prompt, 20);
+        if (!is_array($ai) || !isset($ai['score'])) {
+            return null;
+        }
+        $score = self::clampInt($ai['score'], 0, 100, 70);
+        // Same labels and classes as the rule-based scorer so the results UI is unchanged.
+        [$rating, $ratingClass] = $score >= 88 ? ['Exceptional Answer', 'res-prio-high'] : ($score >= 78 ? ['Strong Answer', 'res-prio-med'] : ['Good Start — Add Structure', 'res-prio-low']);
+        $star = is_array($ai['star'] ?? null) ? $ai['star'] : [];
+        $latencyMs = (int)round((microtime(true) - $startTime) * 1000);
+        self::logUsage($profile['user_id'] ?? 1, 'candidate', 'Mock Interview Assistant', 'Gemini (Jenny AI)', (int)(strlen($answer) / 4) + 160, 450, $latencyMs);
+        return [
+            'score'          => $score,
+            'rating'         => $rating,
+            'rating_class'   => $ratingClass,
+            'star_adherence' => [
+                'situation' => !empty($star['situation']),
+                'task'      => !empty($star['task']),
+                'action'    => !empty($star['action']),
+                'result'    => !empty($star['result']),
+            ],
+            'detected_skills' => self::strList($ai['skills'] ?? [], 6, 40),
+            'strengths'       => self::strList($ai['strengths'] ?? [], 3),
+            'improvements'    => self::strList($ai['improvements'] ?? [], 3),
+            'model_answer'    => mb_substr(strip_tags((string)($ai['model_answer'] ?? '')), 0, 1600),
+            'tokens_used'     => (int)(strlen($answer) / 4) + 610,
+            'latency_ms'      => $latencyMs,
+            'source'          => 'gemini',
+        ];
+    }
+
+    private static function geminiCoverLetter(array $candidate, array $jobData, string $tone, float $startTime): ?array
+    {
+        if (!GeminiClient::isConfigured()) {
+            return null;
+        }
+        $tone = in_array(strtolower(trim($tone)), ['professional', 'confident', 'technical', 'enthusiastic'], true) ? strtolower(trim($tone)) : 'professional';
+        $name = (string)($candidate['name'] ?? 'Candidate');
+        $company = (string)($jobData['company'] ?? 'the company');
+        $role = (string)($jobData['role'] ?? 'Internship');
+        $facts = [
+            'candidate' => ['name' => $name, 'school' => $candidate['school'] ?? '', 'degree' => $candidate['degree'] ?? '', 'skills' => array_slice((array)($candidate['skills'] ?? []), 0, 10)],
+            'cv'        => self::cvFacts(self::cvContext()),
+            'job'       => ['company' => $company, 'role' => $role, 'location' => $jobData['location'] ?? '', 'description' => mb_substr((string)($jobData['description'] ?? ''), 0, 2000)],
+        ];
+        $prompt = "Write a cover letter for this internship application in a {$tone} tone, as the candidate (first person). Use only facts given; "
+            . "never invent employers, numbers or degrees. Four paragraphs: hook and intent; evidence from experience/skills; fit with the company; closing. Do not include a greeting ('Dear ...') or a sign-off; they are added separately."
+            . (!empty($jobData['max_chars']) ? ' Keep the whole letter, including greeting and sign-off, under ' . (int)$jobData['max_chars'] . ' characters.' : '') . "\n"
+            . 'FACTS: ' . json_encode($facts, JSON_UNESCAPED_UNICODE)
+            . "\nReturn JSON only: {\"paragraphs\":[\"p1\",\"p2\",\"p3\",\"p4\"],\"matched_skills\":[\"up to 5 skills that match the role\"]}";
+        $ai = GeminiClient::json($prompt, 25);
+        // Greeting and sign-off are added below; drop any the model wrote into the paragraphs.
+        $paragraphs = array_values(array_filter(array_map(static function (string $p): string {
+            $p = preg_replace('/^\s*dear\b[^\n,]*,\s*/i', '', $p) ?? $p;
+            $p = preg_replace('/\s*(sincerely|best regards|kind regards|yours faithfully|yours sincerely|regards)\s*,?[\s\S]*$/i', '', $p) ?? $p;
+            return trim($p);
+        }, self::strList($ai['paragraphs'] ?? [], 6, 1200)), static fn ($p) => mb_strlen($p) > 20));
+        $paragraphs = array_slice($paragraphs, 0, 4);
+        if (count($paragraphs) < 3) {
+            return null;
+        }
+        $salutation = "Dear Hiring Team at {$company},";
+        $signoff = "Sincerely,\n" . $name;
+        $fullLetter = $salutation . "\n\n" . implode("\n\n", $paragraphs) . "\n\n" . $signoff;
+        $wordCount = str_word_count($fullLetter);
+        $latencyMs = (int)round((microtime(true) - $startTime) * 1000);
+        self::logUsage($candidate['user_id'] ?? 1, 'candidate', 'AI Cover Letter Generator', 'Gemini (Jenny AI)', 450, 600, $latencyMs);
+        return [
+            'salutation'     => $salutation,
+            'paragraphs'     => $paragraphs,
+            'signoff'        => $signoff,
+            'full_letter'    => $fullLetter,
+            'tone'           => $tone,
+            'matched_skills' => self::strList($ai['matched_skills'] ?? [], 5, 40) ?: array_slice((array)($candidate['skills'] ?? []), 0, 5),
+            'word_count'     => $wordCount,
+            'read_time_min'  => (int)ceil($wordCount / 200),
+            'company'        => $company,
+            'role'           => $role,
+            'tokens_used'    => 1050,
+            'latency_ms'     => $latencyMs,
+            'source'         => 'gemini',
+        ];
+    }
+
+    private static function geminiRoadmap(array $candidate, string $targetRole, float $startTime): ?array
+    {
+        if (!GeminiClient::isConfigured()) {
+            return null;
+        }
+        $facts = ['target_role' => $targetRole, 'skills' => array_slice((array)($candidate['skills'] ?? []), 0, 15), 'cv' => self::cvFacts(self::cvContext())];
+        $prompt = "You are Jenny AI, a career coach for Nigerian students. Build a 12-week skill roadmap for this candidate to become a strong {$targetRole} intern. "
+            . "Base skill levels on the evidence given; be realistic.\nFACTS: " . json_encode($facts, JSON_UNESCAPED_UNICODE)
+            . "\nReturn JSON only: {\"readiness_score\":0-100,\"mastered\":[{\"name\":\"\",\"level\":80-100}],\"in_progress\":[{\"name\":\"\",\"level\":30-79}],"
+            . "\"missing\":[{\"name\":\"\",\"priority\":\"High Priority|Competitive Edge\",\"reason\":\"one sentence\"}],"
+            . "\"phases\":[{\"title\":\"\",\"timeline\":\"Weeks 1 - 3\",\"description\":\"\",\"tasks\":[\"3 concrete tasks\"]}]} with exactly 4 phases.";
+        $ai = GeminiClient::json($prompt, 25, [], 3072);
+        if (!is_array($ai) || empty($ai['phases']) || !is_array($ai['phases'])) {
+            return null;
+        }
+        $skillRows = static function ($rows, string $status, string $class, int $min, int $max): array {
+            $out = [];
+            foreach (array_slice(is_array($rows) ? $rows : [], 0, 6) as $r) {
+                $name = trim(strip_tags((string)($r['name'] ?? '')));
+                if ($name !== '') {
+                    $out[] = ['name' => mb_substr($name, 0, 60), 'level' => max($min, min($max, (int)($r['level'] ?? $min))), 'status' => $status, 'status_class' => $class];
+                }
+            }
+            return $out;
+        };
+        $missing = [];
+        foreach (array_slice(is_array($ai['missing'] ?? null) ? $ai['missing'] : [], 0, 6) as $r) {
+            $name = trim(strip_tags((string)($r['name'] ?? '')));
+            if ($name !== '') {
+                $missing[] = ['name' => mb_substr($name, 0, 60), 'priority' => ($r['priority'] ?? '') === 'Competitive Edge' ? 'Competitive Edge' : 'High Priority', 'reason' => mb_substr(strip_tags((string)($r['reason'] ?? '')), 0, 200)];
+            }
+        }
+        $phases = [];
+        foreach (array_slice($ai['phases'], 0, 4) as $i => $p) {
+            if (!is_array($p)) {
+                continue;
+            }
+            $phases[] = [
+                'phase_number' => $i + 1,
+                'title'        => mb_substr(strip_tags((string)($p['title'] ?? 'Phase ' . ($i + 1))), 0, 80),
+                'timeline'     => mb_substr(strip_tags((string)($p['timeline'] ?? '')), 0, 30),
+                'description'  => mb_substr(strip_tags((string)($p['description'] ?? '')), 0, 300),
+                'status'       => $i === 0 ? 'In Progress' : 'Upcoming',
+                'status_pct'   => 0,
+                'tasks'        => array_map(static fn ($t) => ['title' => $t, 'done' => false], self::strList($p['tasks'] ?? [], 4, 200)),
+            ];
+        }
+        if (count($phases) < 3) {
+            return null;
+        }
+        $latencyMs = (int)round((microtime(true) - $startTime) * 1000);
+        self::logUsage($candidate['user_id'] ?? 1, 'candidate', 'AI Career Coach & Skill Roadmap', 'Gemini (Jenny AI)', 400, 900, $latencyMs);
+        // Course list stays curated (InternConnect e-learning catalogue).
+        return [
+            'target_role'        => $targetRole,
+            'readiness_score'    => self::clampInt($ai['readiness_score'] ?? null, 0, 100, 60),
+            'mastered_skills'    => $skillRows($ai['mastered'] ?? [], 'Mastered', 'badge-mastered', 80, 100),
+            'in_progress_skills' => $skillRows($ai['in_progress'] ?? [], 'In Progress', 'badge-progress', 30, 79),
+            'missing_skills'     => $missing,
+            'phases'             => $phases,
+            'courses'            => self::curatedCourses(),
+            'tokens_used'        => 1300,
+            'latency_ms'         => $latencyMs,
+            'source'             => 'gemini',
+        ];
+    }
+
+    private static function curatedCourses(): array
+    {
+        return [
+            ['id' => 101, 'title' => 'Enterprise Design Systems & Figma Architecture', 'provider' => 'InternConnect Academy', 'duration' => '4.5 Hours', 'level' => 'Intermediate', 'rating' => '4.9', 'badge' => 'Highest Rated', 'url' => url('/elearning')],
+            ['id' => 102, 'title' => 'Scalable API Development & Database Optimization', 'provider' => 'TechTalent Africa', 'duration' => '6.0 Hours', 'level' => 'Intermediate to Advanced', 'rating' => '4.8', 'badge' => 'Industry Standard', 'url' => url('/elearning')],
+            ['id' => 103, 'title' => 'Technical Interview Mastery: STAR Framework & Live Coding', 'provider' => 'InternConnect Prep', 'duration' => '3.5 Hours', 'level' => 'All Levels', 'rating' => '4.95', 'badge' => 'Essential', 'url' => url('/elearning')],
         ];
     }
 }

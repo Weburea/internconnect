@@ -59,7 +59,7 @@ declare(strict_types=1);
                         <svg style="width: 15px; height: 15px; color: var(--ic-text-subtle); flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
-                        <span>Last Updated: <strong>October 20, 2026</strong></span>
+                        <span>Last Updated: <strong>November 12, 2026</strong></span>
                     </div>
                     <div class="legal-meta-item">
                         <svg style="width: 15px; height: 15px; color: var(--ic-text-subtle); flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -100,11 +100,12 @@ declare(strict_types=1);
                     </h2>
                     <div class="legal-section-body">
                         <p>
-                            Candidates who purchase a <strong>Pro Student Upgrade</strong> are entitled to:
+                            Candidates who buy a <strong>Pro or Premium plan</strong> are entitled to:
                         </p>
                         <ul>
-                            <li><strong>7-Day Cooling-Off Period:</strong> You may request a 100% full refund within 7 days of initial subscription purchase, provided you have not utilized premium features (such as generating more than 2 AI mock interview sessions or requesting priority human application review).</li>
-                            <li><strong>Subscription Cancellation:</strong> You can cancel auto-renewal at any time from your Account Settings. Your Pro access remains active until the end of your prepaid billing month with no further renewal charges.</li>
+                            <li><strong>7-Day Cooling-Off Period:</strong> You may request a full refund within 7 days of your first purchase, provided you have used no more than 3 paid AI features in that time (AI cover letters, CV analysis or mock interviews).</li>
+                            <li><strong>No automatic renewal:</strong> plans do not renew on their own, so there is nothing to cancel. Your access lasts until the end of the period you paid for.</li>
+                            <li><strong>Plans earned through training partners</strong> are free, so there is nothing to refund. If you paid for the same plan, your paid days are never lost: the free period is added before or after them.</li>
                         </ul>
                     </div>
                 </section>
@@ -186,7 +187,7 @@ declare(strict_types=1);
                                 <li>Brief reason for cancellation or refund request.</li>
                             </ol>
                             <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding-top: 12px; border-top: 1px solid #E2E8F0;">
-                                <div style="font-size: 13px; color: #4F48E6; font-weight: 700;">billing@internconnect.ng</div>
+                                <div style="font-size: 13px; color: #4F48E6; font-weight: 700; overflow-wrap: anywhere;"><?= htmlspecialchars(\App\Core\Env::get('MAIL_ADMIN_ADDRESS', 'internconnect@weburea.com'), ENT_QUOTES) ?></div>
                                 <a href="<?= url('/contact') ?>" class="ic-btn ic-btn-primary">
                                     <span>Submit Billing Ticket</span>
                                     <svg style="width: 14px; height: 14px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

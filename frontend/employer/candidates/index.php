@@ -60,6 +60,11 @@ declare(strict_types=1);
                     <!-- Filter Dropdowns Group -->
                     <div class="emp-cand-filter-group">
 
+                        <!-- Certified by a training partner -->
+                        <button type="button" class="emp-drop-btn" :class="{ 'is-active': certifiedOnly }" @click="certifiedOnly = !certifiedOnly; currentPage = 1" :aria-pressed="certifiedOnly" :style="certifiedOnly ? 'border-color: #4F48E6; color: #4F48E6;' : ''">
+                            <span>Certified only</span>
+                        </button>
+
                         <!-- Role Filter Dropdown -->
                         <div class="emp-drop-wrap" @click.outside="roleDropdownOpen = false">
                             <button type="button" 
@@ -199,6 +204,7 @@ declare(strict_types=1);
                                                 </div>
                                                 <div class="emp-cand-meta">
                                                     <span class="emp-cand-name" x-text="cand.name"></span>
+                                                    <template x-for="p in (cand.certified_by || [])" :key="p"><span style="display: inline-flex; margin-left: 6px; padding: 2px 8px; border-radius: 999px; background: #000623; color: #FFFFFF; font-size: 10.5px; font-weight: 700; white-space: nowrap;" x-text="'Certified by ' + p"></span></template>
                                                     <span class="emp-cand-applied-time" x-text="cand.applied_time"></span>
                                                 </div>
                                             </div>
@@ -311,6 +317,7 @@ function candidateApplicationsManager(initialCandidates) {
         roleLabel: 'All Internship Roles',
         roleDropdownOpen: false,
         selectedStatus: 'all',
+        certifiedOnly: false,
         statusLabel: 'All Statuses',
         statusDropdownOpen: false,
         sortBy: 'score',
@@ -379,6 +386,11 @@ function candidateApplicationsManager(initialCandidates) {
             // Status filter
             if (this.selectedStatus !== 'all') {
                 list = list.filter(c => c.status_type === this.selectedStatus);
+            }
+
+            // Certified by a training partner
+            if (this.certifiedOnly) {
+                list = list.filter(c => c.certified_by && c.certified_by.length > 0);
             }
 
             // Sorting

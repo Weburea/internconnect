@@ -267,6 +267,7 @@ declare(strict_types=1);
                     <div class="inline-flex items-center gap-2 border border-primary/20 rounded-full px-4 py-1.5 bg-primary/5">
                         <span class="text-[12px] font-bold tracking-wider text-primary uppercase">Security</span>
                     </div>
+                    <h1 class="sr-only">Create your InternConnect student account</h1>
                     <h2 class="text-[40px] lg:text-[48px] leading-[44px] lg:leading-[50px] font-bold tracking-tight text-[#191C1D]">
                         Secure your <span class="text-primary">career profile.</span>
                     </h2>
@@ -590,7 +591,7 @@ declare(strict_types=1);
                                            class="emp-input-text"
                                            style="height: 44px; min-height: 44px; border: 1px solid #E2E8F0 !important; border-radius: 10px !important; background: #FFFFFF !important; padding-left: 40px !important; padding-right: 44px !important; font-size: 13.5px !important; width: 100% !important; box-sizing: border-box !important; letter-spacing: 0.15em;">
                                     <button @click="password_visible = !password_visible" type="button" 
-                                            class="emp-input-right-slot" :title="password_visible ? 'Hide password' : 'Show password'">
+                                            class="emp-input-right-slot" :aria-label="password_visible ? 'Hide password' : 'Show password'">
                                         <iconify-icon :icon="password_visible ? 'lucide:eye-off' : 'lucide:eye'"></iconify-icon>
                                     </button>
                                 </div>
@@ -616,7 +617,7 @@ declare(strict_types=1);
                                            class="emp-input-text"
                                            style="height: 44px; min-height: 44px; border: 1px solid #E2E8F0 !important; border-radius: 10px !important; background: #FFFFFF !important; padding-left: 40px !important; padding-right: 44px !important; font-size: 13.5px !important; width: 100% !important; box-sizing: border-box !important; letter-spacing: 0.15em;">
                                     <button @click="confirm_password_visible = !confirm_password_visible" type="button" 
-                                            class="emp-input-right-slot" :title="confirm_password_visible ? 'Hide password' : 'Show password'">
+                                            class="emp-input-right-slot" :aria-label="confirm_password_visible ? 'Hide password' : 'Show password'">
                                         <iconify-icon :icon="confirm_password_visible ? 'lucide:eye-off' : 'lucide:eye'"></iconify-icon>
                                     </button>
                                 </div>
@@ -964,11 +965,17 @@ declare(strict_types=1);
                                         <!-- Size, status and AI badge on one aligned row -->
                                         <div class="flex items-center flex-wrap" style="gap: 6px; margin-top: 4px;">
                                             <span class="text-gray-500 whitespace-nowrap" style="font-size: 11px; line-height: 1.35;" x-text="resume_size + ' • Ready'"></span>
-                                            <span class="inline-flex items-center whitespace-nowrap rounded-full bg-green-50 text-green-700 border border-green-200" style="gap: 4px; padding: 2px 8px; font-size: 10px; font-weight: 600; line-height: 1.4;">
+                                            <span x-show="cv_state === 'reading'" class="inline-flex items-center whitespace-nowrap rounded-full bg-indigo-50 text-primary border border-indigo-100" style="gap: 4px; padding: 2px 8px; font-size: 10px; font-weight: 600; line-height: 1.4;">
+                                                <svg class="ob-cv-spin" style="width: 10px; height: 10px; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity=".25"/><path fill="currentColor" d="M4 12a8 8 0 018-8v3a5 5 0 00-5 5H4z"/></svg>
+                                                <span>Reading with AI</span>
+                                            </span>
+                                            <span x-show="cv_state === 'parsed'" class="inline-flex items-center whitespace-nowrap rounded-full bg-green-50 text-green-700 border border-green-200" style="gap: 4px; padding: 2px 8px; font-size: 10px; font-weight: 600; line-height: 1.4;">
                                                 <svg style="width: 10px; height: 10px; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
                                                 <span>Parsed by AI</span>
                                             </span>
                                         </div>
+                                        <p x-show="cv_state === 'parsed' && cv_found" class="text-gray-500 truncate" style="font-size: 11px; line-height: 1.35; margin-top: 4px;" x-text="'Found: ' + cv_found"></p>
+                                        <p x-show="cv_state === 'failed'" class="text-gray-500" style="font-size: 11px; line-height: 1.35; margin-top: 4px;">Saved. We could not read details from this file, you can add them in your profile.</p>
                                     </div>
                                 </div>
                                 <!-- Delete button -->
@@ -1404,6 +1411,7 @@ declare(strict_types=1);
 <script>
     window.INTERN_WELCOME_URL = '<?= url('/welcome') ?>';
     window.INTERN_ONBOARD_COMPLETE_URL = '<?= url('/register/student/complete') ?>';
+    window.INTERN_CV_PARSE_URL = '<?= url('/register/student/parse-resume') ?>';
     window.INTERN_UNIVERSITIES_API = '<?= url('/api/universities') ?>';
 </script>
 <script src="<?= asset('assets/js/onboarding-student.js') ?>?v=<?= filemtime(dirname(__DIR__, 2) . '/public/assets/js/onboarding-student.js') ?>"></script>

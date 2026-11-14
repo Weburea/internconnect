@@ -844,7 +844,7 @@ $featuredRoles = [
                 <template x-for="(tag, index) in activeFilters" :key="index">
                     <span class="opportunity-filter-pill">
                         <span x-text="tag"></span>
-                        <button type="button" @click="removeFilter(tag)" class="opportunity-filter-remove" :title="'Remove ' + tag">
+                        <button type="button" @click="removeFilter(tag)" class="opportunity-filter-remove" :aria-label="'Remove ' + tag">
                             <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>
@@ -888,7 +888,7 @@ $featuredRoles = [
                         x-show="searchQuery.length > 0" 
                         @click.stop="searchQuery = ''; selectedCategory = '';" 
                         class="opportunity-search-clear-btn" 
-                        title="Clear search"
+                        aria-label="Clear search"
                         style="display: none;"
                     >
                         <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -900,7 +900,7 @@ $featuredRoles = [
                         type="button" 
                         class="opportunity-search-filter-btn" 
                         :class="{ 'is-active': dropdownOpen }"
-                        title="Browse role categories" 
+                        aria-label="Browse role categories" 
                         @click.stop="dropdownOpen = !dropdownOpen"
                     >
                         <svg class="opportunity-dropdown-chevron" :class="{ 'rotate-180': dropdownOpen }" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
@@ -975,7 +975,7 @@ $featuredRoles = [
                     <div>
                         <!-- Card Top: Company Logo & Employment Badge -->
                         <div class="opportunity-card-top">
-                            <a href="<?= url('/company/' . ($role['slug'] ?? 'kiro-labs')) ?>" class="opportunity-logo-box" style="background-color: <?= htmlspecialchars($role['logo_bg'] ?? '#FFFFFF') ?>; <?= ($role['logo_bg'] ?? '') === '#000623' ? 'border-color: #1E293B;' : '' ?>" title="View <?= htmlspecialchars($role['company']) ?> Profile">
+                            <a href="<?= url('/company/' . ($role['slug'] ?? 'kiro-labs')) ?>" class="opportunity-logo-box" style="background-color: <?= htmlspecialchars($role['logo_bg'] ?? '#FFFFFF') ?>; <?= ($role['logo_bg'] ?? '') === '#000623' ? 'border-color: #1E293B;' : '' ?>" aria-label="View <?= htmlspecialchars($role['company']) ?> Profile">
                                 <img src="<?= htmlspecialchars($role['logo']) ?>" alt="<?= htmlspecialchars($role['company']) ?>" class="opportunity-logo-img" loading="lazy">
                             </a>
                             <span class="opportunity-type-badge <?= htmlspecialchars($role['type_class']) ?>">

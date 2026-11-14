@@ -396,3 +396,7 @@
     font-weight: 700;
 }
 
+
+/* CV reading badge spinner (signup step 5) */
+.ob-cv-spin { animation: obCvSpin 1s linear infinite; }
+@keyframes obCvSpin { to { transform: rotate(360deg); } }

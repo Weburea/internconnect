@@ -705,6 +705,9 @@ function coverLetterComponent() {
                     window.dispatchEvent(new CustomEvent('show-toast', {
                         detail: { text: 'Cover letter updated with ' + this.tone + ' tone!', type: 'success' }
                     }));
+                } else if (data.error) {
+                    // Plan limit reached (PlanService): say so instead of failing silently.
+                    window.dispatchEvent(new CustomEvent('show-toast', { detail: { text: data.error, type: 'error' } }));
                 }
             } catch (e) {
                 console.error('Error generating letter', e);

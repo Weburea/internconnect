@@ -33,6 +33,7 @@ declare(strict_types=1);
                     <h1 class="admin-page-title">Subscription &amp; Ledger</h1>
                     <p class="admin-page-subtitle">Real-time Monthly Recurring Revenue (MRR), verified student plans, automated Paystack payouts &amp; webhook audits</p>
                 </div>
+                <a href="<?= url('/admin/subscriptions/plans') ?>" style="display: inline-flex; align-items: center; height: 38px; padding: 0 16px; border-radius: 10px; background: #4F48E6; color: #FFFFFF; font-size: 13px; font-weight: 700; text-decoration: none; white-space: nowrap;">Plans &amp; limits</a>
             </div>
 
             <!-- 4 Premium KPI Metric Cards (No side borders, 44px rounded icon chips) -->
@@ -317,7 +318,7 @@ declare(strict_types=1);
                                                 <button type="button" 
                                                         @click="copyReference(tx.ref)"
                                                         class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold text-slate-600 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50 border border-slate-200 hover:border-indigo-200 rounded-lg transition-all cursor-pointer"
-                                                        title="Copy transaction reference">
+                                                        aria-label="Copy transaction reference">
                                                     <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                                                     </svg>
@@ -337,7 +338,7 @@ declare(strict_types=1);
                                             <button type="button" 
                                                     @click="inspectWebhook(tx)"
                                                     class="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-indigo-600 hover:text-indigo-800 bg-indigo-50/70 hover:bg-indigo-100/70 border border-indigo-100 rounded-lg transition-colors cursor-pointer"
-                                                    title="Inspect HMAC webhook payload">
+                                                    aria-label="Inspect HMAC webhook payload">
                                                 <svg class="w-3.5 h-3.5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>

@@ -33,6 +33,7 @@ declare(strict_types=1);
                     <h1 class="admin-page-title">E-Learning &amp; Course Moderation</h1>
                     <p class="admin-page-subtitle">Review mentor curriculum submissions, video modules, and oversee student completions across 4 primary tracks</p>
                 </div>
+                <a href="<?= url('/admin/elearning/partners') ?>" style="display: inline-flex; align-items: center; height: 38px; padding: 0 16px; border-radius: 10px; background: #4F48E6; color: #FFFFFF; font-size: 13px; font-weight: 700; text-decoration: none; white-space: nowrap;">Training partners</a>
             </div>
 
             <!-- 4 Premium KPI Metric Cards (No side borders, 44px rounded icon chips) -->
@@ -205,6 +206,158 @@ declare(strict_types=1);
                     </div>
                 </div>
             </div>
+
+            <!-- Learning Partners: what students see on /elearning (logo, services, visibility) + referral counts -->
+            <style>
+            .alp-card { background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 16px; margin-bottom: 24px; overflow: hidden; }
+            .alp-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; padding: 18px 20px; border-bottom: 1px solid #F1F5F9; flex-wrap: wrap; }
+            .alp-head h2 { font-size: 16px; font-weight: 800; color: #0F172A; margin: 0; }
+            .alp-head p { font-size: 12.5px; color: #64748B; margin: 4px 0 0; }
+            .alp-link { font-size: 12.5px; font-weight: 700; color: #4F48E6; text-decoration: none; }
+            .alp-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; padding: 18px 20px 20px; }
+            .alp-item { border: 1px solid #E2E8F0; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+            .alp-item.is-hidden { background: #F8FAFC; }
+            .alp-item-top { display: flex; align-items: center; gap: 10px; min-width: 0; }
+            .alp-logo { width: 42px; height: 42px; border-radius: 12px; border: 1px solid #E2E8F0; background: #FFFFFF; padding: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; color: #FFFFFF; font-weight: 800; font-size: 13px; }
+            .alp-logo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+            .alp-name { min-width: 0; flex: 1; }
+            .alp-name strong { display: block; font-size: 14px; color: #0F172A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .alp-name span { display: block; font-size: 12px; color: #64748B; }
+            .alp-pill { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 9px; border-radius: 9999px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+            .alp-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+            .alp-pill.is-on { background: #ECFDF5; color: #047857; }
+            .alp-pill.is-off { background: #F1F5F9; color: #64748B; }
+            .alp-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+            .alp-stat { background: #F8FAFC; border-radius: 10px; padding: 8px 10px; }
+            .alp-stat strong { display: block; font-size: 15px; font-weight: 800; color: #0F172A; }
+            .alp-stat span { display: block; font-size: 11px; color: #64748B; }
+            .alp-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 34px; padding: 0 12px; border-radius: 9px; border: 1px solid #E2E8F0; background: #FFFFFF; font-size: 12.5px; font-weight: 700; color: #334155; cursor: pointer; }
+            .alp-btn:hover:not(:disabled) { background: #F8FAFC; color: #0F172A; }
+            .alp-btn.is-primary { background: #4F48E6; border-color: #4F48E6; color: #FFFFFF; }
+            .alp-btn.is-primary:hover:not(:disabled) { background: #4338CA; color: #FFFFFF; }
+            .alp-btn:disabled { opacity: .55; cursor: not-allowed; }
+            .alp-modal { position: fixed; inset: 0; z-index: 3000; background: rgba(0, 6, 35, .55); display: flex; align-items: center; justify-content: center; padding: 20px; }
+            .alp-modal-card { width: 100%; max-width: 620px; max-height: calc(100vh - 40px); overflow-y: auto; background: #FFFFFF; border-radius: 18px; padding: 24px; box-shadow: 0 24px 60px rgba(0, 0, 0, .25); }
+            .alp-modal-card h3 { font-size: 17px; font-weight: 800; color: #000623; margin: 0 0 4px; }
+            .alp-modal-card .alp-sub { font-size: 13px; color: #64748B; margin: 0 0 18px; }
+            .alp-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+            .alp-field label, .alp-field .alp-label { font-size: 12px; font-weight: 700; color: #334155; }
+            .alp-field input[type=text], .alp-field input[type=url], .alp-field textarea { border: 1px solid #E2E8F0; border-radius: 10px; padding: 9px 12px; font-size: 13px; color: #0F172A; background: #FFFFFF; width: 100%; font-family: inherit; }
+            .alp-field textarea { min-height: 76px; resize: vertical; }
+            .alp-field input:focus, .alp-field textarea:focus { outline: none; border-color: #4F48E6; box-shadow: 0 0 0 3px rgba(79, 72, 230, .1); }
+            .alp-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+            .alp-logo-row { display: flex; align-items: center; gap: 12px; }
+            .alp-logo-row .alp-logo { width: 56px; height: 56px; }
+            .alp-hint { font-size: 11.5px; color: #94A3B8; }
+            .alp-services { display: flex; flex-direction: column; gap: 8px; }
+            .alp-service { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) 34px; gap: 8px; }
+            .alp-icon-btn { width: 34px; height: 38px; border: 1px solid #E2E8F0; border-radius: 9px; background: #FFFFFF; color: #64748B; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+            .alp-icon-btn:hover { background: #F8FAFC; color: #0F172A; }
+            .alp-switch { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 1px solid #E2E8F0; border-radius: 12px; margin-bottom: 16px; }
+            .alp-switch strong { display: block; font-size: 13px; color: #0F172A; }
+            .alp-switch span { display: block; font-size: 12px; color: #64748B; }
+            .alp-toggle { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+            .alp-toggle input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; z-index: 1; }
+            .alp-toggle i { position: absolute; inset: 0; border-radius: 9999px; background: #CBD5E1; transition: background .2s ease; }
+            .alp-toggle i::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #FFFFFF; transition: transform .2s ease; }
+            .alp-toggle input:checked + i { background: #4F48E6; }
+            .alp-toggle input:checked + i::after { transform: translateX(18px); }
+            .alp-error { margin: 0 0 12px; padding: 10px 12px; border-radius: 10px; background: #FEF2F2; color: #B91C1C; font-size: 12.5px; font-weight: 600; }
+            .alp-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; }
+            @media (max-width: 1100px) { .alp-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+            @media (max-width: 680px) { .alp-grid, .alp-row2 { grid-template-columns: minmax(0, 1fr); } .alp-service { grid-template-columns: minmax(0, 1fr) 34px; } .alp-service input:nth-child(2) { grid-column: 1 / 2; } }
+            </style>
+            <section class="alp-card" x-data="adminLearningPartners(<?= htmlspecialchars(json_encode($learningPartners ?? [], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') ?>)">
+                <div class="alp-head">
+                    <div>
+                        <h2>Learning Partners</h2>
+                        <p>Platforms students are sent to from E-Learning. Referrals count "Visit Platform &amp; Enroll" clicks.</p>
+                    </div>
+                    <a class="alp-link" href="<?= url('/elearning') ?>" target="_blank" rel="noopener">View public page</a>
+                </div>
+                <div class="alp-grid">
+                    <template x-for="p in partners" :key="p.id">
+                        <div class="alp-item" :class="{ 'is-hidden': !p.is_active }">
+                            <div class="alp-item-top">
+                                <span class="alp-logo" :style="p.logo_url ? '' : 'background:' + p.brand_color">
+                                    <template x-if="p.logo_url"><img :src="p.logo_url" :alt="p.name + ' logo'" width="32" height="32"></template>
+                                    <template x-if="!p.logo_url"><span x-text="p.initials"></span></template>
+                                </span>
+                                <div class="alp-name">
+                                    <strong x-text="p.name"></strong>
+                                    <span x-text="p.tier"></span>
+                                </div>
+                                <span class="alp-pill" :class="p.is_active ? 'is-on' : 'is-off'" x-text="p.is_active ? 'Visible' : 'Hidden'"></span>
+                            </div>
+                            <div class="alp-stats">
+                                <div class="alp-stat"><strong x-text="p.programs"></strong><span>Programs</span></div>
+                                <div class="alp-stat"><strong x-text="p.referrals_30d"></strong><span>Referrals 30d</span></div>
+                                <div class="alp-stat"><strong x-text="p.referrals"></strong><span>All referrals</span></div>
+                            </div>
+                            <button type="button" class="alp-btn" @click="edit(p)" :aria-label="'Edit ' + p.name">Edit partner</button>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Edit partner -->
+                <div class="alp-modal" x-show="form" x-cloak style="display: none;" @keydown.escape.window="form = null">
+                    <form class="alp-modal-card" role="dialog" aria-modal="true" @click.outside="form = null" @submit.prevent="save()" x-show="form">
+                        <template x-if="form">
+                            <div>
+                                <h3 x-text="'Edit ' + form.name"></h3>
+                                <p class="alp-sub">Shown on the E-Learning page and in each program's details.</p>
+                                <p class="alp-error" x-show="error" x-text="error"></p>
+                                <div class="alp-field">
+                                    <span class="alp-label">Logo</span>
+                                    <div class="alp-logo-row">
+                                        <span class="alp-logo" :style="(logoPreview || form.logo_url) ? '' : 'background:' + form.brand_color">
+                                            <template x-if="logoPreview || form.logo_url"><img :src="logoPreview || form.logo_url" alt="Logo preview" width="44" height="44"></template>
+                                            <template x-if="!(logoPreview || form.logo_url)"><span x-text="form.initials"></span></template>
+                                        </span>
+                                        <div>
+                                            <button type="button" class="alp-btn" @click="$refs.logoInput.click()">Upload new logo</button>
+                                            <div class="alp-hint" style="margin-top: 4px;">PNG, JPG or WebP, square works best, max 5MB.</div>
+                                        </div>
+                                        <input type="file" x-ref="logoInput" accept=".png,.jpg,.jpeg,.webp" hidden @change="pickLogo($event)">
+                                    </div>
+                                </div>
+                                <div class="alp-row2">
+                                    <div class="alp-field"><label for="alp-name">Name</label><input id="alp-name" type="text" x-model="form.name" required maxlength="120"></div>
+                                    <div class="alp-field"><label for="alp-tier">Badge</label><input id="alp-tier" type="text" x-model="form.tier" maxlength="60"></div>
+                                </div>
+                                <div class="alp-row2">
+                                    <div class="alp-field"><label for="alp-web">Website (https)</label><input id="alp-web" type="url" x-model="form.website" required pattern="https://.*"></div>
+                                    <div class="alp-field"><label for="alp-hubs">Hubs / locations</label><input id="alp-hubs" type="text" x-model="form.hubs" maxlength="255"></div>
+                                </div>
+                                <div class="alp-field"><label for="alp-about">About the platform</label><textarea id="alp-about" x-model="form.about" maxlength="1200"></textarea></div>
+                                <div class="alp-field">
+                                    <span class="alp-label">Services offered</span>
+                                    <div class="alp-services">
+                                        <template x-for="(s, i) in form.services" :key="i">
+                                            <div class="alp-service">
+                                                <input type="text" x-model="s.name" placeholder="Service" maxlength="80" :aria-label="'Service ' + (i + 1)">
+                                                <input type="text" x-model="s.desc" placeholder="Short description" maxlength="200" :aria-label="'Description ' + (i + 1)">
+                                                <button type="button" class="alp-icon-btn" @click="form.services.splice(i, 1)" :aria-label="'Remove service ' + (i + 1)">
+                                                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+                                                </button>
+                                            </div>
+                                        </template>
+                                        <button type="button" class="alp-btn" style="align-self: flex-start;" @click="form.services.push({ name: '', desc: '' })" :disabled="form.services.length >= 12">Add service</button>
+                                    </div>
+                                </div>
+                                <div class="alp-switch">
+                                    <div><strong>Show on E-Learning</strong><span>Hidden partners and their programs disappear from the public page.</span></div>
+                                    <label class="alp-toggle"><input type="checkbox" x-model="form.is_active" aria-label="Show on E-Learning"><i></i></label>
+                                </div>
+                                <div class="alp-actions">
+                                    <button type="button" class="alp-btn" @click="form = null">Cancel</button>
+                                    <button type="submit" class="alp-btn is-primary" :disabled="saving" x-text="saving ? 'Saving...' : 'Save partner'"></button>
+                                </div>
+                            </div>
+                        </template>
+                    </form>
+                </div>
+            </section>
 
             <!-- Course Moderation Queue Section -->
             <div class="bg-white rounded-2xl border border-slate-200 admin-shelf-card">
@@ -408,6 +561,59 @@ declare(strict_types=1);
 </div>
 
 <script>
+// Learning partners card: edit details, services, visibility and logo (POST /admin/elearning/partners/{id}).
+function adminLearningPartners(partners) {
+    return {
+        partners,
+        form: null,
+        logoFile: null,
+        logoPreview: '',
+        saving: false,
+        error: '',
+        edit(p) {
+            this.form = JSON.parse(JSON.stringify(p));
+            if (!Array.isArray(this.form.services)) this.form.services = [];
+            this.logoFile = null;
+            this.logoPreview = '';
+            this.error = '';
+        },
+        pickLogo(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (!/\.(png|jpe?g|webp)$/i.test(file.name) || file.size > 5 * 1024 * 1024) {
+                this.error = 'Choose a PNG, JPG or WebP image under 5MB.';
+                return;
+            }
+            this.error = '';
+            this.logoFile = file;
+            this.logoPreview = URL.createObjectURL(file);
+        },
+        async save() {
+            if (!this.form || this.saving) return;
+            this.saving = true;
+            this.error = '';
+            const fd = new FormData();
+            ['name', 'tier', 'website', 'brand_color', 'about', 'hubs'].forEach((k) => fd.append(k, this.form[k] || ''));
+            fd.append('services_json', JSON.stringify(this.form.services.filter((s) => (s.name || '').trim())));
+            if (this.form.is_active) fd.append('is_active', '1');
+            if (this.logoFile) fd.append('logo', this.logoFile);
+            try {
+                const res = await fetch(<?= json_encode(url('/admin/elearning/partners/')) ?> + this.form.id, { method: 'POST', headers: { 'Accept': 'application/json' }, body: fd });
+                const json = await res.json().catch(() => ({}));
+                if (!res.ok || !json.success) throw new Error(json.error || 'The partner could not be saved.');
+                const i = this.partners.findIndex((p) => p.id === this.form.id);
+                if (i >= 0) this.partners[i] = Object.assign({}, this.partners[i], json.partner);
+                const name = this.form.name;
+                this.form = null;
+                if (typeof window.adminToast === 'function') window.adminToast('Partner saved', name + ' is updated on the E-Learning page.', null, 'success');
+            } catch (err) {
+                this.error = err.message;
+            } finally {
+                this.saving = false;
+            }
+        },
+    };
+}
 function adminElearning() {
     return {
         activeTab: 'pending',

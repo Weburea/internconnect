@@ -22,6 +22,9 @@ $adminPages = [
     ['title' => 'E-Learning',       'group' => 'Platform',       'icon' => 'book',     'keys' => ['elearning']],
     ['title' => 'Video Interviews', 'group' => 'Platform',       'icon' => 'calendar', 'keys' => ['interviews']],
     ['title' => 'Subscriptions',    'group' => 'Platform',       'icon' => 'card',     'keys' => ['subscriptions']],
+    ['title' => 'Testimonials',     'group' => 'Platform',       'icon' => 'chat',     'keys' => ['testimonials']],
+    ['title' => 'Communications',   'group' => 'Platform',       'icon' => 'chat',     'keys' => ['communications']],
+    ['title' => 'API Reference',    'group' => 'Administration', 'icon' => 'cog',      'keys' => ['api_docs']],
     ['title' => 'Settings & Team',  'group' => 'Administration', 'icon' => 'cog',      'keys' => ['settings', 'team']],
 ];
 $pageHeading = ['workspace' => 'Admin', 'group' => 'Mission Control', 'title' => 'Overview', 'icon' => 'dashboard'];

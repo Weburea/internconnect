@@ -1597,6 +1597,11 @@ class EmployerController extends Controller
         ];
 
         $candidates = $this->getMockCandidates();
+        // "Certified by" training partners for each applicant (docs/57-training-partners.md).
+        foreach ($candidates as &$cand) {
+            $cand['certified_by'] = array_values(array_unique(array_column(\App\Services\PartnerService::certifications((int)($cand['id'] ?? 0)), 'partner_name')));
+        }
+        unset($cand);
 
         $this->renderView('employer/candidates/index', [
             'title'      => 'Applications — InternConnect',
@@ -1637,6 +1642,9 @@ class EmployerController extends Controller
             'avatar'       => $_SESSION['employer_avatar'] ?? null,
         ];
 
+        // Real submission + parsed CV replace the sample data when the candidate has applied.
+        $candidate = $this->withSubmittedApplication($candidate);
+
         $this->renderView('employer/candidates/show', [
             'title'      => $candidate['name'] . ' — Application Review | InternConnect',
             'employer'   => $employer,
@@ -1645,6 +1653,185 @@ class EmployerController extends Controller
         ], 'dashboard');
     }
 
+    /**
+     * Overlay the candidate's latest submitted application and parsed CV (docs/49-cv-autofill-and-applications.md).
+     * Work experience, education and skills come from the CV; the profile summary is written by Jenny AI;
+     * cover letter, answers, salary and documents come from the submission.
+     */
+    private function withSubmittedApplication(array $candidate): array
+    {
+        $id = (int)$candidate['id'];
+        $app = \App\Services\ApplicationService::latestForCandidate($id);
+        $cvRow = \App\Services\CvService::forCandidate($id);
+        $cv = $cvRow['parsed'] ?? null;
+        $candidate['has_submission'] = (bool)$app;
+        $candidate['summary_source'] = 'sample';
+        if (!$app && !$cv) {
+            return $candidate;
+        }
+        $httpUrl = static fn (string $link): string => preg_match('#^https?://#i', $link) ? $link : 'https://' . $link;
+
+        if ($cv) {
+            if (!empty($cv['experience'])) {
+                $candidate['experience'] = array_map(static function (array $e): array {
+                    $start = (string)($e['start'] ?? '');
+                    $end = (string)($e['end'] ?? '') !== '' ? (string)$e['end'] : (!empty($e['current']) ? 'Present' : '');
+                    return [
+                        'title'      => ($e['title'] ?? '') !== '' ? $e['title'] : 'Role',
+                        'period'     => strtoupper(trim($start . ($start !== '' && $end !== '' ? ' - ' : '') . $end)),
+                        'company'    => implode(' • ', array_filter([(string)($e['company'] ?? ''), (string)($e['location'] ?? '')])),
+                        'desc'       => '',
+                        'highlights' => $e['highlights'] ?? [],
+                    ];
+                }, $cv['experience']);
+                $candidate['experience_source'] = 'cv';
+            }
+            if (!empty($cv['education'][0])) {
+                $edu = $cv['education'][0];
+                $candidate['education'] = [
+                    'degree'     => trim(($edu['degree'] ?? '') . (($edu['field'] ?? '') !== '' ? ' in ' . $edu['field'] : '')) ?: 'Degree',
+                    'school'     => $edu['school'],
+                    'grade'      => '',
+                    'gpa'        => '',
+                    'graduation' => ($edu['end'] ?? '') !== '' ? 'Graduation: ' . $edu['end'] : '',
+                ];
+            }
+            if (!empty($cv['skills'])) {
+                $candidate['skills'] = array_slice($cv['skills'], 0, 14);
+            }
+            if (!empty($cv['summary'])) {
+                $candidate['summary'] = $cv['summary'];
+                $candidate['summary_source'] = ($cv['source'] ?? '') === 'gemini' ? 'ai' : 'cv';
+            }
+            foreach (['linkedin' => 'linkedin_url', 'github' => 'github_url', 'portfolio' => 'portfolio_url'] as $k => $docKey) {
+                $link = trim((string)($cv['links'][$k] ?? ''));
+                if ($link !== '') {
+                    $candidate['documents'][$docKey] = $httpUrl($link);
+                }
+            }
+            if (!empty($cv['headline']) && !$app) {
+                $candidate['student_title'] = $cv['headline'];
+            }
+        }
+
+        if ($app) {
+            $base = '/employer/candidates/' . $id . '/files/';
+            $candidate['name'] = $app['full_name'] !== '' ? $app['full_name'] : $candidate['name'];
+            $candidate['contact'] = ['email' => $app['email'], 'phone' => $app['phone']];
+            $candidate['questions'] = array_map(static fn ($q) => ['q' => (string)($q['question'] ?? ''), 'a' => (string)($q['answer'] ?? '')], $app['answers'] ?: []);
+            $candidate['relevant_experience_answers'] = array_values(array_filter([
+                ['field' => 'Job Title', 'value' => (string)$app['job_title'], 'type' => 'Text Input'],
+                ['field' => 'Company', 'value' => (string)$app['job_company'], 'type' => 'Text Input'],
+                ['field' => 'Salary Expectation ($/month)', 'value' => (string)$app['salary_expectation'] !== '' ? '$' . $app['salary_expectation'] . ' / month' : '', 'type' => 'Currency / Number'],
+            ], static fn ($r) => $r['value'] !== ''));
+            $candidate['cover_letter'] = (string)$app['cover_letter'];
+            if (!empty($app['ai_summary'])) {
+                $candidate['summary'] = $app['ai_summary'];
+                $candidate['summary_source'] = $app['ai_source'] === 'gemini' ? 'ai' : 'cv';
+            }
+            $candidate['pipeline_stage'] = \App\Services\ApplicationService::stageOf($app);
+            $candidate['status_type'] = match ($candidate['pipeline_stage']) {
+                'Shortlisted' => 'shortlisted',
+                'Rejected'    => 'rejected',
+                default       => 'applied',
+            };
+            $candidate['application'] = [
+                'id'          => (int)$app['id'],
+                'applied_for' => $app['internship_title'] . ' · ' . $app['company_name'],
+                'submitted'   => date('M j, Y · g:i A', strtotime((string)$app['submitted_at'])),
+                'status'      => $app['status'],
+            ];
+            $candidate['documents'] = array_merge($candidate['documents'] ?? [], [
+                'resume_name'        => $app['resume_file']['name'] ?? ($cvRow['file']['name'] ?? 'Resume'),
+                'resume_url'         => !empty($app['resume_file']) ? url($base . 'resume') : '',
+                'cover_letter_name'  => $app['cover_letter_file']['name'] ?? '',
+                'cover_letter_url'   => !empty($app['cover_letter_file']) ? url($base . 'cover_letter') : '',
+                'portfolio_name'     => $app['portfolio_file']['name'] ?? '',
+                'portfolio_file_url' => !empty($app['portfolio_file']) ? url($base . 'portfolio') : '',
+                // File types drive the in-page preview (PDF, Word, image).
+                'resume_ext'         => strtolower((string)($app['resume_file']['ext'] ?? ($cvRow['file']['ext'] ?? ''))),
+                'cover_letter_ext'   => strtolower((string)($app['cover_letter_file']['ext'] ?? '')),
+                'portfolio_ext'      => strtolower((string)($app['portfolio_file']['ext'] ?? '')),
+            ]);
+            foreach (($app['links'] ?? []) as $k => $link) {
+                if ($link !== '' && in_array($k, ['portfolio', 'figma'], true)) {
+                    $candidate['documents'][$k . '_url'] = $httpUrl((string)$link);
+                }
+            }
+            $candidate['applied_time'] = 'Applied ' . date('M j', strtotime((string)$app['submitted_at']));
+        } elseif ($cvRow && !empty($cvRow['file'])) {
+            $candidate['documents']['resume_name'] = $cvRow['file']['name'] ?? 'Resume';
+            $candidate['documents']['resume_url'] = url('/employer/candidates/' . $id . '/files/resume');
+            $candidate['documents']['resume_ext'] = strtolower((string)($cvRow['file']['ext'] ?? ''));
+        }
+        return $candidate;
+    }
+
+    /**
+     * Move the candidate's latest application to a pipeline stage and tell the candidate.
+     * Route: POST /employer/candidates/{id}/stage  {stage: Under Review|Shortlisted|Interviewing|Offer Extended|Rejected}
+     */
+    public function candidateStage(array $params = []): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        header('Content-Type: application/json');
+        $id = (int)($params['id'] ?? 0);
+        $input = json_decode((string)file_get_contents('php://input'), true) ?: $_POST;
+        $stage = (string)($input['stage'] ?? '');
+        $app = \App\Services\ApplicationService::latestForCandidate($id);
+        if (!$app) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'error' => 'This candidate has no submitted application yet.']);
+            exit;
+        }
+        if (!\App\Services\ApplicationService::setStage((int)$app['id'], $stage)) {
+            http_response_code(422);
+            echo json_encode(['success' => false, 'error' => 'Choose a valid pipeline stage.']);
+            exit;
+        }
+        $messages = [
+            'Under Review'   => 'Your application is being reviewed.',
+            'Shortlisted'    => 'Good news: you have been shortlisted.',
+            'Interviewing'   => 'You have moved to the interview stage.',
+            'Offer Extended' => 'Congratulations, an offer is on its way.',
+            'Rejected'       => 'The team has decided not to move forward this time.',
+        ];
+        try {
+            \App\Services\CommunicationService::createNotification(
+                'candidate', $id,
+                $app['company_name'] . ': ' . $stage,
+                $messages[$stage] . ' (' . $app['internship_title'] . ')',
+                'application',
+                url('/candidate/applications')
+            );
+        } catch (\Throwable $e) {
+            error_log('Stage notification: ' . $e->getMessage());
+        }
+        echo json_encode(['success' => true, 'stage' => $stage]);
+        exit;
+    }
+
+    /**
+     * Stream a candidate's application document (private storage).
+     * Route: GET /employer/candidates/{id}/files/{kind}  kind = resume | cover_letter | portfolio
+     */
+    public function candidateFile(array $params = []): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $id = (int)($params['id'] ?? 0);
+        $app = \App\Services\ApplicationService::latestForCandidate($id);
+        $meta = match ((string)($params['kind'] ?? '')) {
+            'resume'       => $app['resume_file'] ?? (\App\Services\CvService::forCandidate($id)['file'] ?? null),
+            'cover_letter' => $app['cover_letter_file'] ?? null,
+            'portfolio'    => $app['portfolio_file'] ?? null,
+            default        => null,
+        };
+        \App\Services\UploadStorage::stream($meta, isset($_GET['download']));
+    }
     /**
      * Renders the Interview Scheduler view
      * Route: /employer/interviews/schedule/{id} or /employer/interviews/schedule
@@ -1733,6 +1920,11 @@ class EmployerController extends Controller
 
         $interviewId = (int)($params['id'] ?? (isset($_GET['id']) ? (int)$_GET['id'] : 1));
         $room = VideoInterviewService::getRoomDetails($interviewId, 'employer');
+        // Someone else's interview renders as "not found" (no details leak).
+        if (!VideoInterviewService::accessibleBy($interviewId, 'employer')) {
+            http_response_code(404);
+            $room = ['exists' => false] + $room;
+        }
 
         $this->renderView('employer/interviews/room', [
             'title'     => 'In-Platform Video Interview — ' . $room['title'] . ' | InternConnect',
@@ -1751,6 +1943,12 @@ class EmployerController extends Controller
             session_start();
         }
         $interviewId = (int)($params['id'] ?? 0);
+        if (!VideoInterviewService::accessibleBy($interviewId, 'employer')) {
+            http_response_code(403);
+            header('Content-Type: application/json');
+            echo json_encode(['ok' => false, 'code' => 'forbidden', 'error' => 'You do not have access to this interview.']);
+            exit;
+        }
         $room = VideoInterviewService::getRoomDetails($interviewId, 'employer');
         $info = VideoInterviewService::joinInfo($interviewId, 'employer', $room['interviewer_name'] . ' (' . $room['company_name'] . ')');
 
@@ -1766,7 +1964,9 @@ class EmployerController extends Controller
      */
     public function leftInterviewRoom(array $params = []): void
     {
-        VideoInterviewService::logEvent((int)($params['id'] ?? 0), 'employer', 'left');
+        if (VideoInterviewService::accessibleBy((int)($params['id'] ?? 0), 'employer')) {
+            VideoInterviewService::logEvent((int)($params['id'] ?? 0), 'employer', 'left');
+        }
         http_response_code(204);
         exit;
     }
@@ -1780,7 +1980,14 @@ class EmployerController extends Controller
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        $ok = VideoInterviewService::endRoom((int)($params['id'] ?? 0), 'employer');
+        $interviewId = (int)($params['id'] ?? 0);
+        if (!VideoInterviewService::accessibleBy($interviewId, 'employer')) {
+            http_response_code(403);
+            header('Content-Type: application/json');
+            echo json_encode(['ok' => false, 'code' => 'forbidden', 'error' => 'You do not have access to this interview.']);
+            exit;
+        }
+        $ok = VideoInterviewService::endRoom($interviewId, 'employer');
         header('Content-Type: application/json');
         echo json_encode(['success' => $ok]);
         exit;
@@ -2819,26 +3026,24 @@ class EmployerController extends Controller
      */
     public function exportBilling(): void
     {
-        $transactions = [
-            [
-                'reference' => 'TRX_NX_99421',
-                'plan'      => 'Pro Recruiter Monthly',
-                'cycle'     => 'Monthly',
-                'amount'    => 24900,
-                'method'    => 'Paystack',
-                'status'    => 'Successful',
-                'date'      => date('Y-m-d H:i:s', strtotime('-15 days')),
-            ],
-            [
-                'reference' => 'TRX_NX_88301',
-                'plan'      => 'Pro Recruiter Monthly',
-                'cycle'     => 'Monthly',
-                'amount'    => 24900,
-                'method'    => 'Paystack',
-                'status'    => 'Successful',
-                'date'      => date('Y-m-d H:i:s', strtotime('-45 days')),
-            ]
-        ];
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        // Real Paystack ledger for this employer (BillingService), newest first.
+        $account = \App\Services\BillingService::account('employer');
+        $rows = \App\Services\BillingService::transactions($account['type'], $account['id'], 100)['rows'];
+        $transactions = array_map(static function (array $t): array {
+            $plan = \App\Services\PaystackService::getPlanDetails((string)$t['plan']);
+            return [
+                'reference' => $t['reference'],
+                'plan'      => $plan['name'] ?? ucfirst((string)$t['plan']),
+                'cycle'     => $t['cycle'] === 'annual' ? 'Annual' : 'Monthly',
+                'amount'    => (int)$t['amount_kobo'] / 100,
+                'method'    => 'Paystack' . ($t['card_last4'] ? ' (' . ($t['card_brand'] ?: 'Card') . ' ' . $t['card_last4'] . ')' : ''),
+                'status'    => \App\Services\BillingService::statusMeta((string)$t['status'])[0],
+                'date'      => $t['paid_at'] ?: $t['created_at'],
+            ];
+        }, $rows);
         ExportService::exportBillingLedger($transactions);
     }
 }

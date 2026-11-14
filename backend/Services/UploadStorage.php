@@ -38,6 +38,8 @@ class UploadStorage
         'logo'         => ['ext' => ['png', 'jpg', 'jpeg', 'webp'], 'max' => 5 * self::MB, 'label' => 'Logo image', 'types' => 'a PNG, JPG or WebP image'],
         // Shared during video interviews: documents and images only (no video).
         'interview_file' => ['ext' => ['pdf', 'docx', 'doc', 'txt', 'png', 'jpg', 'jpeg', 'webp'], 'max' => 10 * self::MB, 'label' => 'File', 'types' => 'a PDF, Word, text or image file'],
+        // Attached to a Jenny AI chat message (read by Gemini; private, never public).
+        'jenny'          => ['ext' => ['pdf', 'docx', 'txt', 'png', 'jpg', 'jpeg', 'webp'], 'max' => 8 * self::MB, 'label' => 'Attachment', 'types' => 'a PDF, Word, text or image file'],
     ];
 
     public static function directory(string $kind): string
@@ -118,6 +120,25 @@ class UploadStorage
         ]];
     }
 
+    /**
+     * Copy a stored file under a new random name (e.g. a profile resume attached to an application,
+     * so replacing the profile resume later never changes what the employer received).
+     */
+    public static function duplicate(?array $meta): ?array
+    {
+        $path = self::path($meta);
+        if ($path === null) {
+            return null;
+        }
+        $kind = (string)$meta['kind'];
+        $ext = strtolower((string)pathinfo($path, PATHINFO_EXTENSION));
+        $stored = bin2hex(random_bytes(16)) . '.' . $ext;
+        if (!@copy($path, self::directory($kind) . '/' . $stored)) {
+            return null;
+        }
+        return ['file' => $stored, 'uploaded_at' => time()] + $meta;
+    }
+
     /** Absolute path for stored metadata, or null if missing/tampered. */
     public static function path(?array $meta): ?string
     {
@@ -171,7 +192,7 @@ class UploadStorage
         return [
             'name'        => $meta['name'],
             'ext'         => $meta['ext'],
-            'size_label'  => number_format(((int)$meta['size']) / self::MB, 1) . ' MB',
+            'size_label'  => (int)$meta['size'] < self::MB ? max(1, (int)round(((int)$meta['size']) / 1024)) . ' KB' : number_format(((int)$meta['size']) / self::MB, 1) . ' MB',
             'uploaded_on' => date('M j, Y', (int)$meta['uploaded_at']),
             'url'         => $viewUrl . (str_contains($viewUrl, '?') ? '&' : '?') . 'v=' . (int)$meta['uploaded_at'],
         ];

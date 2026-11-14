@@ -45,6 +45,11 @@ class InternshipController extends Controller
 
     public function show(array $params = []): void
     {
+        // Premium listings (PlanService): only Premium members open them; others see the upgrade page.
+        if (\App\Services\PlanService::listingLocked((string)($params['slug'] ?? ''))) {
+            header('Location: ' . url('/pricing?plan=premium&ref=premium-listing'));
+            exit;
+        }
         // Mock internship dataset — no database queries
         $internships = [
             'senior-product-design-intern' => [
@@ -267,10 +272,18 @@ class InternshipController extends Controller
             $internship['screening_questions'] = $defaultScreeningQuestions;
         }
 
+        // Contact details and latest job come from the account and the candidate's parsed CV.
+        $savedCv = \App\Services\CvService::forCandidate(\App\Services\CvService::currentCandidateId());
         $this->renderView('candidate/application', [
             'title'      => 'Apply to ' . $internship['company'] . ' — InternConnect',
             'internship' => $internship,
             'slug'       => $slug,
+            'prefill'    => \App\Services\CvService::prefill(),
+            'savedCv'    => $savedCv && !empty($savedCv['file']) ? ['name' => $savedCv['file']['name'] ?? 'CV', 'updated_at' => $savedCv['updated_at']] : null,
+            // Resume already on the profile (signup / profile page): shown in the Resume step, can be replaced.
+            'savedResume' => \App\Services\UploadStorage::describe($_SESSION['profile_resume'] ?? null, url('/candidate/profile/resume')),
+            // Latest letter from the AI Cover Letter tool on the dashboard.
+            'savedLetter' => $_SESSION['ai_last_cover_letter'] ?? null,
         ]);
     }
 }

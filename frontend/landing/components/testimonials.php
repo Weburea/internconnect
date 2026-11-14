@@ -12,32 +12,31 @@ declare(strict_types=1);
  * - Bottom CTA: Standardized primary pill CTA button matching .process-btn-cta.
  */
 
-$videoClips = [
-    [
-        'url' => 'https://res.cloudinary.com/weburea/video/upload/w_400,q_auto:eco,ac_none/v1790815553/test_4_l0uhcx.mp4',
-        'name' => 'Anastasia K.',
-        'role' => 'UI/UX Design Intern',
-        'avatar' => 'https://res.cloudinary.com/weburea/image/upload/v1790816969/test_4_adtliv.png',
-    ],
-    [
-        'url' => 'https://res.cloudinary.com/weburea/video/upload/w_400,q_auto:eco,ac_none/v1790815546/test_2_uypp2k.mp4',
-        'name' => 'Chioma B.',
-        'role' => 'Talent Lead at TechStack',
-        'avatar' => 'https://res.cloudinary.com/weburea/image/upload/v1790816968/test_2_hi8rmz.png',
-    ],
-    [
-        'url' => 'https://res.cloudinary.com/weburea/video/upload/w_400,q_auto:eco,ac_none/v1790819428/test_6_erfvcc.mp4',
-        'name' => 'Kendra L.',
-        'role' => 'Head of Talent at Apex Energy',
-        'avatar' => 'https://res.cloudinary.com/weburea/image/upload/v1790819376/test_6_iwxj2z.png',
-    ],
-    [
-        'url' => 'https://res.cloudinary.com/weburea/video/upload/w_400,q_auto:eco,ac_none/v1790815544/test_3_radsqu.mp4',
-        'name' => 'Sipho D.',
-        'role' => 'Software Engineering Intern',
-        'avatar' => 'https://res.cloudinary.com/weburea/image/upload/v1790816968/test_3_kakx5q.png',
-    ],
-];
+// Managed in Admin > Testimonials (App\Services\TestimonialService, docs/61-testimonials.md).
+$tmQuotes = \App\Services\TestimonialService::list('home', 'quote');
+$tmHalf = (int)ceil(count($tmQuotes) / 2);
+$tmColumns = [array_slice($tmQuotes, 0, $tmHalf), array_slice($tmQuotes, $tmHalf)];
+$videoClips = array_map(static fn ($v) => [
+    'url'    => (string)$v['video_url'],
+    'name'   => (string)$v['name'],
+    'role'   => (string)($v['role'] ?? ''),
+    'avatar' => (string)($v['avatar_url'] ?? ''),
+], \App\Services\TestimonialService::list('home', 'video'));
+$tmCard = static function (array $t, bool $copy = false): string {
+    $e = static fn ($v) => htmlspecialchars((string)$v, ENT_QUOTES, 'UTF-8');
+    $label = \App\Services\TestimonialService::PLATFORMS[$t['platform']] ?? 'InternConnect';
+    $badge = '<div class="testimonial-platform-badge badge-' . $e($t['platform']) . '"' . ($copy ? '' : ' aria-label="' . $e($label) . '"') . '>' . \App\Services\TestimonialService::badge((string)$t['platform'], $t['platform'] === 'x' ? 14 : 16) . '</div>';
+    if (!empty($t['source_url']) && !$copy) {
+        $badge = '<a href="' . $e($t['source_url']) . '" target="_blank" rel="noopener nofollow" style="text-decoration: none;">' . $badge . '</a>';
+    }
+    $avatar = $t['avatar_url']
+        ? '<img src="' . $e($t['avatar_url']) . '" alt="' . ($copy ? '' : $e($t['name'])) . '" class="testimonial-avatar-img" loading="lazy">'
+        : '<span class="testimonial-avatar-img" style="display:flex;align-items:center;justify-content:center;background:#EEF0FF;color:#4F48E6;font-weight:800;">' . $e(mb_substr((string)$t['name'], 0, 1)) . '</span>';
+    return '<div class="testimonial-social-card"' . ($copy ? ' aria-hidden="true"' : '') . '>'
+        . '<div class="testimonial-card-header"><div class="testimonial-author-box">' . $avatar
+        . '<div class="testimonial-author-meta"><span class="testimonial-author-name">' . $e($t['name']) . '</span><span class="testimonial-author-handle">' . $e($t['handle'] ?: $t['role']) . '</span></div></div>'
+        . $badge . '</div><p class="testimonial-text-content">"' . $e(trim((string)$t['quote'], "\" ")) . '"</p></div>';
+};
 ?>
 
 <style>
@@ -288,6 +287,11 @@ $videoClips = [
     border: 1px solid #DBEAFE;
     color: #1877F2;
 }
+
+.badge-tiktok { background: #F8FAFC; border: 1px solid #E2E8F0; color: #000000; }
+.badge-youtube { background: #FEF2F2; border: 1px solid #FEE2E2; color: #FF0000; }
+.badge-google { background: #F0F7FF; border: 1px solid #DBEAFE; color: #4285F4; }
+.badge-website { background: #EEF0FF; border: 1px solid #E0E7FF; color: #4F48E6; }
 
 .testimonial-text-content {
     font-size: 13.5px;
@@ -581,127 +585,9 @@ $videoClips = [
             <!-- Left Column: Vertical Marquee Auto-Scroll (Group A) -->
             <div class="testimonials-marquee-col">
                 <div class="testimonials-marquee-track">
-                    
-                    <!-- Card 1: Daniella O. (Flux.tech - LinkedIn) -->
-                    <div class="testimonial-social-card">
-                        <div class="testimonial-card-header">
-                            <div class="testimonial-author-box">
-                                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80" alt="Daniella O." class="testimonial-avatar-img">
-                                <div class="testimonial-author-meta">
-                                    <span class="testimonial-author-name">Daniella O.</span>
-                                    <span class="testimonial-author-handle">@Flux.tech</span>
-                                </div>
-                            </div>
-                            <div class="testimonial-platform-badge badge-linkedin" title="LinkedIn">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
-                                </svg>
-                            </div>
-                        </div>
-                        <p class="testimonial-text-content">
-                            "The quality of candidates on InternConnect is impressive. We're able to connect with motivated students who have the right skills, attitude, and willingness to learn"
-                        </p>
-                    </div>
-
-                    <!-- Card 2: David M. (Google.com - Instagram) -->
-                    <div class="testimonial-social-card">
-                        <div class="testimonial-card-header">
-                            <div class="testimonial-author-box">
-                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80" alt="David M." class="testimonial-avatar-img">
-                                <div class="testimonial-author-meta">
-                                    <span class="testimonial-author-name">David M.</span>
-                                    <span class="testimonial-author-handle">@Google.com</span>
-                                </div>
-                            </div>
-                            <div class="testimonial-platform-badge badge-instagram" title="Instagram">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
-                                    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
-                                    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" stroke-width="2.5" stroke-linecap="round"/>
-                                </svg>
-                            </div>
-                        </div>
-                        <p class="testimonial-text-content">
-                            "Finding the right intern can take a lot of time, but InternConnect has made the process much more efficient for us. The candidates are ambitious, prepared, and eager to gain real-world experience."
-                        </p>
-                    </div>
-
-                    <!-- Card 3: Anita K. (Prescot LTD - LinkedIn) -->
-                    <div class="testimonial-social-card">
-                        <div class="testimonial-card-header">
-                            <div class="testimonial-author-box">
-                                <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&auto=format&fit=crop&q=80" alt="Anita K." class="testimonial-avatar-img">
-                                <div class="testimonial-author-meta">
-                                    <span class="testimonial-author-name">Anita K.</span>
-                                    <span class="testimonial-author-handle">@AnitaK_design</span>
-                                </div>
-                            </div>
-                            <div class="testimonial-platform-badge badge-linkedin" title="LinkedIn">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
-                                </svg>
-                            </div>
-                        </div>
-                        <p class="testimonial-text-content">
-                            "I really liked how simple the application process was. I could explore different opportunities, understand what employers were looking for, and apply without endless paperwork."
-                        </p>
-                    </div>
-
-                    <!-- Duplicate Cards for Seamless Infinite Vertical Marquee Loop -->
-                    <div class="testimonial-social-card" aria-hidden="true">
-                        <div class="testimonial-card-header">
-                            <div class="testimonial-author-box">
-                                <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80" alt="Daniella O." class="testimonial-avatar-img">
-                                <div class="testimonial-author-meta">
-                                    <span class="testimonial-author-name">Daniella O.</span>
-                                    <span class="testimonial-author-handle">@Flux.tech</span>
-                                </div>
-                            </div>
-                            <div class="testimonial-platform-badge badge-linkedin">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
-                            </div>
-                        </div>
-                        <p class="testimonial-text-content">
-                            "The quality of candidates on InternConnect is impressive. We're able to connect with motivated students who have the right skills, attitude, and willingness to learn"
-                        </p>
-                    </div>
-
-                    <div class="testimonial-social-card" aria-hidden="true">
-                        <div class="testimonial-card-header">
-                            <div class="testimonial-author-box">
-                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80" alt="David M." class="testimonial-avatar-img">
-                                <div class="testimonial-author-meta">
-                                    <span class="testimonial-author-name">David M.</span>
-                                    <span class="testimonial-author-handle">@Google.com</span>
-                                </div>
-                            </div>
-                            <div class="testimonial-platform-badge badge-instagram">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5" stroke-width="2.5" stroke-linecap="round"/></svg>
-                            </div>
-                        </div>
-                        <p class="testimonial-text-content">
-                            "Finding the right intern can take a lot of time, but InternConnect has made the process much more efficient for us. The candidates are ambitious, prepared, and eager to gain real-world experience."
-                        </p>
-                    </div>
-
-                    <div class="testimonial-social-card" aria-hidden="true">
-                        <div class="testimonial-card-header">
-                            <div class="testimonial-author-box">
-                                <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150&auto=format&fit=crop&q=80" alt="Anita K." class="testimonial-avatar-img">
-                                <div class="testimonial-author-meta">
-                                    <span class="testimonial-author-name">Anita K.</span>
-                                    <span class="testimonial-author-handle">@AnitaK_design</span>
-                                </div>
-                            </div>
-                            <div class="testimonial-platform-badge badge-linkedin">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
-                            </div>
-                        </div>
-                        <p class="testimonial-text-content">
-                            "I really liked how simple the application process was. I could explore different opportunities, understand what employers were looking for, and apply without endless paperwork."
-                        </p>
-                    </div>
-
+                    <?php foreach ($tmColumns[0] as $t) { echo $tmCard($t); } ?>
+                    <!-- Duplicates keep the vertical loop seamless -->
+                    <?php foreach ($tmColumns[0] as $t) { echo $tmCard($t, true); } ?>
                 </div>
             </div>
 
@@ -713,7 +599,7 @@ $videoClips = [
 
                 <!-- Story Progress Bars (4 Segments) -->
                 <div class="testimonials-story-bar-wrap">
-                    <?php for ($s = 0; $s < 4; $s++): ?>
+                    <?php for ($s = 0; $s < count($videoClips); $s++): ?>
                         <div class="testimonials-story-seg">
                             <div class="testimonials-story-seg-fill"
                                  :style="activeClip > <?= $s ?> ? 'width: 100%' : (activeClip === <?= $s ?> ? 'width: ' + progress + '%' : 'width: 0%')">
@@ -764,125 +650,8 @@ $videoClips = [
             <!-- Right Column: Vertical Marquee Auto-Scroll (Group B) -->
             <div class="testimonials-marquee-col col-secondary">
                 <div class="testimonials-marquee-track track-alt">
-                    
-                    <!-- Card 4: Sarah A. (Prescot LTD - X) -->
-                    <div class="testimonial-social-card">
-                        <div class="testimonial-card-header">
-                            <div class="testimonial-author-box">
-                                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Sarah A." class="testimonial-avatar-img">
-                                <div class="testimonial-author-meta">
-                                    <span class="testimonial-author-name">Sarah A.</span>
-                                    <span class="testimonial-author-handle">@Prescot LTD</span>
-                                </div>
-                            </div>
-                            <div class="testimonial-platform-badge badge-x" title="X (Twitter)">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                                </svg>
-                            </div>
-                        </div>
-                        <p class="testimonial-text-content">
-                            "The platform makes it easier to find students who are genuinely interested in growing with our team."
-                        </p>
-                    </div>
-
-                    <!-- Card 5: Michael T. (TechStack - X) -->
-                    <div class="testimonial-social-card">
-                        <div class="testimonial-card-header">
-                            <div class="testimonial-author-box">
-                                <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80" alt="Michael T." class="testimonial-avatar-img">
-                                <div class="testimonial-author-meta">
-                                    <span class="testimonial-author-name">Michael T.</span>
-                                    <span class="testimonial-author-handle">@MichaelT_dev</span>
-                                </div>
-                            </div>
-                            <div class="testimonial-platform-badge badge-x" title="X (Twitter)">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                                </svg>
-                            </div>
-                        </div>
-                        <p class="testimonial-text-content">
-                            "InternConnect made my internship search so much easier. I found opportunities that actually matched my skills and career goals, and I could track every application without feeling overwhelmed."
-                        </p>
-                    </div>
-
-                    <!-- Card 6: Grace E. (Creative Minds - Facebook) -->
-                    <div class="testimonial-social-card">
-                        <div class="testimonial-card-header">
-                            <div class="testimonial-author-box">
-                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80" alt="Grace E." class="testimonial-avatar-img">
-                                <div class="testimonial-author-meta">
-                                    <span class="testimonial-author-name">Grace E.</span>
-                                    <span class="testimonial-author-handle">@GraceE_tech</span>
-                                </div>
-                            </div>
-                            <div class="testimonial-platform-badge badge-facebook" title="Facebook">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                                </svg>
-                            </div>
-                        </div>
-                        <p class="testimonial-text-content">
-                            "Before InternConnect, I spent so much time jumping between different job boards. Now I can discover internships, apply quickly, and keep track of my progress in one place."
-                        </p>
-                    </div>
-
-                    <!-- Duplicate Cards for Seamless Infinite Vertical Marquee Loop -->
-                    <div class="testimonial-social-card" aria-hidden="true">
-                        <div class="testimonial-card-header">
-                            <div class="testimonial-author-box">
-                                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Sarah A." class="testimonial-avatar-img">
-                                <div class="testimonial-author-meta">
-                                    <span class="testimonial-author-name">Sarah A.</span>
-                                    <span class="testimonial-author-handle">@Prescot LTD</span>
-                                </div>
-                            </div>
-                            <div class="testimonial-platform-badge badge-x">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                            </div>
-                        </div>
-                        <p class="testimonial-text-content">
-                            "The platform makes it easier to find students who are genuinely interested in growing with our team."
-                        </p>
-                    </div>
-
-                    <div class="testimonial-social-card" aria-hidden="true">
-                        <div class="testimonial-card-header">
-                            <div class="testimonial-author-box">
-                                <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80" alt="Michael T." class="testimonial-avatar-img">
-                                <div class="testimonial-author-meta">
-                                    <span class="testimonial-author-name">Michael T.</span>
-                                    <span class="testimonial-author-handle">@MichaelT_dev</span>
-                                </div>
-                            </div>
-                            <div class="testimonial-platform-badge badge-x">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                            </div>
-                        </div>
-                        <p class="testimonial-text-content">
-                            "InternConnect made my internship search so much easier. I found opportunities that actually matched my skills and career goals, and I could track every application without feeling overwhelmed."
-                        </p>
-                    </div>
-
-                    <div class="testimonial-social-card" aria-hidden="true">
-                        <div class="testimonial-card-header">
-                            <div class="testimonial-author-box">
-                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80" alt="Grace E." class="testimonial-avatar-img">
-                                <div class="testimonial-author-meta">
-                                    <span class="testimonial-author-name">Grace E.</span>
-                                    <span class="testimonial-author-handle">@GraceE_tech</span>
-                                </div>
-                            </div>
-                            <div class="testimonial-platform-badge badge-facebook">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                            </div>
-                        </div>
-                        <p class="testimonial-text-content">
-                            "Before InternConnect, I spent so much time jumping between different job boards. Now I can discover internships, apply quickly, and keep track of my progress in one place."
-                        </p>
-                    </div>
-
+                    <?php foreach ($tmColumns[1] as $t) { echo $tmCard($t); } ?>
+                    <?php foreach ($tmColumns[1] as $t) { echo $tmCard($t, true); } ?>
                 </div>
             </div>
 
@@ -890,8 +659,8 @@ $videoClips = [
 
         <!-- Section Bottom CTA matching View All Opportunities link style -->
         <div class="testimonials-cta-wrap">
-            <a href="<?= url('/internships') ?>" class="testimonials-view-all-link">
-                <span>View All</span>
+            <a href="<?= url('/testimonials') ?>" class="testimonials-view-all-link">
+                <span>View all stories</span>
                 <svg class="testimonials-view-all-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>

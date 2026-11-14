@@ -10,21 +10,33 @@ use App\Services\VideoInterviewService;
 
 /**
  * In-call actions and interview history for employers and candidates.
- * The role comes from the URL prefix (/employer/... or /candidate/...), never from the request body.
+ * The role comes from the URL prefix (/employer/..., /candidate/... or /admin/...), never from the request body.
  * Spec: docs/47-video-interviews.md
  */
 class InterviewController extends Controller
 {
-    private function boot(): void
+    /** Session + ownership: only the interview's own candidate/employer (or an admin) may use its actions. */
+    private function boot(array $params = []): void
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
+        }
+        $id = (int)($params['id'] ?? 0);
+        if ($id > 0 && !VideoInterviewService::accessibleBy($id, $this->role())) {
+            $this->json(['success' => false, 'error' => 'You do not have access to this interview.'], 403);
         }
     }
 
     private function role(): string
     {
         $path = (string)parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+        if (str_contains($path, '/admin/')) {
+            // Admin room actions are only reachable by signed-in staff.
+            if (empty($_SESSION['admin_logged_in'])) {
+                $this->json(['success' => false, 'error' => 'Admin sign-in required.'], 403);
+            }
+            return 'admin';
+        }
         return str_contains($path, '/employer/') ? 'employer' : 'candidate';
     }
 
@@ -45,6 +57,9 @@ class InterviewController extends Controller
 
     private function selfName(array $interview, string $role): string
     {
+        if ($role === 'admin') {
+            return 'InternConnect Admin';
+        }
         return $role === 'employer'
             ? $interview['interviewer_name'] . ' (' . $interview['company_name'] . ')'
             : ($_SESSION['profile_name'] ?? $interview['candidate_name']);
@@ -52,13 +67,16 @@ class InterviewController extends Controller
 
     private function fileUrl(string $role, int $interviewId, int $fileId): string
     {
+        if ($role === 'admin') {
+            return url('/admin/interviews/' . $interviewId . '/files/' . $fileId);
+        }
         return url(($role === 'employer' ? '/employer/interviews/room/' : '/candidate/interview/room/') . $interviewId . '/files/' . $fileId);
     }
 
     /** POST .../room/{id}/event  {event: screen_share_started | screen_share_stopped} */
     public function roomEvent(array $params = []): void
     {
-        $this->boot();
+        $this->boot($params);
         $event = (string)($this->input()['event'] ?? '');
         if (!in_array($event, ['screen_share_started', 'screen_share_stopped', 'time_warning'], true)) {
             $this->json(['success' => false], 422);
@@ -70,7 +88,7 @@ class InterviewController extends Controller
     /** POST .../room/{id}/files  (multipart field "file") */
     public function uploadFile(array $params = []): void
     {
-        $this->boot();
+        $this->boot($params);
         $id = (int)($params['id'] ?? 0);
         $role = $this->role();
         $interview = VideoInterviewService::getInterview($id);
@@ -89,7 +107,7 @@ class InterviewController extends Controller
     /** GET .../room/{id}/files/{fileId} */
     public function downloadFile(array $params = []): void
     {
-        $this->boot();
+        $this->boot($params);
         $meta = VideoInterviewService::fileMeta((int)($params['id'] ?? 0), (int)($params['fileId'] ?? 0));
         UploadStorage::stream($meta, isset($_GET['download']));
     }
@@ -97,7 +115,7 @@ class InterviewController extends Controller
     /** POST .../room/{id}/chat  {body} */
     public function chatMessage(array $params = []): void
     {
-        $this->boot();
+        $this->boot($params);
         $id = (int)($params['id'] ?? 0);
         $interview = VideoInterviewService::getInterview($id);
         $body = trim((string)($this->input()['body'] ?? ''));
@@ -112,7 +130,7 @@ class InterviewController extends Controller
     /** POST /employer/interviews/room/{id}/scorecard */
     public function saveScorecard(array $params = []): void
     {
-        $this->boot();
+        $this->boot($params);
         $saved = VideoInterviewService::saveScorecard((int)($params['id'] ?? 0), $this->input());
         $this->json(['success' => true, 'scorecard' => $saved]);
     }
@@ -120,7 +138,7 @@ class InterviewController extends Controller
     /** POST /employer/interviews/room/{id}/suggest  {asked: [ids], notes} */
     public function suggestQuestions(array $params = []): void
     {
-        $this->boot();
+        $this->boot($params);
         $in = $this->input();
         $asked = array_map('intval', (array)($in['asked'] ?? []));
         $result = VideoInterviewService::suggestQuestions((int)($params['id'] ?? 0), $asked, (string)($in['notes'] ?? ''));
@@ -130,7 +148,7 @@ class InterviewController extends Controller
     /** POST /employer/interviews/{id}/report/ai */
     public function generateSummary(array $params = []): void
     {
-        $this->boot();
+        $this->boot($params);
         $summary = VideoInterviewService::generateSummary((int)($params['id'] ?? 0));
         $summary ? $this->json(['success' => true, 'summary' => $summary]) : $this->json(['success' => false], 404);
     }
@@ -141,7 +159,8 @@ class InterviewController extends Controller
         $this->boot();
         $role = $this->role();
         $id = (int)($params['id'] ?? 0);
-        $report = VideoInterviewService::report($id, $role);
+        // Someone else's report renders as "not found".
+        $report = VideoInterviewService::accessibleBy($id, $role) ? VideoInterviewService::report($id, $role) : null;
         if (!$report) {
             http_response_code(404);
         }

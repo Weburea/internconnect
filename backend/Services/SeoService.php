@@ -42,8 +42,8 @@ class SeoService
     public function __construct()
     {
         $this->siteName = $_ENV['SEO_SITE_NAME'] ?? 'InternConnect';
-        $this->title = $_ENV['SEO_SITE_TITLE_DEFAULT'] ?? 'InternConnect — AI-Powered Internship Platform in Nigeria';
-        $this->description = $_ENV['SEO_DESCRIPTION_DEFAULT'] ?? 'Connecting Nigerian students, interns, and fresh graduates with verified employers. AI matching, resume optimization, and instant interview scheduling.';
+        $this->title = $_ENV['SEO_SITE_TITLE_DEFAULT'] ?? 'InternConnect — AI Internship & Early-Career Platform';
+        $this->description = $_ENV['SEO_DESCRIPTION_DEFAULT'] ?? 'Find verified internships and graduate roles worldwide. Jenny AI matches your skills, polishes your CV and helps you prepare, while employers hire ready-to-work interns.';
         
         $keywordsRaw = $_ENV['SEO_KEYWORDS_DEFAULT'] ?? 'internships in nigeria, student internships lagos, SIWES placement, NYSC jobs, tech internships nigeria';
         $this->keywords = array_filter(array_map('trim', explode(',', $keywordsRaw)));
@@ -199,7 +199,7 @@ class SeoService
             ->name($this->siteName)
             ->url($siteUrl)
             ->logo($this->ogImage)
-            ->description('The leading AI-assisted internship and career acceleration network in Nigeria.')
+            ->description('An AI-assisted internship and early-career platform for students, graduates and employers worldwide.')
             ->address(
                 Schema::postalAddress()
                     ->addressLocality('Lagos')

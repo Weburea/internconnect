@@ -427,13 +427,16 @@ $recruiterFirstName = $employer['first_name'] ?? 'Tunde';
                     <h1 class="emp-ai-title">Jenny AI Talent Assistant</h1>
                     <p class="emp-ai-sub">Your intelligent hiring partner for posting roles, ranking top candidates, and auto-scheduling interviews.</p>
                 </div>
-                <img src="https://res.cloudinary.com/weburea/image/upload/v1793434500/jenny_ai_hi_chat_mafe7r.png" alt="Jenny AI Companion" class="emp-ai-mascot-img" loading="eager">
+                <div style="display: flex; align-items: center; gap: 14px; flex-shrink: 0;">
+                    <?php $coinType = 'employer'; $coinId = (int)($_SESSION['employer_id'] ?? 1); include dirname(__DIR__, 2) . '/shared/components/jenny-coin-pill.php'; ?>
+                    <img src="https://res.cloudinary.com/weburea/image/upload/v1793434500/jenny_ai_hi_chat_mafe7r.png" alt="Jenny AI Companion" class="emp-ai-mascot-img" loading="eager">
+                </div>
             </div>
 
             <!-- ── Hero Action Card ── -->
             <div class="emp-ai-hero-card">
                 <div class="emp-ai-hero-top">
-                    <div class="emp-ai-icon-badge" title="Jenny AI Employer Partner">
+                    <div class="emp-ai-icon-badge" aria-label="Jenny AI Employer Partner">
                         <!-- Official Jenny AI Vector Mark inside Circle Badge -->
                         <svg style="width: 22px; height: 22px; flex-shrink: 0;" viewBox="0 0 74 83" fill="currentColor">
                             <path d="M73.74 32.4627V59.9427C67.93 59.7673 62.2767 61.8422 57.9596 65.7344C53.6426 69.6267 50.9952 75.0356 50.57 80.8327C50.52 81.3027 50.48 81.8327 50.46 82.2827H23.57C23.57 82.0227 23.48 81.7627 23.43 81.5127C20.73 67.1427 16.41 63.2427 0 59.6527V32.6527C13.34 31.5727 27.12 37.6527 36.92 47.9327C46 38.3527 58.99 31.8927 73.74 32.4627Z"/>

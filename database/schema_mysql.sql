@@ -438,5 +438,143 @@ CREATE TABLE IF NOT EXISTS `audit_logs` (
     INDEX `idx_audit_created` (`created_at` DESC)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- =====================================================================
+-- 12. CANDIDATE CV PROFILES & APPLICATION SUBMISSIONS (docs/49-cv-autofill-and-applications.md)
+--     Parsed CV per candidate (Gemini or rules) and each submitted application with private files.
+--     application_submissions merges into `applications` when accounts move fully to MySQL.
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS `candidate_cv_profiles` (
+    `candidate_id` BIGINT UNSIGNED NOT NULL,
+    `file_meta` JSON NULL,
+    `parsed_json` JSON NOT NULL,
+    `source` VARCHAR(16) NOT NULL DEFAULT 'rules',
+    `updated_at` DATETIME NOT NULL,
+    PRIMARY KEY (`candidate_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `application_submissions` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `candidate_id` BIGINT UNSIGNED NOT NULL,
+    `internship_slug` VARCHAR(160) NOT NULL,
+    `internship_title` VARCHAR(200) NOT NULL,
+    `company_name` VARCHAR(200) NOT NULL,
+    `full_name` VARCHAR(120) NOT NULL,
+    `email` VARCHAR(190) NOT NULL,
+    `phone` VARCHAR(40) NOT NULL,
+    `job_title` VARCHAR(160) NOT NULL,
+    `job_company` VARCHAR(160) NOT NULL,
+    `salary_expectation` VARCHAR(40) NULL,
+    `cover_letter` TEXT NULL,
+    `cover_letter_file` JSON NULL,
+    `answers_json` JSON NULL,
+    `links_json` JSON NULL,
+    `resume_file` JSON NULL,
+    `portfolio_file` JSON NULL,
+    `ai_summary` TEXT NULL,
+    `ai_source` VARCHAR(16) NULL,
+    `status` VARCHAR(32) NOT NULL DEFAULT 'Submitted' COMMENT 'Submitted | Under Review | Shortlisted | Interviewing | Offer Extended | Rejected',
+    `submitted_at` DATETIME NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `idx_app_sub_candidate` (`candidate_id`, `submitted_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =====================================================================
+-- 13. BILLING LEDGER & ACTIVE PLANS (docs/08-payment-system.md)
+--     One row per Paystack reference (pending -> success/failed); one current plan per account.
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS `billing_transactions` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `account_type` VARCHAR(16) NOT NULL COMMENT 'candidate | employer',
+    `account_id` BIGINT UNSIGNED NOT NULL,
+    `reference` VARCHAR(100) NOT NULL,
+    `plan` VARCHAR(32) NOT NULL,
+    `cycle` VARCHAR(16) NOT NULL,
+    `amount_kobo` INT UNSIGNED NOT NULL,
+    `currency` CHAR(3) NOT NULL DEFAULT 'NGN',
+    `status` VARCHAR(16) NOT NULL DEFAULT 'pending' COMMENT 'pending | success | failed | abandoned | reversed',
+    `channel` VARCHAR(32) NULL,
+    `card_brand` VARCHAR(32) NULL,
+    `card_last4` VARCHAR(4) NULL,
+    `gateway_response` VARCHAR(255) NULL,
+    `email` VARCHAR(190) NULL,
+    `paid_at` DATETIME NULL,
+    `created_at` DATETIME NOT NULL,
+    `updated_at` DATETIME NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uq_billing_reference` (`reference`),
+    INDEX `idx_billing_tx_account` (`account_type`, `account_id`, `created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `billing_subscriptions` (
+    `account_type` VARCHAR(16) NOT NULL,
+    `account_id` BIGINT UNSIGNED NOT NULL,
+    `plan` VARCHAR(32) NOT NULL,
+    `cycle` VARCHAR(16) NOT NULL,
+    `status` VARCHAR(16) NOT NULL COMMENT 'active (reads as expired after renews_at)',
+    `amount_kobo` INT UNSIGNED NOT NULL,
+    `started_at` DATETIME NOT NULL,
+    `renews_at` DATETIME NOT NULL,
+    `last_reference` VARCHAR(100) NULL,
+    `updated_at` DATETIME NOT NULL,
+    PRIMARY KEY (`account_type`, `account_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =====================================================================
+-- 14. E-LEARNING PARTNERS, PROGRAMS & REFERRALS (docs/50-elearning-partners.md)
+--     Partners (logo, about, hubs, services) shown on /elearning; programs are the cards;
+--     every "Visit Platform & Enroll" click through /elearning/go/{id} is a referral.
+--     Seeded automatically by ElearningService on first use.
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS `elearning_partners` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `slug` VARCHAR(80) NOT NULL,
+    `name` VARCHAR(120) NOT NULL,
+    `tier` VARCHAR(60) NOT NULL,
+    `website` VARCHAR(255) NOT NULL,
+    `logo` VARCHAR(255) NULL COMMENT 'assets/partners/*.png (bundled) or an uploaded file name (UploadStorage kind logo)',
+    `brand_color` CHAR(7) NOT NULL DEFAULT '#4F48E6',
+    `about` TEXT NOT NULL,
+    `hubs` VARCHAR(255) NOT NULL,
+    `services_json` JSON NOT NULL COMMENT '[{name, desc}]',
+    `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+    `sort_order` INT NOT NULL DEFAULT 0,
+    `updated_at` DATETIME NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uq_elearning_partner_slug` (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `elearning_programs` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `partner_id` BIGINT UNSIGNED NOT NULL,
+    `title` VARCHAR(200) NOT NULL,
+    `category` VARCHAR(20) NOT NULL COMMENT 'tech | design | data | business | free',
+    `duration` VARCHAR(80) NOT NULL,
+    `delivery` VARCHAR(120) NOT NULL,
+    `level` VARCHAR(60) NOT NULL,
+    `description` TEXT NOT NULL,
+    `highlights_json` JSON NOT NULL,
+    `outcomes` VARCHAR(255) NOT NULL,
+    `perk` VARCHAR(160) NOT NULL,
+    `perk_code` VARCHAR(40) NOT NULL,
+    `external_url` VARCHAR(255) NOT NULL COMMENT 'https only',
+    `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+    `sort_order` INT NOT NULL DEFAULT 0,
+    `updated_at` DATETIME NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `idx_elp_partner` (`partner_id`),
+    CONSTRAINT `fk_elp_partner` FOREIGN KEY (`partner_id`) REFERENCES `elearning_partners` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `elearning_referrals` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    `program_id` BIGINT UNSIGNED NOT NULL,
+    `partner_id` BIGINT UNSIGNED NOT NULL,
+    `candidate_id` BIGINT UNSIGNED NULL COMMENT 'NULL for visitors who are not signed in',
+    `created_at` DATETIME NOT NULL,
+    PRIMARY KEY (`id`),
+    INDEX `idx_elr_partner` (`partner_id`, `created_at`),
+    INDEX `idx_elr_program` (`program_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 SET FOREIGN_KEY_CHECKS = 1;
 

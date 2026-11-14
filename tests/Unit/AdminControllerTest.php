@@ -413,7 +413,7 @@ class AdminControllerTest extends TestCase
 
         foreach (['overview', 'interns', 'employers', 'ai', 'aiChat', 'elearning', 'subscriptions', 'settingsTeam', 'streamDocument', 'liveSessions'] as $method) {
             $this->assertTrue(
-                (bool) preg_match('/function ' . $method . '\(\): void\s*\{\s*\$this->requireAdminAuth\(\);/', $controllerFile),
+                (bool) preg_match('/function ' . $method . '\([^)]*\): void\s*\{\s*\$this->requireAdminAuth\(\);/', $controllerFile),
                 "{$method}() must call requireAdminAuth() first"
             );
         }
@@ -461,6 +461,6 @@ class AdminControllerTest extends TestCase
 
         // 8. Jenny AI Chat Layout
         $this->assertStringContains('jenny_icon.png', $chatView, 'Chat workspace must include Jenny AI avatar');
-        $this->assertStringContains('attachSampleDoc', $chatView, 'Chat workspace must include attachment action');
+        $this->assertStringContains('handleFileSelect', $chatView, 'Chat workspace must include a real file attachment action');
     }
 }

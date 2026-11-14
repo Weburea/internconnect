@@ -224,7 +224,7 @@ declare(strict_types=1);
                                         </a>
 
                                         <!-- View Posted Internship (Preview) -->
-                                        <a :href="'<?= url('/employer/internships/review') ?>?preview_id=' + item.id" class="emp-icon-action-btn" title="View Posted Internship">
+                                        <a :href="'<?= url('/employer/internships/review') ?>?preview_id=' + item.id" class="emp-icon-action-btn" aria-label="View Posted Internship">
                                             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -233,7 +233,7 @@ declare(strict_types=1);
 
                                         <!-- Options Menu Dropdown for Active Role -->
                                         <div class="emp-card-menu-wrap" style="position: relative;" @click.outside="activeMenuId = (activeMenuId === item.id ? null : activeMenuId)">
-                                            <button type="button" class="emp-icon-action-btn" title="More Actions" @click="activeMenuId = (activeMenuId === item.id ? null : item.id)">
+                                            <button type="button" class="emp-icon-action-btn" aria-label="More Actions" @click="activeMenuId = (activeMenuId === item.id ? null : item.id)">
                                                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
                                                 </svg>
@@ -278,7 +278,7 @@ declare(strict_types=1);
                                         </button>
 
                                         <!-- View Posted Internship -->
-                                        <a :href="'<?= url('/employer/internships/review') ?>?preview_id=' + item.id" class="emp-icon-action-btn" title="View Posted Internship">
+                                        <a :href="'<?= url('/employer/internships/review') ?>?preview_id=' + item.id" class="emp-icon-action-btn" aria-label="View Posted Internship">
                                             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -286,14 +286,14 @@ declare(strict_types=1);
                                         </a>
 
                                         <!-- Reopen Button -->
-                                        <button type="button" class="emp-icon-action-btn" title="Reopen Internship" @click="reopenRole(item)">
+                                        <button type="button" class="emp-icon-action-btn" aria-label="Reopen Internship" @click="reopenRole(item)">
                                             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                             </svg>
                                         </button>
 
                                         <!-- Delete Button -->
-                                        <button type="button" class="emp-icon-action-btn is-danger" title="Delete Listing" @click="promptDelete(item)">
+                                        <button type="button" class="emp-icon-action-btn is-danger" aria-label="Delete Listing" @click="promptDelete(item)">
                                             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>
@@ -308,13 +308,13 @@ declare(strict_types=1);
                                             Finish & Post
                                         </a>
 
-                                        <a :href="'<?= url('/employer/internships/create') ?>?draft_id=' + item.id" class="emp-icon-action-btn" title="Edit Draft">
+                                        <a :href="'<?= url('/employer/internships/create') ?>?draft_id=' + item.id" class="emp-icon-action-btn" aria-label="Edit Draft">
                                             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                             </svg>
                                         </a>
 
-                                        <button type="button" class="emp-icon-action-btn is-danger" title="Delete Draft" @click="promptDelete(item)">
+                                        <button type="button" class="emp-icon-action-btn is-danger" aria-label="Delete Draft" @click="promptDelete(item)">
                                             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                             </svg>

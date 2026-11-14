@@ -30,7 +30,8 @@ $vrPayload = [
     'durationMin' => (int)($room['duration_minutes'] ?? $vrSettings['default_duration_min']),
     'graceMin'    => (int)$vrSettings['grace_min'],
     'earlyMin'    => (int)$vrSettings['join_early_min'],
-    'opensAt'     => !empty($room['timing']['opens_at']) ? (int)$room['timing']['opens_at'] * 1000 : 0,
+    // Only candidates wait for the join window; employers and admins can open the room any time.
+    'opensAt'     => $vrConfig['role'] === 'candidate' && !empty($room['timing']['opens_at']) ? (int)$room['timing']['opens_at'] * 1000 : 0,
     'serverNow'   => time() * 1000,
     'allowFiles'  => (bool)$vrSettings['allow_files'],
     'notFound'    => empty($room['exists']),
@@ -556,7 +557,7 @@ function videoRoom(cfg) {
         describeJoinError(msg) {
             const m = String(msg || '').toLowerCase();
             if (m.includes('payment-method') || m.includes('account')) {
-                return cfg.role === 'employer'
+                return cfg.role !== 'candidate'
                     ? 'The video service account needs attention before calls can start. Please contact InternConnect support.'
                     : 'The video service is temporarily unavailable. Please contact InternConnect support.';
             }
@@ -830,7 +831,7 @@ function videoRoom(cfg) {
                 <label for="vr-cam">Camera</label>
                 <div class="vr-select-wrap">
                     <svg class="vr-select-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                    <select id="vr-cam" class="vr-select" x-model="camId" @change="startPreview()">
+                    <select data-ic-select="dark" id="vr-cam" class="vr-select" x-model="camId" @change="startPreview()">
                         <template x-for="d in cams" :key="d.id"><option :value="d.id" x-text="d.label"></option></template>
                     </select>
                     <svg class="vr-select-caret" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
@@ -840,7 +841,7 @@ function videoRoom(cfg) {
                 <label for="vr-mic">Microphone</label>
                 <div class="vr-select-wrap">
                     <svg class="vr-select-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
-                    <select id="vr-mic" class="vr-select" x-model="micId" @change="startPreview()">
+                    <select data-ic-select="dark" id="vr-mic" class="vr-select" x-model="micId" @change="startPreview()">
                         <template x-for="d in mics" :key="d.id"><option :value="d.id" x-text="d.label"></option></template>
                     </select>
                     <svg class="vr-select-caret" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>

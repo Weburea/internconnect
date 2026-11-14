@@ -50,6 +50,9 @@ function studentOnboardingWizard() {
         resume_name: '',
         resume_size: '',
         fileUploaded: false,
+        // Jenny AI CV read: '' | reading | parsed | failed (docs/49-cv-autofill-and-applications.md)
+        cv_state: '',
+        cv_found: '',
         portfolio: '',
         linkedin: '',
         github: '',
@@ -602,12 +605,38 @@ function studentOnboardingWizard() {
             this.resume_size = sizeInMb + ' MB';
             this.fileUploaded = true;
             this.server_errors = [];
+            this.readResume(file);
+        },
+
+        // Read the CV now so the badge reflects a real parse; the result is reused when signup completes.
+        async readResume(file) {
+            this.cv_state = 'reading';
+            this.cv_found = '';
+            try {
+                const form = new FormData();
+                form.append('resume', file);
+                const res = await fetch(window.INTERN_CV_PARSE_URL || '/register/student/parse-resume', { method: 'POST', headers: { 'Accept': 'application/json' }, body: form });
+                const json = await res.json().catch(() => ({}));
+                if (window.__icOnboardingResume !== file) return; // a different file was chosen meanwhile
+                if (!res.ok || !json.success) throw new Error(json.error || '');
+                const f = json.fields || {};
+                const found = [];
+                if (f.full_name) found.push(f.full_name);
+                if (f.job_title) found.push(f.job_title + (f.company ? ' at ' + f.company : ''));
+                if (Array.isArray(f.skills) && f.skills.length) found.push(f.skills.length + ' skills');
+                this.cv_found = found.join(' · ');
+                this.cv_state = found.length || f.email || f.phone ? 'parsed' : 'failed';
+            } catch (e) {
+                if (window.__icOnboardingResume === file) this.cv_state = 'failed';
+            }
         },
 
         removeSelectedFile() {
             this.resume_name = '';
             this.resume_size = '';
             this.fileUploaded = false;
+            this.cv_state = '';
+            this.cv_found = '';
             window.__icOnboardingResume = null;
             if (this.$refs.fileInput) {
                 this.$refs.fileInput.value = '';

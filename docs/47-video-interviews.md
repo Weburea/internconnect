@@ -21,9 +21,10 @@
 | Employer | `/employer/interviews/{id}/report` | Full report: Jenny AI summary + suggested rating/decision, scorecard and private notes, questions covered, chat, files, activity. |
 | Candidate | `/candidate/interview/invite` | Latest real session: date/time, **Join interview** (platform room), countdown, interview history with "View summary". |
 | Candidate | room / `/candidate/interview/{id}/report` | Lobby, call, agenda, Jenny tips, chat + files. Report shows timeline, files and chat only (no scorecard, no AI assessment). |
-| Admin | `/admin/interviews` | KPIs, **live interview map**, sessions table (filters, View, Mark ready, End room, Reopen, Cancel), **Schedule interview**, video settings, recent activity (last 60 events, filter chips All / Joins / Screens & files / Room & admin, 6 per page) with badges + location + device. |
+| Admin | `/admin/interviews/{id}/room` | **Join as admin** any time (host token, no join window; a closed room is reopened). Drawer: session brief. Also linked as "Join" in the sessions table, "Open video room" on the detail page and the overview's recent sessions. |
+| Admin | `/admin/interviews` | KPIs, **live interview map**, sessions table (10 per page; filters, Join, View, Mark ready, End room, Reopen, Cancel), **Schedule interview**, video settings, recent activity (last 60 events, filter chips All / Joins / Screens & files / Room & admin, 6 per page) with badges + location + device. |
 | Admin | `/admin/interviews/{id}` | Brief: timeline with approximate locations, scores, decision, AI summary, files. No chat content and no private notes. |
-| Admin | `/admin` (overview) | Second map card "Live interviews" next to "Live visitors". |
+| Admin | `/admin` (overview) | Second map card "Live interviews" next to "Live visitors", and **Recent interview sessions** (latest 5, Join / View). |
 
 ## 3. Timing rules (admin settings, `platform_settings` keys `video.*`)
 
@@ -31,10 +32,10 @@
 |---|---|---|
 | `default_duration_min` | 30 | Interview length when the employer does not choose one. |
 | `grace_min` | 1 | Extra wrap-up time after the length, announced to both people. |
-| `join_early_min` | 10 | The room opens this many minutes before `scheduled_at`. Earlier visitors see "Room opens in ..." and Join is disabled until then. |
+| `join_early_min` | 5 | **Candidates only**: the room opens for the candidate this many minutes before `scheduled_at` ("Room opens in ...", Join disabled until then). Employers and admins can open the room any time to prepare. |
 | `video_enabled`, `allow_screenshare`, `allow_chat`, `allow_files` | on | Feature switches. |
 
-In the call (both people): timer counts down; toast at **5 minutes** left; banner + toast at **1 minute** left; at 0 the timer turns red and shows the **extra minute** ("Time is up, the room closes in 00:52"); at the end of the grace minute the call closes for both. The server also sets the Daily room expiry to the same moment, so nobody can stay in. The timer starts at the first join (`interview_rooms.started_at`); a reopened room starts a fresh timer.
+In the call (both people): timer counts down; toast at **5 minutes** left; banner + toast at **1 minute** left; at 0 the timer turns red and shows the **extra minute** ("Time is up, the room closes in 00:52"); at the end of the grace minute the call closes for both. The server also sets the Daily room expiry to the same moment, so nobody can stay in. The timer starts at the first join (`interview_rooms.started_at`), but never before `scheduled_at`: a host who opens the room early does not shorten the interview. A reopened room starts a fresh timer.
 
 ## 4. Inside the room
 
@@ -48,7 +49,7 @@ In the call (both people): timer counts down; toast at **5 minutes** left; banne
 
 ## 5. Jenny AI (Gemini)
 
-- `GeminiClient::json()` tries `GEMINI_MODEL`, then `GEMINI_FALLBACK_MODEL`, then `gemini-flash-lite-latest` (always available), with short timeouts for interactive calls (8s per model) and 15s for summaries.
+- `GeminiClient::json()` tries `GEMINI_MODEL`, then `GEMINI_FALLBACK_MODEL`, then `gemini-flash-lite-latest`. Earlier models are capped at 12s; a model that is overloaded (503/429) or times out is skipped for 5 minutes, a retired one (404) for a day (`storage/cache/gemini-models.json`); the last model gets one quick retry. Files (PDF) can be attached.
 - Uses: question suggestions while preparing (`POST /employer/interviews/suggest-questions`), follow-ups during the call (`POST .../room/{id}/suggest`), and the post-interview summary (`POST /employer/interviews/{id}/report/ai`, `POST /admin/interviews/{id}/report/ai`).
 - Summary = overview, highlights, concerns, suggested rating (1-5), suggested decision (one of the employer's options), confidence. If AI is unavailable, a rule-based summary is built from attendance, questions asked and ratings, and labelled as such. The employer always makes the decision.
 - Not implemented: transcription of the spoken conversation (needs Daily's paid transcription add-on).

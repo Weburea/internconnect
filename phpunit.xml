@@ -1,22 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  InternConnect PHPUnit configuration (PHPUnit 11).
+  Run:  composer test            (all suites)
+        composer test:unit       (no web server needed)
+        composer test:feature    (HTTP checks against TEST_BASE_URL, default http://localhost/InternConnect;
+                                  skipped automatically when the site is not running)
+  Spec: docs/45-testing-api-architecture-and-audit-plan.md section 1
+-->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.0/phpunit.xsd"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          bootstrap="tests/bootstrap.php"
          colors="true"
-         stopOnFailure="false"
-         cacheDirectory=".phpunit.cache">
+         cacheDirectory=".phpunit.cache"
+         failOnRisky="true"
+         failOnWarning="true"
+         displayDetailsOnTestsThatTriggerWarnings="true"
+         displayDetailsOnSkippedTests="true">
     <testsuites>
         <testsuite name="Unit">
-            <directory suffix="Test.php">tests/Unit</directory>
+            <directory suffix="Test.php">tests/PHPUnit/Unit</directory>
         </testsuite>
         <testsuite name="Feature">
-            <directory suffix="Test.php">tests/Feature</directory>
+            <directory suffix="Test.php">tests/PHPUnit/Feature</directory>
         </testsuite>
     </testsuites>
+    <source>
+        <include>
+            <directory suffix=".php">backend</directory>
+        </include>
+    </source>
     <php>
         <env name="APP_ENV" value="testing"/>
-        <env name="DB_CONNECTION" value="sqlite"/>
-        <env name="DB_DATABASE" value=":memory:"/>
+        <env name="TEST_BASE_URL" value="http://localhost/InternConnect" force="false"/>
     </php>
 </phpunit>
-

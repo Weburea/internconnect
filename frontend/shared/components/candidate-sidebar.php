@@ -9,21 +9,11 @@ declare(strict_types=1);
  * @var array  $candidate   Candidate user info (name, role, avatar, plan)
  */
 
-if (isset($_GET['plan'])) {
-    $requestedPlan = strtolower(trim((string)$_GET['plan']));
-    if (in_array($requestedPlan, ['free', 'pro', 'premium'], true)) {
-        $_SESSION['candidate_plan'] = $requestedPlan;
-    }
-}
-
 $candName      = $candidate['name'] ?? ($_SESSION['profile_name'] ?? 'Sarah Peters');
 $candFirstName = explode(' ', trim($candName))[0];
 $candRole      = $candidate['role'] ?? ($_SESSION['profile_role'] ?? 'Student Applicant');
 $candAvatar    = $candidate['avatar'] ?? ($_SESSION['profile_avatar'] ?? asset('assets/images/profile.png'));
-$candPlan      = $_SESSION['candidate_plan'] ?? ($candidate['plan'] ?? 'pro');
-if (!in_array($candPlan, ['free', 'pro', 'premium'], true)) {
-    $candPlan = 'pro';
-}
+$candPlan      = \App\Services\PlanService::candidatePlan();
 $activeNav     = $activeNav ?? 'dashboard';
 
 $isActive = static fn (array $keys): bool => in_array($activeNav, $keys, true);
@@ -143,7 +133,7 @@ $promoKey = 'icPromoClosed_candidate_' . $candPlan;
             <span>Profile Settings</span>
         </a>
 
-        <a href="<?= url('/pricing') ?>" class="db-nav-link <?= $isActive(['billings', 'billing', 'subscription']) ? 'is-active' : '' ?>" <?= $isActive(['billings', 'billing', 'subscription']) ? 'aria-current="page"' : '' ?>>
+        <a href="<?= url('/candidate/billing') ?>" class="db-nav-link <?= $isActive(['billings', 'billing', 'subscription']) ? 'is-active' : '' ?>" <?= $isActive(['billings', 'billing', 'subscription']) ? 'aria-current="page"' : '' ?>>
             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
             </svg>
@@ -192,9 +182,20 @@ $promoKey = 'icPromoClosed_candidate_' . $candPlan;
                 <h4 class="db-promo-dark-title"><span class="db-promo-status-dot"></span>Premium Active</h4>
                 <p class="db-promo-dark-desc">You have full access to high-pay global roles, AI CV improvements, and interview prep.</p>
             <?php endif; ?>
+            <?php $sbCoins = \App\Services\PlanService::coins('candidate', (int)($_SESSION['candidate_id'] ?? 1)); ?>
+            <a href="<?= url('/candidate/ai-assistant/chat') ?>" class="db-promo-coins">
+                <img src="<?= url('assets/images/jenny-coin.svg') ?>" width="22" height="22" alt="">
+                <span><strong><?= $sbCoins['unlimited'] ? 'Unlimited' : (int)$sbCoins['balance'] . ' of ' . (int)$sbCoins['allowance'] ?></strong> Jenny Coins</span>
+            </a>
         </div>
     </div>
 </aside>
+<style>
+    .db-promo-coins { display: flex; align-items: center; gap: 8px; margin-top: 10px; padding: 7px 9px; border-radius: 10px; background: rgba(255, 255, 255, .08); color: #E2E8F0; font-size: 12px; text-decoration: none; }
+    .db-promo-coins:hover { background: rgba(255, 255, 255, .14); }
+    .db-promo-coins img { width: 22px; height: 22px; flex-shrink: 0; }
+    .db-promo-coins strong { color: #FDE68A; }
+</style>
 
 <!-- Global Mobile Sidebar Toggle Script -->
 <script>

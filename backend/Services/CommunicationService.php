@@ -27,6 +27,11 @@ class CommunicationService
 
         try {
             $pdo = Database::getConnection();
+            // MySQL: tables come from database/migrations (php bin/migrate.php); this DDL is SQLite-only.
+            if ((string)$pdo->getAttribute(\PDO::ATTR_DRIVER_NAME) === 'mysql') {
+                self::$tablesInitialized = true;
+                return;
+            }
 
             // 1. Notifications Table
             $pdo->exec("
